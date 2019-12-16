@@ -1,0 +1,18 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/python:3.5
+    steps:
+      - checkout
+      - run:
+          name: Install Dependencies
+          command: |
+            python3 -m venv venv
+            . venv/bin/activate
+            pip install astropy pytest pytest-astropy "setuptools>=30.3"
+      - run:
+          name: Run Tests
+          command: |
+            . venv/bin/activate
+            python setup.py test
