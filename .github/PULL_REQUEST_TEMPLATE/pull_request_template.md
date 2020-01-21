@@ -1,7 +1,7 @@
 ## Description
 
 ## Checklist
-- [ ] follow the contributor guidelines [TODO: LINK]
+- [ ] Follow the [Contributor Guidelines](https://github.com/skypyproject/skypy/blob/develop/CONTRIBUTING.md)
 - [ ] Write unit tests
 - [ ] Write documentation strings
 - [ ] Assign someone from your working team to review this pull request
