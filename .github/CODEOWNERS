@@ -1,0 +1,5 @@
+skypy @skypyproject/skypy-infrastructure
+skypy/linear @skypyproject/linear-developers
+skypy/nonlinear @skypyproject/nonlinear-developers
+skypy/galaxy @skypyproject/galaxy-developers
+
