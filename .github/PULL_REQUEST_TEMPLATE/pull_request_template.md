@@ -1,8 +1,8 @@
-What does this PR do?
+## Description
 
-# PR checklist
+## Checklist
 - [ ] follow the contributor guidelines [TODO: LINK]
 - [ ] Write unit tests
 - [ ] Write documentation strings
-- [ ] Assign someone from your working team to review this PR
-- [ ] Assign someone from the infrastructure team to review this PR
+- [ ] Assign someone from your working team to review this pull request
+- [ ] Assign someone from the infrastructure team to review this pull request
