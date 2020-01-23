@@ -130,4 +130,4 @@ res = graph.calculate(data={'shape': 1, 'scale': 1, 'size': 5})
 ```
 
 ## Decision Outcome
-Pending...
+After [discussion](https://github.com/skypyproject/skypy/pull/38) option 3 has been picked.  This will be easiest for developers to write new functions and write clean unit tests.  Within the example given above `pyungo` was just used as an example, other DAG frameworks exist and picking one should be the topic of a different ADR.
