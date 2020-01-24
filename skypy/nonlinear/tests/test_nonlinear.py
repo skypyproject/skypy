@@ -1,6 +1,6 @@
 from astropy.cosmology import default_cosmology
 import numpy as np
-from skypy.nonlinear.halofit import halofit
+from skypy.nonlinear.power import halofit
 
 
 def test_halofit():
