@@ -29,9 +29,13 @@ def carroll(redshift, cosmology):
     >>> carroll(redshift, cosmology)
     array([0.78136173, 0.47628062, 0.32754955])
 
+    Reference
+    ---------
+    doi : 10.1146/annurev.aa.30.090192.002435
+
     """
     Om = cosmology.Om(redshift)
     Ode = cosmology.Ode(redshift)
     growth = 2.5 * Om / (1 + redshift)
-    growth = growth / (np.power(Om, 4./7.) - Ode + (1+0.5*Om)*(1.+Ode/70.))
+    growth = growth / (np.power(Om, 4.0/7.0) - Ode + (1 + 0.5*Om) * (1.0 + Ode/70.0))
     return growth
