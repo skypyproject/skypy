@@ -2,14 +2,14 @@ import numpy as np
 import camb as _camb
 
 
-def camb(wavenumber, redshift, cosmology):
+def camb(wavenumber, redshift, A_s, n_s, cosmology):
     """ CAMB computation of the linear matter power spectrum, on a two
     dimensional grid of wavenumber and redshift
 
     Parameters
     ----------
     wavenumber : array_like
-        Array of wavenumbers of length nk in units of h Mpc^-1 at which to
+        Array of wavenumbers of length nk in units of Mpc^-1 at which to
         evaluate the linear matter power spectrum.
     cosmology : astropy.cosmology.Cosmology
         Cosmology object providing omega_matter, omega_baryon, Hubble parameter
@@ -33,6 +33,7 @@ def camb(wavenumber, redshift, cosmology):
     h2 = cosmology.h*cosmology.h
 
     # ToDo: ensure astropy.cosmology can fully specify model
+    pars = camb.CAMBparams()
     pars.set_cosmology(H0=cosmology.H0.value,
                         ombh2=cosmology.Ob0*h2,
                         omch2=cosmology.Odm0*h2,
@@ -43,19 +44,24 @@ def camb(wavenumber, redshift, cosmology):
                         #tau=cosmology.tau
                         )
 
-    pars.WantTransfer = True
+    #pars.WantTransfer = True
 
     # check redshifts decreasing (required by camb)
     if redshifts[-1] > redshifts[0]:
         redshifts = redshifts[::-1]
 
-    #pars.InitPower.ns = cosmology.n
+    pars.InitPower.ns = n_s
+    pars.InitPower.As = A_s
     
-    pars.Transfer.PK_num_redshifts = len(list(redshifts))
-    pars.Transfer.PK_redshifts = list(redshifts)
+    #pars.Transfer.PK_num_redshifts = len(list(redshifts))
+    #pars.Transfer.PK_redshifts = list(redshifts)
+
+    pars.set_matter_power(redshifts=list(redshifts), kmax=wavenumber.max())
+
+    pars.NonLinear = _camb.model.NonLinear_none
 
     results = _camb.get_results(pars)
     
-    kh, z, power_spectrum = results.get_matter_power_spectrum(minkh=wavenumber.min(), maxkh=wavenumber.max(), npoints=len(wavenumber))
+    kh, z, power_spectrum = results.get_matter_power_spectrum(minkh=wavenumber.min()*cosmology.h, maxkh=wavenumber.max()*cosmology.h, npoints=len(wavenumber))
 
     return power_spectrum
