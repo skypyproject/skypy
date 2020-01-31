@@ -23,6 +23,10 @@ def test_smail():
     assert np.isclose(dist.ppf(dist.cdf(4.)), 4.)
     assert np.isclose(dist.isf(dist.sf(5.)), 5.)
 
+    # check median matches parameter
+    zm = np.random.rand(10)
+    assert np.allclose(smail.median(zm, 2.0, 1.5), zm)
+
     # check moments
     m, v, s, k = dist.stats(moments='mvsk')
     check_mean_expect(smail, args, m, 'smail')
