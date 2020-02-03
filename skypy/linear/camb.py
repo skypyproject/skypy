@@ -1,8 +1,9 @@
 import numpy as np
 import camb as _camb
+import os
+import pdb
 
-
-def camb(wavenumber, redshift, A_s, n_s, cosmology):
+def camb(wavenumber, redshift, cosmology, A_s, n_s):
     """ CAMB computation of the linear matter power spectrum, on a two
     dimensional grid of wavenumber and redshift
 
@@ -28,12 +29,12 @@ def camb(wavenumber, redshift, A_s, n_s, cosmology):
 
     print('Using CAMB %s installed at %s'%(_camb.__version__,os.path.dirname(_camb.__file__)))
 
-    redshifts = np.atleast_1d(redshifts)
+    redshift = np.atleast_1d(redshift)
 
     h2 = cosmology.h*cosmology.h
 
     # ToDo: ensure astropy.cosmology can fully specify model
-    pars = camb.CAMBparams()
+    pars = _camb.CAMBparams()
     pars.set_cosmology(H0=cosmology.H0.value,
                         ombh2=cosmology.Ob0*h2,
                         omch2=cosmology.Odm0*h2,
@@ -41,27 +42,21 @@ def camb(wavenumber, redshift, A_s, n_s, cosmology):
                         TCMB=cosmology.Tcmb0.value,
                         mnu=np.sum(cosmology.m_nu.value),
                         standard_neutrino_neff=cosmology.Neff
-                        #tau=cosmology.tau
                         )
 
-    #pars.WantTransfer = True
 
-    # check redshifts decreasing (required by camb)
-    if redshifts[-1] > redshifts[0]:
-        redshifts = redshifts[::-1]
+    # check redshift decreasing (required by camb)
+    if redshift[-1] > redshift[0]:
+        redshift = redshift[::-1]
 
     pars.InitPower.ns = n_s
     pars.InitPower.As = A_s
-    
-    #pars.Transfer.PK_num_redshifts = len(list(redshifts))
-    #pars.Transfer.PK_redshifts = list(redshifts)
 
-    pars.set_matter_power(redshifts=list(redshifts), kmax=wavenumber.max())
+    pars.set_matter_power(redshifts=list(redshift), kmax=wavenumber.max())
 
     pars.NonLinear = _camb.model.NonLinear_none
 
     results = _camb.get_results(pars)
     
     kh, z, power_spectrum = results.get_matter_power_spectrum(minkh=wavenumber.min()*cosmology.h, maxkh=wavenumber.max()*cosmology.h, npoints=len(wavenumber))
-
     return power_spectrum
