@@ -4,7 +4,9 @@ import numpy as np
 from skypy.linear.camb import camb
 
 def test_camb():
-
+  '''
+  Test a FlatLambdaCDM cosmology with the default camb parameters
+  '''
   camb_default_cosmology = FlatLambdaCDM(H0=67.5, Om0=(0.122+0.022)/(0.675*0.675), Tcmb0=2.7255, Ob0=0.022/(0.675*0.675), m_nu=[0.0, 0.0, 0.06]*eV)
   redshift = 0.0
   wavenumber = np.logspace(-4.0, np.log10(2.0), 200) # camb wavenumbers are kh

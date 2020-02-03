@@ -4,7 +4,7 @@ import os
 import pdb
 
 def camb(wavenumber, redshift, cosmology, A_s, n_s):
-    """ CAMB computation of the linear matter power spectrum, on a two
+    """ Return the CAMB computation of the linear matter power spectrum, on a two
     dimensional grid of wavenumber and redshift
 
     Parameters
@@ -12,18 +12,36 @@ def camb(wavenumber, redshift, cosmology, A_s, n_s):
     wavenumber : array_like
         Array of wavenumbers of length nk in units of Mpc^-1 at which to
         evaluate the linear matter power spectrum.
+    redshift : numpy.ndarray
+        Array of redshifts at which to evaluate the linear matter power spectrum.
     cosmology : astropy.cosmology.Cosmology
         Cosmology object providing omega_matter, omega_baryon, Hubble parameter
         and CMB temperature in the present day
+    
     Returns
     -------
     power_spectrum : array_like
         Array of values for the linear matter power spectrum evaluated at the
         input wavenumbers for the given primordial power spectrum parameters,
         cosmology
-    References
-    ----------
 
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from astropy.cosmology import default_cosmology
+    >>> cosmology = default_cosmology.get()
+    >>> redshift = np.array([0, 1])
+    >>> wavenumber = np.array([1.e-2, 1.e-1])
+    >>> A_s = 2.e-9
+    >>> n_s = 0.965
+    >>> camb(wavenumber, redshift, cosmology, A_s, n_s)
+    array([[17596.19571205,  9367.99583637],
+           [ 6524.28734592,  3479.62135542]])
+    
+    Reference
+    ---------
+    doi : 10.1086/309179
+    arXiv: astro-ph/9911177
 
     """
 
