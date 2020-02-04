@@ -4,7 +4,7 @@ from scipy.stats.tests.common_tests import (
     check_normalization, check_moment, check_mean_expect, check_var_expect,
     check_skew_expect, check_kurt_expect, check_edge_support,
     check_random_state_property, check_pickling)
-import pytest
+
 
 def test_smail():
     from skypy.galaxy.redshift import smail

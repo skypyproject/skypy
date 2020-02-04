@@ -8,6 +8,7 @@ import numpy as np
 from scipy import stats
 import scipy.special as sc
 
+
 class smail_gen(stats.rv_continuous):
     r'''Redshifts following the Smail et al. (1994) model.
 
@@ -55,8 +56,8 @@ class smail_gen(stats.rv_continuous):
     def _logpdf(self, z, zm, a, b):
         k = (a+1)/b
         z0 = zm/sc.gammainccinv(k, 0.5)**(1/b)
-        l = np.log(b) - np.log(z0) - sc.gammaln(k)
-        return l + sc.xlogy(a, z/z0) - (z/z0)**b
+        lognorm = np.log(b) - np.log(z0) - sc.gammaln(k)
+        return lognorm + sc.xlogy(a, z/z0) - (z/z0)**b
 
     def _cdf(self, z, zm, a, b):
         k = (a+1)/b
@@ -82,5 +83,6 @@ class smail_gen(stats.rv_continuous):
         k = (a+1)/b
         z0 = zm/sc.gammainccinv(k, 0.5)**(1/b)
         return z0**n*np.exp(sc.gammaln((a+n+1)/b) - sc.gammaln(k))
+
 
 smail = smail_gen(a=0., name='smail', shapes='z_median, alpha, beta')
