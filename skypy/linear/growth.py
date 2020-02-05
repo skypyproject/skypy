@@ -1,14 +1,20 @@
+"""Linear growth module.
+This module provides facilities to evaluate the cosmological linear growth
+function and related quantities.
+"""
+
+from astropy.utils import isiterable
 import numpy as np
 
 
-def carroll(redshift, cosmology):
+def growth_function_carroll(redshift, cosmology):
     """
     Return the growth function as a function of redshift for a given cosmology
-    as approximated by Carroll, Press & Turner (1992) Equation. 29.
+    as approximated by Carroll, Press & Turner (1992) Equation 29.
 
     Parameters
     ----------
-    redshift : numpy.ndarray
+    redshift : array_like
         Array of redshifts at which to evaluate the growth function.
     cosmology : astropy.cosmology.Cosmology
         Cosmology object providing methods for the evolution history of
@@ -16,9 +22,9 @@ def carroll(redshift, cosmology):
 
     Returns
     -------
-    growth : numpy.ndarray
-        Array of values for the growth function evaluated at the input
-        redshifts for the given cosmology.
+    growth : numpy.ndarray, or float if input scalar
+        The growth function evaluated at the input redshifts for the given
+        cosmology.
 
     Examples
     --------
@@ -26,7 +32,7 @@ def carroll(redshift, cosmology):
     >>> from astropy.cosmology import default_cosmology
     >>> redshift = np.array([0, 1, 2])
     >>> cosmology = default_cosmology.get()
-    >>> carroll(redshift, cosmology)
+    >>> growth_function_carroll(redshift, cosmology)
     array([0.78136173, 0.47628062, 0.32754955])
 
     Reference
@@ -34,8 +40,12 @@ def carroll(redshift, cosmology):
     doi : 10.1146/annurev.aa.30.090192.002435
 
     """
+    if isiterable(redshift):
+        redshift = np.asarray(redshift)
+    if np.any(redshift < 0):
+        raise ValueError('Redshifts must be non-negative')
+
     Om = cosmology.Om(redshift)
     Ode = cosmology.Ode(redshift)
-    growth = 2.5 * Om / (1 + redshift)
-    growth = growth / (np.power(Om, 4.0/7.0) - Ode + (1 + 0.5*Om) * (1.0 + Ode/70.0))
-    return growth
+    Dz = 2.5 * Om / (1 + redshift)
+    return Dz / (np.power(Om, 4.0/7.0) - Ode + (1 + 0.5*Om) * (1.0 + Ode/70.0))
