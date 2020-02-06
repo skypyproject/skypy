@@ -1,4 +1,4 @@
-from astropy.cosmology import FlatLambdaCDM
+from astropy.cosmology import FlatLambdaCDM, Planck15
 from astropy.units import allclose
 import numpy as np
 import pytest
@@ -25,6 +25,12 @@ def test_carroll():
     Dz_carroll = growth_function_carroll(redshift, cosmology)
     Dz_theory = 1.0 / (1.0 + redshift)
     assert allclose(Dz_carroll, Dz_theory)
+
+    # Test against precomputed values for Planck15
+    redshift = np.linspace(0,5,4)
+    Dz_carroll = growth_function_carroll(redshift, Planck15)
+    Dz_truth = np.array([0.78136173, 0.36635322, 0.22889793, 0.16577711])
+    assert allclose(Dz_carroll, Dz_truth)
 
     # Test for failure when redshift < 0
     negative_redshift_scalar = -1
