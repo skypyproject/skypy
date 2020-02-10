@@ -41,6 +41,22 @@ class smail_gen(stats.rv_continuous):
     ----------
     [1] Smail I., Ellis R. S., Fitchett M. J., 1994, MNRAS, 270, 245
     [2] Amara A., Refregier A., 2007, MNRAS, 381, 1018
+
+    Examples
+    --------
+    >>> from skypy.galaxy.redshift import smail
+
+    Sample 10 random variates from the Smail model with `alpha = 1.5` and
+    `beta = 2` and median redshift `z_median = 1.2`.
+
+    >>> redshift = smail.rvs(1.2, 1.5, 2.0, size=10)
+
+    Fix distribution parameters for repeated use.
+
+    >>> redshift_dist = smail(1.2, 1.5, 2.0)
+    >>> redshift_dist.median()
+    1.2
+    >>> redshift = redshift_dist.rvs(size=10)
     '''
 
     def _rvs(self, zm, a, b):
