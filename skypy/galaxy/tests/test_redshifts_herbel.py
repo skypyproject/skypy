@@ -14,9 +14,6 @@ def test_rescale_luminosity_limit():
     np.testing.assert_allclose(result_func, result)
 
 
-def test_convert_abs_mag_to_lum():
-    assert round(redshift._convert_abs_mag_to_lum(-22), 1) == 630957344.5
-
 
 def test_cdf_redshift():
     cdf = redshift._cdf_redshift(np.array([0.01, 0.5, 1, 2]),
