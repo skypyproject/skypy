@@ -31,6 +31,17 @@ def transfer_with_wiggles(wavenumber, A_s, n_s, cosmology, kwmap=0.02):
         primordial power spectrum parameters A_s and n_s, cosmology and kwmap
         normalization.
 
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from astropy.cosmology import default_cosmology
+    >>> wavenumber = np.logspace(-3, 1, num=5, base=10.0)
+    >>> A_s, n_s = 2.1982e-09, 0.969453
+    >>> cosmology = default_cosmology.get()
+    >>> transfer_with_wiggles(wavenumber, A_s, n_s, cosmology, kwmap=0.02)
+    array([9.92144790e-01, 7.78548704e-01, 1.29998169e-01, 4.63863054e-03,
+       8.87918075e-05])
+
     References
     ----------
         [1] Eisenstein D. J., Hu W., ApJ, 496, 605 (1998)
@@ -139,6 +150,17 @@ def transfer_no_wiggles(wavenumber, A_s, n_s, cosmology):
         Transfer function evaluated at the given wavenumbers for the input
         primordial power spectrum parameters A_s and n_s, cosmology and kwmap
         normalization.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from astropy.cosmology import default_cosmology
+    >>> wavenumber = np.logspace(-3, 1, num=5, base=10.0)
+    >>> A_s, n_s = 2.1982e-09, 0.969453
+    >>> cosmology = default_cosmology.get()
+    >>> transfer_no_wiggles(wavenumber, A_s, n_s, cosmology)
+    array([9.91959695e-01, 7.84518347e-01, 1.32327555e-01, 4.60773671e-03,
+       8.78447096e-05])
 
     References
     ----------
