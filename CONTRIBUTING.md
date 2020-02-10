@@ -62,12 +62,41 @@ When you feel that work on your new feature is complete, you should create a *Pu
 
   1. Go to [SkyPy Pull Requests](https://github.com/skypyproject/skypy/pulls)
   2. Click the green **New pull request** button
-  3. On the Compare page, click **compare across forks**
+  3. Click **compare across forks**
   4. Confirm that the base fork is `skypyproject/skypy` and the base branch is `develop`
   5. Confirm the head fork is `<your-account>/skypy` and the compare branch is `<your-branch-name>`
   6. Give your pull request a title and fill out the the template for the description
   7. Click the green **Create pull request** button
 
-## More Information
+### More Information
 
 More information regarding the usage of GitHub can be found in the [GitHub Guides](https://guides.github.com/).
+
+Coding Guidelines
+-----------------
+
+Before your pull request can be merged into the codebase, it will be reviewed by one of the SkyPy developers and required to pass a number of automated checks. Below are a minimum set of guidelines for developers to follow:
+
+### General Guidelines
+
+- SkyPy is compatible with Python>=3.5 (see [setup.cfg](setup.cfg)). SkyPy *does not* support backwards compatibility with Python 2.x; `six`, `__future__` and `2to3` should not be used.
+- All contributions should follow the [PEP8 Style Guide for Python Code](https://www.python.org/dev/peps/pep-0008/). We recommend using [flake8](https://flake8.pycqa.org/) to check your code for PEP8 compliance.
+- Importing SkyPy should only depend on having [NumPy](https://www.numpy.org), [SciPy](https://www.scipy.org/) and [Astropy](https://www.astropy.org/) installed.
+- Code is grouped into submodules based on broad science areas e.g. [linear](skypy/linear), [nonlinear](skypy/nonlinear) and [galaxy](skypy/galaxy). There is also a [utils](skypy/utils) submodule for general utility functions.
+- For more information see the [Astropy Coding Guidelines](http://docs.astropy.org/en/latest/development/codeguide.html)
+
+### Unit Tests
+
+Pull requests will require existing unit tests to pass before they can be merged. Additionally, new unit tests should be written for all new public methods and functions. Unit tests for each submodule are contained in subdirectories called `tests` and you can run them locally using `python setup.py test`. For more information see the [Astropy Testing Guidelines](https://docs.astropy.org/en/stable/development/testguide.html).
+
+### Docstrings
+
+All public classes, methods and functions require docstrings. You can build documentation locally by installing [sphinx-astropy](https://github.com/astropy/sphinx-astropy) and calling `python setup.py build_docs`. Docstrings should include the following sections:
+
+  - Description
+  - Parameters
+  - Notes
+  - Examples
+  - References
+
+For more information see the Astropy guide to [Writing Documentation](https://docs.astropy.org/en/stable/development/docguide.html).
