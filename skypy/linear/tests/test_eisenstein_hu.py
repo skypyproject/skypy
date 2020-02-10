@@ -50,11 +50,13 @@ def test_eisenstein_hu():
     with pytest.raises(ValueError):
         power_spectrum(negative_wavenumber_scalar, A_s, n_s, cosmology, kwmap,
                        wiggle=True)
+    with pytest.raises(ValueError):
         power_spectrum(negative_wavenumber_scalar, A_s, n_s, cosmology, kwmap,
                        wiggle=False)
     negative_wavenumber_array = [0, 1, -2, 3]
     with pytest.raises(ValueError):
         power_spectrum(negative_wavenumber_array, A_s, n_s, cosmology, kwmap,
                        wiggle=True)
+    with pytest.raises(ValueError):
         power_spectrum(negative_wavenumber_array, A_s, n_s, cosmology, kwmap,
                        wiggle=False)

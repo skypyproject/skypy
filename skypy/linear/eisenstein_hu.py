@@ -22,7 +22,7 @@ def transfer_with_wiggles(wavenumber, A_s, n_s, cosmology, kwmap=0.02):
         Amplitude and spectral index of primordial scalar fluctuations.
     kwmap : float
         WMAP normalization for the amplitude of primordial scalar fluctuations,
-        as described in [3], in units of [Mpc^-1].
+        as described in [3], in units of [Mpc^-1]. Default is 0.02.
 
     Returns
     -------
@@ -190,9 +190,11 @@ def power_spectrum(wavenumber, A_s, n_s, cosmology, kwmap=0.02, wiggle=True):
         and CMB temperature in the present day
     kwmap : float
         WMAP normalization for the amplitude of primordial scalar fluctuations,
-        as described in [3], in units of [Mpc^-1].
+        as described in [3], in units of [Mpc^-1]. Default is 0.02.
     wiggle : bool
         Boolean flag to set the use of baryion acoustic oscilations wiggles.
+        Default is True, for which the power spectrum is computed with the
+        wiggles.
 
     Returns
     -------
