@@ -32,3 +32,9 @@ jobs:
           command: |
             . venv/bin/activate
             python setup.py flake8
+workflows:
+  version: 2
+  build:
+    jobs:
+      - test
+      - flake8
