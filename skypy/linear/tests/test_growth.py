@@ -81,10 +81,10 @@ def test_growth():
     Dz_default = growth.growth_function(zvec, default)
     Dzprime_default = growth.growth_function_derivative(zvec, default)
 
-    precomputed_fz_default = np.array([0.50569209, 0.67584448, 0.79061913,
+    precomputed_fz_default = np.array([0.5255848 , 0.69412802, 0.80439553,
+                                       0.87179376])
+    precomputed_Dz_default = np.array([0.50569209, 0.67584448, 0.79061913,
                                        0.86237487])
-    precomputed_Dz_default = np.array([0.65662148, 0.55390363, 0.47007708,
-                                       0.40418847])
     precomputed_Dzprime_default = np.array([-0.33204829, -0.28076453,
                                             -0.22299116, -0.17428099])
 
