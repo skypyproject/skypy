@@ -34,7 +34,7 @@ def growth_function_carroll(redshift, cosmology):
     >>> redshift = np.array([0, 1, 2])
     >>> cosmology = default_cosmology.get()
     >>> growth_function_carroll(redshift, cosmology)
-    array([0.78136169, 0.47628058, 0.32754952])
+    array([0.78136173, 0.47628062, 0.32754955])
 
     Reference
     ---------
