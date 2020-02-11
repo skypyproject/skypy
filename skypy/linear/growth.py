@@ -9,7 +9,7 @@ from scipy import integrate
 
 
 def growth_function_carroll(redshift, cosmology):
-    """
+    """Computation of the growth function.
     Return the growth function as a function of redshift for a given cosmology
     as approximated by Carroll, Press & Turner (1992) Equation 29.
 
@@ -52,7 +52,7 @@ def growth_function_carroll(redshift, cosmology):
 
 
 def growth_factor(redshift, cosmology, gamma=6.0/11.0):
-    """
+    """Computation of the growth factor.
     Function used to calculate f(z), parametrised growth factor at different
     redshifts, as described in [1].
 
@@ -93,7 +93,7 @@ def growth_factor(redshift, cosmology, gamma=6.0/11.0):
 
 
 def growth_function(redshift, cosmology, gamma=6.0/11.0):
-    """
+    """Computation of the growth function.
     Function used to calculate D(z), growth function at different redshifts,
     as described in [1].
 
@@ -152,7 +152,7 @@ def growth_function(redshift, cosmology, gamma=6.0/11.0):
 
 
 def growth_function_derivative(redshift, cosmology, gamma=6.0/11.0):
-    """
+    """Computation of the first derivative of the growth function.
     Function used to calculate D'(z), derivative of the growth function
     with respect to redshift, described in [1].
 
