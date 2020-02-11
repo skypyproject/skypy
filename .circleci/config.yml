@@ -1,6 +1,6 @@
 version: 2
 jobs:
-  test:
+  unit-tests:
     docker:
       - image: circleci/python:3.5
     steps:
@@ -16,7 +16,7 @@ jobs:
           command: |
             . venv/bin/activate
             python setup.py test
-  flake8:
+  code-style:
     docker:
       - image: circleci/python:3.5
     steps:
@@ -34,7 +34,7 @@ jobs:
             python setup.py flake8
 workflows:
   version: 2
-  build:
+  run_all_checks:
     jobs:
-      - test
-      - flake8
+      - unit-tests
+      - code-style
