@@ -1,6 +1,6 @@
 version: 2
 jobs:
-  build:
+  test:
     docker:
       - image: circleci/python:3.5
     steps:
@@ -16,3 +16,19 @@ jobs:
           command: |
             . venv/bin/activate
             python setup.py test
+  flake8:
+    docker:
+      - image: circleci/python:3.5
+    steps:
+      - checkout
+      - run:
+          name: Install Dependencies
+          command: |
+            python3 -m venv venv
+            . venv/bin/activate
+            pip install flake8 "setuptools>=30.3"
+      - run:
+          name: Run flake8
+          command: |
+            . venv/bin/activate
+            python setup.py flake8
