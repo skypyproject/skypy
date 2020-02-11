@@ -12,6 +12,7 @@ def growth_function_carroll(redshift, cosmology):
     """
     Return the growth function as a function of redshift for a given cosmology
     as approximated by Carroll, Press & Turner (1992) Equation 29.
+
     Parameters
     ----------
     redshift : array_like
@@ -19,11 +20,13 @@ def growth_function_carroll(redshift, cosmology):
     cosmology : astropy.cosmology.Cosmology
         Cosmology object providing methods for the evolution history of
         omega_matter and omega_lambda with redshift.
+
     Returns
     -------
     growth : numpy.ndarray, or float if input scalar
         The growth function evaluated at the input redshifts for the given
         cosmology.
+
     Examples
     --------
     >>> import numpy as np
@@ -31,7 +34,8 @@ def growth_function_carroll(redshift, cosmology):
     >>> redshift = np.array([0, 1, 2])
     >>> cosmology = default_cosmology.get()
     >>> growth_function_carroll(redshift, cosmology)
-    array([0.78136173, 0.47628062, 0.32754955])
+    array([0.78136169, 0.47628058, 0.32754952])
+
     Reference
     ---------
     doi : 10.1146/annurev.aa.30.090192.002435
@@ -51,6 +55,7 @@ def growth_factor(redshift, cosmology, gamma=6.0/11.0):
     """
     Function used to calculate f(z), parametrised growth factor at different
     redshifts, as described in [1].
+
     Parameters
     ----------
     redshift : array_like
@@ -61,10 +66,12 @@ def growth_factor(redshift, cosmology, gamma=6.0/11.0):
     gamma : float
         Growth index providing an efficient parametrization of the matter
         perturbations.
+
     Returns
     -------
     growth_factor : ndarray, or float if input scalar
       The redshift scaling of the growth factor, equation 17 in [1].
+
     Examples
     --------
     >>> import numpy as np
@@ -72,6 +79,7 @@ def growth_factor(redshift, cosmology, gamma=6.0/11.0):
     >>> cosmology = FlatLambdaCDM(H0=67.04, Om0=0.3183, Ob0=0.047745)
     >>> growth_factor(0, cosmology)
     0.5355746155304598
+
     References
     ----------
         [1] E. V. Linder, Phys. Rev. D 72, 043529 (2005)
@@ -88,6 +96,7 @@ def growth_function(redshift, cosmology, gamma=6.0/11.0):
     """
     Function used to calculate D(z), growth function at different redshifts,
     as described in [1].
+
     Parameters
     ----------
     redshift : array_like
@@ -98,10 +107,12 @@ def growth_function(redshift, cosmology, gamma=6.0/11.0):
     gamma : float
         Growth index providing an efficient parametrization of the matter
         perturbations.
+
     Returns
     -------
     growth_function : ndarray
       The redshift scaling of the growth function, equation 16 in [1].
+
     Examples
     --------
     >>> import numpy as np
@@ -110,6 +121,7 @@ def growth_function(redshift, cosmology, gamma=6.0/11.0):
     >>> cosmology = FlatLambdaCDM(H0=67.04, Om0=0.3183, Ob0=0.047745)
     >>> growth_function(0, cosmology)
     0.7909271056297236
+
     References
     ----------
         [1] E. V. Linder, Phys. Rev. D 72, 043529 (2005)
@@ -143,6 +155,7 @@ def growth_function_derivative(redshift, cosmology, gamma=6.0/11.0):
     """
     Function used to calculate D'(z), derivative of the growth function
     with respect to redshift, described in [1].
+
     Parameters
     ----------
     redshift : array_like
@@ -153,11 +166,13 @@ def growth_function_derivative(redshift, cosmology, gamma=6.0/11.0):
     gamma : float
         Growth index providing an efficient parametrization of the matter
         perturbations.
+
     Returns
     -------
     growth_function_derivative : ndarray, or float if input scalar
       The redshift scaling of the derivative of the growth function.
       Analytic expression derived from equation 16 in [1].
+
     Examples
     --------
     >>> import numpy as np
@@ -166,6 +181,7 @@ def growth_function_derivative(redshift, cosmology, gamma=6.0/11.0):
     >>> cosmology = FlatLambdaCDM(H0=67.04, Om0=0.3183, Ob0=0.047745)
     >>> growth_function_derivative(0, cosmology)
     -0.42360048051025856
+
     References
     ----------
         [1] E. V. Linder, Phys. Rev. D 72, 043529 (2005)
