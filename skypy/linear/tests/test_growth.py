@@ -83,10 +83,10 @@ def test_growth():
 
     precomputed_fz_default = np.array([0.5255848 , 0.69412802, 0.80439553,
                                        0.87179376])
-    precomputed_Dz_default = np.array([0.50569209, 0.67584448, 0.79061913,
-                                       0.86237487])
-    precomputed_Dzprime_default = np.array([-0.33204829, -0.28076453,
-                                            -0.22299116, -0.17428099])
+    precomputed_Dz_default = np.array([0.66328939, 0.55638978, 0.4704842 ,
+                                       0.40368459])
+    precomputed_Dzprime_default = np.array([-0.34861482, -0.2896543,
+                                            -0.22707323, -0.17596485])
 
     assert allclose(fz_default, precomputed_fz_default)
     assert allclose(Dz_default, precomputed_Dz_default)
