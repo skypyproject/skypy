@@ -32,7 +32,7 @@ jobs:
           command: |
             . venv/bin/activate
             python setup.py flake8
-  make-docs:
+  build-docs:
     docker:
       - image: circleci/python:3.5
     steps:
@@ -78,3 +78,4 @@ workflows:
     jobs:
       - unit-tests
       - code-style
+      - build-docs
