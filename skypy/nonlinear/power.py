@@ -10,50 +10,52 @@ from scipy import optimize
 
 def halofit(wavenumber, redshift, linear_power_spectrum,
             cosmology, model='Takahashi'):
-    """ This function computes the non-linear halo power spectrum, as a function
-        of redshift and wavenumbers.
-        One can choose from two different models: 'Takahashi' or 'Smith',
-        described in [1] and [2], respectively.
+    """Computation of the non-linear halo power spectrum.
+    This function computes the non-linear halo power spectrum, as a function
+    of redshift and wavenumbers.
+    One can choose from two different models: 'Takahashi' or 'Smith',
+    described in [1] and [2], respectively.
 
-        Parameters
-        ----------
-        k : array_like
-            Imput wavenumbers in units of [Mpc^-1].
-        z : integer or float
-            Input redshifts.
-        P : array_like
-            Linear power spectrum for a single redshift [Mpc^3].
-        cosmology : array_like
-                    Astropy-like cosmology.
-        model : string
-                'Takahashi' (default model),
-                'Smith'.
+    Parameters
+    ----------
+    k : array_like
+        Imput wavenumbers in units of [Mpc^-1].
+    z : integer or float
+        Array of redshifts at which to evaluate the growth function.
+    P : array_like
+        Linear power spectrum for a single redshift [Mpc^3].
+    cosmology : array_like
+                Cosmology object providing methods for the evolution history of
+                omega_matter and omega_lambda with redshift.
+    model : string
+            'Takahashi' (default model),
+            'Smith'.
 
-        Returns
-        -------
-        pknl : array_like
-               Non-linear halo power spectrum, described in [1] or [2], in
-               units of [Mpc^3].
+    Returns
+    -------
+    pknl : array_like
+           Non-linear halo power spectrum, described in [1] or [2], in
+           units of [Mpc^3].
 
+    References
+    ----------
+        [1] R. Takahashi, M. Sato, T. Nishimichi, A. Taruya and M. Oguri,
+            Astrophys. J. 761, 152 (2012).
+        [2] R. E. Smith it et al., VIRGO Consortium,
+            Mon. Not. Roy. Astron. Soc. 341, 1311 (2003).
 
-        References
-        ----------
-            [1] R. Takahashi, M. Sato, T. Nishimichi, A. Taruya and M. Oguri,
-                Astrophys. J. 761, 152 (2012).
-            [2] R. E. Smith it et al., VIRGO Consortium,
-                Mon. Not. Roy. Astron. Soc. 341, 1311 (2003).
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from astropy.cosmology import FlatLambdaCDM
+    >>> kvec = np.array([1.00000000e-04, 1.01000000e+01])
+    >>> zvalue = 0.0
+    >>> pvec = np.array([388.6725682632502, 0.21676249605280398])
+    >>> cosmo = FlatLambdaCDM(H0=67.04, Om0=0.21479, Ob0=0.04895)
+    >>> halofit(kvec, zvalue, pvec, cosmo)
+    array([388.66299997,   3.794662  ])
+    """
 
-        Examples
-        --------
-        >>> import numpy as np
-        >>> from astropy.cosmology import FlatLambdaCDM
-        >>> kvec = np.array([1.00000000e-04, 1.01000000e+01])
-        >>> zvalue = 0.0
-        >>> pvec = np.array([388.6725682632502, 0.21676249605280398])
-        >>> cosmo = FlatLambdaCDM(H0=67.04, Om0=0.21479, Ob0=0.04895)
-        >>> halofit(kvec, zvalue, pvec, cosmo)[0]
-        388.6629999679634
-        """
     # Declaration of variables
     z = redshift
     k = wavenumber
@@ -71,8 +73,6 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
 
     # Equation A4 sigma^2(R)
     def sigma_squared(R):
-        ''' Equation A4, sigma^2(R)
-            '''
         R2 = R * R
 
         def integrand(x):
@@ -84,8 +84,6 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
 
     # First and second derivatives of sigma^2(R), equation A5
     def dln_sigma_squared(R):
-        ''' First derivative of sigma^2(R), c.f.  neff in equation A5
-            '''
         R2 = R * R
 
         def integrand(x):
@@ -96,8 +94,6 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
         return res
 
     def d2ln_sigma_squared(R):
-        ''' Second derivative of sigma^2(R), c.f.  C in equation A5
-            '''
         R2 = R * R
         R4 = R2 * R2
 
@@ -153,14 +149,7 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
         munv = [-3.5442, 0.1908]
         nunv = [0.9589, 1.2857]
     else:
-        anv = [-np.inf, 0.0, 0.0, 0.0, 0.0, 0.0]
-        bnv = [-np.inf, 0.0, 0.0, 0.0]
-        cnv = [-np.inf, 0.0, 0.0, 0.0]
-        gammanv = np.zeros(3)
-        alphanv = np.zeros(4)
-        betanv = np.zeros(6)
-        munv = [-np.inf, 0.0]
-        nunv = [-np.inf, 0.0]
+        raise ValueError('Module should be either \'Takahashi\' or \'Smith\'')
 
     # Parameters
     an = np.power(10, anv[0] + anv[1] * neff + anv[2] * neff2 + anv[3] * neff3
