@@ -75,3 +75,6 @@ workflows:
       - unit-tests
       - code-style
       - build-docs
+notify:
+  webhooks:
+    - url: https://giles.cadair.dev/circleci
