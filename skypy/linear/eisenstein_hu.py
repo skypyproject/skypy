@@ -44,9 +44,9 @@ def transfer_with_wiggles(wavenumber, A_s, n_s, cosmology, kwmap=0.02):
 
     References
     ----------
-        [1] Eisenstein D. J., Hu W., ApJ, 496, 605 (1998)
-        [2] Eisenstein D. J., Hu W., ApJ, 511, 5 (1999)
-        [3] Komatsu et al., ApJS, 180, 330 (2009)
+    .. [1] Eisenstein D. J., Hu W., ApJ, 496, 605 (1998)
+    .. [2] Eisenstein D. J., Hu W., ApJ, 511, 5 (1999)
+    .. [3] Komatsu et al., ApJS, 180, 330 (2009)
     """
 
     if isiterable(wavenumber):
@@ -164,9 +164,9 @@ def transfer_no_wiggles(wavenumber, A_s, n_s, cosmology):
 
     References
     ----------
-        [1] Eisenstein D. J., Hu W., ApJ, 496, 605 (1998)
-        [2] Eisenstein D. J., Hu W., ApJ, 511, 5 (1999)
-        [3] Komatsu et al., ApJS, 180, 330 (2009)
+    .. [1] Eisenstein D. J., Hu W., ApJ, 496, 605 (1998)
+    .. [2] Eisenstein D. J., Hu W., ApJ, 511, 5 (1999)
+    .. [3] Komatsu et al., ApJS, 180, 330 (2009)
     """
 
     if isiterable(wavenumber):
@@ -239,9 +239,9 @@ def power_spectrum(wavenumber, A_s, n_s, cosmology, kwmap=0.02, wiggle=True):
 
     References
     ----------
-        [1] Eisenstein D. J., Hu W., ApJ, 496, 605 (1998)
-        [2] Eisenstein D. J., Hu W., ApJ, 511, 5 (1999)
-        [3] Komatsu et al., ApJS, 180, 330 (2009)
+    .. [1] Eisenstein D. J., Hu W., ApJ, 496, 605 (1998)
+    .. [2] Eisenstein D. J., Hu W., ApJ, 511, 5 (1999)
+    .. [3] Komatsu et al., ApJS, 180, 330 (2009)
     """
     om0 = cosmology.Om0
     h0 = cosmology.H0.value / 100
