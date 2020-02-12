@@ -32,6 +32,46 @@ jobs:
           command: |
             . venv/bin/activate
             python setup.py flake8
+  make-docs:
+    docker:
+      - image: circleci/python:3.5
+    steps:
+      - checkout
+      - run:
+          name: Install Packages
+          command: |
+            sudo apt update
+            sudo apt install -y graphviz
+      - run:
+          name: Install Dependencies
+          command: |
+            python3 -m venv venv
+            . venv/bin/activate
+            pip install sphinx-astropy "setuptools>=30.3"
+      - run:
+          name: Build Docs
+          command: |
+            . venv/bin/activate
+            python setup.py build_docs
+      - run:
+          name: Prepare Upload
+          command: |
+            if [ -z "${CIRCLE_PULL_REQUEST}" ]; then
+              # remove all docs if not a PR
+              rm -r docs/_build/html
+            else
+              # remove extra files if a PR
+              rm -r docs/_build/html/_sources
+              rm -r docs/_build/html/_modules
+              rm -r docs/_build/html/.doctrees
+            fi
+      - store_artifacts:
+          path: docs/_build/html
+      - run:
+          name: "Upload Complete:"
+          command: |
+            DOCS_URL="${CIRCLE_BUILD_URL}/artifacts/${CIRCLE_NODE_INDEX}/${CIRCLE_WORKING_DIRECTORY/#\~/$HOME}/docs/_build/html/index.html"
+            echo $DOCS_URL
 workflows:
   version: 2
   run_all_checks:
