@@ -82,7 +82,7 @@ def growth_factor(redshift, cosmology, gamma=6.0/11.0):
 
     References
     ----------
-        [1] E. V. Linder, Phys. Rev. D 72, 043529 (2005)
+    .. [1] E. V. Linder, Phys. Rev. D 72, 043529 (2005)
     """
     z = redshift
 
@@ -124,7 +124,7 @@ def growth_function(redshift, cosmology, gamma=6.0/11.0):
 
     References
     ----------
-        [1] E. V. Linder, Phys. Rev. D 72, 043529 (2005)
+    .. [1] E. V. Linder, Phys. Rev. D 72, 043529 (2005)
     """
     z = redshift
 
@@ -184,7 +184,7 @@ def growth_function_derivative(redshift, cosmology, gamma=6.0/11.0):
 
     References
     ----------
-        [1] E. V. Linder, Phys. Rev. D 72, 043529 (2005)
+    .. [1] E. V. Linder, Phys. Rev. D 72, 043529 (2005)
     """
     z = redshift
 
