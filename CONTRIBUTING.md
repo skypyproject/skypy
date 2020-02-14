@@ -68,6 +68,28 @@ When you feel that work on your new feature is complete, you should create a *Pu
   6. Give your pull request a title and fill out the the template for the description
   7. Click the green **Create pull request** button
 
+### Updating your branch
+
+As you work on your feature, new commits might be made to the `skypyproject` development branch. You will need to update your branch with these new commits before your pull request can be accepted. You can achieve this in a few different ways:
+
+  - If your pull request has no conflicts, click **Update branch**
+  - If your pull request has conflicts, click **Resolve conflicts**, manually resolve the conflicts and click **Mark as resolved**
+  - *merge* the `skypyproject` development branch from the command line:
+    ```bash
+    git fetch skypyproject
+    git merge skypyproject/develop
+    ```
+  - *rebase* your feature branch onto the `skypyproject` development branch from the command line:
+    ```bash
+    git fetch skypyproject
+    git rebase skypyproject/develop
+    ```
+
+For more information about resolving conflicts see the GitHub guides:
+  - [Resolving a merge conflict on GitHub](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/resolving-a-merge-conflict-on-github)
+  - [Resolving a merge conflict using the command line](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/resolving-a-merge-conflict-using-the-command-line)
+  - [About Git rebase](https://help.github.com/en/github/using-git/about-git-rebase)
+
 ### More Information
 
 More information regarding the usage of GitHub can be found in the [GitHub Guides](https://guides.github.com/).
