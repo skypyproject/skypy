@@ -1,7 +1,5 @@
 name: Pull Request
-
-on: [push, pull_request]
-
+on: [pull_request]
 jobs:
   test:
     name: Unit Tests
@@ -9,7 +7,7 @@ jobs:
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v2
-    - name: Set up Python 3.5
+    - name: Install Python 3.5
       uses: actions/setup-python@v1
       with:
         python-version: 3.5
@@ -26,7 +24,7 @@ jobs:
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v2
-    - name: Set up Python 3.5
+    - name: Install Python 3.5
       uses: actions/setup-python@v1
       with:
         python-version: 3.5
@@ -43,7 +41,7 @@ jobs:
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v2
-    - name: Set up Python 3.5
+    - name: Install Python 3.5
       uses: actions/setup-python@v1
       with:
         python-version: 3.5
