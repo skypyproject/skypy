@@ -2,10 +2,39 @@
     redshift and wavenumbers.
     '''
 
+from collections import namedtuple
 import numpy as np
 from scipy import interpolate
 from scipy.integrate import quad
 from scipy import optimize
+
+_HalofitParameters = namedtuple(
+    'HalofitParameters',
+    ['a', 'b', 'c', 'gamma', 'alpha', 'beta', 'mu', 'nu'])
+
+_smith_parameters = _HalofitParameters(
+    [1.4861, 1.8369, 1.6762, 0.7940, 0.1670, -0.6206],
+    [0.9463, 0.9466, 0.3084, -0.9400],
+    [-0.2807, 0.6669, 0.3214, -0.0793],
+    [0.8649, 0.2989, 0.1631],
+    [1.3884, 0.3700, -0.1452, 0.0],
+    [0.8291, 0.9854, 0.3401, 0.0, 0.0, 0.0],
+    [-3.5442, 0.1908],
+    [0.9589, 1.2857])
+
+_takahashi_parameters = _HalofitParameters(
+    [1.5222, 2.8553, 2.3706, 0.9903, 0.2250, -0.6038],
+    [-0.5642, 0.5864, 0.5716, -1.5474],
+    [0.3698, 2.0404, 0.8161, 0.5869],
+    [0.1971, -0.0843, 0.8460],
+    [6.0835, 1.3373, -0.1959, -5.5274],
+    [2.0379, -0.7354, 0.3157, 1.2490, 0.3980, -0.1682],
+    [-np.inf, 0.0],
+    [5.2105, 3.6902])
+
+_halofit_parameters = {
+    'Smith': _smith_parameters,
+    'Takahashi': _takahashi_parameters}
 
 
 def halofit(wavenumber, redshift, linear_power_spectrum,
@@ -127,42 +156,20 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
     neff4 = neff3 * neff
     c = - s3r
 
-    # Coefficients
-    if model == 'Takahashi':
-        # Equations A6-13
-        anv = [1.5222, 2.8553, 2.3706, 0.9903, 0.2250, -0.6038]
-        bnv = [-0.5642, 0.5864, 0.5716, -1.5474]
-        cnv = [0.3698, 2.0404, 0.8161, 0.5869]
-        gammanv = [0.1971, -0.0843, 0.8460]
-        alphanv = [6.0835, 1.3373, -0.1959, -5.5274]
-        betanv = [2.0379, -0.7354, 0.3157, 1.2490, 0.3980, -0.1682]
-        munv = [-np.inf, 0.0]
-        nunv = [5.2105, 3.6902]
-    elif model == 'Smith':
-        # Equations C9-16
-        anv = [1.4861, 1.8369, 1.6762, 0.7940, 0.1670, -0.6206]
-        bnv = [0.9463, 0.9466, 0.3084, -0.9400]
-        cnv = [-0.2807, 0.6669, 0.3214, -0.0793]
-        gammanv = [0.8649, 0.2989, 0.1631]
-        alphanv = [1.3884, 0.3700, -0.1452, 0.0]
-        betanv = [0.8291, 0.9854, 0.3401, 0.0, 0.0, 0.0]
-        munv = [-3.5442, 0.1908]
-        nunv = [0.9589, 1.2857]
-    else:
-        raise ValueError('Module should be either \'Takahashi\' or \'Smith\'')
+    p = _halofit_parameters[model]
 
     # Parameters
-    an = np.power(10, anv[0] + anv[1] * neff + anv[2] * neff2 + anv[3] * neff3
-                  + anv[4] * neff4 + anv[5] * c)
-    bn = np.power(10, bnv[0] + bnv[1] * neff + bnv[2] * neff2 + bnv[3] * c)
-    cn = np.power(10, cnv[0] + cnv[1] * neff + cnv[2] * neff2 + cnv[3] * c)
-    gamman = gammanv[0] + gammanv[1] * neff + gammanv[2] * c
-    alphan = np.abs(alphanv[0] + alphanv[1] * neff + alphanv[2] * neff2
-                    + alphanv[3] * c)
-    betan = betanv[0] + betanv[1] * neff + betanv[2] * neff2\
-        + betanv[3] * neff3 + betanv[4] * neff4 + betanv[5] * c
-    mun = np.power(10, munv[0] + munv[1] * neff)
-    nun = np.power(10, nunv[0] + nunv[1] * neff)
+    an = np.power(10, p.a[0] + p.a[1] * neff + p.a[2] * neff2 + p.a[3] * neff3
+                  + p.a[4] * neff4 + p.a[5] * c)
+    bn = np.power(10, p.b[0] + p.b[1] * neff + p.b[2] * neff2 + p.b[3] * c)
+    cn = np.power(10, p.c[0] + p.c[1] * neff + p.c[2] * neff2 + p.c[3] * c)
+    gamman = p.gamma[0] + p.gamma[1] * neff + p.gamma[2] * c
+    alphan = np.abs(p.alpha[0] + p.alpha[1] * neff + p.alpha[2] * neff2
+                    + p.alpha[3] * c)
+    betan = p.beta[0] + p.beta[1] * neff + p.beta[2] * neff2\
+        + p.beta[3] * neff3 + p.beta[4] * neff4 + p.beta[5] * c
+    mun = np.power(10, p.mu[0] + p.mu[1] * neff)
+    nun = np.power(10, p.nu[0] + p.nu[1] * neff)
 
     # Equation A14
     f1 = np.power(omega_m_z, -0.0307)
