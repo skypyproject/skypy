@@ -3,39 +3,16 @@ from astropy.cosmology import FlatLambdaCDM
 import scipy.integrate
 
 import skypy.utils.special as special
-import skypy.galaxy.models as model
 import skypy.utils.astronomy as astro
 
 
-def herbel_redshift(low=0.01, high=2.0, size=None, gal_type=None, **kwargs):
+def herbel_redshift(alpha, a_phi, a_m, b_phi, b_m, low=0.0, high=2.0,
+                    size=None, absolute_magnitude_max=-16.0):
     r""" Redshift following the Schechter luminosity function marginalised over
         luminosities following the Herbel et al. (2017) model.
 
     Parameters
     ----------
-    size : int or tuple of ints
-        The number of redshifts to sample. If None one value is sampled.
-    low : float or array_like of floats
-        The lower boundary of teh output interval. All values generated will be
-        greater than or equal to low.
-        It has to be larger than 0. The default value is 0.01.
-    high : float or array_like of floats
-        Upper boundary of output interval. All values generated will be less
-        than high. The default value is 2.0
-    gal_type : str
-        The galaxy type whose redshifts will be sampled. Set 'blue' for blue
-        galaxies according to the model of Herbel et al. (2017). Set 'red' for
-        red galaxies according to the model of Herbel et al. (2017).
-        The default value is None. If None the parameters a_m, b_m, a_phi,
-        b_phi and alpha have to be given.
-
-    Returns
-    -------
-    redshift_sample : ndarray or float
-        Drawn redshifts from the marginalised Schechter luminosity function.
-
-    Other Parameters
-    -------
     alpha : float or scalar
         The alpha parameter in the Schechter luminosity function
     a_phi : float or scalar
@@ -50,11 +27,21 @@ def herbel_redshift(low=0.01, high=2.0, size=None, gal_type=None, **kwargs):
     b_m : float or scalar
         Parametrisation factor of the characteristic absolute magnitude M_* as
         a function of redshift according to Herbel et al. (2017) equation (3.3)
+    low : float or array_like of floats
+        The lower boundary of teh output interval. All values generated will be
+        greater than or equal to low.
+        It has to be larger than 0. The default value is 0.01.
+    high : float or array_like of floats
+        Upper boundary of output interval. All values generated will be less
+        than high. The default value is 2.0
+    size : int or tuple of ints
+        The number of redshifts to sample. If None one value is sampled.
     absolute_magnitude_max : float or scalar.
-        It defines the lower limit of the luminosity. It has to be given
-        because the Schechter luminosity function diverges for L -> 0
-        Cut-off luminosity value such that the Schechter luminosity function
-        does not diverge for L -> 0. The default value is -16.0.
+
+    Returns
+    -------
+    redshift_sample : ndarray or float
+        Drawn redshifts from the marginalised Schechter luminosity function.
 
     Notes
     -------
@@ -104,21 +91,7 @@ def herbel_redshift(low=0.01, high=2.0, size=None, gal_type=None, **kwargs):
 
 
     """
-    if gal_type is None:
-        try:
-            a_m = kwargs['a_m']
-            b_m = kwargs['b_m']
-            a_phi = kwargs['a_phi']
-            b_phi = kwargs['b_phi']
-            alpha = kwargs['alpha']
-        except KeyError:
-            raise ValueError('Not all required parameters are given. '
-                             'You have to give a_m, b_m, a_phi, b_phi '
-                             'and alpha')
-    else:
-        a_m, b_m, a_phi, b_phi, alpha = model._herbel_params(gal_type)
 
-    absolute_magnitude_max = kwargs.get('absolute_magnitude_max', -16.0)
     luminosity_min = astro.convert_abs_mag_to_lum(absolute_magnitude_max)
     redshift = np.linspace(low, high, 10000)
     pdf = _pdf(redshift, alpha, a_phi, a_m, b_phi, b_m, luminosity_min)
@@ -175,28 +148,3 @@ def _pdf(redshift, alpha, a_phi, a_m, b_phi, b_m, luminosity_min):
                                          * 10 ** (0.4 * (
                                                     a_m * redshift + b_m))) \
         * diff_com_el
-
-
-def _rescale_luminosity_limit(redshift, a_m, b_m, luminosity_min):
-    """ Defines a parameter simplifying the calculation of the CDF.
-
-    Parameters
-    ----------
-    redshift : array_like
-            Input redshifts.
-    a_m : float or scalar
-        Parametrisation factor of the characteristic absolute magnitude M_* as
-        a function of redshift according to Herbel et al. (2017) equation (3.3)
-    b_m : float or scalar
-        Parametrisation factor of the characteristic absolute magnitude M_* as
-        a function of redshift according to Herbel et al. (2017) equation (3.3)
-    luminosity_min : float or scalar
-        Cut-off luminosity value such that the Schechter luminosity function
-        diverges for L -> 0
-
-    Returns
-    -------
-    ndarray or scalar
-    Rescaling luminosity to simplify CDF.
-    """
-    return luminosity_min * 10 ** (0.4 * (a_m * redshift + b_m))
