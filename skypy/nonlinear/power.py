@@ -2,7 +2,9 @@
     redshift and wavenumbers.
     '''
 
+from astropy.utils import isiterable
 from collections import namedtuple
+from functools import partial
 import numpy as np
 from scipy import interpolate
 from scipy import integrate
@@ -86,44 +88,61 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
     """
 
     # Declaration of variables
-    z = redshift
-    k = wavenumber
-    P = linear_power_spectrum
+    if isiterable(redshift):
+        redshift = np.asarray(redshift)
+    if isiterable(wavenumber):
+        wavenumber = np.asarray(wavenumber)
+    if isiterable(linear_power_spectrum):
+        linear_power_spectrum = np.asarray(linear_power_spectrum)
+    if np.any(redshift < 0):
+        raise ValueError('Redshifts must be non-negative')
+    if np.any(wavenumber <= 0):
+        raise ValueError('Wavenumbers must be strictly positive')
+    if np.any(linear_power_spectrum < 0):
+        raise ValueError('Linear power spectrum must be non-negative')
+    if not np.all(sorted(wavenumber) == wavenumber):
+        raise ValueError('Wavenumbers must be provided in ascending order')
 
     # Cosmology
-    omega_m_z = cosmology.Om(z)
+    omega_m_z = cosmology.Om(redshift)
 
     # Linear power spectrum
-    k2 = k * k
-    k3 = k2 * k
-    pi2 = np.pi * np.pi
-    dl2_kz = (P * k3) / (2 * pi2)
-    dl2k = interpolate.interp1d(np.log(k), np.log(dl2_kz))
+    k3 = wavenumber * wavenumber * wavenumber
+    dl2_kz = (linear_power_spectrum * k3) / (2 * np.pi * np.pi)
+    dl2k = interpolate.interp1d(np.log(wavenumber), np.log(dl2_kz))
+    lnkmin = np.log(wavenumber[0])
+    lnkmax = np.log(wavenumber[-1])
 
     # Integrals required to evaluate A4 and A5
-    def integral_k0(lnR):
+    def integrand_k0(lnk, lnR):
         R2 = np.exp(2*lnR)
-        def integrand_k0(lnk):
-            k2 = np.exp(2*lnk)
-            dl2 = np.exp(dl2k(lnk))
-            return dl2 * np.exp(-k2*R2)
-        return integrate.quad(integrand_k0, np.log(k[0]), np.log(k[-1]))[0]
+        k2 = np.exp(2*lnk)
+        dl2 = np.exp(dl2k(lnk))
+        return dl2 * np.exp(-k2*R2)
+
+    def integrand_k2(lnk, lnR):
+        R2 = np.exp(2*lnR)
+        k2 = np.exp(2*lnk)
+        dl2 = np.exp(dl2k(lnk))
+        return dl2 * k2 * np.exp(-k2*R2)
+
+    def integrand_k4(lnk, lnR):
+        R2 = np.exp(2*lnR)
+        k2 = np.exp(2*lnk)
+        dl2 = np.exp(dl2k(lnk))
+        return dl2 * k2 * k2 * np.exp(-k2*R2)
+
+    def integral_k0(lnR):
+        integrand = partial(integrand_k0, lnR=lnR)
+        return integrate.quad(integrand, lnkmin, lnkmax)[0]
 
     def integral_k2(lnR):
-        R2 = np.exp(2*lnR)
-        def integrand_k2(lnk):
-            k2 = np.exp(2*lnk)
-            dl2 = np.exp(dl2k(lnk))
-            return dl2 * k2 * np.exp(-k2*R2)
-        return integrate.quad(integrand_k2, np.log(k[0]), np.log(k[-1]))[0]
+        integrand = partial(integrand_k2, lnR=lnR)
+        return integrate.quad(integrand, lnkmin, lnkmax)[0]
 
     def integral_k4(lnR):
-        R2 = np.exp(2*lnR)
-        def integrand_k4(lnk):
-            k2 = np.exp(2*lnk)
-            dl2 = np.exp(dl2k(lnk))
-            return dl2 * k2 *k2 * np.exp(-k2*R2)
-        return integrate.quad(integrand_k4, np.log(k[0]), np.log(k[-1]))[0]
+        integrand = partial(integrand_k4, lnR=lnR)
+        return integrate.quad(integrand, lnkmin, lnkmax)[0]
 
     # Find root at which sigma^2(R) == 1.0, equation A4
     def log_sigma_squared(lnR):
@@ -162,8 +181,7 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
     f3 = np.power(omega_m_z,  0.0743)
 
     # Two-halo term, equation A2
-    y = k / ksigma
-    y2 = y * y
+    y = wavenumber / ksigma
     fy = 0.25 * y + 0.125 * np.square(y)
     dq2 = dl2_kz * (np.power(1 + dl2_kz, betan) / (1 + alphan * dl2_kz))\
         * np.exp(-fy)
@@ -171,9 +189,9 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
     # One-halo term, equation A3
     dh2p = an * np.power(y, 3 * f1)\
         / (1.0 + bn * np.power(y, f2) + np.power(cn * f3 * y, 3 - gamman))
-    dh2 = dh2p / (1.0 + mun / y + nun / y2)
+    dh2 = dh2p / (1.0 + mun / y + nun / (y * y))
 
     # Halofit non-linear power spectrum, equation A1
-    pknl = 2 * pi2 * (dq2 + dh2) / k3
+    pknl = 2 * np.pi * np.pi * (dq2 + dh2) / k3
 
     return pknl.T
