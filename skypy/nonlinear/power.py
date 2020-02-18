@@ -5,7 +5,7 @@
 from collections import namedtuple
 import numpy as np
 from scipy import interpolate
-from scipy.integrate import quad
+from scipy import integrate
 from scipy import optimize
 
 _HalofitParameters = namedtuple(
@@ -98,63 +98,51 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
     k3 = k2 * k
     pi2 = np.pi * np.pi
     dl2_kz = (P * k3) / (2 * pi2)
-    dl2k = interpolate.interp1d(k, dl2_kz)
+    dl2k = interpolate.interp1d(np.log(k), np.log(dl2_kz))
 
-    # Equation A4 sigma^2(R)
-    def sigma_squared(R):
-        R2 = R * R
+    # Integrals required to evaluate A4 and A5
+    def integral_k0(lnR):
+        R2 = np.exp(2*lnR)
+        def integrand_k0(lnk):
+            k2 = np.exp(2*lnk)
+            dl2 = np.exp(dl2k(lnk))
+            return dl2 * np.exp(-k2*R2)
+        return integrate.quad(integrand_k0, np.log(k[0]), np.log(k[-1]))[0]
 
-        def integrand(x):
-            return (dl2k(x) * np.exp(-x * x * R2)) / x
+    def integral_k2(lnR):
+        R2 = np.exp(2*lnR)
+        def integrand_k2(lnk):
+            k2 = np.exp(2*lnk)
+            dl2 = np.exp(dl2k(lnk))
+            return dl2 * k2 * np.exp(-k2*R2)
+        return integrate.quad(integrand_k2, np.log(k[0]), np.log(k[-1]))[0]
 
-        integrand = quad(integrand, k[0], k[-1], limit=100)[0]
+    def integral_k4(lnR):
+        R2 = np.exp(2*lnR)
+        def integrand_k4(lnk):
+            k2 = np.exp(2*lnk)
+            dl2 = np.exp(dl2k(lnk))
+            return dl2 * k2 *k2 * np.exp(-k2*R2)
+        return integrate.quad(integrand_k4, np.log(k[0]), np.log(k[-1]))[0]
 
-        return integrand
+    # Find root at which sigma^2(R) == 1.0, equation A4
+    def log_sigma_squared(lnR):
+        return np.log(integral_k0(lnR))
+    root = optimize.fsolve(log_sigma_squared, 0.0)[0]
 
-    # First and second derivatives of sigma^2(R), equation A5
-    def dln_sigma_squared(R):
-        R2 = R * R
-
-        def integrand(x):
-            return dl2k(x) * np.exp(-x * x * R2) * x
-
-        res = quad(integrand, k[0], k[-1], limit=100)[0]
-        res = -2 * R2 * res / sigma_squared(R)
-        return res
-
-    def d2ln_sigma_squared(R):
-        R2 = R * R
-        R4 = R2 * R2
-
-        term1 = 2 * dln_sigma_squared(R)
-        term2 = - np.power(dln_sigma_squared(R), 2)
-
-        def integrand(x):
-            return dl2k(x) * np.exp(-x * x * R2) * np.power(x, 3)
-        integral3 = quad(integrand, k[0], k[-1], limit=100)[0]
-        term3 = 4 * R4 * integral3 / sigma_squared(R)
-
-        res = term1 + term2 + term3
-        return res
-
-    # Find root at which sigma^2(R) == 1.0
-    def equation(R):
-        equation = sigma_squared(R) - 1.0
-        return equation
-
-    Rroot = optimize.fsolve(equation, 2.0)[0]
-
-    # Evaluation at R = root
-    s2r = dln_sigma_squared(Rroot)
-    s3r = d2ln_sigma_squared(Rroot)
-    ksigma = 1.0 / Rroot
+    # Evaluation at lnR = root
+    ik0 = integral_k0(root)
+    ik2 = integral_k2(root)
+    ik4 = integral_k4(root)
+    R = np.exp(root)
+    ksigma = 1.0 / R
 
     # Effective spectral index neff and curvature C, equation A5
-    neff = (- 3 - s2r)
+    neff = (2 * R * R * ik2 / ik0) - 3
     neff2 = np.square(neff)
     neff3 = neff2 * neff
     neff4 = neff3 * neff
-    c = - s3r
+    c = (4 * R * R / ik0) * (ik2 + R * R * (ik2 * ik2 / ik0 - ik4))
 
     p = _halofit_parameters[model]
 
