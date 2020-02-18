@@ -144,9 +144,8 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
     neff4 = neff3 * neff
     c = (4 * R * R / ik0) * (ik2 + R * R * (ik2 * ik2 / ik0 - ik4))
 
+    # Equations A6-A14
     p = _halofit_parameters[model]
-
-    # Parameters
     an = np.power(10, p.a[0] + p.a[1] * neff + p.a[2] * neff2 + p.a[3] * neff3
                   + p.a[4] * neff4 + p.a[5] * c)
     bn = np.power(10, p.b[0] + p.b[1] * neff + p.b[2] * neff2 + p.b[3] * c)
@@ -158,27 +157,23 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
         + p.beta[3] * neff3 + p.beta[4] * neff4 + p.beta[5] * c
     mun = np.power(10, p.mu[0] + p.mu[1] * neff)
     nun = np.power(10, p.nu[0] + p.nu[1] * neff)
-
-    # Equation A14
     f1 = np.power(omega_m_z, -0.0307)
     f2 = np.power(omega_m_z, -0.0585)
     f3 = np.power(omega_m_z,  0.0743)
 
-    # Equations A1, A2 & A3
+    # Two-halo term, equation A2
     y = k / ksigma
     y2 = y * y
     fy = 0.25 * y + 0.125 * np.square(y)
-
-    # Two-halo contribution
     dq2 = dl2_kz * (np.power(1 + dl2_kz, betan) / (1 + alphan * dl2_kz))\
         * np.exp(-fy)
 
-    # One-halo contribution dh2 and its derivative dh2p
+    # One-halo term, equation A3
     dh2p = an * np.power(y, 3 * f1)\
         / (1.0 + bn * np.power(y, f2) + np.power(cn * f3 * y, 3 - gamman))
     dh2 = dh2p / (1.0 + mun / y + nun / y2)
 
-    # halo power spectrum
+    # Halofit non-linear power spectrum, equation A1
     pknl = 2 * pi2 * (dq2 + dh2) / k3
 
     return pknl.T
