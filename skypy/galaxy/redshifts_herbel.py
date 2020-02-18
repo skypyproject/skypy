@@ -82,7 +82,9 @@ def herbel_redshift(alpha, a_phi, a_m, b_phi, b_m, low=0.0, high=2.0,
     a_m = -0.9408582, b_m = -20.40492365, a_phi = -0.10268436,
     b_phi = 0.00370253, alpha = -1.3.
 
-    >>> redshifts = herbel.herbel_redshift(size=100, gal_type='blue')
+    >>> redshift = herbel.herbel_redshift(size=100000000, low=0.01, alpha=-1.3,
+    ...                     a_phi=-0.10268436,a_m=-0.9408582, b_phi=0.00370253,
+    ...                     b_m=-20.40492365, absolute_magnitude_max=-16.)
 
     References
     -------

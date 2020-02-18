@@ -1,7 +1,6 @@
 import numpy as np
 import skypy.galaxy.redshifts_herbel as redshift
 from unittest.mock import patch
-import pytest
 import scipy.stats
 import scipy.integrate
 
