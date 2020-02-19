@@ -23,5 +23,5 @@ def upper_incomplete_gamma(a, x):
     if a > 0:
         return scipy.special.gammaincc(a, x) * scipy.special.gamma(a)
     return (scipy.special.gammaincc(a + 1, x)
-            - x ** a * np.exp(-x) / scipy.special.gamma(a + 1)) \
+            - np.power(x, a) * np.exp(-x) / scipy.special.gamma(a + 1)) \
         * scipy.special.gamma(a)

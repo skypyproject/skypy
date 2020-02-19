@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def convert_abs_mag_to_lum(absolute_magnitude):
+def luminosity_from_absolute_magnitude(absolute_magnitude):
     """ Converts absolute magnitudes into luminosities
 
     Parameters
@@ -14,10 +14,10 @@ def convert_abs_mag_to_lum(absolute_magnitude):
     Luminosity values.
     """
 
-    return 10 ** (-0.4 * absolute_magnitude)
+    return np.power(10, -0.4*absolute_magnitude)
 
 
-def convert_lum_to_abs_mag(luminosity):
+def absolute_magnitude_from_luminosity(luminosity):
     """
 
     Parameters
