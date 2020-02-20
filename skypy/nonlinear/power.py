@@ -87,6 +87,11 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
     array([388.66299997,   3.794662  ])
     """
 
+    return_shape = np.shape(linear_power_spectrum)
+    redshift = np.atleast_1d(redshift)
+    if np.ndim(linear_power_spectrum) == 1:
+        linear_power_spectrum = linear_power_spectrum[:, np.newaxis]
+
     # Declaration of variables
     if isiterable(redshift):
         redshift = np.asarray(redshift)
@@ -194,4 +199,4 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
     # Halofit non-linear power spectrum, equation A1
     pknl = 2 * np.pi * np.pi * (dq2 + dh2) / k3
 
-    return pknl.T
+    return pknl.T.reshape(return_shape)
