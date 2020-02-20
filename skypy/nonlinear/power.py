@@ -104,56 +104,56 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
         raise ValueError('Wavenumbers must be provided in ascending order')
 
     # Cosmology
-    omega_m_z = cosmology.Om(redshift)
+    omega_m_z = cosmology.Om(redshift)[:, np.newaxis]
 
     # Linear power spectrum
     k3 = wavenumber * wavenumber * wavenumber
-    dl2_kz = (linear_power_spectrum * k3) / (2 * np.pi * np.pi)
-    dl2k = interpolate.interp1d(np.log(wavenumber), np.log(dl2_kz))
+    dl2_kz = (linear_power_spectrum.T * k3) / (2 * np.pi * np.pi)
+    dl2k = [interpolate.interp1d(np.log(wavenumber), np.log(d)) for d in dl2_kz]
     lnkmin = np.log(wavenumber[0])
     lnkmax = np.log(wavenumber[-1])
 
     # Integrals required to evaluate A4 and A5
-    def integrand_k0(lnk, lnR):
+    def integrand_k0(lnk, lnR, lnd):
         R2 = np.exp(2*lnR)
         k2 = np.exp(2*lnk)
-        dl2 = np.exp(dl2k(lnk))
+        dl2 = np.exp(lnd(lnk))
         return dl2 * np.exp(-k2*R2)
 
-    def integrand_k2(lnk, lnR):
+    def integrand_k2(lnk, lnR, lnd):
         R2 = np.exp(2*lnR)
         k2 = np.exp(2*lnk)
-        dl2 = np.exp(dl2k(lnk))
+        dl2 = np.exp(lnd(lnk))
         return dl2 * k2 * np.exp(-k2*R2)
 
-    def integrand_k4(lnk, lnR):
+    def integrand_k4(lnk, lnR, lnd):
         R2 = np.exp(2*lnR)
         k2 = np.exp(2*lnk)
-        dl2 = np.exp(dl2k(lnk))
+        dl2 = np.exp(lnd(lnk))
         return dl2 * k2 * k2 * np.exp(-k2*R2)
 
-    def integral_k0(lnR):
-        integrand = partial(integrand_k0, lnR=lnR)
+    def integral_k0(lnR, lnd):
+        integrand = partial(integrand_k0, lnR=lnR, lnd=lnd)
         return integrate.quad(integrand, lnkmin, lnkmax)[0]
 
-    def integral_k2(lnR):
-        integrand = partial(integrand_k2, lnR=lnR)
+    def integral_k2(lnR, lnd):
+        integrand = partial(integrand_k2, lnR=lnR, lnd=lnd)
         return integrate.quad(integrand, lnkmin, lnkmax)[0]
 
-    def integral_k4(lnR):
-        integrand = partial(integrand_k4, lnR=lnR)
+    def integral_k4(lnR, lnd):
+        integrand = partial(integrand_k4, lnR=lnR, lnd=lnd)
         return integrate.quad(integrand, lnkmin, lnkmax)[0]
 
     # Find root at which sigma^2(R) == 1.0, equation A4
-    def log_sigma_squared(lnR):
-        return np.log(integral_k0(lnR))
-    root = optimize.fsolve(log_sigma_squared, 0.0)[0]
+    def log_sigma_squared(lnRarray):
+        return np.array([np.log(integral_k0(lnR, lnD)) for lnR,lnD in zip(lnRarray, dl2k)])
+    root = optimize.fsolve(log_sigma_squared, np.zeros(np.size(redshift)))
 
     # Evaluation at lnR = root
-    ik0 = integral_k0(root)
-    ik2 = integral_k2(root)
-    ik4 = integral_k4(root)
-    R = np.exp(root)
+    ik0 = np.array([integral_k0(r,d) for r,d in zip(root, dl2k)])[:, np.newaxis]
+    ik2 = np.array([integral_k2(r,d) for r,d in zip(root, dl2k)])[:, np.newaxis]
+    ik4 = np.array([integral_k4(r,d) for r,d in zip(root, dl2k)])[:, np.newaxis]
+    R = np.exp(root)[:, np.newaxis]
     ksigma = 1.0 / R
 
     # Effective spectral index neff and curvature C, equation A5
