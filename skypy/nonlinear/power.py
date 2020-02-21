@@ -49,22 +49,22 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
 
     Parameters
     ----------
-    k : array_like
-        Imput wavenumbers in units of [Mpc^-1].
-    z : integer or float
-        Array of redshifts at which to evaluate the growth function.
-    P : array_like
-        Linear power spectrum for a single redshift [Mpc^3].
-    cosmology : array_like
-                Cosmology object providing methods for the evolution history of
-                omega_matter and omega_lambda with redshift.
+    k : (nk,) array_like
+        Input wavenumbers in units of [Mpc^-1].
+    z : (nz,) array_like
+        Input redshifts
+    P : (nk, nz) array_like
+        Linear power spectrum for given wavenumbers and redshifts [Mpc^3].
+    cosmology : astropy.cosmology.Cosmology
+                Cosmology object providing method for the evolution of
+                omega_matter with redshift.
     model : string
             'Takahashi' (default model),
             'Smith'.
 
     Returns
     -------
-    pknl : array_like
+    pknl : (nk, nz) array_like
            Non-linear halo power spectrum, described in [1] or [2], in
            units of [Mpc^3].
 
@@ -84,9 +84,10 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
     >>> pvec = np.array([388.6725682632502, 0.21676249605280398])
     >>> cosmo = FlatLambdaCDM(H0=67.04, Om0=0.21479, Ob0=0.04895)
     >>> halofit(kvec, zvalue, pvec, cosmo)
-    array([388.66299997,   3.794662  ])
+    array([388.67064424,   0.72797614])
     """
 
+    # Manage shapes of input arrays
     return_shape = np.shape(linear_power_spectrum)
     redshift = np.atleast_1d(redshift)
     if np.ndim(linear_power_spectrum) == 1:
@@ -112,54 +113,39 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
     omega_m_z = cosmology.Om(redshift)[:, np.newaxis]
 
     # Linear power spectrum
-    k3 = wavenumber * wavenumber * wavenumber
-    dl2_kz = (linear_power_spectrum.T * k3) / (2 * np.pi * np.pi)
-    dl2k = [interpolate.interp1d(np.log(wavenumber), np.log(d)) for d in dl2_kz]
-    lnkmin = np.log(wavenumber[0])
-    lnkmax = np.log(wavenumber[-1])
+    k3 = np.power(wavenumber, 3)
+    dl2kz = (linear_power_spectrum.T * k3) / (2 * np.pi * np.pi)
+    dl2k = [interpolate.interp1d(np.log(wavenumber), np.log(d)) for d in dl2kz]
+    low = np.log(wavenumber[0])
+    hi = np.log(wavenumber[-1])
 
     # Integrals required to evaluate A4 and A5
-    def integrand_k0(lnk, lnR, lnd):
+    def integrand_kn(lnk, lnR, lnd, n):
         R2 = np.exp(2*lnR)
         k2 = np.exp(2*lnk)
         dl2 = np.exp(lnd(lnk))
-        return dl2 * np.exp(-k2*R2)
+        return dl2 * np.power(k2, n/2) * np.exp(-k2*R2)
 
-    def integrand_k2(lnk, lnR, lnd):
-        R2 = np.exp(2*lnR)
-        k2 = np.exp(2*lnk)
-        dl2 = np.exp(lnd(lnk))
-        return dl2 * k2 * np.exp(-k2*R2)
+    def integral_kn(lnR, lnd, n, low, hi):
+        integrand = partial(integrand_kn, lnR=lnR, lnd=lnd, n=n)
+        return integrate.quad(integrand, low, hi)[0]
 
-    def integrand_k4(lnk, lnR, lnd):
-        R2 = np.exp(2*lnR)
-        k2 = np.exp(2*lnk)
-        dl2 = np.exp(lnd(lnk))
-        return dl2 * k2 * k2 * np.exp(-k2*R2)
-
-    def integral_k0(lnR, lnd):
-        integrand = partial(integrand_k0, lnR=lnR, lnd=lnd)
-        return integrate.quad(integrand, lnkmin, lnkmax)[0]
-
-    def integral_k2(lnR, lnd):
-        integrand = partial(integrand_k2, lnR=lnR, lnd=lnd)
-        return integrate.quad(integrand, lnkmin, lnkmax)[0]
-
-    def integral_k4(lnR, lnd):
-        integrand = partial(integrand_k4, lnR=lnR, lnd=lnd)
-        return integrate.quad(integrand, lnkmin, lnkmax)[0]
-
-    # Find root at which sigma^2(R) == 1.0, equation A4
-    def log_sigma_squared(lnRarray):
-        return np.array([np.log(integral_k0(lnR, lnD)) for lnR,lnD in zip(lnRarray, dl2k)])
-    root = optimize.fsolve(log_sigma_squared, np.zeros(np.size(redshift)))
-
-    # Evaluation at lnR = root
-    ik0 = np.array([integral_k0(r,d) for r,d in zip(root, dl2k)])[:, np.newaxis]
-    ik2 = np.array([integral_k2(r,d) for r,d in zip(root, dl2k)])[:, np.newaxis]
-    ik4 = np.array([integral_k4(r,d) for r,d in zip(root, dl2k)])[:, np.newaxis]
+    # Find root at which sigma^2(R) == 1.0 for each redshift, equation A4
+    def log_sigma_squared(lnR):
+        ik0 = [integral_kn(r, d, 0, low, hi) for r, d in zip(lnR, dl2k)]
+        return np.log(ik0)
+    guess = np.zeros(np.size(redshift))
+    root = optimize.fsolve(log_sigma_squared, guess)
     R = np.exp(root)[:, np.newaxis]
     ksigma = 1.0 / R
+
+    # Evaluation at lnR = root
+    ik0 = [integral_kn(r, d, 0, low, hi) for r, d in zip(root, dl2k)]
+    ik2 = [integral_kn(r, d, 2, low, hi) for r, d in zip(root, dl2k)]
+    ik4 = [integral_kn(r, d, 4, low, hi) for r, d in zip(root, dl2k)]
+    ik0 = np.array(ik0)[:, np.newaxis]
+    ik2 = np.array(ik2)[:, np.newaxis]
+    ik4 = np.array(ik4)[:, np.newaxis]
 
     # Effective spectral index neff and curvature C, equation A5
     neff = (2 * R * R * ik2 / ik0) - 3
@@ -188,8 +174,7 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
     # Two-halo term, equation A2
     y = wavenumber / ksigma
     fy = 0.25 * y + 0.125 * np.square(y)
-    dq2 = dl2_kz * (np.power(1 + dl2_kz, betan) / (1 + alphan * dl2_kz))\
-        * np.exp(-fy)
+    dq2 = dl2kz * (np.power(1+dl2kz, betan) / (1 + alphan*dl2kz)) * np.exp(-fy)
 
     # One-halo term, equation A3
     dh2p = an * np.power(y, 3 * f1)\

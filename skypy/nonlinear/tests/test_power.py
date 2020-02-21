@@ -15,24 +15,13 @@ def test_halofit():
     cosmo = FlatLambdaCDM(H0=67.04, Om0=0.21479, Ob0=0.04895)
     model = 'Takahashi'
 
-    # Test that inputs have correct shape and type
-    assert isinstance(z, int) or isinstance(z, float),\
-        "The redshift is not a float nor an integer"
-    assert p.shape == k.shape,\
-        "The input power spectrum does not have the same shape as wavenumber"
-    assert isinstance(model, str),\
-        "The model should be a string {\'Takahashi\', \'Smith\'}"
-    if model != 'Takahashi' and model != 'Smith':
-        print(" The model should be a string {\'Takahashi\', \'Smith\'}")
-
     # Test that output is a one-dimensional array
     nl_power = halofit(k, z, p, cosmo, model)
-    assert nl_power.shape == k.shape,\
-        "The power spectrum does not have the same shape as wavenumber"
+    assert nl_power.shape == p.shape
 
     # Test against precomputed values
-    precomputed_halo = np.array([3.88647217e+02, 6.04109819e+03,
-                                 1.69587688e+04, 6.58984953e+02,
-                                 1.11790397e+01])
+    precomputed_halo = np.array([3.88652482e+02, 6.04244677e+03,
+                                 1.71388132e+04, 3.83404914e+02,
+                                 8.64713011e+00])
 
     assert allclose(nl_power, precomputed_halo)
