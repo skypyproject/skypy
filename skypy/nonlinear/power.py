@@ -15,8 +15,8 @@ _HalofitParameters = namedtuple(
     ['a', 'b', 'c', 'gamma', 'alpha', 'beta', 'mu', 'nu'])
 
 _smith_parameters = _HalofitParameters(
-    [0.1670, 0.7940, 1.6762, 1.8369, 1.4861, -0.6206],
-    [0.3084, 0.9466, 0.9463, -0.9400],
+    [0.1670, 0.7940, 1.6762, 1.8369, 1.4861, -0.6206, 0.0],
+    [0.3084, 0.9466, 0.9463, -0.9400, 0.0],
     [0.3214, 0.6669, -0.2807, -0.0793],
     [0.2989, 0.8649, 0.1631],
     [-0.1452, 0.3700, 1.3884, 0.0],
@@ -25,8 +25,8 @@ _smith_parameters = _HalofitParameters(
     [1.2857, 0.9589])
 
 _takahashi_parameters = _HalofitParameters(
-    [0.2250, 0.9903, 2.3706, 2.8553, 1.5222, -0.6038],
-    [0.5716, 0.5864, -0.5642, -1.5474],
+    [0.2250, 0.9903, 2.3706, 2.8553, 1.5222, -0.6038, 0.1749],
+    [0.5716, 0.5864, -0.5642, -1.5474, 0.2279],
     [0.8161, 2.0404, 0.3698, 0.5869],
     [-0.0843, 0.1971, 0.8460],
     [-0.1959, 1.3373, 6.0835, -5.5274],
@@ -111,6 +111,8 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
 
     # Cosmology
     omega_m_z = cosmology.Om(redshift)[:, np.newaxis]
+    omega_w_z = cosmology.Ode(redshift) * (1 + cosmology.w(redshift))
+    omega_w_z = omega_w_z[:, np.newaxis]
 
     # Linear power spectrum
     k3 = np.power(wavenumber, 3)
@@ -153,8 +155,8 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
 
     # Equations A6-A14
     p = _halofit_parameters[model]
-    an = np.power(10, np.polyval(p.a[:5], neff) + p.a[5]*c)
-    bn = np.power(10, np.polyval(p.b[:3], neff) + p.b[3]*c)
+    an = np.power(10, np.polyval(p.a[:5], neff) + p.a[5]*c + p.a[6]*omega_w_z)
+    bn = np.power(10, np.polyval(p.b[:3], neff) + p.b[3]*c + p.a[4]*omega_w_z)
     cn = np.power(10, np.polyval(p.c[:3], neff) + p.c[3]*c)
     gamman = np.polyval(p.gamma[:2], neff) + p.gamma[2]*c
     alphan = np.abs(np.polyval(p.alpha[:3], neff) + p.alpha[3]*c)
