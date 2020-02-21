@@ -15,24 +15,24 @@ _HalofitParameters = namedtuple(
     ['a', 'b', 'c', 'gamma', 'alpha', 'beta', 'mu', 'nu'])
 
 _smith_parameters = _HalofitParameters(
-    [1.4861, 1.8369, 1.6762, 0.7940, 0.1670, -0.6206],
-    [0.9463, 0.9466, 0.3084, -0.9400],
-    [-0.2807, 0.6669, 0.3214, -0.0793],
-    [0.8649, 0.2989, 0.1631],
-    [1.3884, 0.3700, -0.1452, 0.0],
-    [0.8291, 0.9854, 0.3401, 0.0, 0.0, 0.0],
-    [-3.5442, 0.1908],
-    [0.9589, 1.2857])
+    [0.1670, 0.7940, 1.6762, 1.8369, 1.4861, -0.6206],
+    [0.3084, 0.9466, 0.9463, -0.9400],
+    [0.3214, 0.6669, -0.2807, -0.0793],
+    [0.2989, 0.8649, 0.1631],
+    [-0.1452, 0.3700, 1.3884, 0.0],
+    [0.0, 0.0, 0.3401, 0.9854, 0.8291, 0.0],
+    [0.1908, -3.5442],
+    [1.2857, 0.9589])
 
 _takahashi_parameters = _HalofitParameters(
-    [1.5222, 2.8553, 2.3706, 0.9903, 0.2250, -0.6038],
-    [-0.5642, 0.5864, 0.5716, -1.5474],
-    [0.3698, 2.0404, 0.8161, 0.5869],
-    [0.1971, -0.0843, 0.8460],
-    [6.0835, 1.3373, -0.1959, -5.5274],
-    [2.0379, -0.7354, 0.3157, 1.2490, 0.3980, -0.1682],
-    [-np.inf, 0.0],
-    [5.2105, 3.6902])
+    [0.2250, 0.9903, 2.3706, 2.8553, 1.5222, -0.6038],
+    [0.5716, 0.5864, -0.5642, -1.5474],
+    [0.8161, 2.0404, 0.3698, 0.5869],
+    [-0.0843, 0.1971, 0.8460],
+    [-0.1959, 1.3373, 6.0835, -5.5274],
+    [0.3980, 1.2490, 0.3157, -0.7354, 2.0379, -0.1682],
+    [0.0, -np.inf],
+    [3.6902, 5.2105])
 
 _halofit_parameters = {
     'Smith': _smith_parameters,
@@ -149,24 +149,18 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
 
     # Effective spectral index neff and curvature C, equation A5
     neff = (2 * R * R * ik2 / ik0) - 3
-    neff2 = np.square(neff)
-    neff3 = neff2 * neff
-    neff4 = neff3 * neff
     c = (4 * R * R / ik0) * (ik2 + R * R * (ik2 * ik2 / ik0 - ik4))
 
     # Equations A6-A14
     p = _halofit_parameters[model]
-    an = np.power(10, p.a[0] + p.a[1] * neff + p.a[2] * neff2 + p.a[3] * neff3
-                  + p.a[4] * neff4 + p.a[5] * c)
-    bn = np.power(10, p.b[0] + p.b[1] * neff + p.b[2] * neff2 + p.b[3] * c)
-    cn = np.power(10, p.c[0] + p.c[1] * neff + p.c[2] * neff2 + p.c[3] * c)
-    gamman = p.gamma[0] + p.gamma[1] * neff + p.gamma[2] * c
-    alphan = np.abs(p.alpha[0] + p.alpha[1] * neff + p.alpha[2] * neff2
-                    + p.alpha[3] * c)
-    betan = p.beta[0] + p.beta[1] * neff + p.beta[2] * neff2\
-        + p.beta[3] * neff3 + p.beta[4] * neff4 + p.beta[5] * c
-    mun = np.power(10, p.mu[0] + p.mu[1] * neff)
-    nun = np.power(10, p.nu[0] + p.nu[1] * neff)
+    an = np.power(10, np.polyval(p.a[:5], neff) + p.a[5]*c)
+    bn = np.power(10, np.polyval(p.b[:3], neff) + p.b[3]*c)
+    cn = np.power(10, np.polyval(p.c[:3], neff) + p.c[3]*c)
+    gamman = np.polyval(p.gamma[:2], neff) + p.gamma[2]*c
+    alphan = np.abs(np.polyval(p.alpha[:3], neff) + p.alpha[3]*c)
+    betan = np.polyval(p.beta[:5], neff) + p.beta[5]*c
+    mun = np.power(10, np.polyval(p.mu, neff))
+    nun = np.power(10, np.polyval(p.nu, neff))
     f1 = np.power(omega_m_z, -0.0307)
     f2 = np.power(omega_m_z, -0.0585)
     f3 = np.power(omega_m_z,  0.0743)
