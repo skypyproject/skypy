@@ -2,9 +2,9 @@ import numpy as np
 from astropy.cosmology import Planck15
 from astropy.units import allclose
 import pytest
-from skypy.nonlinear.power import halofit_smith
-from skypy.nonlinear.power import halofit_takahashi
-from skypy.nonlinear.power import halofit_bird
+from skypy.nonlinear.halofit import halofit_smith
+from skypy.nonlinear.halofit import halofit_takahashi
+from skypy.nonlinear.halofit import halofit_bird
 
 
 def test_halofit():
