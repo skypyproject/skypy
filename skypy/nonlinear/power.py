@@ -10,12 +10,12 @@ from scipy import interpolate
 from scipy import integrate
 from scipy import optimize
 
-_HalofitParameters = namedtuple(
+HalofitParameters = namedtuple(
     'HalofitParameters',
     ['a', 'b', 'c', 'gamma', 'alpha', 'beta', 'mu', 'nu', 'f',
      'l', 'm', 'p', 'r', 's', 't'])
 
-_smith_parameters = _HalofitParameters(
+_smith_parameters = HalofitParameters(
     [0.1670, 0.7940, 1.6762, 1.8369, 1.4861, -0.6206, 0.0],
     [0.3084, 0.9466, 0.9463, -0.9400, 0.0],
     [0.3214, 0.6669, -0.2807, -0.0793],
@@ -27,7 +27,7 @@ _smith_parameters = _HalofitParameters(
     [-0.0307, -0.0585, 0.0743],
     0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
 
-_takahashi_parameters = _HalofitParameters(
+_takahashi_parameters = HalofitParameters(
     [0.2250, 0.9903, 2.3706, 2.8553, 1.5222, -0.6038, 0.1749],
     [0.5716, 0.5864, -0.5642, -1.5474, 0.2279],
     [0.8161, 2.0404, 0.3698, 0.5869],
@@ -39,7 +39,7 @@ _takahashi_parameters = _HalofitParameters(
     [-0.0307, -0.0585, 0.0743],
     0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
 
-_bird_parameters = _HalofitParameters(
+_bird_parameters = HalofitParameters(
     [0.1670, 0.7940, 1.6762, 1.8369, 1.4861, -0.6206, 0.0],
     [0.3084, 0.9466, 0.9463, -0.9400, 0.0],
     [0.3214, 0.6669, -0.2807, -0.0793],
@@ -51,19 +51,12 @@ _bird_parameters = _HalofitParameters(
     [-0.0307, -0.0585, 0.0743],
     2.080, 1.2e-3, 26.3, -6.49, 1.44, 12.4)
 
-_halofit_parameters = {
-    'Smith': _smith_parameters,
-    'Takahashi': _takahashi_parameters,
-    'Bird': _bird_parameters}
-
 
 def halofit(wavenumber, redshift, linear_power_spectrum,
-            cosmology, model='Takahashi'):
+            cosmology, parameters):
     """Computation of the non-linear halo power spectrum.
     This function computes the non-linear halo power spectrum, as a function
     of redshift and wavenumbers.
-    One can choose from two different models: 'Takahashi' or 'Smith',
-    described in [1] and [2], respectively.
 
     Parameters
     ----------
@@ -76,10 +69,8 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
     cosmology : astropy.cosmology.Cosmology
                 Cosmology object providing method for the evolution of
                 omega_matter with redshift.
-    model : string
-            'Takahashi' (default model),
-            'Smith',
-            'Bird'.
+    parameters : HalofitParameters
+                 namedtuple containing the free parameters of the model.
 
     Returns
     -------
@@ -104,7 +95,7 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
     >>> zvalue = 0.0
     >>> pvec = np.array([388.6725682632502, 0.21676249605280398])
     >>> cosmo = FlatLambdaCDM(H0=67.04, Om0=0.21479, Ob0=0.04895)
-    >>> halofit(kvec, zvalue, pvec, cosmo)
+    >>> halofit(kvec, zvalue, pvec, cosmo, _takahashi_parameters)
     array([388.67064424,   0.72797614])
     """
 
@@ -178,7 +169,7 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
     c = (4 * R * R / ik0) * (ik2 + R * R * (ik2 * ik2 / ik0 - ik4))
 
     # Equations A6-A14
-    p = _halofit_parameters[model]
+    p = parameters
     an = np.power(10, np.polyval(p.a[:5], neff) + p.a[5]*c + p.a[6]*omega_w_z)
     bn = np.power(10, np.polyval(p.b[:3], neff) + p.b[3]*c + p.a[4]*omega_w_z)
     cn = np.power(10, np.polyval(p.c[:3], neff) + p.c[3]*c)
@@ -211,3 +202,8 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
     pknl = 2 * np.pi * np.pi * (dq2 + dh2) / k3
 
     return pknl.T.reshape(return_shape)
+
+
+halofit_smith = partial(halofit, parameters=_smith_parameters)
+halofit_takahashi = partial(halofit, parameters=_takahashi_parameters)
+halofit_bird = partial(halofit, parameters=_bird_parameters)
