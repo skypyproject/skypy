@@ -12,7 +12,8 @@ from scipy import optimize
 
 _HalofitParameters = namedtuple(
     'HalofitParameters',
-    ['a', 'b', 'c', 'gamma', 'alpha', 'beta', 'mu', 'nu', 'f'])
+    ['a', 'b', 'c', 'gamma', 'alpha', 'beta', 'mu', 'nu', 'f',
+     'l', 'm', 'p', 'r', 's', 't'])
 
 _smith_parameters = _HalofitParameters(
     [0.1670, 0.7940, 1.6762, 1.8369, 1.4861, -0.6206, 0.0],
@@ -23,7 +24,8 @@ _smith_parameters = _HalofitParameters(
     [0.0, 0.0, 0.3401, 0.9854, 0.8291, 0.0],
     [0.1908, -3.5442],
     [1.2857, 0.9589],
-    [-0.0307, -0.0585, 0.0743])
+    [-0.0307, -0.0585, 0.0743],
+    0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
 
 _takahashi_parameters = _HalofitParameters(
     [0.2250, 0.9903, 2.3706, 2.8553, 1.5222, -0.6038, 0.1749],
@@ -34,11 +36,25 @@ _takahashi_parameters = _HalofitParameters(
     [0.3980, 1.2490, 0.3157, -0.7354, 2.0379, -0.1682],
     [0.0, -np.inf],
     [3.6902, 5.2105],
-    [-0.0307, -0.0585, 0.0743])
+    [-0.0307, -0.0585, 0.0743],
+    0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+
+_bird_parameters = _HalofitParameters(
+    [0.1670, 0.7940, 1.6762, 1.8369, 1.4861, -0.6206, 0.0],
+    [0.3084, 0.9466, 0.9463, -0.9400, 0.0],
+    [0.3214, 0.6669, -0.2807, -0.0793],
+    [0.2224, 1.18075, -0.6719],
+    [-0.1452, 0.3700, 1.3884, 0.0],
+    [0.0, 0.0, 0.3401, 0.9854, 0.8291, 0.0],
+    [0.1908, -3.5442],
+    [1.2857, 0.9589],
+    [-0.0307, -0.0585, 0.0743],
+    2.080, 1.2e-3, 26.3, -6.49, 1.44, 12.4)
 
 _halofit_parameters = {
     'Smith': _smith_parameters,
-    'Takahashi': _takahashi_parameters}
+    'Takahashi': _takahashi_parameters,
+    'Bird': _bird_parameters}
 
 
 def halofit(wavenumber, redshift, linear_power_spectrum,
@@ -62,7 +78,8 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
                 omega_matter with redshift.
     model : string
             'Takahashi' (default model),
-            'Smith'.
+            'Smith',
+            'Bird'.
 
     Returns
     -------
@@ -72,10 +89,12 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
 
     References
     ----------
-        [1] R. Takahashi, M. Sato, T. Nishimichi, A. Taruya and M. Oguri,
-            Astrophys. J. 761, 152 (2012).
-        [2] R. E. Smith it et al., VIRGO Consortium,
+        [1] R. E. Smith it et al., VIRGO Consortium,
             Mon. Not. Roy. Astron. Soc. 341, 1311 (2003).
+        [2] R. Takahashi, M. Sato, T. Nishimichi, A. Taruya and M. Oguri,
+            Astrophys. J. 761, 152 (2012).
+        [3] S. Bird, M. Viel and M. G. Haehnelt,
+            Mon. Not. Roy. Astron. Soc. 420, 2551 (2012).
 
     Examples
     --------
@@ -115,8 +134,10 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
     omega_m_z = cosmology.Om(redshift)[:, np.newaxis]
     omega_w_z = cosmology.Ode(redshift) * (1 + cosmology.w(redshift))
     omega_w_z = omega_w_z[:, np.newaxis]
+    omega_nu_z = cosmology.Onu(redshift)[:, np.newaxis]
 
     # Linear power spectrum
+    k2 = np.square(wavenumber)
     k3 = np.power(wavenumber, 3)
     dl2kz = (linear_power_spectrum.T * k3) / (2 * np.pi * np.pi)
     dl2k = [interpolate.interp1d(np.log(wavenumber), np.log(d)) for d in dl2kz]
@@ -142,6 +163,7 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
     root = optimize.fsolve(log_sigma_squared, guess)
     R = np.exp(root)[:, np.newaxis]
     ksigma = 1.0 / R
+    y = wavenumber / ksigma
 
     # Evaluation at lnR = root
     ik0 = [integral_kn(r, d, 0, low, hi) for r, d in zip(root, dl2k)]
@@ -169,15 +191,21 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
     f2 = np.power(omega_m_z, p.f[1])
     f3 = np.power(omega_m_z, p.f[2])
 
+    # Massive neutrino terms; Bird et al. 2012 equations A6, A9 and A10
+    fnu = omega_nu_z / omega_m_z
+    Qnu = fnu * (p.l - p.t * (omega_m_z - 0.3)) / (1 + p.m * np.power(y, 3))
+    dl2kz = dl2kz * (1 + (p.p * fnu * k2) / (1 + 1.5 * k2))
+    betan = betan + fnu * (p.r + p.s * np.square(neff))
+
     # Two-halo term, equation A2
-    y = wavenumber / ksigma
     fy = 0.25 * y + 0.125 * np.square(y)
     dq2 = dl2kz * (np.power(1+dl2kz, betan) / (1 + alphan*dl2kz)) * np.exp(-fy)
 
-    # One-halo term, equation A3
+    # One-halo term, Smith et. al. 2003 equations C3 and C4
+    # with massive neutrino factor Q_nu, Bird et al. 2012 equation A7
     dh2p = an * np.power(y, 3 * f1)\
         / (1.0 + bn * np.power(y, f2) + np.power(cn * f3 * y, 3 - gamman))
-    dh2 = dh2p / (1.0 + mun / y + nun / (y * y))
+    dh2 = (1 + Qnu) * dh2p / (1.0 + mun / y + nun / (y * y))
 
     # Halofit non-linear power spectrum, equation A1
     pknl = 2 * np.pi * np.pi * (dq2 + dh2) / k3
