@@ -123,17 +123,18 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
 
     # Cosmology
     omega_m_z = cosmology.Om(redshift)[:, np.newaxis]
-    omega_w_z = cosmology.Ode(redshift) * (1 + cosmology.w(redshift))
-    omega_w_z = omega_w_z[:, np.newaxis]
     omega_nu_z = cosmology.Onu(redshift)[:, np.newaxis]
+    omega_de_z = cosmology.Ode(redshift)[:, np.newaxis]
+    wp1_z = 1.0 + cosmology.w(redshift)[:, np.newaxis]
+    ode_1pw_z = omega_de_z * wp1_z
 
     # Linear power spectrum
     k2 = np.square(wavenumber)
     k3 = np.power(wavenumber, 3)
     dl2kz = (linear_power_spectrum.T * k3) / (2 * np.pi * np.pi)
     dl2k = [interpolate.interp1d(np.log(wavenumber), np.log(d)) for d in dl2kz]
-    low = np.log(wavenumber[0])
-    hi = np.log(wavenumber[-1])
+    lnk_lo = np.log(wavenumber[0])
+    lnk_up = np.log(wavenumber[-1])
 
     # Integrals required to evaluate A4 and A5
     def integrand_kn(lnk, lnR, lnd, n):
@@ -142,13 +143,13 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
         dl2 = np.exp(lnd(lnk))
         return dl2 * np.power(k2, n/2) * np.exp(-k2*R2)
 
-    def integral_kn(lnR, lnd, n, low, hi):
+    def integral_kn(lnR, lnd, n, lnk_lo, lnk_up):
         integrand = partial(integrand_kn, lnR=lnR, lnd=lnd, n=n)
-        return integrate.quad(integrand, low, hi)[0]
+        return integrate.quad(integrand, lnk_lo, lnk_up)[0]
 
     # Find root at which sigma^2(R) == 1.0 for each redshift, equation A4
     def log_sigma_squared(lnR):
-        ik0 = [integral_kn(r, d, 0, low, hi) for r, d in zip(lnR, dl2k)]
+        ik0 = [integral_kn(r, d, 0, lnk_lo, lnk_up) for r, d in zip(lnR, dl2k)]
         return np.log(ik0)
     guess = np.zeros(np.size(redshift))
     root = optimize.fsolve(log_sigma_squared, guess)
@@ -157,12 +158,12 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
     y = wavenumber / ksigma
 
     # Evaluation at lnR = root
-    ik0 = [integral_kn(r, d, 0, low, hi) for r, d in zip(root, dl2k)]
-    ik2 = [integral_kn(r, d, 2, low, hi) for r, d in zip(root, dl2k)]
-    ik4 = [integral_kn(r, d, 4, low, hi) for r, d in zip(root, dl2k)]
-    ik0 = np.array(ik0)[:, np.newaxis]
-    ik2 = np.array(ik2)[:, np.newaxis]
-    ik4 = np.array(ik4)[:, np.newaxis]
+    ik0 = [integral_kn(r, d, 0, lnk_lo, lnk_up) for r, d in zip(root, dl2k)]
+    ik2 = [integral_kn(r, d, 2, lnk_lo, lnk_up) for r, d in zip(root, dl2k)]
+    ik4 = [integral_kn(r, d, 4, lnk_lo, lnk_up) for r, d in zip(root, dl2k)]
+    ik0 = np.asarray(ik0)[:, np.newaxis]
+    ik2 = np.asarray(ik2)[:, np.newaxis]
+    ik4 = np.asarray(ik4)[:, np.newaxis]
 
     # Effective spectral index neff and curvature C, equation A5
     neff = (2 * R * R * ik2 / ik0) - 3
@@ -170,17 +171,15 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
 
     # Equations A6-A14
     p = parameters
-    an = np.power(10, np.polyval(p.a[:5], neff) + p.a[5]*c + p.a[6]*omega_w_z)
-    bn = np.power(10, np.polyval(p.b[:3], neff) + p.b[3]*c + p.a[4]*omega_w_z)
+    an = np.power(10, np.polyval(p.a[:5], neff) + p.a[5]*c + p.a[6]*ode_1pw_z)
+    bn = np.power(10, np.polyval(p.b[:3], neff) + p.b[3]*c + p.a[4]*ode_1pw_z)
     cn = np.power(10, np.polyval(p.c[:3], neff) + p.c[3]*c)
     gamman = np.polyval(p.gamma[:2], neff) + p.gamma[2]*c
     alphan = np.abs(np.polyval(p.alpha[:3], neff) + p.alpha[3]*c)
     betan = np.polyval(p.beta[:5], neff) + p.beta[5]*c
     mun = np.power(10, np.polyval(p.mu, neff))
     nun = np.power(10, np.polyval(p.nu, neff))
-    f1 = np.power(omega_m_z, p.f[0])
-    f2 = np.power(omega_m_z, p.f[1])
-    f3 = np.power(omega_m_z, p.f[2])
+    f = np.power(omega_m_z, np.asarray(p.f)[:, np.newaxis, np.newaxis])
 
     # Massive neutrino terms; Bird et al. 2012 equations A6, A9 and A10
     fnu = omega_nu_z / omega_m_z
@@ -194,8 +193,8 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
 
     # One-halo term, Smith et. al. 2003 equations C3 and C4
     # with massive neutrino factor Q_nu, Bird et al. 2012 equation A7
-    dh2p = an * np.power(y, 3 * f1)\
-        / (1.0 + bn * np.power(y, f2) + np.power(cn * f3 * y, 3 - gamman))
+    dh2p = an * np.power(y, 3 * f[0])\
+        / (1.0 + bn * np.power(y, f[1]) + np.power(cn * f[2] * y, 3 - gamman))
     dh2 = (1 + Qnu) * dh2p / (1.0 + mun / y + nun / (y * y))
 
     # Halofit non-linear power spectrum, equation A1
