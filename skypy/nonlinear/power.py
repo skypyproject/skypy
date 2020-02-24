@@ -12,7 +12,7 @@ from scipy import optimize
 
 _HalofitParameters = namedtuple(
     'HalofitParameters',
-    ['a', 'b', 'c', 'gamma', 'alpha', 'beta', 'mu', 'nu'])
+    ['a', 'b', 'c', 'gamma', 'alpha', 'beta', 'mu', 'nu', 'f'])
 
 _smith_parameters = _HalofitParameters(
     [0.1670, 0.7940, 1.6762, 1.8369, 1.4861, -0.6206, 0.0],
@@ -22,7 +22,8 @@ _smith_parameters = _HalofitParameters(
     [-0.1452, 0.3700, 1.3884, 0.0],
     [0.0, 0.0, 0.3401, 0.9854, 0.8291, 0.0],
     [0.1908, -3.5442],
-    [1.2857, 0.9589])
+    [1.2857, 0.9589],
+    [-0.0307, -0.0585, 0.0743])
 
 _takahashi_parameters = _HalofitParameters(
     [0.2250, 0.9903, 2.3706, 2.8553, 1.5222, -0.6038, 0.1749],
@@ -32,7 +33,8 @@ _takahashi_parameters = _HalofitParameters(
     [-0.1959, 1.3373, 6.0835, -5.5274],
     [0.3980, 1.2490, 0.3157, -0.7354, 2.0379, -0.1682],
     [0.0, -np.inf],
-    [3.6902, 5.2105])
+    [3.6902, 5.2105],
+    [-0.0307, -0.0585, 0.0743])
 
 _halofit_parameters = {
     'Smith': _smith_parameters,
@@ -163,9 +165,9 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
     betan = np.polyval(p.beta[:5], neff) + p.beta[5]*c
     mun = np.power(10, np.polyval(p.mu, neff))
     nun = np.power(10, np.polyval(p.nu, neff))
-    f1 = np.power(omega_m_z, -0.0307)
-    f2 = np.power(omega_m_z, -0.0585)
-    f3 = np.power(omega_m_z,  0.0743)
+    f1 = np.power(omega_m_z, p.f[0])
+    f2 = np.power(omega_m_z, p.f[1])
+    f3 = np.power(omega_m_z, p.f[2])
 
     # Two-halo term, equation A2
     y = wavenumber / ksigma
