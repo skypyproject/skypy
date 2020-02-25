@@ -12,7 +12,7 @@ from scipy import optimize
 
 HalofitParameters = namedtuple(
     'HalofitParameters',
-    ['a', 'b', 'c', 'gamma', 'alpha', 'beta', 'mu', 'nu', 'f',
+    ['a', 'b', 'c', 'gamma', 'alpha', 'beta', 'mu', 'nu', 'fa', 'fb',
      'l', 'm', 'p', 'r', 's', 't'])
 
 _smith_parameters = HalofitParameters(
@@ -24,6 +24,7 @@ _smith_parameters = HalofitParameters(
     [0.0, 0.0, 0.3401, 0.9854, 0.8291, 0.0],
     [0.1908, -3.5442],
     [1.2857, 0.9589],
+    [-0.0732, -0.1423, 0.0725],
     [-0.0307, -0.0585, 0.0743],
     0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
 
@@ -36,6 +37,7 @@ _takahashi_parameters = HalofitParameters(
     [0.3980, 1.2490, 0.3157, -0.7354, 2.0379, -0.1682],
     [0.0, -np.inf],
     [3.6902, 5.2105],
+    [-0.0732, -0.1423, 0.0725],
     [-0.0307, -0.0585, 0.0743],
     0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
 
@@ -48,6 +50,7 @@ _bird_parameters = HalofitParameters(
     [0.0, 0.0, 0.3401, 0.9854, 0.8291, 0.0],
     [0.1908, -3.5442],
     [1.2857, 0.9589],
+    [-0.0732, -0.1423, 0.0725],
     [-0.0307, -0.0585, 0.0743],
     2.080, 1.2e-3, 26.3, -6.49, 1.44, 12.4)
 
@@ -179,7 +182,12 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
     betan = np.polyval(p.beta[:5], neff) + p.beta[5]*c
     mun = np.power(10, np.polyval(p.mu, neff))
     nun = np.power(10, np.polyval(p.nu, neff))
-    f = np.power(omega_m_z, np.asarray(p.f)[:, np.newaxis, np.newaxis])
+    fa = np.power(omega_m_z, np.asarray(p.fa)[:, np.newaxis, np.newaxis])
+    fb = np.power(omega_m_z, np.asarray(p.fb)[:, np.newaxis, np.newaxis])
+    f = np.ones((3, np.size(redshift), 1))
+    mask = omega_m_z != 1
+    fraction = omega_de_z[mask] / (1.0 - omega_m_z[mask])
+    f[:, mask] = fraction * fb[:, mask] + (1.0 - fraction) * fa[:, mask]
 
     # Massive neutrino terms; Bird et al. 2012 equations A6, A9 and A10
     fnu = omega_nu_z / omega_m_z
