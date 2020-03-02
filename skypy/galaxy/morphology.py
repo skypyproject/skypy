@@ -4,7 +4,7 @@ This module provides facilities to sample the morphological properties of
 galaxies using a number of models.
 """
 
-from scipy.stats._continuous_distns import beta_gen
+from scipy import stats
 
 
 def _kacprzak_parameterization(beta_method):
@@ -16,7 +16,7 @@ def _kacprzak_parameterization(beta_method):
     return reparameterize
 
 
-class kacprzak_gen(beta_gen):
+class kacprzak_gen(stats._continuous_distns.beta_gen):
     r'''Galaxy ellipticities sampled from a reparameterized beta distribution.
 
     The ellipticities follow a beta distribution parameterized by
@@ -85,7 +85,8 @@ class kacprzak_gen(beta_gen):
         return super()._stats(*args)
 
     def fit(self, data, *args, **kwds):
-        return super(beta_gen, self).fit(data, *args, **kwds)
+        return super(stats._continuous_distns.beta_gen, self).fit(
+            data, *args, **kwds)
 
 
 kacprzak = kacprzak_gen(a=0.0, b=1.0, name='kacprzak')
