@@ -7,54 +7,53 @@ from scipy.stats.tests.common_tests import (
     check_random_state_property, check_pickling)
 
 
-def test_ellipticity_beta():
+def test_kacprzak():
 
-    from skypy.galaxy.morphology import ellipticity_beta
+    from skypy.galaxy.morphology import kacprzak
 
     a, b = np.random.lognormal(size=2)
-    args = (a + b, a / (a + b))
-    beta = stats.beta(a, b)
-    kacprzak = ellipticity_beta(*args)
-    kacprzak_uniform = ellipticity_beta(2, 0.5)
-    kacprzak_arcsine = ellipticity_beta(1, 0.5)
+    args = (a / (a + b), a + b)
+    beta_dist = stats.beta(a, b)
+    kacprzak_dist = kacprzak(*args)
+    kacprzak_uniform = kacprzak(0.5, 2.0)
+    kacprzak_arcsine = kacprzak(0.5, 1.0)
 
     x = np.linspace(0, 1, 100)
-    intervals = np.linspace(0, 1, 100)
 
-    check_normalization(ellipticity_beta, args, 'ellipticity_beta')
-    check_edge_support(ellipticity_beta, args)
-    check_random_state_property(ellipticity_beta, args)
-    check_pickling(ellipticity_beta, args)
+    check_normalization(kacprzak, args, 'kacprzak')
+    check_edge_support(kacprzak, args)
+    check_random_state_property(kacprzak, args)
+    check_pickling(kacprzak, args)
 
-    m, v, s, k = kacprzak.stats(moments='mvsk')
-    check_mean_expect(ellipticity_beta, args, m, 'ellipticity_beta')
-    check_var_expect(ellipticity_beta, args, m, v, 'ellipticity_beta')
-    check_skew_expect(ellipticity_beta, args, m, v, s, 'ellipticity_beta')
-    check_kurt_expect(ellipticity_beta, args, m, v, k, 'ellipticity_beta')
-    check_moment(ellipticity_beta, args, m, v, 'ellipticity_beta')
+    m, v, s, k = kacprzak_dist.stats(moments='mvsk')
+    check_mean_expect(kacprzak, args, m, 'kacprzak')
+    check_var_expect(kacprzak, args, m, v, 'kacprzak')
+    check_skew_expect(kacprzak, args, m, v, s, 'kacprzak')
+    check_kurt_expect(kacprzak, args, m, v, k, 'kacprzak')
+    check_moment(kacprzak, args, m, v, 'kacprzak')
 
-    assert allclose(kacprzak.pdf(x), beta.pdf(x))
-    assert allclose(kacprzak.logpdf(x), beta.logpdf(x))
-    assert allclose(kacprzak.cdf(x), beta.cdf(x))
-    assert allclose(kacprzak.logcdf(x), beta.logcdf(x))
-    assert allclose(kacprzak.ppf(x), beta.ppf(x))
-    assert allclose(kacprzak.sf(x), beta.sf(x))
-    assert allclose(kacprzak.logsf(x), beta.logsf(x))
-    assert allclose(kacprzak.isf(x), beta.isf(x))
-    assert isclose(kacprzak.entropy(), beta.entropy())
-    assert isclose(kacprzak.median(), beta.median())
-    assert isclose(kacprzak.std(), beta.std())
-    assert allclose(kacprzak.interval(intervals), beta.interval(intervals))
+    assert allclose(kacprzak_dist.pdf(x), beta_dist.pdf(x))
+    assert allclose(kacprzak_dist.logpdf(x), beta_dist.logpdf(x))
+    assert allclose(kacprzak_dist.cdf(x), beta_dist.cdf(x))
+    assert allclose(kacprzak_dist.logcdf(x), beta_dist.logcdf(x))
+    assert allclose(kacprzak_dist.ppf(x), beta_dist.ppf(x))
+    assert allclose(kacprzak_dist.sf(x), beta_dist.sf(x))
+    assert allclose(kacprzak_dist.logsf(x), beta_dist.logsf(x))
+    assert allclose(kacprzak_dist.isf(x), beta_dist.isf(x))
+    assert isclose(kacprzak_dist.entropy(), beta_dist.entropy())
+    assert isclose(kacprzak_dist.median(), beta_dist.median())
+    assert isclose(kacprzak_dist.std(), beta_dist.std())
+    assert allclose(kacprzak_dist.interval(x), beta_dist.interval(x))
 
-    assert np.isscalar(kacprzak.rvs())
-    assert kacprzak.rvs(size=10).shape == (10,)
+    assert np.isscalar(kacprzak_dist.rvs())
+    assert kacprzak_dist.rvs(size=10).shape == (10,)
 
-    e_sum = 0.5 * np.ones((7, 5))
     e_ratio = 0.5 * np.ones((13, 1, 5))
-    rvs = ellipticity_beta.rvs(e_sum, e_ratio)
-    assert rvs.shape == np.broadcast(e_sum, e_ratio).shape
+    e_sum = 0.5 * np.ones((7, 5))
+    rvs = kacprzak.rvs(e_ratio, e_sum)
+    assert rvs.shape == np.broadcast(e_ratio, e_sum).shape
 
-    D, p = stats.kstest(kacprzak.rvs, beta.cdf, N=1000)
+    D, p = stats.kstest(kacprzak_dist.rvs, beta_dist.cdf, N=1000)
     assert p > 0.01, 'D = {}, p = {}'.format(D, p)
 
     D, p = stats.kstest(kacprzak_uniform.rvs, 'uniform', N=1000)
