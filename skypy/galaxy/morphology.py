@@ -89,4 +89,4 @@ class kacprzak_gen(stats._continuous_distns.beta_gen):
             data, *args, **kwds)
 
 
-kacprzak = kacprzak_gen(a=0.0, b=1.0, name='kacprzak')
+kacprzak = kacprzak_gen(a=0.0, b=1.0, name='kacprzak', shapes="e_ratio e_sum")
