@@ -30,4 +30,6 @@ version = generate_version_py()
 # details.
 package_info = get_package_info()
 
-setup(version=version, cmdclass=cmdclass, **package_info)
+setup(version=version, cmdclass=cmdclass, install_requires=['numpy', 'scipy',
+                                                            'astropy'],
+      **package_info)
