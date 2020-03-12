@@ -24,17 +24,17 @@ def angular_size(physical_size, redshift, cosmology):
     Results
     -------
     angular_size : numpy.ndarray
-        Array of angular distances in units of [Mpc^-1] with shape (nz,nr).
+        Array of angular distances in units of [Mpc^-1] with shape (nz, nr).
 
     Examples
     --------
     >>> import numpy as np
     >>> from astropy.cosmology import FlatLambdaCDM
     >>> cosmology = FlatLambdaCDM(H0=67.04, Om0=0.3183, Ob0=0.047745)
-    >>> r = np.logspace(-3,2,num=1000)
-    >>> da = angular_size(r,1,cosmology)
+    >>> r = np.logspace(-3, 2, num=1000)
+    >>> da = angular_size(r, 1, cosmology)
     >>> da[0]
-    <Quantity 5.85990062e-07 1 / Mpc>
+    5.859900619138525e-07
 
     References
     ----------
@@ -51,7 +51,7 @@ def angular_size(physical_size, redshift, cosmology):
     angular_diameter = c.angular_diameter_distance(z)
     angular_size = r / angular_diameter
 
-    return angular_size
+    return angular_size.value
 
 
 def half_light_angular_size(magnitude, redshift, cosmology,
@@ -86,11 +86,12 @@ def half_light_angular_size(magnitude, redshift, cosmology,
 
     Examples
     --------
-    import numpy as np
-    from astropy.cosmology import FlatLambdaCDM
-    cosmology = FlatLambdaCDM(H0=67.04, Om0=0.3183, Ob0=0.047745)
-    da = half_light_angular_size(-21.7,1,cosmology)
-    <Quantity 3.98088255e-14 1 / Mpc>
+    >>> import numpy as np
+    >>> from astropy.cosmology import FlatLambdaCDM
+    >>> cosmology = FlatLambdaCDM(H0=67.04, Om0=0.3183, Ob0=0.047745)
+    >>> magnitude = np.linspace(-26, 26, num=100)
+    >>> hlas = half_light_angular_size(26, 1, cosmology)
+    >>> # hlas # 57851889.20812848
 
     References
     ----------
@@ -111,4 +112,4 @@ def half_light_angular_size(magnitude, redshift, cosmology,
 
     angular_size = half_light_radius / angular_diameter
 
-    return angular_size
+    return angular_size.value

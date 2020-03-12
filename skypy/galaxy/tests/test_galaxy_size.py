@@ -27,14 +27,14 @@ def test_galaxy_size():
     array_angular_size = gs.angular_size(array_radius, array_redshift,
                                          cosmology)
 
-    array_magnitude = np.linspace(-26, 26, num=1000)
-    array_half_light_angular_size = gs.half_light_angular_size(array_radius,
-                                                               array_magnitude,
+    array_magnitude = np.linspace(-26, 26, num=100)
+    array_half_light_angular_size = gs.half_light_angular_size(array_magnitude,
+                                                               array_redshift,
                                                                cosmology)
 
-    nr = array_radius
-    nz = array_redshift
-    nM = array_magnitude
+    nr = array_radius.size
+    nz = array_redshift.size
+    nM = array_magnitude.size
 
     assert array_angular_size.shape == (nz, nr)
     assert array_half_light_angular_size.shape == (nz, nM)
