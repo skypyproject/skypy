@@ -83,6 +83,8 @@ def linear_lognormal(magnitude, a_mu=1.0 * units.kpc, b_mu=0.0 * units.kpc,
     '''
 
     mu_physical = a_mu * magnitude + b_mu
-    radius = np.random.lognormal(mu_physical, sigma_physical)
+    sigma_physical = sigma_physical.to(mu_physical.unit)
+    physical_size = scipy.stats.lognorm.rvs(mu_physical, sigma_physical, size=size)
+    return physical_size * mu_physical.unit
 
     return radius
