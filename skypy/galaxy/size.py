@@ -41,7 +41,7 @@ def angular_size(radius, redshift, cosmology):
     '''
 
     distance = cosmology.angular_diameter_distance(redshift)
-    angular_size = (radius / distance).to(units.dimensionless_unscaled)
+    return np.arctan(physical_size / distance)
 
     return Angle(angular_size, unit=units.radian)
 
