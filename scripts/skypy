@@ -1,0 +1,15 @@
+import argparse
+from skypy.core import SkyPyDriver
+import yaml
+
+parser = argparse.ArgumentParser(description="SkyPy pipeline driver")
+parser.add_argument('-c', '--config', required=True,
+                    type=argparse.FileType('r'), help='Config file name')
+
+
+if __name__ == "__main__":
+
+    args = parser.parse_args()
+    config = yaml.safe_load(args.config)
+    driver = SkyPyDriver()
+    driver.execute(config)
