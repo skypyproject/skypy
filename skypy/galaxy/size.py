@@ -83,7 +83,7 @@ def linear_lognormal(magnitude, a_mu, b_mu, sigma_physical, size=None):
     >>> b_mu = 0.0 * units.kpc
     >>> sigma = 1.0 * units.kpc
     >>> linear_lognormal(magnitude, a_mu, b_mu, sigma)
-    <Quantity 1.00488103 kpc>
+    <Quantity 1.59497222e+11 kpc>
 
     References
     ----------
@@ -97,7 +97,8 @@ def linear_lognormal(magnitude, a_mu, b_mu, sigma_physical, size=None):
     mu_value = mu_physical.value
     sigma_value = sigma_physical.value
 
-    size_value = scipy.stats.lognorm.rvs(mu_value, sigma_value, size=size)
+    size_value = scipy.stats.lognorm.rvs(s=sigma_value, scale=np.exp(mu_value),
+                                         size=size)
     size_physical = size_value * mu_physical.unit
 
     return size_physical

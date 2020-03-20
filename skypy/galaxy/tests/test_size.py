@@ -31,9 +31,16 @@ def test_linear_lognormal():
 
     # Test the distribution of galaxy sizes follows a lognormal distribution
     size_distribution = size.linear_lognormal(scalar_magnitude, a_mu, b_mu,
-                                              sigma, size=1000)
-    test = stats.kstest(size_distribution, 'lognorm', (1,))
+                                              sigma, size=1000).value
+
+    mu_physical = a_mu * scalar_magnitude + b_mu
+    mu_value = mu_physical.value
+
+    arguments = (sigma, 0, np.exp(mu_value))
+    test = stats.kstest(size_distribution, 'lognorm', args=arguments)
+
     D_value = test[0]
     p_value = test[1]
 
+    assert p_value > 0
     assert D_value < p_value
