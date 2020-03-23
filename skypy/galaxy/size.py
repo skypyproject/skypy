@@ -11,8 +11,8 @@ def angular_size(physical_size, redshift, cosmology):
 
     Parameters
     ----------
-    physical_size : float
-        Physical radius of galaxies in units of [kpc].
+    physical_size : astropy.Quantity
+        Physical radius of galaxies in units of length.
     redshift : float
         Redshifts at which to evaluate the angular diameter distance.
     cosmology : astropy.cosmology.Cosmology
@@ -21,7 +21,7 @@ def angular_size(physical_size, redshift, cosmology):
 
     Results
     -------
-    angular_size : float
+    angular_size : astropy.Quantity
         Angular distances in units of [rad] for a given radius.
 
     Examples
@@ -54,12 +54,12 @@ def linear_lognormal(magnitude, a_mu, b_mu, sigma_physical, size=None):
     ----------
     magnitude : float
         Galaxy magnitude at which evaluate the lognormal distribution.
-    a_mu, b_mu : float
+    a_mu, b_mu : astropy.Quantity
         Lognormal distribution parameters for the physical radius of galaxies
-        in [kpc], described in [1].
-    sigma_physical : float
+        in units of length, described in [1].
+    sigma_physical : astropy.Quantity
         Standard deviation of the lognormal distribution for the
-        physical radius of galaxies in [kpc].
+        physical radius of galaxies in units of length.
     size : int or tuple of ints, optional.
         Output shape. If the given shape is, e.g., (m, n, k),
         then m * n * k samples are drawn. If size is None (default),
@@ -68,9 +68,9 @@ def linear_lognormal(magnitude, a_mu, b_mu, sigma_physical, size=None):
 
     Results
     -------
-    physical_size : numpy.ndarray
+    physical_size : numpy.ndarray or astropy.Quantity
         Physical distance for a given galaxy with a given magnitude,
-        in units of [kpc].
+        in the same length units as input parameters.
 
     Examples
     --------
