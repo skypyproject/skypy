@@ -2,7 +2,6 @@
 their physical size.'''
 
 import numpy as np
-import scipy
 
 
 def angular_size(physical_size, redshift, cosmology):
@@ -79,11 +78,11 @@ def linear_lognormal(magnitude, a_mu, b_mu, sigma_physical, size=None):
     >>> from astropy import units
     >>> np.random.seed(12345)
     >>> magnitude = 26.0
-    >>> a_mu = 1.0 * units.kpc
-    >>> b_mu = 0.0 * units.kpc
-    >>> sigma = 1.0 * units.kpc
+    >>> a_mu = -0.25 * units.kpc
+    >>> b_mu = 1.0 * units.kpc
+    >>> sigma = 0.5 * units.kpc
     >>> linear_lognormal(magnitude, a_mu, b_mu, sigma)
-    <Quantity 1.59497222e+11 kpc>
+    <Quantity 0.00368917 kpc>
 
     References
     ----------
@@ -97,8 +96,7 @@ def linear_lognormal(magnitude, a_mu, b_mu, sigma_physical, size=None):
     mu_value = mu_physical.value
     sigma_value = sigma_physical.value
 
-    size_value = scipy.stats.lognorm.rvs(s=sigma_value, scale=np.exp(mu_value),
-                                         size=size)
+    size_value = np.random.lognormal(mu_value, sigma_value, size=size)
     size_physical = size_value * mu_physical.unit
 
     return size_physical

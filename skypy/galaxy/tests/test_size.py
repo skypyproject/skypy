@@ -36,11 +36,14 @@ def test_linear_lognormal():
     mu_physical = a_mu * scalar_magnitude + b_mu
     mu_value = mu_physical.value
 
-    arguments = (sigma, 0, np.exp(mu_value))
+    arguments = (sigma.value, 0, np.exp(mu_value))
     test = stats.kstest(size_distribution, 'lognorm', args=arguments)
 
     D_value = test[0]
     p_value = test[1]
 
-    assert p_value > 0
+    assert p_value > 0.01
     assert D_value < p_value
+
+    # Test the returned distribution is of the right shape
+    assert size_distribution.shape == (1000,)
