@@ -5,8 +5,8 @@ import skypy.utils.special as special
 
 
 def herbel_luminosities(redshift, alpha, a_m, b_m, size=None,
-                        absolute_magnitude_max=-16.0,
-                        absolute_magnitude_min=-28.0, resolution=100):
+                        q_min=0.00305,
+                        q_max=1100.0, resolution=100):
 
     r""" Luminosities following the Schechter luminosity function followjng the
         Herbel er al. (2017) model.
@@ -26,12 +26,10 @@ def herbel_luminosities(redshift, alpha, a_m, b_m, size=None,
     size: int
         The number of luminosity values to sample for each redshift value. If
         'redshift' is array-like, size has to be None.
-    absolute_magnitude_max : float or scalar, optional
-        Upper limit of the considered absolute magnitudes of the galaxies to
-        wanna sample.
-    absolute_magnitude_min : float or scalar, optional
-        Lower limit of the considered absolute magnitudes of the galaxies to
-        wanna sample.
+    q_min : float or scalar, optional
+        Lower limit of the luminosities to sample in units of L_*.
+    q_max : float or scalar, optional
+        Upper limit of of the luminosities to sample in units of L_*.
     resolution : int, optional
         Characterises the resolution of the sampling. Default is 100
 
@@ -95,29 +93,17 @@ def herbel_luminosities(redshift, alpha, a_m, b_m, size=None,
 
     """
 
-    if isinstance(redshift, np.ndarray):
-        if size:
-            raise ValueError("If 'redshift' is an array, "
-                             "'size' has to be None")
+    if isinstance(redshift, np.ndarray) and size:
+        raise ValueError("If 'redshift' is an array, "
+                         "'size' has to be None")
 
     luminosity_star = _calculate_luminosity_star(redshift, a_m, b_m)
-    luminosity_min = astro.luminosity_from_absolute_magnitude(
-        absolute_magnitude_max)
-    luminosity_max = astro.luminosity_from_absolute_magnitude(
-        absolute_magnitude_min)
-    q_min = luminosity_min / luminosity_star
-    q_max = luminosity_max / luminosity_star
-    if type(redshift) == float:
-        q = np.logspace(np.log10(q_min), np.log10(q_max), resolution)
-        cdf = _cdf(q, q_min, q_max, alpha)
-    else:
-        q = np.logspace(np.log10(min(q_min)), np.log10(max(q_max)), resolution)
-        cdf = _cdf(q, min(q_min), max(q_max), alpha)
-    # CDF lower bound for each redshift
+    q = np.logspace(np.log10(np.min(q_min)), np.log10(np.max(q_max)),
+                    resolution)
+    cdf = _cdf(q, np.min(q_min), np.max(q_max), alpha)
     t_lower = np.interp(q_min, q, cdf)
-    # CDF lower bound for each redshift
     t_upper = np.interp(q_max, q, cdf)
-    u = np.random.uniform(t_lower, t_upper, size)
+    u = np.random.uniform(t_lower, t_upper, size=size)
     q_sample = np.interp(u, cdf, q)
     luminosity_sample = luminosity_star * q_sample
     return luminosity_sample
@@ -136,4 +122,4 @@ def _cdf(q, q_min, q_max, alpha):
 def _calculate_luminosity_star(redshift, a_m, b_m):
     # function to calculate the parameter L_*
     absolute_magnitude_star = a_m * redshift + b_m
-    return np.power(10, -0.4*absolute_magnitude_star)
+    return astro.luminosity_from_absolute_magnitude(absolute_magnitude_star)

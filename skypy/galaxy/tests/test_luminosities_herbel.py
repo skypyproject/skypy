@@ -65,3 +65,21 @@ def test_herbel_luminosities():
                                      size=1000)
     p_value = scipy.stats.kstest(sample, calc_cdf)[1]
     assert p_value >= 0.01
+
+
+def test_exponential_distribution():
+    # Test exponential distribution (if alpha is 0)
+    redshift = 0
+    alpha = 0
+    a_m = 0
+    b_m = 0
+    # with a_m and b_m 0 L_* is 1 and L=q.
+    q_min = 1e-10
+    q_max = 1e2
+    resolution = 1000
+    size = 1000
+    sample = lum.herbel_luminosities(redshift, alpha, a_m, b_m,
+                                     q_min=q_min, size=size,
+                                     resolution=resolution)
+    d, p_value = scipy.stats.kstest(sample, 'truncexpon', args=(q_max,))
+    assert p_value >= 0.01
