@@ -18,14 +18,13 @@ def test_angular_size():
 
     assert np.isscalar(angular_size.value)
 
-    # Test that the input and output have the right units
-    assert scalar_radius. unit.is_equivalent(units.kpc)
+    # Test that the output has the correct units
     assert angular_size.unit.is_equivalent(units.rad)
 
     # If the input have bad units, a UnitConversionError is raised
     radius_without_units = 1.0
 
-    with pytest.raises(units.UnitConversionError):
+    with pytest.raises(units.UnitTypeError):
         size.angular_size(radius_without_units, scalar_redshift, cosmology)
 
 
@@ -40,14 +39,8 @@ def test_linear_lognormal():
 
     assert np.isscalar(size_output.value)
 
-    # Test that the input and output have the right units
-    assert a_mu.unit.is_equivalent(units.kpc)
-    assert b_mu.unit.is_equivalent(units.kpc)
-    assert sigma.unit.is_equivalent(units.kpc)
+    # Test that the output has the correct units
     assert size_output.unit.is_equivalent(units.kpc)
-
-    # Check that the output has the correct units
-    assert size_output.unit.is_equivalent(a_mu.unit)
 
     # If the inputs have bad units, an UnitConversionError is raised
     a_mu_without_units = 1.0
