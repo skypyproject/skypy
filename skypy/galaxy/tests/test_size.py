@@ -1,8 +1,9 @@
 import numpy as np
 from astropy import units
 from scipy import stats
-from astropy.cosmology import FlatLambdaCDM
+import pytest
 
+from astropy.cosmology import FlatLambdaCDM
 from skypy.galaxy import size
 
 
@@ -17,6 +18,16 @@ def test_angular_size():
 
     assert np.isscalar(angular_size.value)
 
+    # Test that the input and output have the right units
+    assert scalar_radius. unit.is_equivalent(units.kpc)
+    assert angular_size.unit.is_equivalent(units.rad)
+
+    # If the input have bad units, a UnitConversionError is raised
+    radius_without_units = 1.0
+
+    with pytest.raises(units.UnitConversionError):
+        size.angular_size(radius_without_units, scalar_redshift, cosmology)
+
 
 def test_linear_lognormal():
     """ Test lognormal distribution of galaxy sizes"""
@@ -28,6 +39,32 @@ def test_linear_lognormal():
     size_output = size.linear_lognormal(scalar_magnitude, a_mu, b_mu, sigma)
 
     assert np.isscalar(size_output.value)
+
+    # Test that the input and output have the right units
+    assert a_mu.unit.is_equivalent(units.kpc)
+    assert b_mu.unit.is_equivalent(units.kpc)
+    assert sigma.unit.is_equivalent(units.kpc)
+    assert size_output.unit.is_equivalent(units.kpc)
+
+    # Check that the output has the correct units
+    assert size_output.unit.is_equivalent(a_mu.unit)
+
+    # If the inputs have bad units, an UnitConversionError is raised
+    a_mu_without_units = 1.0
+    b_mu_without_units = 1.0
+    sigma_without_units = 1.0
+
+    with pytest.raises(units.UnitConversionError):
+        size.linear_lognormal(scalar_magnitude, a_mu_without_units, b_mu,
+                              sigma)
+
+    with pytest.raises(units.UnitConversionError):
+        size.linear_lognormal(scalar_magnitude, a_mu, b_mu_without_units,
+                              sigma)
+
+    with pytest.raises(units.UnitConversionError):
+        size.linear_lognormal(scalar_magnitude, a_mu, b_mu,
+                              sigma_without_units)
 
     # Test the distribution of galaxy sizes follows a lognormal distribution
     size_distribution = size.linear_lognormal(scalar_magnitude, a_mu, b_mu,
@@ -46,4 +83,4 @@ def test_linear_lognormal():
     assert D_value < p_value
 
     # Test the returned distribution is of the right shape
-    assert size_distribution.shape == (1000,)
+    assert size_distribution.shape == (1000, )

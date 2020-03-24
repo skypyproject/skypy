@@ -2,6 +2,7 @@
 their physical size.'''
 
 import numpy as np
+from astropy import units
 
 
 def angular_size(physical_size, redshift, cosmology):
@@ -40,7 +41,9 @@ def angular_size(physical_size, redshift, cosmology):
     '''
 
     distance = cosmology.angular_diameter_distance(redshift)
-    angular_size = np.arctan(physical_size / distance)
+    size_physical = units.Quantity(physical_size).to(distance.unit)
+
+    angular_size = np.arctan(size_physical / distance)
 
     return angular_size
 
@@ -90,9 +93,8 @@ def linear_lognormal(magnitude, a_mu, b_mu, sigma_physical, size=None):
            A. Nicola, JCAP 1708, 035 (2017).
     '''
 
-    mu_physical = a_mu * magnitude + b_mu
-    sigma_physical = sigma_physical.to(mu_physical.unit)
-
+    mu_physical = units.Quantity(a_mu * magnitude + b_mu)
+    sigma_physical = units.Quantity(sigma_physical).to(mu_physical.unit)
     mu_value = mu_physical.value
     sigma_value = sigma_physical.value
 
