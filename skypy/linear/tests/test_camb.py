@@ -15,7 +15,7 @@ camb_mock.get_results().get_matter_power_spectrum.return_value = [0, 1, np.array
 try:
     import camb
     camb_import_loc = {}
-except ModuleNotFoundError:
+except ImportError:
     camb_import_loc = {'camb': camb_mock}
 
 
