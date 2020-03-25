@@ -3,6 +3,7 @@ import camb as _camb
 import os
 import pdb
 
+
 def camb(wavenumber, redshift, cosmology, A_s, n_s):
     """ Return the CAMB computation of the linear matter power spectrum, on a
     two dimensional grid of wavenumber and redshift
@@ -18,7 +19,7 @@ def camb(wavenumber, redshift, cosmology, A_s, n_s):
     cosmology : astropy.cosmology.Cosmology
         Cosmology object providing omega_matter, omega_baryon, Hubble parameter
         and CMB temperature in the present day
-    
+
     Returns
     -------
     power_spectrum : array_like
@@ -39,7 +40,7 @@ def camb(wavenumber, redshift, cosmology, A_s, n_s):
     >>> camb(wavenumber, redshift, cosmology, A_s, n_s)
     array([[17596.19571205,  9367.99583637],
            [ 6524.28734592,  3479.62135542]])
-    
+
     Reference
     ---------
     doi : 10.1086/309179
@@ -47,7 +48,7 @@ def camb(wavenumber, redshift, cosmology, A_s, n_s):
 
     """
 
-    print('Using CAMB %s installed at %s'%(_camb.__version__,os.path.dirname(_camb.__file__)))
+    print('Using CAMB %s installed at %s'%(_camb.__version__, os.path.dirname(_camb.__file__)))
 
     redshift = np.atleast_1d(redshift)
 
@@ -56,15 +57,15 @@ def camb(wavenumber, redshift, cosmology, A_s, n_s):
     # ToDo: ensure astropy.cosmology can fully specify model
     pars = _camb.CAMBparams()
     pars.set_cosmology(H0=cosmology.H0.value,
-                        ombh2=cosmology.Ob0*h2,
-                        omch2=cosmology.Odm0*h2,
-                        omk=cosmology.Ok0,
-                        TCMB=cosmology.Tcmb0.value,
-                        mnu=np.sum(cosmology.m_nu.value),
-                        standard_neutrino_neff=cosmology.Neff
-                        )
+                       ombh2=cosmology.Ob0*h2,
+                       omch2=cosmology.Odm0*h2,
+                       omk=cosmology.Ok0,
+                       TCMB=cosmology.Tcmb0.value,
+                       mnu=np.sum(cosmology.m_nu.value),
+                       standard_neutrino_neff=cosmology.Neff
+                       )
 
-    redshift_order = np.argsort(redshift)[::-1] # camb requires redshifts to be in decreasing order
+    redshift_order = np.argsort(redshift)[::-1]  # camb requires redshifts to be in decreasing order
 
     pars.InitPower.ns = n_s
     pars.InitPower.As = A_s
@@ -74,6 +75,6 @@ def camb(wavenumber, redshift, cosmology, A_s, n_s):
     pars.NonLinear = _camb.model.NonLinear_none
 
     results = _camb.get_results(pars)
-    
+
     kh, z, power_spectrum = results.get_matter_power_spectrum(minkh=wavenumber.min()*cosmology.h, maxkh=wavenumber.max()*cosmology.h, npoints=len(wavenumber))
     return power_spectrum[redshift_order[::-1]]
