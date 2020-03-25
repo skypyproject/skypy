@@ -1,7 +1,6 @@
 import numpy as np
 import camb as _camb
 import os
-import pdb
 
 
 def camb(wavenumber, redshift, cosmology, A_s, n_s):
