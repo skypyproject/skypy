@@ -11,7 +11,7 @@ def camb(wavenumber, redshift, cosmology, A_s, n_s):
     Parameters
     ----------
     wavenumber : array_like
-        Array of wavenumbers of length nk in units of Mpc^-1 at which to
+        Array of wavenumbers of length nk in units of [Mpc^-1] at which to
         evaluate the linear matter power spectrum.
     redshift : array_like
         Array of redshifts at which to evaluate the linear matter power
@@ -23,8 +23,8 @@ def camb(wavenumber, redshift, cosmology, A_s, n_s):
     Returns
     -------
     power_spectrum : array_like
-        Array of values for the linear matter power spectrum evaluated at the
-        input wavenumbers for the given primordial power spectrum parameters,
+        Array of values for the linear matter power spectrum in  [Mpc^3] evaluated
+        at the input wavenumbers for the given primordial power spectrum parameters,
         cosmology. For nz redshifts and nk wavenumbers the returned array will
         have shape (nz, nk).
 
@@ -52,13 +52,13 @@ def camb(wavenumber, redshift, cosmology, A_s, n_s):
 
     redshift = np.atleast_1d(redshift)
 
-    h2 = cosmology.h*cosmology.h
+    h2 = cosmology.h * cosmology.h
 
     # ToDo: ensure astropy.cosmology can fully specify model
     pars = _camb.CAMBparams()
     pars.set_cosmology(H0=cosmology.H0.value,
-                       ombh2=cosmology.Ob0*h2,
-                       omch2=cosmology.Odm0*h2,
+                       ombh2=cosmology.Ob0 * h2,
+                       omch2=cosmology.Odm0 * h2,
                        omk=cosmology.Ok0,
                        TCMB=cosmology.Tcmb0.value,
                        mnu=np.sum(cosmology.m_nu.value),
@@ -76,5 +76,5 @@ def camb(wavenumber, redshift, cosmology, A_s, n_s):
 
     results = _camb.get_results(pars)
 
-    kh, z, power_spectrum = results.get_matter_power_spectrum(minkh=wavenumber.min()*cosmology.h, maxkh=wavenumber.max()*cosmology.h, npoints=len(wavenumber))
+    kh, z, power_spectrum = results.get_matter_power_spectrum(minkh=wavenumber.min() * cosmology.h, maxkh=wavenumber.max()*cosmology.h, npoints=len(wavenumber))
     return power_spectrum[redshift_order[::-1]]
