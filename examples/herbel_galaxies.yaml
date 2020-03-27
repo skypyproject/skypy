@@ -1,3 +1,9 @@
+cosmology:
+  module: astropy.cosmology
+  function: FlatLambdaCDM
+  kwargs:
+    H0: 67.7
+    Om0: 0.307
 tables:
   red_galaxies:
     redshift:
