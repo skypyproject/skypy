@@ -9,10 +9,10 @@ def camb(wavenumber, redshift, cosmology, A_s, n_s):
 
     Parameters
     ----------
-    wavenumber : array_like
-        Array of wavenumbers of length nk in units of [Mpc^-1] at which to
+    wavenumber : (nk,) array_like
+        Array of wavenumbers in units of [Mpc^-1] at which to
         evaluate the linear matter power spectrum.
-    redshift : array_like
+    redshift : (nz,) array_like
         Array of redshifts at which to evaluate the linear matter power
         spectrum.
     cosmology : astropy.cosmology.Cosmology
@@ -21,7 +21,7 @@ def camb(wavenumber, redshift, cosmology, A_s, n_s):
 
     Returns
     -------
-    power_spectrum : array_like
+    power_spectrum : (nk, nz) array_like
         Array of values for the linear matter power spectrum in  [Mpc^3] evaluated
         at the input wavenumbers for the given primordial power spectrum parameters,
         cosmology. For nz redshifts and nk wavenumbers the returned array will
