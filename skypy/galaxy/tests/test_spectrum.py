@@ -60,4 +60,3 @@ def test_sampling_coefficients():
     with pytest.raises(ValueError,
                        match="alpha0 and alpha1 have to be array_like."):
         dirichlet_coefficients(redshift, alpha0, alpha1)
-
