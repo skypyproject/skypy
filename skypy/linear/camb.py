@@ -69,7 +69,7 @@ def camb(wavenumber, redshift, cosmology, A_s, n_s):
     pars.InitPower.ns = n_s
     pars.InitPower.As = A_s
 
-    pars.set_matter_power(redshifts=list(redshift[redshift_order]), kmax=wavenumber.max())
+    pars.set_matter_power(redshifts=list(redshift[redshift_order]), kmax=np.max(wavenumber))
 
     pars.NonLinear = _camb.model.NonLinear_none
 
