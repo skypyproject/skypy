@@ -75,5 +75,5 @@ def camb(wavenumber, redshift, cosmology, A_s, n_s):
 
     results = _camb.get_results(pars)
 
-    kh, z, power_spectrum = results.get_matter_power_spectrum(minkh=wavenumber.min() * cosmology.h, maxkh=wavenumber.max()*cosmology.h, npoints=len(wavenumber))
+    kh, z, power_spectrum = results.get_matter_power_spectrum(minkh=np.min(wavenumber) * cosmology.h, maxkh=np.max(wavenumber)*cosmology.h, npoints=len(wavenumber))
     return power_spectrum[redshift_order[::-1]]
