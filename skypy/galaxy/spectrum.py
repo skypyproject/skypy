@@ -7,10 +7,10 @@ def dirichlet_coefficients(redshift, alpha0, alpha1, z1=1.):
 
     Parameters
     ----------
-    redshift : (n,) array_like
+    redshift : (nz,) array_like
         The redshift values of the galaxies for which the coefficients want to
         be sampled.
-    alpha0, alpha1 : (na,) array_like
+    alpha0, alpha1 : (nc,) array_like
         Factors parameterising the Dirichlet distribution according to Equation
         (3.9) in [1].
     z1 : float or scalar, optional
@@ -18,9 +18,9 @@ def dirichlet_coefficients(redshift, alpha0, alpha1, z1=1.):
 
     Returns
     -------
-    coefficients : (n, 5) ndarray
-        The spectral coefficients of the galaxies. The shape is (n, 5) with n
-        the number of redshifts.
+    coefficients : (nz, nc) ndarray
+        The spectral coefficients of the galaxies. The shape is (n, nc) with nz
+        the number of redshifts and nc the number of coefficients.
 
     Notes
     -------
@@ -70,7 +70,7 @@ def dirichlet_coefficients(redshift, alpha0, alpha1, z1=1.):
     Page 734
     """
     if np.isscalar(alpha0) or np.isscalar(alpha1):
-        raise ValueError("alpha0 and alpha1 have to be array_like.")
+        raise ValueError("alpha0 and alpha1 must be array_like.")
     return_shape = (*np.shape(redshift), *np.shape(alpha0))
     redshift = np.atleast_1d(redshift)[:, np.newaxis]
 
