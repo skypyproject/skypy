@@ -3,7 +3,7 @@ import scipy.stats
 import scipy.integrate
 import pytest
 
-import skypy.galaxy.luminosities_herbel as lum
+import skypy.galaxy.luminosity as lum
 import skypy.utils.special as special
 import skypy.utils.astronomy as astro
 
@@ -27,10 +27,9 @@ def test_calculate_luminosity_star():
 
 
 def test_herbel_luminosities():
-    # test that error is returned if redshift input is an array but size is not
-    # None
-    with pytest.raises(ValueError, match="If 'redshift' is an array,"
-                                         " 'size' has to be None"):
+    # test that error is returned if redshift input is an array but size !=
+    # None and size != redshift,size
+    with pytest.raises(ValueError):
         lum.herbel_luminosities(np.array([1, 2]), -1.3, -0.9408582,
                                 -20.40492365, size=3)
 
@@ -68,18 +67,10 @@ def test_herbel_luminosities():
 
 
 def test_exponential_distribution():
-    # Test exponential distribution (if alpha is 0)
-    redshift = 0
-    alpha = 0
-    a_m = 0
-    b_m = 0
-    # with a_m and b_m 0 L_* is 1 and L=q.
-    q_min = 1e-10
+    # When alpha=0, L*=1 and q_min~0 we get a truncated exponential
     q_max = 1e2
-    resolution = 1000
-    size = 1000
-    sample = lum.herbel_luminosities(redshift, alpha, a_m, b_m,
-                                     q_min=q_min, size=size,
-                                     resolution=resolution)
+    sample = lum.herbel_luminosities(0, 0, 0, 0, size=1000,
+                                     q_min=1e-10, q_max=q_max,
+                                     resolution=1000)
     d, p_value = scipy.stats.kstest(sample, 'truncexpon', args=(q_max,))
     assert p_value >= 0.01

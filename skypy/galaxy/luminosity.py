@@ -13,29 +13,23 @@ def herbel_luminosities(redshift, alpha, a_m, b_m, size=None,
 
     Parameters
     ----------
-    redshift : array-like or float
-        The redshift values assigned to the sampled luminosities
-    alpha : float or scalar
-        The alpha parameter in the Schechter luminosity function
-    a_m : float or scalar
-        Parametrisation factor of the characteristic absolute magnitude M_* as
-        a function of redshift according to Herbel et al. (2017) equation (3.3)
-    b_m : float or scalar
-        Parametrisation factor of the characteristic absolute magnitude M_* as
-        a function of redshift according to Herbel et al. (2017) equation (3.3)
-    size: int
-        The number of luminosity values to sample for each redshift value. If
-        'redshift' is array-like, size has to be None.
-    q_min : float or scalar, optional
-        Lower limit of the luminosities to sample in units of L_*.
-    q_max : float or scalar, optional
-        Upper limit of of the luminosities to sample in units of L_*.
+    redshift : array-like
+        The redshift values at which to sample luminosities.
+    alpha : float or int
+        The alpha parameter in the Schechter luminosity function.
+    a_m, b_m : float or int
+        Factors parameterising the characteristic absolute magnitude M_* as
+        a linear function of redshift according to Equation 3.3 in [1].
+    size: int, optional
+         Output shape of luminosity samples.
+    q_min, q_max : float or int, optional
+        Lower and upper luminosity bounds in units of L*.
     resolution : int, optional
-        Characterises the resolution of the sampling. Default is 100
+        Resolution of the inverse transform sampling spline. Default is 100.
 
     Returns
     -------
-    luminosity_sample : ndarray or float
+    luminosity : array_like
         Drawn luminosities from the Schechter luminosity function.
 
     Notes
@@ -71,7 +65,7 @@ def herbel_luminosities(redshift, alpha, a_m, b_m, size=None,
 
     Examples
     -------
-    >>> import skypy.galaxy.luminosities_herbel as lum
+    >>> import skypy.galaxy.luminosity as lum
 
     Sample 100 luminosity values at redshift z = 1.0 with
     a_m = -0.9408582, b_m = -20.40492365, alpha = -1.3.
@@ -93,9 +87,8 @@ def herbel_luminosities(redshift, alpha, a_m, b_m, size=None,
 
     """
 
-    if isinstance(redshift, np.ndarray) and size:
-        raise ValueError("If 'redshift' is an array, "
-                         "'size' has to be None")
+    if size is None and np.shape(redshift):
+        size = np.shape(redshift)
 
     luminosity_star = _calculate_luminosity_star(redshift, a_m, b_m)
     q = np.logspace(np.log10(np.min(q_min)), np.log10(np.max(q_max)),
@@ -110,8 +103,6 @@ def herbel_luminosities(redshift, alpha, a_m, b_m, size=None,
 
 
 def _cdf(q, q_min, q_max, alpha):
-    # normalised rescaled (independent of redshift) cumulative distribution
-    # function
     a = special.upper_incomplete_gamma(alpha+1, q_min)
     b = special.upper_incomplete_gamma(alpha+1, q)
     c = special.upper_incomplete_gamma(alpha+1, q_min)
@@ -120,6 +111,5 @@ def _cdf(q, q_min, q_max, alpha):
 
 
 def _calculate_luminosity_star(redshift, a_m, b_m):
-    # function to calculate the parameter L_*
     absolute_magnitude_star = a_m * redshift + b_m
     return astro.luminosity_from_absolute_magnitude(absolute_magnitude_star)
