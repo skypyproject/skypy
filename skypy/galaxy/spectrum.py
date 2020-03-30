@@ -1,23 +1,24 @@
 import numpy as np
 
 
-def sampling_coefficients(redshift, a10, a20, a30, a40, a50,
-                          a11, a21, a31, a41, a51):
+def dirichlet_coefficients(redshift, alpha0, alpha1, z1=1.):
     r""" Spectral coefficients to calculate the rest-frame spectral energy
-        distribution of a galaxy following the Herbel et al. (2018) model.
+        distribution of a galaxy following the Herbel et al. model in [1].
 
     Parameters
     ----------
-    redshift : array_like
+    redshift : (n,) array_like
         The redshift values of the galaxies for which the coefficients want to
         be sampled.
-    a10, a20, a30, a40, a50, a11, a21, a31, a41, a51 : float or scalar
+    alpha0, alpha1 : (na,) array_like
         Factors parameterising the Dirichlet distribution according to Equation
         (3.9) in [1].
+    z1 : float or scalar, optional
+       Reference redshift at which alpha = alpha1. The default value is 1.0.
 
     Returns
     -------
-    coefficients : ndarray
+    coefficients : (n, 5) ndarray
         The spectral coefficients of the galaxies. The shape is (n, 5) with n
         the number of redshifts.
 
@@ -43,20 +44,22 @@ def sampling_coefficients(redshift, a10, a20, a30, a40, a50,
     :math:'z=0' and :math:'\alpha_{i,1}' the population at :math:'z=z_1 > 0'.
     These parameters depend on the galaxy type and we chose :math:'z_1=1'.
 
+    This code works for a general number of templates.
+
     Examples
     -------
-    >>> from skypy.galaxy.spectra import sampling_coefficients
+    >>> from skypy.galaxy.spectrum import dirichlet_coefficients
     >>> import numpy as np
 
     Sample the coefficients according to [1] for n blue galaxies with redshifts
     between 0 and 1.
 
     >>> n = 100000
-    >>> a10 = 2.079; a20 = 3.524; a30 = 1.917; a40 = 1.992; a50 = 2.536
-    >>> a11 = 2.265; a21 = 3.862; a31 = 1.921; a41 = 1.685; a51 = 2.480
+    >>> alpha0 = np.array([2.079, 3.524, 1.917, 1.992, 2.536])
+    >>> alpha1 = np.array([2.265, 3.862, 1.921, 1.685, 2.480])
     >>> redshift = np.linspace(0,2, n)
-    >>> coefficients = sampling_coefficients(redshift, a10, a20, a30, a40, a50,
-    ...                                      a11, a21, a31, a41, a51)
+    >>> coefficients = dirichlet_coefficients(redshift, alpha0, alpha1)
+
 
     References
     -------
@@ -66,27 +69,19 @@ def sampling_coefficients(redshift, a10, a20, a30, a40, a50,
     [2] Blanton M. R., Roweis S., 2007, The Astronomical Journal, Volume 133,
     Page 734
     """
-    a1 = _spectral_coeff(redshift, a10, a11)
-    a2 = _spectral_coeff(redshift, a20, a21)
-    a3 = _spectral_coeff(redshift, a30, a31)
-    a4 = _spectral_coeff(redshift, a40, a41)
-    a5 = _spectral_coeff(redshift, a50, a51)
+    if np.isscalar(alpha0) or np.isscalar(alpha1):
+        raise ValueError("alpha0 and alpha1 have to be array_like.")
+    return_shape = (*np.shape(redshift), *np.shape(alpha0))
+    redshift = np.atleast_1d(redshift)[:, np.newaxis]
 
-    if type(redshift) == float:
-        redshift = np.array([redshift])
+    alpha = np.power(alpha0, 1. - redshift / z1) * \
+        np.power(alpha1, redshift / z1)
 
-    a_vec = np.zeros(shape=(len(redshift), 5), dtype=float)
-    a_vec[:, 0] = a1
-    a_vec[:, 1] = a2
-    a_vec[:, 2] = a3
-    a_vec[:, 3] = a4
-    a_vec[:, 4] = a5
-
-    y = np.random.gamma(a_vec)
-    sum_y = y.sum(1)
+    # To sample Dirichlet distributed variables of order k we first sample k
+    # Gamma distributed variables y_i with the parameters alpha_i.
+    # Normalising all y_i by the sum of all k y_i gives us the k Dirichlet
+    # distributed variables.
+    y = np.random.gamma(alpha)
+    sum_y = y.sum(axis=1)
     coefficients = np.divide(y.T, sum_y.T).T
-    return coefficients
-
-
-def _spectral_coeff(z, ai0, ai1):
-    return np.power(ai0, (1. - z / 1.)) * np.power(ai1, (z / 1.))
+    return coefficients.reshape(return_shape)
