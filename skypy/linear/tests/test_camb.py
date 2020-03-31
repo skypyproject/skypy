@@ -34,11 +34,13 @@ def test_camb():
     redshift = [0.0, 1.0]
     wavenumber = np.logspace(-4.0, np.log10(2.0), 200)  # camb wavenumbers are kh
     pk = camb(wavenumber, redshift, camb_default_cosmology, 2.e-9, 0.965)
-    assert allclose(pk[0,:], camb_direct_pk_z0, rtol=1.e-4)
-    assert allclose(pk[1,:], camb_direct_pk_z1, rtol=1.e-4)
+    assert pk.shape == (len(wavenumber), len(redshift))
+    assert allclose(pk[:,0], camb_direct_pk_z0, rtol=1.e-4)
+    assert allclose(pk[:,1], camb_direct_pk_z1, rtol=1.e-4)
 
     # also check redshifts are ordered correctly
     redshift = [1.0, 0.0]
     pk = camb(wavenumber, redshift, camb_default_cosmology, 2.e-9, 0.965)
-    assert allclose(pk[0,:], camb_direct_pk_z1, rtol=1.e-4)
-    assert allclose(pk[1,:], camb_direct_pk_z0, rtol=1.e-4)
+    assert pk.shape == (len(wavenumber), len(redshift))
+    assert allclose(pk[:,0], camb_direct_pk_z1, rtol=1.e-4)
+    assert allclose(pk[:,1], camb_direct_pk_z0, rtol=1.e-4)

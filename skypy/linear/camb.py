@@ -1,6 +1,6 @@
 import numpy as np
-import camb as _camb
-import os
+from camb import CAMBparams, get_results, model
+from astropy import units as uns
 
 
 def camb(wavenumber, redshift, cosmology, A_s, n_s):
@@ -18,6 +18,11 @@ def camb(wavenumber, redshift, cosmology, A_s, n_s):
     cosmology : astropy.cosmology.Cosmology
         Cosmology object providing omega_matter, omega_baryon, Hubble parameter
         and CMB temperature in the present day
+    A_s : float
+        Cosmology parameter, amplitude normalisation of curvature perturbation power
+        spectrum
+    n_s : float
+        Cosmology parameter, spectral infex of scalar perturbation power spectrum
 
     Returns
     -------
@@ -25,7 +30,7 @@ def camb(wavenumber, redshift, cosmology, A_s, n_s):
         Array of values for the linear matter power spectrum in  [Mpc^3] evaluated
         at the input wavenumbers for the given primordial power spectrum parameters,
         cosmology. For nz redshifts and nk wavenumbers the returned array will
-        have shape (nz, nk).
+        have shape (nk, nz).
 
     Examples
     --------
@@ -47,14 +52,12 @@ def camb(wavenumber, redshift, cosmology, A_s, n_s):
 
     """
 
-    print('Using CAMB %s installed at %s'%(_camb.__version__, os.path.dirname(_camb.__file__)))
-
     redshift = np.atleast_1d(redshift)
 
     h2 = cosmology.h * cosmology.h
 
     # ToDo: ensure astropy.cosmology can fully specify model
-    pars = _camb.CAMBparams()
+    pars = CAMBparams()
     pars.set_cosmology(H0=cosmology.H0.value,
                        ombh2=cosmology.Ob0 * h2,
                        omch2=cosmology.Odm0 * h2,
@@ -71,9 +74,14 @@ def camb(wavenumber, redshift, cosmology, A_s, n_s):
 
     pars.set_matter_power(redshifts=list(redshift[redshift_order]), kmax=np.max(wavenumber))
 
-    pars.NonLinear = _camb.model.NonLinear_none
+    pars.NonLinear = model.NonLinear_none
 
-    results = _camb.get_results(pars)
+    results = get_results(pars)
 
-    kh, z, power_spectrum = results.get_matter_power_spectrum(minkh=np.min(wavenumber) * cosmology.h, maxkh=np.max(wavenumber)*cosmology.h, npoints=len(wavenumber))
-    return power_spectrum[redshift_order[::-1]]
+    k = wavenumber * (1. / uns.Mpc)
+
+    k_h = k.to((uns.littleh / uns.Mpc), uns.with_H0(cosmology.H0))
+
+    kh, z, power_spectrum = results.get_matter_power_spectrum(minkh=np.min(k_h.value), maxkh=np.max(k_h.value), npoints=len(k_h.value))
+
+    return power_spectrum[redshift_order[::-1]].T
