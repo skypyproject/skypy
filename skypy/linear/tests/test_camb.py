@@ -5,7 +5,8 @@ from unittest.mock import patch, MagicMock
 
 from skypy.linear.tests.camb_result import camb_direct_pk_z0, camb_direct_pk_z1
 
-# create a mock object and specify values for all the attributes needed in camb.py
+# create a mock object and specify values for all the attributes needed in
+# camb.py
 camb_mock = MagicMock()
 camb_mock.__version__ = 'Mock'
 camb_mock.__file__ = 'test_camb.py'
@@ -35,12 +36,12 @@ def test_camb():
     wavenumber = np.logspace(-4.0, np.log10(2.0), 200)  # camb wavenumbers are kh
     pk = camb(wavenumber, redshift, camb_default_cosmology, 2.e-9, 0.965)
     assert pk.shape == (len(wavenumber), len(redshift))
-    assert allclose(pk[:,0], camb_direct_pk_z0, rtol=1.e-4)
-    assert allclose(pk[:,1], camb_direct_pk_z1, rtol=1.e-4)
+    assert allclose(pk[:, 0], camb_direct_pk_z0, rtol=1.e-4)
+    assert allclose(pk[:, 1], camb_direct_pk_z1, rtol=1.e-4)
 
     # also check redshifts are ordered correctly
     redshift = [1.0, 0.0]
     pk = camb(wavenumber, redshift, camb_default_cosmology, 2.e-9, 0.965)
     assert pk.shape == (len(wavenumber), len(redshift))
-    assert allclose(pk[:,0], camb_direct_pk_z1, rtol=1.e-4)
-    assert allclose(pk[:,1], camb_direct_pk_z0, rtol=1.e-4)
+    assert allclose(pk[:, 0], camb_direct_pk_z1, rtol=1.e-4)
+    assert allclose(pk[:, 1], camb_direct_pk_z0, rtol=1.e-4)

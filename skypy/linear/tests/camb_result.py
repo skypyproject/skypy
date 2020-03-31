@@ -1,6 +1,6 @@
 import numpy as np
 
-camb_direct_pk_z0 = np.array([5.79744993e+02,
+camb_direct_pk_z0 = np.array([ 5.79744993e+02,
                                6.08234467e+02,
                                6.38120481e+02,
                                6.69470940e+02,
@@ -201,7 +201,7 @@ camb_direct_pk_z0 = np.array([5.79744993e+02,
                                5.59708671e+00,
                                4.94748646e+00])
 
-camb_direct_pk_z1 = np.array([2.12681976e+02,
+camb_direct_pk_z1 = np.array([ 2.12681976e+02,
                                2.23134493e+02,
                                2.34099538e+02,
                                2.45602094e+02,
@@ -401,4 +401,3 @@ camb_direct_pk_z1 = np.array([2.12681976e+02,
                                2.33113274e+00,
                                2.06098653e+00,
                                1.82178797e+00])
-      

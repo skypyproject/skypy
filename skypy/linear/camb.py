@@ -16,21 +16,22 @@ def camb(wavenumber, redshift, cosmology, A_s, n_s):
         Array of redshifts at which to evaluate the linear matter power
         spectrum.
     cosmology : astropy.cosmology.Cosmology
-        Cosmology object providing omega_matter, omega_baryon, Hubble parameter
-        and CMB temperature in the present day
+        Cosmology object providing omega_matter, omega_baryon, Hubble
+        parameter and CMB temperature in the present day
     A_s : float
-        Cosmology parameter, amplitude normalisation of curvature perturbation power
-        spectrum
+        Cosmology parameter, amplitude normalisation of curvature perturbation
+        power spectrum
     n_s : float
-        Cosmology parameter, spectral infex of scalar perturbation power spectrum
+        Cosmology parameter, spectral infex of scalar perturbation power
+        spectrum
 
     Returns
     -------
     power_spectrum : (nk, nz) array_like
-        Array of values for the linear matter power spectrum in  [Mpc^3] evaluated
-        at the input wavenumbers for the given primordial power spectrum parameters,
-        cosmology. For nz redshifts and nk wavenumbers the returned array will
-        have shape (nk, nz).
+        Array of values for the linear matter power spectrum in  [Mpc^3]
+        evaluated at the input wavenumbers for the given primordial power
+        spectrum parameters, cosmology. For nz redshifts and nk wavenumbers
+        the returned array will have shape (nk, nz).
 
     Examples
     --------
@@ -67,12 +68,14 @@ def camb(wavenumber, redshift, cosmology, A_s, n_s):
                        standard_neutrino_neff=cosmology.Neff
                        )
 
-    redshift_order = np.argsort(redshift)[::-1]  # camb requires redshifts to be in decreasing order
+    redshift_order = np.argsort(redshift)[::-1]  # camb requires redshifts to
+                                                 # be in decreasing order
 
     pars.InitPower.ns = n_s
     pars.InitPower.As = A_s
 
-    pars.set_matter_power(redshifts=list(redshift[redshift_order]), kmax=np.max(wavenumber))
+    pars.set_matter_power(redshifts=list(redshift[redshift_order]),
+                          kmax=np.max(wavenumber))
 
     pars.NonLinear = model.NonLinear_none
 
@@ -82,6 +85,8 @@ def camb(wavenumber, redshift, cosmology, A_s, n_s):
 
     k_h = k.to((uns.littleh / uns.Mpc), uns.with_H0(cosmology.H0))
 
-    kh, z, power_spectrum = results.get_matter_power_spectrum(minkh=np.min(k_h.value), maxkh=np.max(k_h.value), npoints=len(k_h.value))
+    kh, z, power_spectrum = results.get_matter_power_spectrum(minkh=np.min(k_h.value),
+                                                              maxkh=np.max(k_h.value),
+                                                              npoints=len(k_h.value))
 
     return power_spectrum[redshift_order[::-1]].T
