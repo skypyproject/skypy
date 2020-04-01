@@ -7,7 +7,7 @@ cosmology:
 tables:
   red_galaxies:
     redshift:
-      module: skypy.galaxy.redshifts_herbel
+      module: skypy.galaxy.redshift
       function: herbel_redshift
       kwargs:
         alpha: -0.5
@@ -18,9 +18,18 @@ tables:
         size: 100
       requires:
         cosmology: cosmology
+    luminosity:
+      module: skypy.galaxy.luminosity
+      function: herbel_luminosities
+      kwargs:
+        alpha: -0.5
+        a_m: -0.70798041
+        b_m: -20.37196157
+      requires:
+        redshift: red_galaxies.redshift
   blue_galaxies:
     redshift:
-      module: skypy.galaxy.redshifts_herbel
+      module: skypy.galaxy.redshift
       function: herbel_redshift
       kwargs:
         alpha: -1.3
@@ -31,3 +40,12 @@ tables:
         size: 200
       requires:
         cosmology: cosmology
+    luminosity:
+      module: skypy.galaxy.luminosity
+      function: herbel_luminosities
+      kwargs:
+        alpha: -1.3
+        a_m: -0.9408582
+        b_m: -20.40492365
+      requires:
+        redshift: blue_galaxies.redshift

@@ -1,4 +1,5 @@
 from astropy.table import Table
+import re
 
 
 class SkyPyDriver:
@@ -26,7 +27,12 @@ class SkyPyDriver:
         args = config.get('args', [])
         kwargs = config.get('kwargs', {})
         req = config.get('requires', {})
-        req = {k: getattr(self, v) for k, v in req.items()}
+        req = {k: self.__getitem__(v) for k, v in req.items()}
 
         # Call function
         return function(*args, **kwargs, **req)
+
+    def __getitem__(self, label):
+        name, key = re.search(r'^(\w*)\.?(\w*)$', label).groups()
+        item = getattr(self, name)
+        return item[key].data if key else item
