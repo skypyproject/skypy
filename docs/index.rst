@@ -29,6 +29,7 @@ Packages
    galaxy/index
    linear/index
    nonlinear/index
+   random/index
 
 
 .. _developer-docs:
