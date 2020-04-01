@@ -13,7 +13,7 @@ def herbel_luminosities(redshift, alpha, a_m, b_m, size=None,
 
     Parameters
     ----------
-    redshift : array-like
+    redshift : (nz,) array-like
         The redshift values at which to sample luminosities.
     alpha : float or int
         The alpha parameter in the Schechter luminosity function.
@@ -21,7 +21,10 @@ def herbel_luminosities(redshift, alpha, a_m, b_m, size=None,
         Factors parameterising the characteristic absolute magnitude M_* as
         a linear function of redshift according to Equation 3.3 in [1].
     size: int, optional
-         Output shape of luminosity samples.
+         Output shape of luminosity samples. If size is None and redshift
+         is a scalar, a single sample is returned. If size is None and
+         redshift is an array, an array of samples is returned with the same
+         shape as redshift.
     q_min, q_max : float or int, optional
         Lower and upper luminosity bounds in units of L*.
     resolution : int, optional

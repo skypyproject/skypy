@@ -27,7 +27,7 @@ def test_calculate_luminosity_star():
 
 
 def test_herbel_luminosities():
-    # test that error is returned if redshift input is an array but size !=
+    # Test that error is returned if redshift input is an array but size !=
     # None and size != redshift,size
     with pytest.raises(ValueError):
         lum.herbel_luminosities(np.array([1, 2]), -1.3, -0.9408582,
