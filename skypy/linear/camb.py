@@ -1,6 +1,6 @@
 import numpy as np
 from camb import CAMBparams, get_results, model
-from astropy import units as uns
+from astropy import units as u
 
 
 def camb(wavenumber, redshift, cosmology, A_s, n_s):
@@ -22,7 +22,7 @@ def camb(wavenumber, redshift, cosmology, A_s, n_s):
         Cosmology parameter, amplitude normalisation of curvature perturbation
         power spectrum
     n_s : float
-        Cosmology parameter, spectral infex of scalar perturbation power
+        Cosmology parameter, spectral index of scalar perturbation power
         spectrum
 
     Returns
@@ -57,7 +57,6 @@ def camb(wavenumber, redshift, cosmology, A_s, n_s):
 
     h2 = cosmology.h * cosmology.h
 
-    # ToDo: ensure astropy.cosmology can fully specify model
     pars = CAMBparams()
     pars.set_cosmology(H0=cosmology.H0.value,
                        ombh2=cosmology.Ob0 * h2,
@@ -81,9 +80,9 @@ def camb(wavenumber, redshift, cosmology, A_s, n_s):
 
     results = get_results(pars)
 
-    k = wavenumber * (1. / uns.Mpc)
+    k = wavenumber * (1. / u.Mpc)
 
-    k_h = k.to((uns.littleh / uns.Mpc), uns.with_H0(cosmology.H0))
+    k_h = k.to((u.littleh / u.Mpc), u.with_H0(cosmology.H0))
 
     kh, z, power_spectrum = results.get_matter_power_spectrum(minkh=np.min(k_h.value),
                                                               maxkh=np.max(k_h.value),
