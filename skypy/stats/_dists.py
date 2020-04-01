@@ -1,5 +1,5 @@
 import numpy as np
-from scipy import stats
+from scipy.stats import rv_continuous
 import scipy.special as sc
 
 
@@ -28,7 +28,7 @@ def _gammaincc(a, x):
 gammaincc = np.vectorize(_gammaincc)
 
 
-class genschechter_gen(stats.rv_continuous):
+class genschechter_gen(rv_continuous):
     r'''Generalised Schechter random variable.
 
     The generalised Schechter distribution is a generalised gamma distribution
@@ -57,7 +57,7 @@ class genschechter_gen(stats.rv_continuous):
 
     Examples
     --------
-    >>> from skypy.random import genschechter
+    >>> from skypy.stats import genschechter
 
     Sample 10 random variates from the `genschechter` distribution with negative
     shape parameter `alpha = -1.2` and lower limit `a = 1e-5`.

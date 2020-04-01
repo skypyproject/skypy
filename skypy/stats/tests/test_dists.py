@@ -5,7 +5,7 @@ from scipy.stats.tests.common_tests import (
     check_skew_expect, check_kurt_expect, check_edge_support,
     check_random_state_property, check_pickling)
 
-from skypy.random import genschechter
+from skypy.stats import genschechter
 
 def test_genschechter():
     # freeze a distribution with parameters

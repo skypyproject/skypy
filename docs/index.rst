@@ -29,7 +29,6 @@ Packages
    galaxy/index
    linear/index
    nonlinear/index
-   random/index
 
 
 .. _developer-docs:
@@ -37,6 +36,11 @@ Packages
 ***********************
 Developer Documentation
 ***********************
+
+.. toctree::
+   :maxdepth: 1
+
+   stats/index
 
 
 .. _project-details:
