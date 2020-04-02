@@ -1,2 +1,2 @@
-from .distributions import *
-from .checks import *
+from .distributions import *  # noqa
+from .checks import *  # noqa
