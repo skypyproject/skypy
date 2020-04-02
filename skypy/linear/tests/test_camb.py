@@ -1,9 +1,12 @@
 import numpy as np
-from astropy.cosmology import default_cosmology
+from astropy.cosmology import Planck15
 from astropy.units import allclose, eV
 from unittest.mock import patch, MagicMock
 
-from skypy.linear.tests.camb_result import camb_direct_pk_z0, camb_direct_pk_z1
+# load the external camb result to test against
+camb_result_filename = './tests/camb_result.txt'
+camb_direct_pk_z0, camb_direct_pk_z1 = np.loadtxt(camb_result_filename,
+                                                  unpack=True, delimiter=',')
 
 # create a mock object and specify values for all the attributes needed in
 # camb.py
@@ -27,14 +30,14 @@ def test_camb():
 
     redshift = [0.0, 1.0]
     wavenumber = np.logspace(-4.0, np.log10(2.0), 200)
-    pk = camb(wavenumber, redshift, default_cosmology.get(), 2.e-9, 0.965)
+    pk = camb(wavenumber, redshift, Planck15, 2.e-9, 0.965)
     assert pk.shape == (len(wavenumber), len(redshift))
     assert allclose(pk[:, 0], camb_direct_pk_z0, rtol=1.e-4)
     assert allclose(pk[:, 1], camb_direct_pk_z1, rtol=1.e-4)
 
     # also check redshifts are ordered correctly
     redshift = [1.0, 0.0]
-    pk = camb(wavenumber, redshift, default_cosmology.get(), 2.e-9, 0.965)
+    pk = camb(wavenumber, redshift, Planck15, 2.e-9, 0.965)
     assert pk.shape == (len(wavenumber), len(redshift))
     assert allclose(pk[:, 0], camb_direct_pk_z1, rtol=1.e-4)
     assert allclose(pk[:, 1], camb_direct_pk_z0, rtol=1.e-4)
