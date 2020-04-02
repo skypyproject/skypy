@@ -5,8 +5,12 @@ Random Variables and Statistics (`skypy.stats`)
 .. automodule:: skypy.stats
 
 
-Continuous Distributions
-========================
+Distributions
+=============
+
+
+Continuous
+----------
 
 .. autosummary::
    :nosignatures:

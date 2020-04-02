@@ -1,5 +1,5 @@
 import numpy as np
-from scipy.stats import rv_continuous
+from ._dist_infrastructure import rv_continuous
 import scipy.special as sc
 
 
@@ -22,7 +22,7 @@ def _gammaincc(a, x):
     return g
 
 
-gammaincc = np.vectorize(_gammaincc)
+gammaincc = np.vectorize(_gammaincc, otypes=['float'])
 
 
 class schechter_gen(rv_continuous):
@@ -31,12 +31,7 @@ class schechter_gen(rv_continuous):
     The Schechter distribution is a gamma distribution with negative shape
     parameter :math:`\alpha` and a lower cut-off.
 
-    Parameters
-    ----------
-    alpha : float or array_like of floats
-        Power law exponent :math:`x^\alpha`, must greater than -2.
-    a : float or array_like of floats
-        Lower cut-off of the distribution.
+    %(before_notes)s
 
     Notes
     -----
@@ -44,19 +39,16 @@ class schechter_gen(rv_continuous):
 
     .. math::
 
-        f(x) = \frac{x^\alpha \, e^{-x}}{\Gamma(\alpha+1, a)} \;,
+        f(x) = \frac{x^\alpha \, e^{-x}}{\Gamma(\alpha+1, a)} \;, \quad
+        x \ge a \;,
 
-    for :math:`x \ge a`, where :math:`a` is given as a shape parameter, and
-    :math:`\alpha` is the shape parameters of the distribution.
+    where :math:`\alpha > -2` is the shape parameter of the distribution, and
+    :math:`a > 0` is the shape parameter for the lower cut-off of the support.
 
-    Examples
-    --------
-    >>> from skypy.stats import schechter
+    %(after_notes)s
 
-    Sample random variates from the `schechter` distribution with negative
-    shape parameter `alpha = -1.2` and lower limit `a = 1e-5`.
+    %(example)s
 
-    >>> x = schechter.rvs(-1.2, 1e-5, size=10)
     '''
 
     def _argcheck(self, alpha, a):
@@ -97,14 +89,7 @@ class genschechter_gen(rv_continuous):
     The generalised Schechter distribution is a generalised gamma distribution
     with negative shape parameter :math:`\alpha` and a lower cut-off.
 
-    Parameters
-    ----------
-    alpha : float or array_like of floats
-        Power law exponent :math:`x^\alpha`, must greater than -2.
-    gamma : float or array_like of floats
-        Log-power law exponent :math:`\exp\{-x^\gamma\}`, must be positive.
-    a : float or array_like of floats
-        Lower cut-off of the distribution.
+    %(before_notes)s
 
     Notes
     -----
@@ -115,17 +100,14 @@ class genschechter_gen(rv_continuous):
         f(x) = \frac{\gamma \, x^\alpha \, e^{-x^\gamma}}
                 {\Gamma\Bigl(\frac{\alpha+1}{\gamma}, a^\gamma\Bigr)} \;,
 
-    for :math:`x \ge a`, where :math:`a` is given as a shape parameter, and
-    :math:`\alpha`, :math:`\gamma` are shape parameters of the distribution.
+    for :math:`x \ge a`, where :math:`\alpha > -2` and :math:`\gamma > 0` are
+    the shape parameters of the distribution, and:math:`a > 0` is the shape
+    parameter for the lower cut-off of the support.
 
-    Examples
-    --------
-    >>> from skypy.stats import genschechter
+    %(after_notes)s
 
-    Sample random variates from the `genschechter` distribution with negative
-    shape parameter `alpha = -1.2` and lower limit `a = 1e-5`.
+    %(example)s
 
-    >>> x = genschechter.rvs(-1.2, 1, 1e-5, size=10)
     '''
 
     def _argcheck(self, alpha, gamma, a):
