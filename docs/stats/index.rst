@@ -2,7 +2,7 @@
 Statistics and Random Variables (:mod:`skypy.stats`)
 ====================================================
 
-.. currentmodule:: skypy.stats
+.. automodule:: skypy.stats
 
 
 Continuous Distributions
