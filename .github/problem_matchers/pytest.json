@@ -1,0 +1,34 @@
+{
+    "problemMatcher": [
+        {
+            "owner": "pytest-failure",
+            "severity": "error",
+            "pattern": [
+                {
+                    "regexp": "^E\\s+.*$"
+                },
+                {
+                    "regexp": "^$"
+                },
+                {
+                    "regexp": "^(.*):(\\d+): (.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "message": 3
+                }
+            ]
+        },
+        {
+            "owner": "pytest-doctest-failure",
+            "severity": "error",
+            "pattern": [
+                {
+                    "regexp": "^.*/site-packages/(.*):(\\d+): (DocTestFailure)$",
+                    "file": 1,
+                    "line": 2,
+                    "message": 3
+                }
+            ]
+        }
+    ]
+}
