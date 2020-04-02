@@ -87,7 +87,7 @@ def late_type_lognormal(magnitude, alpha, beta, gamma, M0, sigma1, sigma2,
     >>> sigma1, sigma2 = 0.48, 0.25
     >>> size.late_type_lognormal(magnitude, alpha, beta, gamma, M0,\
                                  sigma1, sigma2)
-    <Quantity 0.9851048 kpc>
+    <Quantity 0.9850926 kpc>
 
 
     References
@@ -99,25 +99,20 @@ def late_type_lognormal(magnitude, alpha, beta, gamma, M0, sigma1, sigma2,
     if size is None and np.shape(magnitude):
         size = np.shape(magnitude)
 
-    r_bar_value = np.power(10, -0.4 * alpha * magnitude + (beta - alpha) *
-                           np.log10(1 + np.power(10, -0.4 * (magnitude - M0)))
-                           + gamma)
-    r_bar = r_bar_value * units.kpc
+    r_bar = np.power(10, -0.4 * alpha * magnitude + (beta - alpha) *
+                     np.log10(1 + np.power(10, -0.4 * (magnitude - M0)))
+                     + gamma) * units.kpc
 
-    sigma_lnR_numerator = sigma2 + (sigma1 - sigma2)
-    sigma_lnR_denominator = 1.0 + np.power(10, -0.8 * (magnitude - M0))
-    sigma_lnR = sigma_lnR_numerator / sigma_lnR_denominator
+    sigma_lnR = sigma2 + (sigma1 - sigma2) /\
+                         (1.0 + np.power(10, -0.8 * (magnitude - M0)))
 
-    size_physical = r_bar * np.random.lognormal(sigma=sigma_lnR, size=size)
-
-    return size_physical
+    return r_bar * np.random.lognormal(sigma=sigma_lnR, size=size)
 
 
 def early_type_lognormal(magnitude, a, b, M0, sigma1, sigma2, size=None):
-    '''Shen et. al. 2003 (eqns 12, 14, 15 and 16)
-    Lognormal distribution with linear mean.
+    '''Lognormal distribution for early-type galaxies.
     This function provides a lognormal distribution for the physical size of
-    galaxies with mean given by equation 3.14 in [1].
+    early-type galaxies, described by equations 12, 14 and 16 in [1].
 
     Parameters
     ----------
@@ -153,7 +148,7 @@ def early_type_lognormal(magnitude, a, b, M0, sigma1, sigma2, size=None):
     >>> a, b, M0 = 0.6, -4.63, -20.52
     >>> sigma1, sigma2 = 0.48, 0.25
     >>> size.early_type_lognormal(magnitude, a, b, M0, sigma1, sigma2)
-    <Quantity 1.37771671 kpc>
+    <Quantity 1.35830285 kpc>
 
 
     References
@@ -162,10 +157,8 @@ def early_type_lognormal(magnitude, a, b, M0, sigma1, sigma2, size=None):
         J. Brinkmann, I. Csabai, Mon. Not. Roy. Astron. Soc. 343, 978 (2003).
         '''
 
-    size_physical = late_type_lognormal(magnitude, a, a, b, M0, sigma1, sigma2,
-                                        size=size)
-
-    return size_physical
+    return late_type_lognormal(magnitude, a, a, b, M0, sigma1, sigma2,
+                               size=size)
 
 
 def linear_lognormal(magnitude, a_mu, b_mu, sigma, size=None):
@@ -217,6 +210,5 @@ def linear_lognormal(magnitude, a_mu, b_mu, sigma, size=None):
            J. Brinkmann, I.Csabai, Mon. Not. Roy. Astron. Soc. 343, 978 (2003).
     '''
 
-    size_physical = late_type_lognormal(magnitude, -a_mu / 0.4, -a_mu / 0.4,
-                                        b_mu, -np.inf, sigma, sigma, size=size)
-    return size_physical
+    return late_type_lognormal(magnitude, -a_mu / 0.4, -a_mu / 0.4,
+                               b_mu, -np.inf, sigma, sigma, size=size)

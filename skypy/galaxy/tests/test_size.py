@@ -1,5 +1,6 @@
 import numpy as np
 from astropy import units
+from scipy import stats
 import pytest
 
 from astropy.cosmology import FlatLambdaCDM
@@ -54,6 +55,18 @@ def test_late_type_lognormal():
 
     assert np.shape(size_sample.value) == (1000,)
 
+    # Test the distribution of galaxy sizes follows a lognormal distribution
+    mean = -0.4 * alpha * magnitude_scalar + (beta - alpha) *\
+        np.log10(1 + np.power(10, -0.4 * (magnitude_scalar - M0)))\
+        + gamma
+    sigma = sigma2 + (sigma1 - sigma2) /\
+        (1.0 + np.power(10, -0.8 * (magnitude_scalar - M0)))
+
+    arguments = (sigma, 0, np.power(10, mean))
+    d, p = stats.kstest(size_sample, 'lognorm', args=arguments)
+
+    assert p > 0.01
+
 
 def test_early_type_lognormal():
     """ Test lognormal distribution of late-type galaxy sizes"""
@@ -81,6 +94,16 @@ def test_early_type_lognormal():
 
     assert np.shape(size_sample.value) == (1000,)
 
+    # Test the distribution of galaxy sizes follows a lognormal distribution
+    mean = -0.4 * a * magnitude_scalar + b
+    sigma = sigma2 + (sigma1 - sigma2) /\
+                     (1.0 + np.power(10, -0.8 * (magnitude_scalar - M0)))
+
+    arguments = (sigma, 0, np.power(10, mean))
+    d, p = stats.kstest(size_sample, 'lognorm', args=arguments)
+
+    assert p > 0.01
+
 
 def test_linear_lognormal():
     """ Test lognormal distribution of galaxy sizes"""
@@ -106,16 +129,8 @@ def test_linear_lognormal():
     assert np.shape(size_sample.value) == (1000,)
 
     # Test the distribution of galaxy sizes follows a lognormal distribution
-    # size_distribution = size_sample.value
+    mean = a_mu * magnitude_scalar + b_mu
+    arguments = (sigma, 0, np.power(10, mean))
+    d, p = stats.kstest(size_sample, 'lognorm', args=arguments)
 
-    # mu_physical = a_mu * scalar_magnitude + b_mu
-    # mu_value = mu_physical.value
-
-    # arguments = (sigma.value, 0, np.exp(mu_value))
-    # test = stats.kstest(size_distribution, 'lognorm', args=arguments)
-
-    # D_value = test[0]
-    # p_value = test[1]
-
-    # assert p_value > 0.01
-    # assert D_value < p_value
+    assert p > 0.01
