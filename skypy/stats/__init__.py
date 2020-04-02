@@ -1,1 +1,1 @@
-from ._dists import *
+from .distributions import *

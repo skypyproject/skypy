@@ -1,9 +1,14 @@
-***********************************************
-Statistics and Random Variables (`skypy.stats`)
-***********************************************
+====================================================
+Statistics and Random Variables (:mod:`skypy.stats`)
+====================================================
+
+.. currentmodule:: skypy.stats
 
 
-Reference/API
-=============
+Continuous Distributions
+========================
 
-.. automodapi:: skypy.stats
+.. autosummary::
+   :toctree:
+
+   genschechter -- Generalised Schechter distribution

@@ -13,7 +13,9 @@ def _gammainc(a, x):
         b, g, f = b-1, g+b/x*(g-f), g
     return g
 
+
 gammainc = np.vectorize(_gammainc)
+
 
 def _gammaincc(a, x):
     '''gammaincc for negative indices'''
@@ -24,6 +26,7 @@ def _gammaincc(a, x):
     while b > a:
         b, g, f = b-1, g+b/x*(g-f), g
     return g
+
 
 gammaincc = np.vectorize(_gammaincc)
 
@@ -53,13 +56,13 @@ class genschechter_gen(rv_continuous):
                 {\Gamma\Bigl(\frac{\alpha+1}{\gamma}, c^\gamma\Bigr)} \;,
 
     for :math:`x \ge a`, where :math:`a` is given as a shape parameter, and
-    :math:`\alpha`, :math:`\gamma` are the shape parameters of the distribution.
+    :math:`\alpha`, :math:`\gamma` are shape parameters of the distribution.
 
     Examples
     --------
     >>> from skypy.stats import genschechter
 
-    Sample 10 random variates from the `genschechter` distribution with negative
+    Sample random variates from the `genschechter` distribution with negative
     shape parameter `alpha = -1.2` and lower limit `a = 1e-5`.
 
     >>> x = genschechter.rvs(-1.2, 1, 1e-5, size=10)
@@ -90,8 +93,9 @@ class genschechter_gen(rv_continuous):
         a_to_gamma = a**gamma
         ap1nog = (alpha+1+n)/gamma
         ap1og = (alpha+1)/gamma
-        Gn = np.log(np.fabs(gammaincc(ap1nog, a_to_gamma))) + sc.gammaln(ap1nog)
-        G = np.log(np.fabs(gammaincc(ap1og, a_to_gamma))) + sc.gammaln(ap1og)
-        return np.exp(Gn - G)
+        u = np.log(np.fabs(gammaincc(ap1nog, a_to_gamma))) + sc.gammaln(ap1nog)
+        v = np.log(np.fabs(gammaincc(ap1og, a_to_gamma))) + sc.gammaln(ap1og)
+        return np.exp(u - v)
+
 
 genschechter = genschechter_gen(a=0., name='genschechter')
