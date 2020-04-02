@@ -105,7 +105,7 @@ def late_type_lognormal(magnitude, alpha, beta, gamma, M0, sigma1, sigma2,
     r_bar = r_bar_value * units.kpc
 
     sigma_lnR_numerator = sigma2 + (sigma1 - sigma2)
-    sigma_lnR_denominator= 1.0 + np.power(10, -0.8 * (magnitude - M0))
+    sigma_lnR_denominator = 1.0 + np.power(10, -0.8 * (magnitude - M0))
     sigma_lnR = sigma_lnR_numerator / sigma_lnR_denominator
 
     size_physical = r_bar * np.random.lognormal(sigma=sigma_lnR, size=size)
