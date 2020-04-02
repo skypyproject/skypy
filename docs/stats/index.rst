@@ -9,6 +9,7 @@ Continuous Distributions
 ========================
 
 .. autosummary::
-   :toctree:
+   :nosignatures:
+   :toctree: generated/
 
-   genschechter -- Generalised Schechter distribution
+   genschechter
