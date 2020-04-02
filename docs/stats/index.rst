@@ -10,7 +10,7 @@ Continuous Distributions
 
 .. autosummary::
    :nosignatures:
-   :toctree: generated/
+   :toctree: ../api/
 
    genschechter
    schechter
