@@ -13,3 +13,4 @@ Continuous Distributions
    :toctree: generated/
 
    genschechter
+   schechter

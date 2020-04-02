@@ -3,18 +3,9 @@ from scipy.stats import rv_continuous
 import scipy.special as sc
 
 
-def _gammainc(a, x):
-    '''gammainc for negative indices'''
-    b = a
-    while b < 0:
-        b = b+1
-    g, f = sc.gammainc(b, x), sc.gammainc(b+1, x)
-    while b > a:
-        b, g, f = b-1, g+b/x*(g-f), g
-    return g
-
-
-gammainc = np.vectorize(_gammainc)
+def gammaincc_m1(a, x):
+    '''gammaincc for negative indices > -1'''
+    return sc.gammaincc(a+1, x) - np.exp(sc.xlogy(a, x) - x - sc.gammaln(a+1))
 
 
 def _gammaincc(a, x):
@@ -22,13 +13,82 @@ def _gammaincc(a, x):
     b = a
     while b < 0:
         b = b+1
-    g, f = sc.gammaincc(b, x), sc.gammaincc(b+1, x)
+    g = sc.gammaincc(b, x)
+    f = np.exp(sc.xlogy(b, x) - x - sc.gammaln(b+1))
     while b > a:
-        b, g, f = b-1, g+b/x*(g-f), g
+        f *= b/x
+        g -= f
+        b -= 1
     return g
 
 
 gammaincc = np.vectorize(_gammaincc)
+
+
+class schechter_gen(rv_continuous):
+    r'''Schechter random variable.
+
+    The Schechter distribution is a gamma distribution with negative shape
+    parameter :math:`\alpha` and a lower cut-off.
+
+    Parameters
+    ----------
+    alpha : float or array_like of floats
+        Power law exponent :math:`x^\alpha`, must greater than -2.
+    a : float or array_like of floats
+        Lower cut-off of the distribution.
+
+    Notes
+    -----
+    The probability distribution function for `schechter` is
+
+    .. math::
+
+        f(x) = \frac{x^\alpha \, e^{-x}}{\Gamma(\alpha+1, a)} \;,
+
+    for :math:`x \ge a`, where :math:`a` is given as a shape parameter, and
+    :math:`\alpha` is the shape parameters of the distribution.
+
+    Examples
+    --------
+    >>> from skypy.stats import schechter
+
+    Sample random variates from the `schechter` distribution with negative
+    shape parameter `alpha = -1.2` and lower limit `a = 1e-5`.
+
+    >>> x = schechter.rvs(-1.2, 1e-5, size=10)
+    '''
+
+    def _argcheck(self, alpha, a):
+        return (alpha > -2) & (a > 0)
+
+    def _get_support(self, alpha, a):
+        return a, self.b
+
+    def _pdf(self, x, alpha, a):
+        return np.exp(self._logpdf(x, alpha, a))
+
+    def _logpdf(self, x, alpha, a):
+        ap1 = alpha+1
+        norm = np.log(np.fabs(gammaincc_m1(ap1, a))) + sc.gammaln(ap1)
+        return sc.xlogy(alpha, x) - x - norm
+
+    def _cdf(self, x, alpha, a):
+        return 1 - self._sf(x, alpha, a)
+
+    def _sf(self, x, alpha, a):
+        ap1 = alpha+1
+        return gammaincc_m1(ap1, x)/gammaincc_m1(ap1, a)
+
+    def _munp(self, n, alpha, a):
+        ap1n = alpha+1+n
+        ap1 = alpha+1
+        u = np.log(np.fabs(gammaincc_m1(ap1n, a))) + sc.gammaln(ap1n)
+        v = np.log(np.fabs(gammaincc_m1(ap1, a))) + sc.gammaln(ap1)
+        return np.exp(u - v)
+
+
+schechter = schechter_gen(a=0., name='schechter')
 
 
 class genschechter_gen(rv_continuous):
@@ -53,7 +113,7 @@ class genschechter_gen(rv_continuous):
     .. math::
 
         f(x) = \frac{\gamma \, x^\alpha \, e^{-x^\gamma}}
-                {\Gamma\Bigl(\frac{\alpha+1}{\gamma}, c^\gamma\Bigr)} \;,
+                {\Gamma\Bigl(\frac{\alpha+1}{\gamma}, a^\gamma\Bigr)} \;,
 
     for :math:`x \ge a`, where :math:`a` is given as a shape parameter, and
     :math:`\alpha`, :math:`\gamma` are shape parameters of the distribution.
