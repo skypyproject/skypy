@@ -46,21 +46,22 @@ def angular_size(physical_size, redshift, cosmology):
     return angular_size
 
 
-def linear_lognormal(magnitude, a_mu, b_mu, sigma_physical, size=None):
-    '''Lognormal distribution with linear mean.
+def late_type_lognormal(magnitude, alpha, beta, gamma, M0, sigma1, sigma2,
+                        size=None):
+    '''Lognormal distribution for late-type galaxies.
     This function provides a lognormal distribution for the physical size of
-    galaxies with mean given by equation 3.14 in [1].
+    late-type galaxies, described by equations 12, 15 and 16 in [1].
 
     Parameters
     ----------
-    magnitude : float
+    magnitude : float or array_like.
         Galaxy magnitude at which evaluate the lognormal distribution.
-    a_mu, b_mu : astropy.Quantity
-        Lognormal distribution parameters for the physical radius of galaxies
-        in units of length, described in [1].
-    sigma_physical : astropy.Quantity
-        Standard deviation of the lognormal distribution for the
-        physical radius of galaxies in units of length.
+    alpha, beta, gamma, M0: float
+        Model parameters describing the mean size of galaxies in [kpc].
+        Equation 15 in [1].
+    sigma1, sigma2: float
+        Parameters describing the standard deviation of the lognormal
+        distribution for the physical radius of galaxies. Equation 16 in [1].
     size : int or tuple of ints, optional.
         Output shape. If the given shape is, e.g., (m, n, k),
         then m * n * k samples are drawn. If size is None (default),
@@ -70,33 +71,152 @@ def linear_lognormal(magnitude, a_mu, b_mu, sigma_physical, size=None):
     Results
     -------
     physical_size : numpy.ndarray or astropy.Quantity
-        Physical distance for a given galaxy with a given magnitude,
-        in the same length units as input parameters.
+        Physical distance for a given galaxy with a given magnitude, in [kpc].
+        If size is None and magnitude is a scalar, a single sample is returned.
+        If size is different from None and magnitude is scalar,
+        shape is (size,). If magnitude has shape (nm,) and size=None,
+        shape is (nm,).
 
     Examples
     --------
     >>> import numpy as np
-    >>> from astropy import units
+    >>> from skypy.galaxy import size
     >>> np.random.seed(12345)
-    >>> magnitude = 26.0
-    >>> a_mu = -0.25 * units.kpc
-    >>> b_mu = 1.0 * units.kpc
-    >>> sigma = 0.5 * units.kpc
-    >>> linear_lognormal(magnitude, a_mu, b_mu, sigma)
-    <Quantity 0.00368917 kpc>
+    >>> magnitude = -16.0
+    >>> alpha, beta, gamma, M0 = 0.21, 0.53, -1.31, -20.52
+    >>> sigma1, sigma2 = 0.48, 0.25
+    >>> size.late_type_lognormal(magnitude, alpha, beta, gamma, M0,\
+                                 sigma1, sigma2)
+    <Quantity 0.9851048 kpc>
+
 
     References
     ----------
-    .. [1] J. Herbel, T. Kacprzak, A. Amara, A. Refregier, C.Bruderer and
-           A. Nicola, JCAP 1708, 035 (2017).
+    ..[1] S. Shen, H.J. Mo, S.D.M. White, M.R. Blanton, G. Kauffmann, W. Voges,
+        J. Brinkmann, I. Csabai, Mon. Not. Roy. Astron. Soc. 343, 978 (2003).
     '''
 
-    mu_physical = units.Quantity(a_mu * magnitude + b_mu)
-    sigma_physical = units.Quantity(sigma_physical).to(mu_physical.unit)
-    mu_value = mu_physical.value
-    sigma_value = sigma_physical.value
+    if size is None and np.shape(magnitude):
+        size = np.shape(magnitude)
 
-    size_value = np.random.lognormal(mu_value, sigma_value, size=size)
-    size_physical = size_value * mu_physical.unit
+    r_bar_value = np.power(10, -0.4 * alpha * magnitude + (beta - alpha) *
+                           np.log10(1 + np.power(10, -0.4 * (magnitude - M0)))
+                           + gamma)
+    r_bar = r_bar_value * units.kpc
 
+    sigma_lnR_numerator = sigma2 + (sigma1 - sigma2)
+    sigma_lnR_denominator= 1.0 + np.power(10, -0.8 * (magnitude - M0))
+    sigma_lnR = sigma_lnR_numerator / sigma_lnR_denominator
+
+    size_physical = r_bar * np.random.lognormal(sigma=sigma_lnR, size=size)
+
+    return size_physical
+
+
+def early_type_lognormal(magnitude, a, b, M0, sigma1, sigma2, size=None):
+    '''Shen et. al. 2003 (eqns 12, 14, 15 and 16)
+    Lognormal distribution with linear mean.
+    This function provides a lognormal distribution for the physical size of
+    galaxies with mean given by equation 3.14 in [1].
+
+    Parameters
+    ----------
+    magnitude : float or array_like.
+        Galaxy magnitude at which evaluate the lognormal distribution.
+    a_mu, b_mu : float
+        Linear model parameters describing the mean size of galaxies,
+        equation 3.14 in [1].
+    sigma: float
+        Standard deviation of the lognormal distribution for the
+        physical radius of galaxies.
+    size : int or tuple of ints, optional.
+        Output shape. If the given shape is, e.g., (m, n, k),
+        then m * n * k samples are drawn. If size is None (default),
+        a single value is returned if mean and sigma are both scalars.
+        Otherwise, np.broadcast(mean, sigma).size samples are drawn.
+
+    Results
+    -------
+    physical_size : ndarray or astropy.Quantity
+        Physical distance for a given galaxy with a given magnitude, in [kpc].
+        If size is None and magnitude is a scalar, a single sample is returned.
+        If size is different from None and magnitude is scalar,
+        shape is (size,). If magnitude has shape (nm,) and size=None,
+        shape is (nm,).
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from skypy.galaxy import size
+    >>> np.random.seed(12345)
+    >>> magnitude = -20.0
+    >>> a, b, M0 = 0.6, -4.63, -20.52
+    >>> sigma1, sigma2 = 0.48, 0.25
+    >>> size.early_type_lognormal(magnitude, a, b, M0, sigma1, sigma2)
+    <Quantity 1.37771671 kpc>
+
+
+    References
+    ----------
+    ..[1] S. Shen, H.J. Mo, S.D.M. White, M.R. Blanton, G. Kauffmann, W. Voges,
+        J. Brinkmann, I. Csabai, Mon. Not. Roy. Astron. Soc. 343, 978 (2003).
+        '''
+
+    size_physical = late_type_lognormal(magnitude, a, a, b, M0, sigma1, sigma2,
+                                        size=size)
+
+    return size_physical
+
+
+def linear_lognormal(magnitude, a_mu, b_mu, sigma, size=None):
+    '''Lognormal distribution with linear mean.
+    This function provides a lognormal distribution for the physical size of
+    galaxies with a linear mean, described by equation 3.14 in [1]. See also
+    equation 14 in [2].
+
+    Parameters
+    ----------
+    magnitude : float or array_like.
+        Galaxy magnitude at which evaluate the lognormal distribution.
+    a_mu, b_mu : float
+        Linear model parameters describing the mean size of galaxies,
+        equation 3.14 in [1].
+    sigma: float
+        Standard deviation of the lognormal distribution for the
+        physical radius of galaxies.
+    size : int or tuple of ints, optional.
+        Output shape. If the given shape is, e.g., (m, n, k),
+        then m * n * k samples are drawn. If size is None (default),
+        a single value is returned if mean and sigma are both scalars.
+        Otherwise, np.broadcast(mean, sigma).size samples are drawn.
+
+    Results
+    -------
+    physical_size : numpy.ndarray or astropy.Quantity
+        Physical distance for a given galaxy with a given magnitude, in [kpc].
+        If size is None and magnitude is a scalar, a single sample is returned.
+        If size is different from None and magnitude is scalar,
+        shape is (size,). If magnitude has shape (nm,) and size=None,
+        shape is (nm,).
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from skypy.galaxy import size
+    >>> np.random.seed(12345)
+    >>> magnitude = -20.0
+    >>> a_mu, b_mu, sigma =-0.24, -4.63, 0.4
+    >>> size.linear_lognormal(magnitude, a_mu, b_mu, sigma)
+    <Quantity 1.36282044 kpc>
+
+    References
+    ----------
+    ..[1] J. Herbel, T. Kacprzak, A. Amara, A. Refregier, C.Bruderer and
+           A. Nicola, JCAP 1708, 035 (2017).
+    ..[2] S. Shen, H.J. Mo, S.D.M. White, M.R. Blanton, G. Kauffmann, W.Voges,
+           J. Brinkmann, I.Csabai, Mon. Not. Roy. Astron. Soc. 343, 978 (2003).
+    '''
+
+    size_physical = late_type_lognormal(magnitude, -a_mu / 0.4, -a_mu / 0.4,
+                                        b_mu, -np.inf, sigma, sigma, size=size)
     return size_physical
