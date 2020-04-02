@@ -34,7 +34,7 @@ def check_functions(rv, args, size=10):
 
     # check CDF and PPF
     npt.assert_allclose(rv.ppf(q, *args), x)
-    
+
     # check SF and ISF
     npt.assert_allclose(rv.isf(1-q, *args), x)
 
@@ -64,7 +64,7 @@ def check_sample_size(rv, args):
 
     # sample a single value
     rvs = rv.rvs(*args)
-    assert np.isscalar(rvs), 'sampling without size did not produce scalar' 
+    assert np.isscalar(rvs), 'sampling without size did not produce scalar'
 
     # sample 1d array
     rvs = rv.rvs(*args, size=10)
