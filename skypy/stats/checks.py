@@ -4,6 +4,17 @@ import scipy.stats as st
 import scipy.stats.tests as stt
 
 
+# list of exported checks
+__all__ = [
+    'check_internals',
+    'check_normalisation',
+    'check_functions',
+    'check_moments',
+    'check_sample_size',
+    'check_sample_distribution'
+]
+
+
 def check_internals(rv, args):
     '''check internal settings of rv'''
 

@@ -5,37 +5,24 @@ Random Variables and Statistics (`skypy.stats`)
 .. automodule:: skypy.stats
 
 
-Distributions
-=============
-
-
-Continuous
-----------
+Implementing Random Variables
+=============================
 
 .. autosummary::
    :nosignatures:
-   :toctree: ../api/
+   :toctree: ../api
 
-   genschechter
-   schechter
+   rv_example
 
 
-Random Variable Testing
+Testing Random Variable
 =======================
-
-
-Suites
-------
 
 .. autosummary::
    :nosignatures:
    :toctree: ../api/
 
    check_rv
-
-
-Checks
-------
 
 .. autosummary::
    :nosignatures:
@@ -47,3 +34,14 @@ Checks
    check_moments
    check_sample_size
    check_sample_distribution
+
+
+Generic Distributions
+=====================
+
+.. autosummary::
+   :nosignatures:
+   :toctree: ../api/
+
+   genschechter
+   schechter

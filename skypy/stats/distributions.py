@@ -1,6 +1,14 @@
 import numpy as np
-from ._dist_infrastructure import rv_continuous
+from scipy.stats import rv_continuous
+from ._doc import rv_example
 import scipy.special as sc
+
+
+# list of exported distributions
+__all__ = [
+    'genschechter',
+    'schechter',
+]
 
 
 def gammaincc_m1(a, x):
@@ -25,6 +33,7 @@ def _gammaincc(a, x):
 gammaincc = np.vectorize(_gammaincc, otypes=['float'])
 
 
+@rv_example(-1.2, 10.)
 class schechter_gen(rv_continuous):
     r'''Schechter random variable.
 
@@ -83,6 +92,7 @@ class schechter_gen(rv_continuous):
 schechter = schechter_gen(a=0., name='schechter')
 
 
+@rv_example(-1.2, 1.5, 10.)
 class genschechter_gen(rv_continuous):
     r'''Generalised Schechter random variable.
 
