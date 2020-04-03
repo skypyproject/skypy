@@ -11,7 +11,8 @@ __all__ = [
     'check_functions',
     'check_moments',
     'check_sample_size',
-    'check_sample_distribution'
+    'check_sample_distribution',
+    'check_rv',
 ]
 
 
