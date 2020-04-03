@@ -1,7 +1,7 @@
 Package for modelling the universe.
 -----------------------------------
 
-|Astropy Badge| |CircleCI Status| |Coverage Status|
+|Astropy Badge| |CircleCI Status| |Coverage Status| |Documentation Status|
 
 This package contains methods for modelling the universe, galaxies and Milky
 Way. Also included are methods for generating observed data.
@@ -60,3 +60,7 @@ skypy based on its use in the README file for the
 .. |Coverage Status| image:: https://codecov.io/gh/skypyproject/skypy/branch/develop/graph/badge.svg
     :target: https://codecov.io/gh/skypyproject/skypy
     :alt: Astropy's Coverage Status
+
+.. |Documentation Status| image:: https://readthedocs.org/projects/githubapps/badge/?version=latest
+    :target: https://skypy.readthedocs.io/en/latest/?badge=latest
+    :alt: Documentation Status
