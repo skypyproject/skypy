@@ -3,14 +3,20 @@
 import sys
 
 
+# list of exported symbols
+__all__ = [
+    'rv_example',
+]
+
+
 _EXAMPLE_IMPORT = 'from %(module)s import %(name)s\n'
 _EXAMPLE_ARGS = '>>> %(shapes)s = %(args)s\n'
 
 
-def rv_example(*args):
+def rv_example(*example_args):
     '''Decorator for random variables with default example docstring.'''
 
-    example_args = str(args)
+    example_args = ', '.join('%.3g' % arg for arg in example_args)
 
     def decorator_rv_example(rv_gen):
         if sys.flags.optimize < 2:
