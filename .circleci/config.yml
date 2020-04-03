@@ -10,12 +10,17 @@ jobs:
           command: |
             python3 -m venv venv
             . venv/bin/activate
-            pip install astropy pytest pytest-astropy scipy "setuptools>=30.3"
+            pip install astropy codecov pytest pytest-astropy scipy "setuptools>=30.3"
       - run:
           name: Run Tests
           command: |
             . venv/bin/activate
-            python setup.py test
+            python setup.py test --coverage
+      - run:
+          name: Run codecov
+          command: |
+            . venv/bin/activate
+            codecov
   code-style:
     docker:
       - image: circleci/python:3.5
