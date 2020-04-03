@@ -1,18 +1,18 @@
 import numpy as np
 from astropy.cosmology import Planck15
-from astropy.units import allclose, eV
+from astropy.units import allclose
 from astropy.utils.data import get_pkg_data_filename
 from unittest.mock import patch, MagicMock
 
 # load the external camb result to test against
 camb_result_filename = get_pkg_data_filename('data/camb_result.txt')
-camb_direct_pk_z0, camb_direct_pk_z1 = np.loadtxt(camb_result_filename,
-                                                  unpack=True, delimiter=',')
+mock_pkz = np.loadtxt(camb_result_filename, delimiter=',')
 
 # create a mock object and specify values for all the attributes needed in
 # camb.py
 camb_mock = MagicMock()
-camb_mock.get_results().get_matter_power_spectrum.return_value = [0, 1, np.array([camb_direct_pk_z0, camb_direct_pk_z1])]
+camb_result = [0, 1, mock_pkz]
+camb_mock.get_results().get_matter_power_spectrum.return_value = camb_result
 
 # try to import the requirement, if it doesn't exist, use the mock instead
 try:
@@ -33,12 +33,12 @@ def test_camb():
     wavenumber = np.logspace(-4.0, np.log10(2.0), 200)
     pk = camb(wavenumber, redshift, Planck15, 2.e-9, 0.965)
     assert pk.shape == (len(wavenumber), len(redshift))
-    assert allclose(pk[:, 0], camb_direct_pk_z0, rtol=1.e-4)
-    assert allclose(pk[:, 1], camb_direct_pk_z1, rtol=1.e-4)
+    assert allclose(pk[:, 0], mock_pkz[:, 0], rtol=1.e-4)
+    assert allclose(pk[:, 1], mock_pkz[:, 1], rtol=1.e-4)
 
     # also check redshifts are ordered correctly
     redshift = [1.0, 0.0]
     pk = camb(wavenumber, redshift, Planck15, 2.e-9, 0.965)
     assert pk.shape == (len(wavenumber), len(redshift))
-    assert allclose(pk[:, 0], camb_direct_pk_z1, rtol=1.e-4)
-    assert allclose(pk[:, 1], camb_direct_pk_z0, rtol=1.e-4)
+    assert allclose(pk[:, 0], mock_pkz[:, 1], rtol=1.e-4)
+    assert allclose(pk[:, 1], mock_pkz[:, 0], rtol=1.e-4)
