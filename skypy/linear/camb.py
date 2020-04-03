@@ -67,8 +67,8 @@ def camb(wavenumber, redshift, cosmology, A_s, n_s):
                        standard_neutrino_neff=cosmology.Neff
                        )
 
-    redshift_order = np.argsort(redshift)[::-1]  # camb requires redshifts to
-                                                 # be in decreasing order
+    # camb requires redshifts to be in decreasing order
+    redshift_order = np.argsort(redshift)[::-1]
 
     pars.InitPower.ns = n_s
     pars.InitPower.As = A_s
