@@ -1,10 +1,11 @@
 import numpy as np
 from astropy.cosmology import Planck15
 from astropy.units import allclose, eV
+from astropy.utils.data import get_pkg_data_filename
 from unittest.mock import patch, MagicMock
 
 # load the external camb result to test against
-camb_result_filename = './tests/camb_result.txt'
+camb_result_filename = get_pkg_data_filename('data/camb_result.txt')
 camb_direct_pk_z0, camb_direct_pk_z1 = np.loadtxt(camb_result_filename,
                                                   unpack=True, delimiter=',')
 
