@@ -10,7 +10,7 @@ jobs:
           command: |
             python3 -m venv venv
             . venv/bin/activate
-            pip install astropy codecov pytest pytest-astropy scipy "setuptools>=30.3"
+            pip install astropy codecov 'coverage<5' pytest pytest-astropy scipy "setuptools>=30.3"
       - run:
           name: Run Tests
           command: |
