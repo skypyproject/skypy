@@ -1,3 +1,17 @@
+r'''Models of galaxy luminosities.
+
+
+Models
+======
+
+.. autosummary::
+   :nosignatures:
+   :toctree: ../api/
+
+   herbel_luminosities
+
+'''
+
 import numpy as np
 
 import skypy.utils.astronomy as astro
@@ -8,8 +22,10 @@ def herbel_luminosities(redshift, alpha, a_m, b_m, size=None,
                         q_min=0.00305,
                         q_max=1100.0, resolution=100):
 
-    r""" Luminosities following the Schechter luminosity function followjng the
-        Herbel er al. (2017) model.
+    r"""Model of Herbel et al (2017)
+
+    Luminosities following the Schechter luminosity function following the
+    Herbel et al. [1]_ model.
 
     Parameters
     ----------
@@ -19,7 +35,7 @@ def herbel_luminosities(redshift, alpha, a_m, b_m, size=None,
         The alpha parameter in the Schechter luminosity function.
     a_m, b_m : float or int
         Factors parameterising the characteristic absolute magnitude M_* as
-        a linear function of redshift according to Equation 3.3 in [1].
+        a linear function of redshift according to Equation 3.3 in [1]_.
     size: int, optional
          Output shape of luminosity samples. If size is None and redshift
          is a scalar, a single sample is returned. If size is None and
@@ -36,8 +52,8 @@ def herbel_luminosities(redshift, alpha, a_m, b_m, size=None,
         Drawn luminosities from the Schechter luminosity function.
 
     Notes
-    -------
-     The Schechter luminosity function is given as
+    -----
+    The Schechter luminosity function is given as
 
     .. math::
 
@@ -51,7 +67,7 @@ def herbel_luminosities(redshift, alpha, a_m, b_m, size=None,
 
         L = 10^{-0.4M} \;,
 
-    with absolute magnitude :math:`M`. Furthermore, Herbel et al. (2017)
+    with absolute magnitude :math:`M`. Furthermore, Herbel et al. [1]_
     introduced
 
     .. math::
@@ -67,7 +83,7 @@ def herbel_luminosities(redshift, alpha, a_m, b_m, size=None,
         \phi(L,z) = \frac{d_H d_M^2}{E(z)}  \Phi(L,z)\;.
 
     Examples
-    -------
+    --------
     >>> import skypy.galaxy.luminosity as lum
 
     Sample 100 luminosity values at redshift z = 1.0 with
@@ -84,9 +100,9 @@ def herbel_luminosities(redshift, alpha, a_m, b_m, size=None,
     ...                                         -20.40492365)
 
     References
-    -------
-    [1] Herbel J., Kacprzak T., Amara A. et al., 2017, Journal of Cosmology and
-    Astroparticle Physics, Issue 08, article id. 035 (2017)
+    ----------
+    .. [1] Herbel J., Kacprzak T., Amara A. et al., 2017, Journal of Cosmology
+           and Astroparticle Physics, Issue 08, article id. 035 (2017)
 
     """
 

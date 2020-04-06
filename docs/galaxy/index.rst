@@ -2,25 +2,28 @@
 Galaxies (`skypy.galaxy`)
 *************************
 
+.. automodule:: skypy.galaxy
+
 
 Luminosities (`skypy.galaxy.luminosity`)
 ========================================
 
+.. automodule:: skypy.galaxy.luminosity
+
+
 Redshifts (`skypy.galaxy.redshift`)
 ===================================
+
+.. automodule:: skypy.galaxy.redshift
+
 
 Sizes (`skypy.galaxy.size`)
 ===========================
 
-Spectra ('skypy.galaxy.spectrum')
+.. automodule:: skypy.galaxy.size
+
+
+Spectra (`skypy.galaxy.spectrum`)
 =================================
 
-
-Reference/API
-=============
-
-.. automodapi:: skypy.galaxy
-.. automodapi:: skypy.galaxy.luminosity
-.. automodapi:: skypy.galaxy.redshift
-.. automodapi:: skypy.galaxy.size
-.. automodapi:: skypy.galaxy.spectrum
+.. automodule:: skypy.galaxy.spectrum

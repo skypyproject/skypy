@@ -1,5 +1,30 @@
-""" This modules computes the angular size of galaxies from
-their physical size."""
+r"""Galaxy size module.
+
+This modules computes the angular size of galaxies from their physical size.
+
+
+Utility functions
+=================
+
+.. autosummary::
+   :nosignatures:
+   :toctree: ../api/
+
+   angular_size
+
+
+Models
+======
+
+.. autosummary::
+   :nosignatures:
+   :toctree: ../api/
+
+   early_type_lognormal
+   late_type_lognormal
+   linear_lognormal
+
+"""
 
 import numpy as np
 from astropy import units
@@ -20,7 +45,7 @@ def angular_size(physical_size, redshift, cosmology):
         Cosmology object providing methods for the evolution history of
         omega_matter and omega_lambda with redshift.
 
-    Results
+    Returns
     -------
     angular_size : astropy.Quantity
         Angular distances in units of [rad] for a given radius.
@@ -68,7 +93,7 @@ def late_type_lognormal(magnitude, alpha, beta, gamma, M0, sigma1, sigma2,
         a single value is returned if mean and sigma are both scalars.
         Otherwise, np.broadcast(mean, sigma).size samples are drawn.
 
-    Results
+    Returns
     -------
     physical_size : numpy.ndarray or astropy.Quantity
         Physical distance for a given galaxy with a given magnitude, in [kpc].
@@ -130,7 +155,7 @@ def early_type_lognormal(magnitude, a, b, M0, sigma1, sigma2, size=None):
         a single value is returned if mean and sigma are both scalars.
         Otherwise, np.broadcast(mean, sigma).size samples are drawn.
 
-    Results
+    Returns
     -------
     physical_size : ndarray or astropy.Quantity
         Physical distance for a given galaxy with a given magnitude, in [kpc].
@@ -183,7 +208,7 @@ def linear_lognormal(magnitude, a_mu, b_mu, sigma, size=None):
         a single value is returned if mean and sigma are both scalars.
         Otherwise, np.broadcast(mean, sigma).size samples are drawn.
 
-    Results
+    Returns
     -------
     physical_size : numpy.ndarray or astropy.Quantity
         Physical distance for a given galaxy with a given magnitude, in [kpc].
