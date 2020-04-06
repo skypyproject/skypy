@@ -1,5 +1,4 @@
 import numpy as np
-from camb import CAMBparams, get_results, model
 from astropy import units as u
 
 
@@ -53,6 +52,11 @@ def camb(wavenumber, redshift, cosmology, A_s, n_s):
     arXiv: astro-ph/9911177
 
     """
+
+    try:
+        from camb import CAMBparams, get_results, model
+    except ImportError:
+        raise Exception("camb is required to use skypy.linear.camb")
 
     redshift = np.atleast_1d(redshift)
 
