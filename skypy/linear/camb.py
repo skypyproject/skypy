@@ -39,12 +39,13 @@ def camb(wavenumber, redshift, cosmology, A_s, n_s):
     >>> from astropy.cosmology import default_cosmology
     >>> cosmology = default_cosmology.get()
     >>> redshift = np.array([0, 1])
-    >>> wavenumber = np.array([1.e-2, 1.e-1])
+    >>> wavenumber = np.array([1.e-2, 1.e-1, 1e0])
     >>> A_s = 2.e-9
     >>> n_s = 0.965
     >>> camb(wavenumber, redshift, cosmology, A_s, n_s)
-    array([[17596.19571205,  9367.99583637],
-           [ 6524.28734592,  3479.62135542]])
+    array([[2.34758952e+04, 8.70837957e+03],
+           [3.03660813e+03, 1.12836115e+03],
+           [2.53124880e+01, 9.40802814e+00]])
 
     Reference
     ---------
