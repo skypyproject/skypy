@@ -1,12 +1,12 @@
-''' This modules computes the angular size of galaxies from
-their physical size.'''
+""" This modules computes the angular size of galaxies from
+their physical size."""
 
 import numpy as np
 from astropy import units
 
 
 def angular_size(physical_size, redshift, cosmology):
-    '''Angular size of a galaxy.
+    """Angular size of a galaxy.
     This function transforms physical radius into angular distance, described
     in [1].
 
@@ -38,7 +38,7 @@ def angular_size(physical_size, redshift, cosmology):
     References
     ----------
     .. [1] D. W. Hogg, (1999), astro-ph/9905116.
-    '''
+    """
 
     distance = cosmology.angular_diameter_distance(redshift)
     angular_size = np.arctan(physical_size / distance)
@@ -48,7 +48,7 @@ def angular_size(physical_size, redshift, cosmology):
 
 def late_type_lognormal(magnitude, alpha, beta, gamma, M0, sigma1, sigma2,
                         size=None):
-    '''Lognormal distribution for late-type galaxies.
+    """Lognormal distribution for late-type galaxies.
     This function provides a lognormal distribution for the physical size of
     late-type galaxies, described by equations 12, 15 and 16 in [1].
 
@@ -73,8 +73,8 @@ def late_type_lognormal(magnitude, alpha, beta, gamma, M0, sigma1, sigma2,
     physical_size : numpy.ndarray or astropy.Quantity
         Physical distance for a given galaxy with a given magnitude, in [kpc].
         If size is None and magnitude is a scalar, a single sample is returned.
-        If size is different from None and magnitude is scalar,
-        shape is (size,). If magnitude has shape (nm,) and size=None,
+        If size is ns, different from None, and magnitude is scalar,
+        shape is (ns,). If magnitude has shape (nm,) and size=None,
         shape is (nm,).
 
     Examples
@@ -94,7 +94,7 @@ def late_type_lognormal(magnitude, alpha, beta, gamma, M0, sigma1, sigma2,
     ----------
     ..[1] S. Shen, H.J. Mo, S.D.M. White, M.R. Blanton, G. Kauffmann, W. Voges,
         J. Brinkmann, I. Csabai, Mon. Not. Roy. Astron. Soc. 343, 978 (2003).
-    '''
+    """
 
     if size is None and np.shape(magnitude):
         size = np.shape(magnitude)
@@ -110,7 +110,7 @@ def late_type_lognormal(magnitude, alpha, beta, gamma, M0, sigma1, sigma2,
 
 
 def early_type_lognormal(magnitude, a, b, M0, sigma1, sigma2, size=None):
-    '''Lognormal distribution for early-type galaxies.
+    """Lognormal distribution for early-type galaxies.
     This function provides a lognormal distribution for the physical size of
     early-type galaxies, described by equations 12, 14 and 16 in [1].
 
@@ -118,7 +118,7 @@ def early_type_lognormal(magnitude, a, b, M0, sigma1, sigma2, size=None):
     ----------
     magnitude : float or array_like.
         Galaxy magnitude at which evaluate the lognormal distribution.
-    a_mu, b_mu : float
+    a, b : float
         Linear model parameters describing the mean size of galaxies,
         equation 3.14 in [1].
     sigma: float
@@ -135,8 +135,8 @@ def early_type_lognormal(magnitude, a, b, M0, sigma1, sigma2, size=None):
     physical_size : ndarray or astropy.Quantity
         Physical distance for a given galaxy with a given magnitude, in [kpc].
         If size is None and magnitude is a scalar, a single sample is returned.
-        If size is different from None and magnitude is scalar,
-        shape is (size,). If magnitude has shape (nm,) and size=None,
+        If size is ns, different from None, and magnitude is scalar,
+        shape is (ns,). If magnitude has shape (nm,) and size=None,
         shape is (nm,).
 
     Examples
@@ -155,14 +155,14 @@ def early_type_lognormal(magnitude, a, b, M0, sigma1, sigma2, size=None):
     ----------
     ..[1] S. Shen, H.J. Mo, S.D.M. White, M.R. Blanton, G. Kauffmann, W. Voges,
         J. Brinkmann, I. Csabai, Mon. Not. Roy. Astron. Soc. 343, 978 (2003).
-        '''
+    """
 
     return late_type_lognormal(magnitude, a, a, b, M0, sigma1, sigma2,
                                size=size)
 
 
 def linear_lognormal(magnitude, a_mu, b_mu, sigma, size=None):
-    '''Lognormal distribution with linear mean.
+    """Lognormal distribution with linear mean.
     This function provides a lognormal distribution for the physical size of
     galaxies with a linear mean, described by equation 3.14 in [1]. See also
     equation 14 in [2].
@@ -170,7 +170,7 @@ def linear_lognormal(magnitude, a_mu, b_mu, sigma, size=None):
     Parameters
     ----------
     magnitude : float or array_like.
-        Galaxy magnitude at which evaluate the lognormal distribution.
+        Galaxy absolute magnitude at which evaluate the lognormal distribution.
     a_mu, b_mu : float
         Linear model parameters describing the mean size of galaxies,
         equation 3.14 in [1].
@@ -188,8 +188,8 @@ def linear_lognormal(magnitude, a_mu, b_mu, sigma, size=None):
     physical_size : numpy.ndarray or astropy.Quantity
         Physical distance for a given galaxy with a given magnitude, in [kpc].
         If size is None and magnitude is a scalar, a single sample is returned.
-        If size is different from None and magnitude is scalar,
-        shape is (size,). If magnitude has shape (nm,) and size=None,
+        If size is ns, different from None, and magnitude is scalar,
+        shape is (ns,). If magnitude has shape (nm,) and size=None,
         shape is (nm,).
 
     Examples
@@ -208,7 +208,7 @@ def linear_lognormal(magnitude, a_mu, b_mu, sigma, size=None):
            A. Nicola, JCAP 1708, 035 (2017).
     ..[2] S. Shen, H.J. Mo, S.D.M. White, M.R. Blanton, G. Kauffmann, W.Voges,
            J. Brinkmann, I.Csabai, Mon. Not. Roy. Astron. Soc. 343, 978 (2003).
-    '''
+    """
 
     return late_type_lognormal(magnitude, -a_mu / 0.4, -a_mu / 0.4,
                                b_mu, -np.inf, sigma, sigma, size=size)

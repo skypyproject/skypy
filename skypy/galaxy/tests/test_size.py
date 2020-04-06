@@ -38,6 +38,7 @@ def test_late_type_lognormal():
                                            gamma, M0, sigma1, sigma2)
 
     assert np.isscalar(size_scalar.value)
+
     # Test that the output has the correct units
     assert size_scalar.unit.is_equivalent(units.kpc)
 
@@ -78,6 +79,7 @@ def test_early_type_lognormal():
                                             sigma1, sigma2)
 
     assert np.isscalar(size_scalar.value)
+
     # Test that the output has the correct units
     assert size_scalar.unit.is_equivalent(units.kpc)
 
@@ -113,6 +115,7 @@ def test_linear_lognormal():
     size_scalar = size.linear_lognormal(magnitude_scalar, a_mu, b_mu, sigma)
 
     assert np.isscalar(size_scalar.value)
+
     # Test that the output has the correct units
     assert size_scalar.unit.is_equivalent(units.kpc)
 
