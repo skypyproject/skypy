@@ -1,0 +1,36 @@
+{
+    "problemMatcher": [
+        {
+            "owner": "sphinx-docscrape-warning",
+            "severity": "warning",
+            "pattern": [
+                {
+                    "regexp": "^.*\/docscrape\\.py:\\d+:\\sUserWarning:\\s(.+) in .*\/build\/lib\/(.*).$",
+                    "message": 1,
+                    "file": 2
+                }
+            ]
+        },
+        {
+            "owner": "sphinx-docstring-warning",
+            "severity": "warning",
+            "pattern": [
+                {
+                    "regexp": "^.*\/build\/lib\/(.+):(docstring of [^:]+:\\d+:\\sWARNING:.*)$",
+                    "file": 1,
+                    "message": 2
+                }
+            ]
+        },
+        {
+            "owner": "sphinx-generic-warning",
+            "severity": "warning",
+            "pattern": [
+                {
+                    "regexp": "^(.*:\\d+:\\sWARNING:\\s.*)$",
+                    "message": 1
+                }
+            ]
+        }
+    ]
+}
