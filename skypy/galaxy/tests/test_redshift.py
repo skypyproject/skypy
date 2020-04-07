@@ -1,4 +1,5 @@
 import numpy as np
+import numpy.testing as npt
 from scipy import stats
 from scipy.stats.tests.common_tests import (
     check_normalization, check_moment, check_mean_expect, check_var_expect,
@@ -14,24 +15,23 @@ import scipy.integrate
 def test_smail():
     # freeze a distribution with parameters
     args = (1.3, 2.0, 1.5)
-    dist = smail(*args)
 
     # check that PDF is normalised
     check_normalization(smail, args, 'smail')
 
     # check CDF and SF
-    assert np.isclose(dist.cdf(3.) + dist.sf(3.), 1.)
+    assert np.isclose(smail.cdf(3., *args) + smail.sf(3., *args), 1.)
 
     # check inverse CDF and SF
-    assert np.isclose(dist.ppf(dist.cdf(4.)), 4.)
-    assert np.isclose(dist.isf(dist.sf(5.)), 5.)
+    assert np.isclose(smail.ppf(smail.cdf(4., *args), *args), 4.)
+    assert np.isclose(smail.isf(smail.sf(5., *args), *args), 5.)
 
     # check median matches parameter
     zm = np.random.rand(10)
-    assert np.allclose(smail.median(zm, 2.0, 1.5), zm)
+    npt.assert_allclose(smail.median(zm, 2.0, 1.5), zm)
 
     # check moments
-    m, v, s, k = dist.stats(moments='mvsk')
+    m, v, s, k = smail.stats(*args, moments='mvsk')
     check_mean_expect(smail, args, m, 'smail')
     check_var_expect(smail, args, m, v, 'smail')
     check_skew_expect(smail, args, m, v, s, 'smail')
@@ -44,11 +44,11 @@ def test_smail():
     check_pickling(smail, args)
 
     # sample a single redshift
-    rvs = dist.rvs()
+    rvs = smail.rvs(*args)
     assert np.isscalar(rvs)
 
     # sample 10 reshifts
-    rvs = dist.rvs(size=10)
+    rvs = smail.rvs(*args, size=10)
     assert rvs.shape == (10,)
 
     # sample with implicit sizes
