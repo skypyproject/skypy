@@ -47,7 +47,7 @@ jobs:
           command: |
             python3 -m venv venv
             . venv/bin/activate
-            pip install scipy matplotlib astropy sphinx-astropy "setuptools>=30.3"
+            pip install scipy matplotlib astropy "sphinx==2.*" sphinx-astropy "setuptools>=30.3"
       - run:
           name: Build Docs
           command: |
