@@ -1,6 +1,6 @@
 version: 2
 jobs:
-  unit-tests:
+  code-coverage:
     docker:
       - image: circleci/python:3.5
     steps:
@@ -10,28 +10,17 @@ jobs:
           command: |
             python3 -m venv venv
             . venv/bin/activate
-            pip install astropy pytest pytest-astropy scipy "setuptools>=30.3"
+            pip install astropy codecov 'coverage<5' pytest pytest-astropy scipy "setuptools>=30.3"
       - run:
           name: Run Tests
           command: |
             . venv/bin/activate
-            python setup.py test
-  code-style:
-    docker:
-      - image: circleci/python:3.5
-    steps:
-      - checkout
+            python setup.py test --coverage
       - run:
-          name: Install Dependencies
-          command: |
-            python3 -m venv venv
-            . venv/bin/activate
-            pip install flake8 "setuptools>=30.3"
-      - run:
-          name: Run flake8
+          name: Run codecov
           command: |
             . venv/bin/activate
-            python setup.py flake8
+            codecov
   build-docs:
     docker:
       - image: circleci/python:3.5
@@ -72,8 +61,7 @@ workflows:
   version: 2
   run_all_checks:
     jobs:
-      - unit-tests
-      - code-style
+      - code-coverage
       - build-docs
 notify:
   webhooks:
