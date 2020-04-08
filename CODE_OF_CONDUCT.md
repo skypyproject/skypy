@@ -86,6 +86,10 @@ If the Board decides to eject someone from the Project, they will inform the eje
 
 The Board understands that taking action against an aggressor could itself cause problems for the victim. The Board will consider this when deciding how to act, and will consult with the victim(s) if this is a concern.
 
+## 4. Process for updating the Code of Conduct
+
+The Code of Conduct is a living document, which is the responsibility of the Board. The Code of Conduct lives on the SkyPy GitHub repository and this is the place where suggestions are welcomed on how it might be updated and improved. Proposed revisions will be considered by the Board. Before they are put into practice they will be emailed to the SkyPy team with a period of 2 weeks for feedback. If no objections are raised, the new Code of Conduct will replace the old one. If there are complaints, the Board will review the issues raised and decide whether (i) to continue with the updated version of the CoC, (ii) keep the old version or (iii) begin the process of drafting a new version.
+
 ## Credits
 
 This Code of Conduct borrows heavily from the Carpentries Code of Conduct.
@@ -97,7 +101,3 @@ This Code of Conduct is licensed under a Creative Commons Attribution 4.0 Intern
 ## Update Logs
 
 [update logs will be placed here in future revisions]
-
-## 4. Process for updating the Code of Conduct
-
-The Code of Conduct is a living document, which is the responsibility of the Board. The Code of Conduct lives on the SkyPy GitHub repository and this is the place where suggestions are welcomed on how it might be updated and improved. Proposed revisions will be considered by the Board. Before they are put into practice they will be emailed to the SkyPy team with a period of 2 weeks for feedback. If no objections are raised, the new Code of Conduct will replace the old one. If there are complaints, the Board will review the issues raised and decide whether (i) to continue with the updated version of the CoC, (ii) keep the old version or (iii) begin the process of drafting a new version.
