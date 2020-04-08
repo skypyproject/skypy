@@ -57,7 +57,7 @@ skypy based on its use in the README file for the
     :target: https://circleci.com/gh/skypyproject/skypy
     :alt: Astropy's CircleCI Status
 
-.. |Coverage Status| image:: https://codecov.io/gh/skypyproject/skypy/branch/develop/graph/badge.svg
+.. |Coverage Status| image:: https://codecov.io/gh/skypyproject/skypy/branch/master/graph/badge.svg
     :target: https://codecov.io/gh/skypyproject/skypy
     :alt: Astropy's Coverage Status
 
