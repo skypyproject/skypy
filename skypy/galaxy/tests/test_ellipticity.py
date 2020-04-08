@@ -7,57 +7,57 @@ from scipy.stats.tests.common_tests import (
     check_random_state_property, check_pickling)
 
 
-def test_kacprzak():
+def test_beta_ellipticity():
 
-    from skypy.galaxy.ellipticity import kacprzak
+    from skypy.galaxy.ellipticity import beta_ellipticity
 
     a, b = np.random.lognormal(size=2)
     args = (a / (a + b), a + b)
     beta_dist = stats.beta(a, b)
-    kacprzak_dist = kacprzak(*args)
-    kacprzak_uniform = kacprzak(0.5, 2.0)
-    kacprzak_arcsine = kacprzak(0.5, 1.0)
+    ellipticity_dist = beta_ellipticity(*args)
+    ellipticity_uniform = beta_ellipticity(0.5, 2.0)
+    ellipticity_arcsine = beta_ellipticity(0.5, 1.0)
 
     x = np.linspace(0, 1, 100)
 
-    check_normalization(kacprzak, args, 'kacprzak')
-    check_edge_support(kacprzak, args)
-    check_random_state_property(kacprzak, args)
-    check_pickling(kacprzak, args)
+    check_normalization(beta_ellipticity, args, 'beta_ellipticity')
+    check_edge_support(beta_ellipticity, args)
+    check_random_state_property(beta_ellipticity, args)
+    check_pickling(beta_ellipticity, args)
 
-    m, v, s, k = kacprzak_dist.stats(moments='mvsk')
-    check_mean_expect(kacprzak, args, m, 'kacprzak')
-    check_var_expect(kacprzak, args, m, v, 'kacprzak')
-    check_skew_expect(kacprzak, args, m, v, s, 'kacprzak')
-    check_kurt_expect(kacprzak, args, m, v, k, 'kacprzak')
-    check_moment(kacprzak, args, m, v, 'kacprzak')
+    m, v, s, k = ellipticity_dist.stats(moments='mvsk')
+    check_mean_expect(beta_ellipticity, args, m, 'beta_ellipticity')
+    check_var_expect(beta_ellipticity, args, m, v, 'beta_ellipticity')
+    check_skew_expect(beta_ellipticity, args, m, v, s, 'beta_ellipticity')
+    check_kurt_expect(beta_ellipticity, args, m, v, k, 'beta_ellipticity')
+    check_moment(beta_ellipticity, args, m, v, 'beta_ellipticity')
 
-    assert allclose(kacprzak_dist.pdf(x), beta_dist.pdf(x))
-    assert allclose(kacprzak_dist.logpdf(x), beta_dist.logpdf(x))
-    assert allclose(kacprzak_dist.cdf(x), beta_dist.cdf(x))
-    assert allclose(kacprzak_dist.logcdf(x), beta_dist.logcdf(x))
-    assert allclose(kacprzak_dist.ppf(x), beta_dist.ppf(x))
-    assert allclose(kacprzak_dist.sf(x), beta_dist.sf(x))
-    assert allclose(kacprzak_dist.logsf(x), beta_dist.logsf(x))
-    assert allclose(kacprzak_dist.isf(x), beta_dist.isf(x))
-    assert isclose(kacprzak_dist.entropy(), beta_dist.entropy())
-    assert isclose(kacprzak_dist.median(), beta_dist.median())
-    assert isclose(kacprzak_dist.std(), beta_dist.std())
-    assert allclose(kacprzak_dist.interval(x), beta_dist.interval(x))
+    assert allclose(ellipticity_dist.pdf(x), beta_dist.pdf(x))
+    assert allclose(ellipticity_dist.logpdf(x), beta_dist.logpdf(x))
+    assert allclose(ellipticity_dist.cdf(x), beta_dist.cdf(x))
+    assert allclose(ellipticity_dist.logcdf(x), beta_dist.logcdf(x))
+    assert allclose(ellipticity_dist.ppf(x), beta_dist.ppf(x))
+    assert allclose(ellipticity_dist.sf(x), beta_dist.sf(x))
+    assert allclose(ellipticity_dist.logsf(x), beta_dist.logsf(x))
+    assert allclose(ellipticity_dist.isf(x), beta_dist.isf(x))
+    assert isclose(ellipticity_dist.entropy(), beta_dist.entropy())
+    assert isclose(ellipticity_dist.median(), beta_dist.median())
+    assert isclose(ellipticity_dist.std(), beta_dist.std())
+    assert allclose(ellipticity_dist.interval(x), beta_dist.interval(x))
 
-    assert np.isscalar(kacprzak_dist.rvs())
-    assert kacprzak_dist.rvs(size=10).shape == (10,)
+    assert np.isscalar(ellipticity_dist.rvs())
+    assert ellipticity_dist.rvs(size=10).shape == (10,)
 
     e_ratio = 0.5 * np.ones((13, 1, 5))
     e_sum = 0.5 * np.ones((7, 5))
-    rvs = kacprzak.rvs(e_ratio, e_sum)
+    rvs = beta_ellipticity.rvs(e_ratio, e_sum)
     assert rvs.shape == np.broadcast(e_ratio, e_sum).shape
 
-    D, p = stats.kstest(kacprzak_dist.rvs, beta_dist.cdf, N=1000)
+    D, p = stats.kstest(ellipticity_dist.rvs, beta_dist.cdf, N=1000)
     assert p > 0.01, 'D = {}, p = {}'.format(D, p)
 
-    D, p = stats.kstest(kacprzak_uniform.rvs, 'uniform', N=1000)
+    D, p = stats.kstest(ellipticity_uniform.rvs, 'uniform', N=1000)
     assert p > 0.01, 'D = {}, p = {}'.format(D, p)
 
-    D, p = stats.kstest(kacprzak_arcsine.rvs, 'arcsine', N=1000)
+    D, p = stats.kstest(ellipticity_arcsine.rvs, 'arcsine', N=1000)
     assert p > 0.01, 'D = {}, p = {}'.format(D, p)

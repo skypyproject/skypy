@@ -6,7 +6,7 @@ This module provides facilities to sample the ellipticities of galaxies.
 from scipy import stats
 
 
-def _kacprzak_parameterization(beta_method):
+def _ellipticity_parameterization(beta_method):
     def reparameterize(self, *args):
         *beta_args, e_ratio, e_sum = args
         a = e_sum * e_ratio
@@ -15,7 +15,7 @@ def _kacprzak_parameterization(beta_method):
     return reparameterize
 
 
-class kacprzak_gen(stats._continuous_distns.beta_gen):
+class beta_ellipticity_gen(stats._continuous_distns.beta_gen):
     r'''Galaxy ellipticities sampled from a reparameterized beta distribution.
 
     The ellipticities follow a beta distribution parameterized by
@@ -48,38 +48,38 @@ class kacprzak_gen(stats._continuous_distns.beta_gen):
 
     Examples
     --------
-    >>> from skypy.galaxy.ellipticity import kacprzak
+    >>> from skypy.galaxy.ellipticity import beta_ellipticity
 
     Sample 10 random variates from the Kacprzak model with
     :math:`e_{\rm ratio} = 0.5` and :math:`e_{\rm sum} = 1.0`:
 
-    >>> ellipticity = kacprzak.rvs(0.5, 1.0, size=10)
+    >>> ellipticity = beta_ellipticity.rvs(0.5, 1.0, size=10)
 
     Fix distribution parameters for repeated use:
 
-    >>> kacprzak_distribution = kacprzak(0.5, 1.0)
-    >>> kacprzak_distribution.mean()
+    >>> ellipticity_distribution = beta_ellipticity(0.5, 1.0)
+    >>> ellipticity_distribution.mean()
     0.5
-    >>> ellipticity = kacprzak_distribution.rvs(size=10)
+    >>> ellipticity = ellipticity_distribution.rvs(size=10)
     '''
 
-    @_kacprzak_parameterization
+    @_ellipticity_parameterization
     def _rvs(self, *args):
         return super()._rvs(*args)
 
-    @_kacprzak_parameterization
+    @_ellipticity_parameterization
     def _logpdf(self, *args):
         return super()._logpdf(*args)
 
-    @_kacprzak_parameterization
+    @_ellipticity_parameterization
     def _cdf(self, *args):
         return super()._cdf(*args)
 
-    @_kacprzak_parameterization
+    @_ellipticity_parameterization
     def _ppf(self, *args):
         return super()._ppf(*args)
 
-    @_kacprzak_parameterization
+    @_ellipticity_parameterization
     def _stats(self, *args):
         return super()._stats(*args)
 
@@ -88,4 +88,5 @@ class kacprzak_gen(stats._continuous_distns.beta_gen):
             data, *args, **kwds)
 
 
-kacprzak = kacprzak_gen(a=0.0, b=1.0, name='kacprzak', shapes="e_ratio e_sum")
+beta_ellipticity = beta_ellipticity_gen(a=0.0, b=1.0, name='beta_ellipticity',
+                                        shapes="e_ratio e_sum")
