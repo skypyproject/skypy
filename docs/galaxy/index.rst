@@ -11,10 +11,10 @@ Luminosities (`skypy.galaxy.luminosity`)
 .. automodule:: skypy.galaxy.luminosity
 
 
-Morphologies (`skypy.galaxy.morphology`)
+Ellipticities (`skypy.galaxy.ellipticity`)
 ========================================
 
-.. automodapi:: skypy.galaxy.morphology
+.. automodapi:: skypy.galaxy.ellipticity
 
 
 Redshifts (`skypy.galaxy.redshift`)

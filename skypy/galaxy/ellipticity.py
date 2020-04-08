@@ -1,7 +1,6 @@
-"""Galaxy morphology module.
+"""Galaxy ellipticity module.
 
-This module provides facilities to sample the morphological properties of
-galaxies using a number of models.
+This module provides facilities to sample the ellipticities of galaxies.
 """
 
 from scipy import stats
@@ -49,7 +48,7 @@ class kacprzak_gen(stats._continuous_distns.beta_gen):
 
     Examples
     --------
-    >>> from skypy.galaxy.morphology import kacprzak
+    >>> from skypy.galaxy.ellipticity import kacprzak
 
     Sample 10 random variates from the Kacprzak model with
     :math:`e_{\rm ratio} = 0.5` and :math:`e_{\rm sum} = 1.0`:

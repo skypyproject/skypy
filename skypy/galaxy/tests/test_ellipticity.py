@@ -9,7 +9,7 @@ from scipy.stats.tests.common_tests import (
 
 def test_kacprzak():
 
-    from skypy.galaxy.morphology import kacprzak
+    from skypy.galaxy.ellipticity import kacprzak
 
     a, b = np.random.lognormal(size=2)
     args = (a / (a + b), a + b)
