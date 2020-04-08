@@ -3,7 +3,7 @@ The SkyPy Code of Conduct
 
 ## 1. Introduction
 
-The SkyPy Board is committed to creating a friendly and respectful place for research and scientific discussion. All SkyPy Members are expected to show respect and courtesy to others --- both inside and outside the team.
+The SkyPy Board is committed to creating a friendly and respectful place for research and scientific discussion. All SkyPy Members are expected to show respect and courtesy to others both inside and outside the team.
 
 By being a Member of the SkyPy Project, Members accept to abide by The SkyPy Code of Conduct and accept the procedures by which Code of Conduct incidents are resolved. Any form of behaviour to exclude, intimidate, or harass is a violation of the Code of Conduct.
 
@@ -51,7 +51,7 @@ Examples of unacceptable behaviour by participants in any Project space include:
 
 ## 3 Complaints procedures
 
-If you feel uncomfortable, don’t wait until it gets worse. [This guide](https://www.edcc.edu/counseling/documents/Conflict.pdf) may help provide ways to broach the issues with the SkyPy Board and/or other Members. Please also see articles on Abuse of Power ---e.g. [48 Ways Managers Abuse Their Power and Destroy Employee Engagement](https://www.linkedin.com/pulse/48-ways-managers-abuse-power-destroy-employee-hanna/).
+If you feel uncomfortable, don’t wait until it gets worse. [This guide](https://www.edcc.edu/counseling/documents/Conflict.pdf) may help provide ways to broach the issues with the SkyPy Board and/or other Members. Please also see articles on Abuse of Power e.g. [48 Ways Managers Abuse Their Power and Destroy Employee Engagement](https://www.linkedin.com/pulse/48-ways-managers-abuse-power-destroy-employee-hanna/).
 
 There are three mechanisms for dealing with complaints:
 
@@ -61,7 +61,7 @@ There are three mechanisms for dealing with complaints:
 
 If there is any concern about a conflict of interest of any Board member then you may choose which member(s) of the Board to contact. By default the whole Board will discuss the complaint including writing notes on key points in a private SkyPy slack channel visible only to the current members of the Board. Therefore, if you foresee a potential conflict of interest with one (or more) members of the Board, or if would prefer your complaint to remain verbal (not recorded in any way other than in individual current Board members’ memories) then please note this when you register your complaint. When the Board membership changes the discussion of previous complaints will not automatically be shared with new Board members, and will only be shared with new Board members with the consent of the complainee(s).
 
-It is acceptable to contact a member of the Board to say that you would like to have a phone call without giving the reasons for the call, and to ask for the entire contents of the conversation to remain confidential. The only situation in which the Board member would violate your wishes to keep the conversation confidential is if they perceive your safety to be at risk --- e.g. if you seemed suicidal they would try to contact a local responsible person which may include the emergency services.
+It is acceptable to contact a member of the Board to say that you would like to have a phone call without giving the reasons for the call, and to ask for the entire contents of the conversation to remain confidential. The only situation in which the Board member would violate your wishes to keep the conversation confidential is if they perceive your safety to be at risk e.g. if you seemed suicidal they would try to contact a local responsible person which may include the emergency services.
 
 Members of the Board and their contact details:
 
