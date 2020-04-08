@@ -21,22 +21,6 @@ jobs:
           command: |
             . venv/bin/activate
             codecov
-  code-style:
-    docker:
-      - image: circleci/python:3.5
-    steps:
-      - checkout
-      - run:
-          name: Install Dependencies
-          command: |
-            python3 -m venv venv
-            . venv/bin/activate
-            pip install flake8 "setuptools>=30.3"
-      - run:
-          name: Run flake8
-          command: |
-            . venv/bin/activate
-            python setup.py flake8
   build-docs:
     docker:
       - image: circleci/python:3.5
@@ -78,7 +62,6 @@ workflows:
   run_all_checks:
     jobs:
       - unit-tests
-      - code-style
       - build-docs
 notify:
   webhooks:
