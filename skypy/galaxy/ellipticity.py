@@ -1,6 +1,17 @@
 """Galaxy ellipticity module.
 
 This module provides facilities to sample the ellipticities of galaxies.
+
+
+Models
+======
+
+.. autosummary::
+   :nosignatures:
+   :toctree: ../api/
+
+   beta_ellipticity
+
 """
 
 from scipy import stats
