@@ -2,6 +2,19 @@
 
 This module provides facilities to sample galaxy redshifts using a number of
 models.
+
+
+Models
+======
+
+.. autosummary::
+   :nosignatures:
+   :toctree: ../api/
+
+   herbel_redshift
+   herbel_pdf
+   smail
+
 """
 
 import numpy as np
@@ -16,8 +29,7 @@ import skypy.utils.astronomy as astro
 class smail_gen(stats.rv_continuous):
     r'''Redshifts following the Smail et al. (1994) model.
 
-    The redshift follows the Smail et al. (1994) redshift distribution as
-    reported by Amara & Refregier (2007).
+    The redshift follows the Smail et al. [1]_ redshift distribution.
 
     Parameters
     ----------
@@ -31,20 +43,19 @@ class smail_gen(stats.rv_continuous):
     Notes
     -----
     The probability distribution function :math:`p(z)` for redshift :math:`z`
-    is given by Amara & Refregier (2007) as
+    is given by Amara & Refregier [2]_ as
 
     .. math::
 
         p(z) \sim \left(\frac{z}{z_0}\right)^\alpha
                     \exp\left[-\left(\frac{z}{z_0}\right)^\beta\right] \;.
 
-    This is brought into the form of a gamma distribution by a change of
-    variable :math:`z \to x = z^\beta`.
+    This is the generalised gamma distribution `scipy.stats.gengamma`.
 
     References
     ----------
-    [1] Smail I., Ellis R. S., Fitchett M. J., 1994, MNRAS, 270, 245
-    [2] Amara A., Refregier A., 2007, MNRAS, 381, 1018
+    .. [1] Smail I., Ellis R. S., Fitchett M. J., 1994, MNRAS, 270, 245
+    .. [2] Amara A., Refregier A., 2007, MNRAS, 381, 1018
 
     Examples
     --------
@@ -153,7 +164,7 @@ def herbel_redshift(alpha, a_phi, a_m, b_phi, b_m, cosmology, low=0.0,
         Drawn redshifts from the marginalised Schechter luminosity function.
 
     Notes
-    -------
+    -----
     The Schechter luminosity function is given as
 
     .. math::
@@ -184,7 +195,7 @@ def herbel_redshift(alpha, a_phi, a_m, b_phi, b_m, cosmology, low=0.0,
         \phi(L,z) = \frac{d_H d_M^2}{E(z)}  \Phi(L,z)
 
     Examples
-    -------
+    --------
     >>> from skypy.galaxy.redshift import herbel_redshift
     >>> from astropy.cosmology import FlatLambdaCDM
 
@@ -199,9 +210,9 @@ def herbel_redshift(alpha, a_phi, a_m, b_phi, b_m, cosmology, low=0.0,
     ...                     absolute_magnitude_max=-16.)
 
     References
-    -------
-    [1] Herbel J., Kacprzak T., Amara A. et al., 2017, Journal of Cosmology and
-    Astroparticle Physics, Issue 08, article id. 035 (2017)
+    ----------
+    .. [1] Herbel J., Kacprzak T., Amara A. et al., 2017, Journal of Cosmology
+           and Astroparticle Physics, Issue 08, article id. 035 (2017)
 
 
     """
@@ -221,11 +232,11 @@ def herbel_redshift(alpha, a_phi, a_m, b_phi, b_m, cosmology, low=0.0,
 
 def herbel_pdf(redshift, alpha, a_phi, a_m, b_phi, b_m, cosmology,
                luminosity_min):
-    """ Calculates the redshift pdf of the Schechter luminosity function
-        according to the model of Herbel et al. (2017) equation (3.6). That is,
-        changing the absolute magnitude M in equation (3.2) to luminosity L,
-        integrate over all possible L and multiplying by the comovin element
-         using a flat LamdaCDM model to get the corresponding pdf.
+    """Calculates the redshift pdf of the Schechter luminosity function
+    according to the model of Herbel et al. (2017) equation (3.6). That is,
+    changing the absolute magnitude M in equation (3.2) to luminosity L,
+    integrate over all possible L and multiplying by the comovin element
+    using a flat LamdaCDM model to get the corresponding pdf.
 
     Parameters
     ----------

@@ -55,6 +55,9 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install scipy astropy sphinx-astropy "setuptools>=30.3"
+    - name: Add sphinx Matcher
+      run: |
+        echo ::add-matcher::.github/problem_matchers/sphinx.json
     - name: Build Docs
       run: |
         python setup.py build_docs
