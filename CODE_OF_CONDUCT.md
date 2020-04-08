@@ -29,7 +29,7 @@ All team Members are expected to show respect and courtesy to others. All intera
 - Focus on what is best for the community
 - Show courtesy and respect towards other community members
 
-Also, please see the four social rules for further recommendations: Four Social Rules. https://www.recurse.com/manual#sub-sec-social-rules
+Also, please see the [Four Social Rules](https://www.recurse.com/manual#sub-sec-social-rules) for further recommendations.
 
 ## 2.2 Unacceptable behaviour
 
@@ -51,10 +51,7 @@ Examples of unacceptable behaviour by participants in any Project space include:
 
 ## 3 Complaints procedures
 
-If you feel uncomfortable, don’t wait until it gets worse. This guide may help provide ways to broach the issues with the SkyPy Board and/or other Members.
- https://www.edcc.edu/counseling/documents/Conflict.pdf
-Please also see articles on Abuse of Power ---e.g.
- https://www.linkedin.com/pulse/48-ways-managers-abuse-power-destroy-employee-hanna/
+If you feel uncomfortable, don’t wait until it gets worse. [This guide](https://www.edcc.edu/counseling/documents/Conflict.pdf) may help provide ways to broach the issues with the SkyPy Board and/or other Members. Please also see articles on Abuse of Power ---e.g. [48 Ways Managers Abuse Their Power and Destroy Employee Engagement](https://www.linkedin.com/pulse/48-ways-managers-abuse-power-destroy-employee-hanna/).
 
 There are three mechanisms for dealing with complaints:
 
