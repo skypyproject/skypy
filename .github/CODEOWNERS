@@ -2,4 +2,5 @@ skypy @skypyproject/skypy-infrastructure
 skypy/linear @skypyproject/linear-developers
 skypy/nonlinear @skypyproject/nonlinear-developers
 skypy/galaxy @skypyproject/galaxy-developers
+CODE_OF_CONDUCT.md @skypyproject/skypy-board
 
