@@ -1,8 +1,13 @@
 name: Tests
-on: [pull_request]
+on:
+  push:
+    branches:
+      - develop
+  pull_request:
+    branches:
+      - develop
 jobs:
   test:
-    name: Unit Tests
     runs-on: ubuntu-latest
     steps:
     - name: Checkout Repository

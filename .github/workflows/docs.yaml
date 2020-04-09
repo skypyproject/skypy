@@ -1,8 +1,10 @@
 name: Documentation
-on: [pull_request]
+on:
+  pull_request:
+    branches:
+      - develop
 jobs:
   build-docs:
-    name: Documentation
     runs-on: ubuntu-latest
     steps:
     - name: Checkout Repository

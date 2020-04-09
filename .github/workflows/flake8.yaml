@@ -1,5 +1,11 @@
 name: Code Style
-on: [pull_request]
+on:
+  push:
+    branches:
+      - develop
+  pull_request:
+    branches:
+      - develop
 jobs:
   flake8:
     runs-on: ubuntu-latest
