@@ -31,15 +31,15 @@ True
 
 Create a new plot:
 
->>> import matplotlib.pyplot as plt
->>> fig, ax = plt.subplots(1, 1)
+>>> import matplotlib.pyplot as plt # doctest: +SKIP
+>>> fig, ax = plt.subplots(1, 1) # doctest: +SKIP
 
 Display the probability density function (``pdf``):
 
 >>> x = np.linspace(%(name)s.ppf(0.01, %(shapes)s),
 ...                 %(name)s.ppf(0.99, %(shapes)s), 100)
 >>> ax.plot(x, %(name)s.pdf(x, %(shapes)s),
-...        'r-', lw=5, alpha=0.6, label='%(name)s pdf')
+...        'r-', lw=5, alpha=0.6, label='%(name)s pdf') # doctest: +SKIP
 
 Generate random numbers:
 
@@ -47,9 +47,9 @@ Generate random numbers:
 
 And compare the histogram:
 
->>> ax.hist(r, density=True, histtype='stepfilled', alpha=0.2)
->>> ax.legend(loc='best', frameon=False)
->>> plt.show()
+>>> ax.hist(r, density=True, histtype='stepfilled', alpha=0.2) # doctest: +SKIP
+>>> ax.legend(loc='best', frameon=False) # doctest: +SKIP
+>>> plt.show() # doctest: +SKIP
 
 """
 
