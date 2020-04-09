@@ -43,12 +43,19 @@ tables:
     physical_size:
       module: skypy.galaxy.size
       function: linear_lognormal
-      requires:
-        magnitude: red_galaxies.magnitude
       kwargs:
         a_mu: -0.243
         b_mu: 0.954
         sigma: 0.568
+      requires:
+        magnitude: red_galaxies.magnitude
+    angular_size:
+      module: skypy.galaxy.size
+      function: angular_size
+      requires:
+        physical_size: red_galaxies.physical_size
+        redshift: red_galaxies.redshift
+        cosmology: cosmology
   blue_galaxies:
     redshift:
       module: skypy.galaxy.redshift
@@ -87,9 +94,16 @@ tables:
     physical_size:
       module: skypy.galaxy.size
       function: linear_lognormal
-      requires:
-        magnitude: blue_galaxies.magnitude
       kwargs:
         a_mu: -0.243
         b_mu: 0.954
         sigma: 0.568
+      requires:
+        magnitude: blue_galaxies.magnitude
+    angular_size:
+      module: skypy.galaxy.size
+      function: angular_size
+      requires:
+        physical_size: blue_galaxies.physical_size
+        redshift: blue_galaxies.redshift
+        cosmology: cosmology
