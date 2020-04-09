@@ -19,7 +19,7 @@ jobs:
     - name: Install Dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install astropy pytest pytest-astropy pytest-cov scipy "setuptools>=30.3"
+        pip install astropy pytest pytest-astropy codecov 'coverage<5' scipy "setuptools>=30.3"
     - name: Add pytest Matcher
       run: |
         echo ::add-matcher::.github/problem_matchers/pytest.json
