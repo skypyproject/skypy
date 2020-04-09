@@ -1,8 +1,24 @@
+r'''Galaxy spectrum module.
+
+
+Models
+======
+
+.. autosummary::
+   :nosignatures:
+   :toctree: ../api/
+
+   dirichlet_coefficients
+
+'''
+
 import numpy as np
 
 
 def dirichlet_coefficients(redshift, alpha0, alpha1, z1=1.):
-    r""" Spectral coefficients to calculate the rest-frame spectral energy
+    r"""Dirichlet-distributed SED coefficients.
+
+    Spectral coefficients to calculate the rest-frame spectral energy
         distribution of a galaxy following the Herbel et al. model in [1].
 
     Parameters
@@ -23,7 +39,7 @@ def dirichlet_coefficients(redshift, alpha0, alpha1, z1=1.):
         the number of redshifts and nc the number of coefficients.
 
     Notes
-    -------
+    -----
     The rest-frame spectral energy distribution of galaxies can be written as a
     linear combination of the five kcorrect ([2]) template spectra :math:`f_i`
     (see [1])
@@ -47,7 +63,7 @@ def dirichlet_coefficients(redshift, alpha0, alpha1, z1=1.):
     This code works for a general number of templates.
 
     Examples
-    -------
+    --------
     >>> from skypy.galaxy.spectrum import dirichlet_coefficients
     >>> import numpy as np
 
@@ -62,12 +78,11 @@ def dirichlet_coefficients(redshift, alpha0, alpha1, z1=1.):
 
 
     References
-    -------
-    [1] Herbel J., Kacprzak T., Amara A. et al., 2017, Journal of Cosmology and
-    Astroparticle Physics, Issue 08, article id. 035 (2017)
-
-    [2] Blanton M. R., Roweis S., 2007, The Astronomical Journal, Volume 133,
-    Page 734
+    ----------
+    .. [1] Herbel J., Kacprzak T., Amara A. et al., 2017, Journal of Cosmology
+           and Astroparticle Physics, Issue 08, article id. 035 (2017)
+    .. [2] Blanton M. R., Roweis S., 2007, The Astronomical Journal,
+           Volume 133, Page 734
     """
     if np.isscalar(alpha0) or np.isscalar(alpha1):
         raise ValueError("alpha0 and alpha1 must be array_like.")
