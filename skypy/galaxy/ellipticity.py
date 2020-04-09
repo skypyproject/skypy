@@ -30,7 +30,8 @@ class beta_ellipticity_gen(stats._continuous_distns.beta_gen):
     r'''Galaxy ellipticities sampled from a reparameterized beta distribution.
 
     The ellipticities follow a beta distribution parameterized by
-    :math:`e_{\rm ratio}` and :math:`e_{\rm sum}` as presented in [1]_.
+    :math:`e_{\rm ratio}` and :math:`e_{\rm sum}` as presented in [1]_ Section
+    III.A.
 
     Parameters
     ----------
@@ -93,9 +94,9 @@ class beta_ellipticity_gen(stats._continuous_distns.beta_gen):
     def _stats(self, *args):
         return super()._stats(*args)
 
-    def fit(self, data, *args, **kwds):
+    def fit(self, data, *args, **kwargs):
         return super(stats._continuous_distns.beta_gen, self).fit(
-            data, *args, **kwds)
+            data, *args, **kwargs)
 
 
 beta_ellipticity = beta_ellipticity_gen(a=0.0, b=1.0, name='beta_ellipticity',
