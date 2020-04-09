@@ -35,4 +35,4 @@ class SkyPyDriver:
     def __getitem__(self, label):
         name, key = re.search(r'^(\w*)\.?(\w*)$', label).groups()
         item = getattr(self, name)
-        return item[key].data if key else item
+        return item[key] if key else item
