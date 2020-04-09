@@ -14,7 +14,7 @@ Luminosities (`skypy.galaxy.luminosity`)
 Ellipticities (`skypy.galaxy.ellipticity`)
 ==========================================
 
-.. automodapi:: skypy.galaxy.ellipticity
+.. automodule:: skypy.galaxy.ellipticity
 
 
 Redshifts (`skypy.galaxy.redshift`)
