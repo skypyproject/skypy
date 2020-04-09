@@ -77,7 +77,7 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
     r'''Computation of the non-linear halo power spectrum.
 
     This function computes the non-linear halo power spectrum, as a function
-    of redshift and wavenumbers, following [1]_,[2]_ and [3]_.
+    of redshift and wavenumbers, following [1]_, [2]_ and [3]_.
 
     Parameters
     ----------
