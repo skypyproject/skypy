@@ -30,8 +30,7 @@ class beta_ellipticity_gen(stats._continuous_distns.beta_gen):
     r'''Galaxy ellipticities sampled from a reparameterized beta distribution.
 
     The ellipticities follow a beta distribution parameterized by
-    :math:`e_{\rm ratio}` and :math:`e_{\rm sum}` as presented in Kacprzak et
-    al. 2019.
+    :math:`e_{\rm ratio}` and :math:`e_{\rm sum}` as presented in [1]_.
 
     Parameters
     ----------
@@ -55,7 +54,7 @@ class beta_ellipticity_gen(stats._continuous_distns.beta_gen):
 
     References
     ----------
-    [1] Kacprzak T., Herbel J., Nicola A. et al., arXiv:1906.01018
+    .. [1] Kacprzak T., Herbel J., Nicola A. et al., arXiv:1906.01018
 
     Examples
     --------
