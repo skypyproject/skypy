@@ -19,9 +19,15 @@ class SkyPyDriver:
 
         # Import function
         module_name = config.get('module')
-        function_name = config.get('function')
-        module = __import__(module_name, fromlist=function_name)
-        function = getattr(module, function_name)
+        object_name, function_name = re.search(r'^(\w*?)\.?(\w*)$',
+                                               config.get('function')).groups()
+        if object_name:
+            module = __import__(module_name, fromlist=object_name)
+            object = getattr(module, object_name)
+            function = getattr(object, function_name)
+        else:
+            module = __import__(module_name, fromlist=function_name)
+            function = getattr(module, function_name)
 
         # Parse arguments
         args = config.get('args', [])
