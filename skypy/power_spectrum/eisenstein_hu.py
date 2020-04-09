@@ -1,6 +1,22 @@
-""" This module provides transfer functions and linear matter power spectra
-using the Eisenstein & Hu (1998) approximations with or without baryon acoustic
-oscilations wiggles."""
+"""Eisenstein-Hu matter power spectrum module.
+
+This module provides transfer functions and linear matter power spectra using
+the Eisenstein & Hu (1998) approximations with or without baryon acoustic
+oscilations wiggles.
+
+
+Models
+======
+
+.. autosummary::
+   :nosignatures:
+   :toctree: ../api/
+
+   power_spectrum
+   transfer_no_wiggles
+   transfer_with_wiggles
+
+"""
 
 from astropy.utils import isiterable
 import numpy as np
