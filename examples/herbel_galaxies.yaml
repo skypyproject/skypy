@@ -56,6 +56,13 @@ tables:
         physical_size: red_galaxies.physical_size
         redshift: red_galaxies.redshift
         cosmology: cosmology
+    ellipticity:
+      module: skypy.galaxy.ellipticity
+      function: beta_ellipticity.rvs
+      kwargs:
+        e_ratio: 0.45
+        e_sum: 3.5
+        size: 141
   blue_galaxies:
     redshift:
       module: skypy.galaxy.redshift
@@ -107,3 +114,10 @@ tables:
         physical_size: blue_galaxies.physical_size
         redshift: blue_galaxies.redshift
         cosmology: cosmology
+    ellipticity:
+      module: skypy.galaxy.ellipticity
+      function: beta_ellipticity.rvs
+      kwargs:
+        e_ratio: 0.45
+        e_sum: 3.5
+        size: 63
