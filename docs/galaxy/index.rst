@@ -12,7 +12,7 @@ Luminosities (`skypy.galaxy.luminosity`)
 
 
 Ellipticities (`skypy.galaxy.ellipticity`)
-========================================
+==========================================
 
 .. automodapi:: skypy.galaxy.ellipticity
 
