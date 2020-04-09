@@ -25,6 +25,9 @@ jobs:
         echo ::add-matcher::.github/problem_matchers/pytest.json
     - name: Run Tests
       run: |
-        python setup.py test --coverage --args "--cov-report=xml"
+        python setup.py test --coverage
+    - name: Generate Coverage
+      run: |
+        coverage xml
     - name: Report Coverage
       uses: codecov/codecov-action@v1
