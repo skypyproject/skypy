@@ -22,12 +22,12 @@ import scipy.stats
 import scipy.special
 import scipy.integrate
 
-from skypy.stats import parametrise, example_args
+from skypy.stats import parametrise, examples
 import skypy.utils.special as special
 import skypy.utils.astronomy as astro
 
 
-@example_args(1.2, 1.5, 2.0)
+@examples(name='smail', args=(1.2, 1.5, 2.0))
 def smail_par(z_median, alpha, beta):
     r'''Redshifts following the Smail et al (1994) model.
 
@@ -60,7 +60,6 @@ def smail_par(z_median, alpha, beta):
     .. [1] Smail I., Ellis R. S., Fitchett M. J., 1994, MNRAS, 270, 245
     .. [2] Amara A., Refregier A., 2007, MNRAS, 381, 1018
 
-    %(examples)s
     '''
 
     a = (alpha+1)/beta

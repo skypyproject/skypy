@@ -2,25 +2,23 @@ from scipy.stats import rv_discrete
 from scipy._lib._util import check_random_state
 
 import inspect
+import functools
 
 
 # list of exported symbols
 __all__ = [
+    'examples',
     'parametrise',
-    'example_args',
 ]
 
 
 # default examples
-_EXAMPLES = """\
+_EXAMPLES = """
+
 Examples
 --------
 >>> from %(module)s import %(name)s
-
-Fix the example parameters:
-
->>> %(shapes)s = %(args)s
-
+%(set_args)s
 Calculate a few first moments:
 
 >>> mean, var, skew, kurt = %(name)s.stats(%(shapes)s, moments='mvsk')
@@ -56,15 +54,68 @@ And compare the histogram:
 """
 
 
+_EXAMPLES_ARGS = """
+Set the example parameters:
+
+>>> %(shapes)s = %(args)s
+"""
+
+
+def _get_shapes(obj):
+    sig = inspect.signature(obj)
+    shapes = [p for p in sig.parameters]
+    return ', '.join(shapes)
+
+
+def _add_examples_to_doc(obj, doc=None, name=None, shapes=None, args=None,
+                         module=None):
+    # get normalised docstring from object if not given
+    doc = doc or inspect.getdoc(obj)
+
+    # get name of object if not given
+    name = name or obj.__name__
+
+    # get shapes from object args if not given
+    shapes = shapes or _get_shapes(obj)
+
+    # no args if not given
+    args = args or ()
+
+    # get module of object if not given
+    module = module or obj.__module__
+
+    # create args setter string
+    if shapes:
+        # collect example args into string
+        args = ', '.join('%.3g' % arg for arg in args)
+
+        # parse template
+        set_args = _EXAMPLES_ARGS % {'shapes': shapes, 'args': args}
+    else:
+        # no arguments set
+        set_args = ''
+
+    # parse examples template
+    examples = _EXAMPLES % {
+        'module':   module,
+        'name':     name,
+        'set_args': set_args,
+        'shapes':   shapes,
+    }
+
+    # append to obj's doctring
+    obj.__doc__ = doc + examples
+
+    # return the object itself
+    return obj
+
+
 def parametrise(dist, argsfn, name=None, units=None):
     return rv_wrapped(dist, argsfn, name=name, units=units)
 
 
-def example_args(*args):
-    def decorator(f):
-        f.example_args = args
-        return f
-    return decorator
+def examples(name, args):
+    return functools.partial(_add_examples_to_doc, name=name, args=args)
 
 
 class rv_wrapped(object):
@@ -85,37 +136,7 @@ class rv_wrapped(object):
                 raise TypeError('units not a Quantity')
         return x
 
-    def _get_shapes(self):
-        sig = inspect.signature(self.argsfn)
-        shapes = [p for p in sig.parameters]
-        return ', '.join(shapes)
-
-    def _make_doc(self, doc):
-        # normalise indendation for substitution
-        doc = inspect.cleandoc(doc)
-
-        # collect example args into string
-        args = ', '.join('%.3g' % arg for arg in self.example_args)
-
-        # dictionary of substitutions
-        docdict = {}
-        docdict['module'] = self.module
-        docdict['name'] = self.name
-        docdict['shapes'] = self.shapes
-        docdict['args'] = args
-        docdict['examples'] = _EXAMPLES
-
-        # recursive string substitution
-        for i in range(5):
-            _doc = doc % docdict
-            if _doc == doc:
-                break
-            doc = _doc
-
-        return doc
-
-    def __init__(self, dist, argsfn, name=None, units=None, module=None,
-                 example_args=None):
+    def __init__(self, dist, argsfn, name=None, units=None):
         # create a new rv instance
         self.dist = dist.__class__(**dist._updated_ctor_param())
 
@@ -123,38 +144,14 @@ class rv_wrapped(object):
         self.argsfn = argsfn
 
         # get shape parameters of args function
-        self.shapes = self._get_shapes()
+        self.shapes = _get_shapes(argsfn)
 
-        # set the name if given
-        if name is not None:
-            self.name = name
-        else:
-            # set to name of args function
-            self.name = argsfn.__name__
-
-        # set the module if given
-        if module is not None:
-            self.module = module
-        else:
-            # use module of args function
-            self.module = argsfn.__module__
-
-        # set the example args if given
-        if example_args is not None:
-            self.example_args = example_args
-        elif hasattr(argsfn, 'example_args'):
-            # example args given in args function
-            self.example_args = argsfn.example_args
-        else:
-            # no example args
-            self.example_args = ()
+        # set the name if given, or inherit from args function
+        self.name = name or argsfn.__name__
 
         # inherit docstring if not set
         if not self.__doc__:
             self.__doc__ = argsfn.__doc__
-
-        # parse docstring
-        self.__doc__ = self._make_doc(self.__doc__)
 
         # set units
         self.units = units
