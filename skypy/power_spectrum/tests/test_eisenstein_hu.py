@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 from astropy.cosmology import default_cosmology
-from skypy.linear.eisenstein_hu import power_spectrum
+from skypy.power_spectrum.eisenstein_hu import power_spectrum
 
 
 def test_eisenstein_hu():

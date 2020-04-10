@@ -1,6 +1,23 @@
-''' This module computes the non-linear halo power spectrum as a function of
-    redshift and wavenumbers.
-    '''
+"""Halofit module.
+
+This module computes the non-linear halo power spectrum as a function of
+redshift and wavenumbers.
+
+
+Models
+======
+
+.. autosummary::
+   :nosignatures:
+   :toctree: ../api/
+
+   halofit
+   HalofitParameters
+   halofit_smith
+   halofit_takahashi
+   halofit_bird
+
+"""
 
 from astropy.utils import isiterable
 from collections import namedtuple
@@ -57,9 +74,10 @@ _bird_parameters = HalofitParameters(
 
 def halofit(wavenumber, redshift, linear_power_spectrum,
             cosmology, parameters):
-    """Computation of the non-linear halo power spectrum.
+    r'''Computation of the non-linear halo power spectrum.
+
     This function computes the non-linear halo power spectrum, as a function
-    of redshift and wavenumbers.
+    of redshift and wavenumbers, following [1]_, [2]_ and [3]_.
 
     Parameters
     ----------
@@ -78,17 +96,16 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
     Returns
     -------
     pknl : (nk, nz) array_like
-           Non-linear halo power spectrum, described in [1] or [2], in
-           units of [Mpc^3].
+           Non-linear halo power spectrum in units of [Mpc^3].
 
     References
     ----------
-        [1] R. E. Smith it et al., VIRGO Consortium,
-            Mon. Not. Roy. Astron. Soc. 341, 1311 (2003).
-        [2] R. Takahashi, M. Sato, T. Nishimichi, A. Taruya and M. Oguri,
-            Astrophys. J. 761, 152 (2012).
-        [3] S. Bird, M. Viel and M. G. Haehnelt,
-            Mon. Not. Roy. Astron. Soc. 420, 2551 (2012).
+    .. [1] R. E. Smith it et al., VIRGO Consortium,
+           Mon. Not. Roy. Astron. Soc. 341, 1311 (2003).
+    .. [2] R. Takahashi, M. Sato, T. Nishimichi, A. Taruya and M. Oguri,
+           Astrophys. J. 761, 152 (2012).
+    .. [3] S. Bird, M. Viel and M. G. Haehnelt,
+           Mon. Not. Roy. Astron. Soc. 420, 2551 (2012).
 
     Examples
     --------
@@ -100,7 +117,7 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
     >>> cosmo = FlatLambdaCDM(H0=67.04, Om0=0.21479, Ob0=0.04895)
     >>> halofit(kvec, zvalue, pvec, cosmo, _takahashi_parameters)
     array([388.67064424,   0.72797614])
-    """
+    '''
 
     # Manage shapes of input arrays
     return_shape = np.shape(linear_power_spectrum)
