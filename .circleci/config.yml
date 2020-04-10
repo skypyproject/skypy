@@ -40,7 +40,6 @@ workflows:
   version: 2
   run_all_checks:
     jobs:
-      - code-coverage
       - build-docs
 notify:
   webhooks:
