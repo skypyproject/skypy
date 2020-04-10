@@ -1,6 +1,21 @@
 """Linear growth module.
+
 This module provides facilities to evaluate the cosmological linear growth
 function and related quantities.
+
+
+Models
+======
+
+.. autosummary::
+   :nosignatures:
+   :toctree: ../api/
+
+   growth_factor
+   growth_function
+   growth_function_carroll
+   growth_function_derivative
+
 """
 
 from astropy.utils import isiterable
@@ -36,8 +51,8 @@ def growth_function_carroll(redshift, cosmology):
     >>> growth_function_carroll(redshift, cosmology)
     array([0.78136173, 0.47628062, 0.32754955])
 
-    Reference
-    ---------
+    References
+    ----------
     doi : 10.1146/annurev.aa.30.090192.002435
     """
     if isiterable(redshift):

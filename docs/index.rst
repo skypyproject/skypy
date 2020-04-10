@@ -27,8 +27,8 @@ Packages
    :maxdepth: 1
 
    galaxy/index
-   linear/index
-   nonlinear/index
+   halo/index
+   power_spectrum/index
 
 
 .. _developer-docs:
