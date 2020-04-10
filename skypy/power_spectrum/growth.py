@@ -51,8 +51,8 @@ def growth_function_carroll(redshift, cosmology):
     >>> growth_function_carroll(redshift, cosmology)
     array([0.78136173, 0.47628062, 0.32754955])
 
-    Reference
-    ---------
+    References
+    ----------
     doi : 10.1146/annurev.aa.30.090192.002435
     """
     if isiterable(redshift):
