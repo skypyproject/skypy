@@ -3,7 +3,7 @@ from astropy.cosmology import FlatLambdaCDM, default_cosmology, Planck15
 from astropy.units import isclose, allclose
 import pytest
 
-from skypy.linear import growth
+from skypy.power_spectrum import growth
 
 
 def test_carroll():

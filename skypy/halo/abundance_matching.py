@@ -1,6 +1,17 @@
 """Abundance matching module.
+
 This module provides methods to perform abundance matching between catalogs of
 galaxies and dark matter halos.
+
+Models
+======
+
+.. autosummary::
+   :nosignatures:
+   :toctree: ../api/
+
+   vale_ostriker
+
 """
 
 from astropy.table import hstack
