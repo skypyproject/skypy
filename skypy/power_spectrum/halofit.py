@@ -96,8 +96,7 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
     Returns
     -------
     pknl : (nk, nz) array_like
-           Non-linear halo power spectrum, described in [1]_, [2]_ and [3]_, in
-           units of [Mpc^3].
+           Non-linear halo power spectrum in units of [Mpc^3].
 
     References
     ----------
