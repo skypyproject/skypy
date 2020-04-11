@@ -7,7 +7,8 @@ class SkyPyDriver:
     def execute(self, config):
 
         # Cosmology
-        self.cosmology = self.call_from_config(config.get('cosmology'))
+        if 'cosmology' in config:
+            self.cosmology = self.call_from_config(config.get('cosmology'))
 
         # Tables
         for table, columns in config.get('tables', {}).items():
