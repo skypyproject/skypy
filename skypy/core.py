@@ -4,7 +4,7 @@ import re
 
 class SkyPyDriver:
 
-    def execute(self, config):
+    def execute(self, config, file_format=None):
 
         # Cosmology
         if 'cosmology' in config:
@@ -15,6 +15,9 @@ class SkyPyDriver:
             setattr(self, table, Table())
             for column, settings in columns.items():
                 getattr(self, table)[column] = self._call_from_config(settings)
+            if file_format:
+                filename = '.'.join((table, file_format))
+                getattr(self, table).write(filename)
 
     def _call_from_config(self, config):
 
