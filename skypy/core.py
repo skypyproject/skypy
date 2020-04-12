@@ -8,15 +8,15 @@ class SkyPyDriver:
 
         # Cosmology
         if 'cosmology' in config:
-            self.cosmology = self.call_from_config(config.get('cosmology'))
+            self.cosmology = self._call_from_config(config.get('cosmology'))
 
         # Tables
         for table, columns in config.get('tables', {}).items():
             setattr(self, table, Table())
             for column, settings in columns.items():
-                getattr(self, table)[column] = self.call_from_config(settings)
+                getattr(self, table)[column] = self._call_from_config(settings)
 
-    def call_from_config(self, config):
+    def _call_from_config(self, config):
 
         # Import function
         module_name = config.get('module')
