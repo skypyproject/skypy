@@ -48,7 +48,7 @@ def growth_function_carroll(redshift, cosmology):
     >>> from astropy.cosmology import default_cosmology
     >>> redshift = np.array([0, 1, 2])
     >>> cosmology = default_cosmology.get()
-    >>> growth_function_carroll(redshift, cosmology) # doctest: +ELLIPSIS
+    >>> growth_function_carroll(redshift, cosmology)
     array([0.781361..., 0.476280..., 0.327549...])
 
     References
