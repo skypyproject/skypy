@@ -11,6 +11,12 @@ Luminosities (`skypy.galaxy.luminosity`)
 .. automodule:: skypy.galaxy.luminosity
 
 
+Ellipticities (`skypy.galaxy.ellipticity`)
+==========================================
+
+.. automodule:: skypy.galaxy.ellipticity
+
+
 Redshifts (`skypy.galaxy.redshift`)
 ===================================
 

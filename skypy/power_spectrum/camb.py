@@ -1,3 +1,20 @@
+"""CAMB matter power spectrum module.
+
+This module provides an interface to calculate the linear matter power spectrum
+using the Code for Anisotropies in the Microwave Background; CAMB.
+
+
+Models
+======
+
+.. autosummary::
+   :nosignatures:
+   :toctree: ../api/
+
+   camb
+
+"""
+
 import numpy as np
 from astropy import units as u
 
@@ -46,8 +63,8 @@ def camb(wavenumber, redshift, cosmology, A_s, n_s):
            [3.03660813e+03, 1.12836115e+03],
            [2.53124880e+01, 9.40802814e+00]])
 
-    Reference
-    ---------
+    References
+    ----------
     doi : 10.1086/309179
     arXiv: astro-ph/9911177
 

@@ -2,7 +2,7 @@ from astropy.table import Table
 from astropy.table.np_utils import TableMergeError
 import numpy as np
 import pytest
-from skypy.nonlinear.abundance_matching import vale_ostriker
+from skypy.halo.abundance_matching import vale_ostriker
 
 
 def test_vale_ostriker():

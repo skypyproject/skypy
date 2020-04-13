@@ -27,7 +27,7 @@ def test_camb():
     '''
     Test a default astropy cosmology
     '''
-    from skypy.linear.camb import camb
+    from skypy.power_spectrum.camb import camb
 
     redshift = [0.0, 1.0]
     wavenumber = np.logspace(-4.0, np.log10(2.0), 200)
