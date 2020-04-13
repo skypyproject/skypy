@@ -1,5 +1,5 @@
 import argparse
-from skypy.core import SkyPyDriver
+from skypy.pipeline.driver import SkyPyDriver
 import yaml
 
 parser = argparse.ArgumentParser(description="SkyPy pipeline driver")

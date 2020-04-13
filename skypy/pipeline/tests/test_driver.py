@@ -5,10 +5,10 @@ import networkx
 import numpy as np
 import os
 import pytest
-from skypy.core import SkyPyDriver
+from skypy.pipeline.driver import SkyPyDriver
 
 
-def test_core():
+def test_driver():
 
     # Evaluate and store the default astropy cosmology.
     config = {'cosmology': {
@@ -64,5 +64,5 @@ def test_core():
 
 def teardown_module(module):
 
-    # Remove fits file generated in test_core
+    # Remove fits file generated in test_driver
     os.remove('test_table.fits')
