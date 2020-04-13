@@ -62,9 +62,20 @@ Set the example parameters:
 
 
 def _get_shapes(obj):
-    sig = inspect.signature(obj)
-    shapes = [p for p in sig.parameters]
-    return ', '.join(shapes)
+    # case: object has a .shapes attribute
+    if hasattr(obj, 'shapes'):
+        return obj.shapes
+
+    # case: object has a rv method
+    for meth_name in ['_pdf', '_cdf']:
+        meth = getattr(obj, meth_name, None)
+        if callable(meth):
+            sig = inspect.getfullargspec(meth)
+            return ', '.join(sig.args[2:])
+
+    # finally: use function arguments
+    sig = inspect.getfullargspec(obj)
+    return ', '.join(sig.args)
 
 
 def _add_examples_to_doc(obj, doc=None, name=None, shapes=None, args=None,
