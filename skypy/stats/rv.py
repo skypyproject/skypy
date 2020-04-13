@@ -156,6 +156,9 @@ class rv_wrapped(object):
         # set units
         self.units = units
 
+        # inherit some r.v. properties
+        self._stats_has_moments = self.dist._stats_has_moments
+
     @property
     def random_state(self):
         return self.dist._random_state
