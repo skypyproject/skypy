@@ -37,6 +37,14 @@ Packages
 Developer Documentation
 ***********************
 
+Packages
+--------
+
+.. toctree::
+   :maxdepth: 1
+
+   stats/index
+
 
 .. _project-details:
 
