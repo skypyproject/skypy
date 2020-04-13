@@ -1,6 +1,7 @@
 from astropy.cosmology import default_cosmology
 from astropy.io import fits
 from astropy.table import Table
+import networkx
 import numpy as np
 import os
 import pytest
@@ -40,8 +41,22 @@ def test_core():
     with fits.open('test_table.fits') as hdu:
         assert np.all(Table(hdu[1].data) == driver.test_table)
 
+    # Check for failure if 'column1' requires itself creating a cyclic
+    # dependency graph
+    config['tables']['test_table']['column1']['requires'] = \
+        {'low': 'test_table.column1'}
+    with pytest.raises(networkx.NetworkXUnfeasible):
+        driver.execute(config)
+
+    # Check for failure if 'column1' and 'column2' both require each other
+    # creating a cyclic dependency graph
+    config['tables']['test_table']['column1']['requires'] = \
+        {'low': 'test_table.column2'}
+    with pytest.raises(networkx.NetworkXUnfeasible):
+        driver.execute(config)
+
     # Check for failure if 'column1' is removed from the config so that the
-    # dependency is broken.
+    # requirements for 'column2' are not satisfied.
     del config['tables']['test_table']['column1']
     with pytest.raises(KeyError):
         driver.execute(config)
