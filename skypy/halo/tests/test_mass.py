@@ -1,25 +1,25 @@
-# import numpy as np
+import numpy as np
 import scipy.stats
-# import pytest
+import scipy.integrate
+
 
 import skypy.halo.mass as mass
 
-# def test_press_schechter():
 
-# Test that sampling corresponds to sampling from the right pdf.
-# For this, we sample an array of luminosities for redshift z = 1.0 and we
-# compare it to the corresponding cdf.
+def test_press_schechter():
+    # Test the schechter function, sampling dimensionless x values
+    n, m_star = 1, 1e9
+    alpha = - 0.5 * (n + 9.0) / (n + 3.0)
 
-# sample = mass.press_schechter(1.0, 1e9, size=1000)
-# p_value = scipy.stats.kstest(sample, calc_cdf)[1]
-# assert p_value >= 0.01
+    def calc_cdf(x):
+        pdf = np.power(x, alpha) * np.exp(- x)
+        cdf = scipy.integrate.cumtrapz(pdf, x, initial=0)
+        cdf = cdf / cdf[-1]
+        return cdf
 
+    sample = mass.press_schechter(n, m_star, x_min=1e-1, x_max=1e2,
+                                  resolution=100, size=1000)
 
-def test_exponential_distribution():
-    # When alpha=0,  and x_min~0 we get a truncated exponential
-    q_max = 1e2
-    sample = mass.press_schechter(-9, 1e9, size=1000,
-                                  x_min=1e-10, x_max=q_max,
-                                  resolution=1000)
-    d, p_value = scipy.stats.kstest(sample, 'truncexpon', args=(q_max,))
-    assert p_value >= 0.01
+    # Test the distribution of galaxy mass follows the right distribution
+    p_value = scipy.stats.kstest(sample, calc_cdf)[1]
+    assert p_value > 0.01
