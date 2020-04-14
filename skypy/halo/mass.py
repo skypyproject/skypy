@@ -50,6 +50,6 @@ def press_schechter(n, m_star, size=None, x_min=0.00305,
 
     alpha = - 0.5 * (n + 9.0) / (n + 3.0)
 
-    x_sample = schechter(alpha, x_min, x_max, resolution=100, size=size)
+    x_sample = schechter(alpha, x_min, x_max, resolution=resolution, size=size)
 
     return m_star * np.power(x_sample, 3.0 / (n + 3.0))
