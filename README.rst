@@ -1,9 +1,7 @@
 Package for modelling the universe.
 -----------------------------------
 
-.. image:: http://img.shields.io/badge/powered%20by-AstroPy-orange.svg?style=flat
-    :target: http://www.astropy.org
-    :alt: Powered by Astropy Badge
+|Astropy Badge| |CircleCI Status| |Coverage Status| |Documentation Status|
 
 This package contains methods for modelling the universe, galaxies and Milky
 Way. Also included are methods for generating observed data.
@@ -13,7 +11,7 @@ License
 -------
 
 This project is Copyright (c) SkyPy Team and licensed under
-the terms of the GNU GPL v3+ license. This package is based upon
+the terms of the BSD 3-Clause license. This package is based upon
 the `Astropy package template <https://github.com/astropy/package-template>`_
 which is licensed under the BSD 3-clause licence. See the licenses folder for
 more information.
@@ -50,3 +48,19 @@ Note: This disclaimer was originally written by
 `PyCon talk <https://www.youtube.com/watch?v=6Uj746j9Heo>`_, and was adapted by
 skypy based on its use in the README file for the
 `MetPy project <https://github.com/Unidata/MetPy>`_.
+
+.. |Astropy Badge| image:: http://img.shields.io/badge/powered%20by-AstroPy-orange.svg?style=flat
+    :target: http://www.astropy.org
+    :alt: Powered by Astropy Badge
+
+.. |CircleCI Status| image:: https://https://circleci.com/gh/skypyproject/skypy.svg?style=svg
+    :target: https://circleci.com/gh/skypyproject/skypy
+    :alt: Astropy's CircleCI Status
+
+.. |Coverage Status| image:: https://codecov.io/gh/skypyproject/skypy/branch/master/graph/badge.svg
+    :target: https://codecov.io/gh/skypyproject/skypy
+    :alt: Astropy's Coverage Status
+
+.. |Documentation Status| image:: https://readthedocs.org/projects/githubapps/badge/?version=latest
+    :target: https://skypy.readthedocs.io/en/latest/?badge=latest
+    :alt: Documentation Status

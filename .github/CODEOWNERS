@@ -1,0 +1,5 @@
+skypy @skypyproject/skypy-infrastructure
+skypy/galaxy @skypyproject/galaxy-developers
+skypy/halo @skypyproject/halo-developers
+skypy/power_spectrum @skypyproject/power-spectrum-developers
+CODE_OF_CONDUCT.md @skypyproject/skypy-board

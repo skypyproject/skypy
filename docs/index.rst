@@ -1,16 +1,62 @@
-Documentation
-=============
+:tocdepth: 3
 
-This is the documentation for skypy.
-This package contains methods for modelling the universe, galaxies and Milky
-Way. Also included are methods for generating observed data.
+###################
+SkyPy Documentation
+###################
+
+This is the documentation for SkyPy.
+
+
+.. _getting-started:
+
+***************
+Getting Started
+***************
+
+
+.. _user-docs:
+
+******************
+User Documentation
+******************
+
+Packages
+--------
 
 .. toctree::
-  :maxdepth: 2
+   :maxdepth: 1
 
-  skypy/index.rst
+   galaxy/index
+   halo/index
+   power_spectrum/index
 
-.. note:: The layout of this directory is simply a suggestion.  To follow
-          traditional practice, do *not* edit this page, but instead place
-          all documentation for the package inside ``skypy/``.
-          You can follow this practice or choose your own layout.
+Pipeline
+--------
+
+.. toctree::
+   :maxdepth: 1
+
+   pipeline/index
+
+
+.. _developer-docs:
+
+***********************
+Developer Documentation
+***********************
+
+
+.. _project-details:
+
+***************
+Project details
+***************
+
+
+*****
+Index
+*****
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
