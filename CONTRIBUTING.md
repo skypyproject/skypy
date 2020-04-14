@@ -28,11 +28,11 @@ Finally add the `skypyproject` repository as a *remote*. This will allow you to 
 
 ### Create a branch for your new feature
 
-Create a *branch* off the `skypyproject` development branch. Working on unique branches for each new feature simplifies the development, review and merge processes by maintining logical separation. To create a feature branch:
+Create a *branch* off the `skypyproject` master branch. Working on unique branches for each new feature simplifies the development, review and merge processes by maintining logical separation. To create a feature branch:
 
   ```bash
   git fetch skypyproject
-  git checkout -b <your-branch-name> skypyproject/develop
+  git checkout -b <your-branch-name> skypyproject/master
   ```
 
 ### Hack away!
@@ -63,26 +63,26 @@ When you feel that work on your new feature is complete, you should create a *Pu
   1. Go to [SkyPy Pull Requests](https://github.com/skypyproject/skypy/pulls)
   2. Click the green **New pull request** button
   3. Click **compare across forks**
-  4. Confirm that the base fork is `skypyproject/skypy` and the base branch is `develop`
+  4. Confirm that the base fork is `skypyproject/skypy` and the base branch is `master`
   5. Confirm the head fork is `<your-account>/skypy` and the compare branch is `<your-branch-name>`
   6. Give your pull request a title and fill out the the template for the description
   7. Click the green **Create pull request** button
 
 ### Updating your branch
 
-As you work on your feature, new commits might be made to the `skypyproject` development branch. You will need to update your branch with these new commits before your pull request can be accepted. You can achieve this in a few different ways:
+As you work on your feature, new commits might be made to the `skypyproject` master branch. You will need to update your branch with these new commits before your pull request can be accepted. You can achieve this in a few different ways:
 
   - If your pull request has no conflicts, click **Update branch**
   - If your pull request has conflicts, click **Resolve conflicts**, manually resolve the conflicts and click **Mark as resolved**
-  - *merge* the `skypyproject` development branch from the command line:
+  - *merge* the `skypyproject` master branch from the command line:
     ```bash
     git fetch skypyproject
-    git merge skypyproject/develop
+    git merge skypyproject/master
     ```
-  - *rebase* your feature branch onto the `skypyproject` development branch from the command line:
+  - *rebase* your feature branch onto the `skypyproject` master branch from the command line:
     ```bash
     git fetch skypyproject
-    git rebase skypyproject/develop
+    git rebase skypyproject/master
     ```
 
 **Warning**: It is bad practice to *rebase* commits that have already been pushed to a remote such as your fork. Rebasing creates new copies of your commits that can cause the local and remote branches to diverge. `git push --force` will **overwrite** the remote branch with your newly rebased local branch. This is strongly discouraged, particularly when working on a shared branch where you could erase a collaborators commits.
