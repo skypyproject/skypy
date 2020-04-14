@@ -8,14 +8,6 @@ import skypy.utils.special as special
 import skypy.utils.astronomy as astro
 
 
-def test_cdf():
-    q = np.logspace(np.log10(0.1), np.log10(10), 10)
-    cdf = lum._cdf(q, min(q), max(q), -1.3)
-    result = np.array([0., 0.31938431, 0.57066007, 0.75733831, 0.88345969,
-                       0.95631112, 0.98886695, 0.99846589, 0.99992254, 1.])
-    np.testing.assert_allclose(cdf, result)
-
-
 def test_calculate_luminosity_star():
     luminosity_star = lum._calculate_luminosity_star(1, 2.5, 5)
     assert luminosity_star == 0.001
@@ -67,10 +59,10 @@ def test_herbel_luminosities():
 
 
 def test_exponential_distribution():
-    # When alpha=0, L*=1 and q_min~0 we get a truncated exponential
+    # When alpha=0, L*=1 and x_min~0 we get a truncated exponential
     q_max = 1e2
     sample = lum.herbel_luminosities(0, 0, 0, 0, size=1000,
-                                     q_min=1e-10, q_max=q_max,
+                                     x_min=1e-10, x_max=q_max,
                                      resolution=1000)
     d, p_value = scipy.stats.kstest(sample, 'truncexpon', args=(q_max,))
     assert p_value >= 0.01
