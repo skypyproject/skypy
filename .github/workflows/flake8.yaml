@@ -2,10 +2,10 @@ name: Code Style
 on:
   push:
     branches:
-      - develop
+      - master
   pull_request:
     branches:
-      - develop
+      - master
 jobs:
   flake8:
     runs-on: ubuntu-latest
