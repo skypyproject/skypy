@@ -1,8 +1,7 @@
 import numpy as np
 import scipy.stats
 import scipy.integrate
-
-import skypy.utils.random as random
+from skypy.utils import random, special
 
 
 def test_schechter_cdf():
@@ -19,14 +18,17 @@ def test_schechter():
 
     # Test the schechter function, sampling dimensionless x values
     alpha = -1.3
+    x_min = 1e-10
+    x_max = 1e2
 
     def calc_cdf(x):
-        pdf = np.power(x, alpha) * np.exp(- x)
-        cdf = scipy.integrate.cumtrapz(pdf, x, initial=0)
-        cdf = cdf / cdf[-1]
-        return cdf
+        a = special.upper_incomplete_gamma(alpha + 1, x_min)
+        b = special.upper_incomplete_gamma(alpha + 1, x)
+        c = special.upper_incomplete_gamma(alpha + 1, x_min)
+        d = special.upper_incomplete_gamma(alpha + 1, x_max)
+        return (a - b) / (c - d)
 
-    sample = random.schechter(alpha, x_min=1e-10, x_max=1e2,
+    sample = random.schechter(alpha, x_min=x_min, x_max=x_max,
                               resolution=100, size=1000)
 
     # Test the distribution of galaxy properties follows the right distribution
