@@ -30,6 +30,14 @@ Packages
    halo/index
    power_spectrum/index
 
+Pipeline
+--------
+
+.. toctree::
+   :maxdepth: 1
+
+   pipeline/index
+
 
 .. _developer-docs:
 
