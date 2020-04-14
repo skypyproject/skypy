@@ -11,7 +11,8 @@ def test_press_schechter():
     n, m_star = 1, 1e9
     alpha = - 0.5 * (n + 9.0) / (n + 3.0)
 
-    def calc_cdf(x):
+    def calc_cdf(m):
+        x = np.power(m/m_star, 1 + n/3)
         pdf = np.power(x, alpha) * np.exp(- x)
         cdf = scipy.integrate.cumtrapz(pdf, x, initial=0)
         cdf = cdf / cdf[-1]
