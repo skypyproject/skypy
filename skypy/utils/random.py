@@ -4,7 +4,6 @@ import skypy.utils.special as special
 
 def schechter(alpha, x_min, x_max, resolution=100, size=None):
     """Sample from the Schechter function.
-
     Parameters
     ----------
     alpha : float or int
@@ -14,12 +13,19 @@ def schechter(alpha, x_min, x_max, resolution=100, size=None):
     resolution : int
         Resolution of the inverse transform sampling spline. Default is 100.
     size: int, optional
-         Output shape of luminosity samples.  Default is None.
-
+        Output shape of samples. Default is None.
     Returns
     -------
     x_sample : array_like
         Samples drawn from the Schechter function.
+
+    Examples
+    --------
+    >>> import skypy.utils.random as random
+    >>> alpha = -1.3
+    >>> sample = random.schechter(alpha, x_min=1e-10, x_max=1e2,
+    ...                           resolution=100, size=1000)
+
 
     References
     ----------

@@ -1,15 +1,10 @@
 r'''Models of galaxy luminosities.
-
-
 Models
 ======
-
 .. autosummary::
    :nosignatures:
    :toctree: ../api/
-
    herbel_luminosities
-
 '''
 
 import numpy as np
@@ -54,47 +49,32 @@ def herbel_luminosities(redshift, alpha, a_m, b_m, size=None,
     Notes
     -----
     The Schechter luminosity function is given as
-
     .. math::
-
         \Phi(L, z) = \frac{\Phi_\star(z)}{L_\star(z)}
             \left(\frac{L}{L_\star(z)}\right)^\alpha
             /exp\left(-\frac{L}{L_\star(z)}\right) \;.
-
     Here the luminosity is defined as
-
     .. math::
-
         L = 10^{-0.4M} \;,
-
     with absolute magnitude :math:`M`. Furthermore, Herbel et al. [1]_
     introduced
-
     .. math::
-
         \Phi_\star(z) = b_\phi \exp(a_\phi z) \;,
         M_\star(z) = a_M z + b_M \;.
-
     Now we have to rescale the Schechter function by the comoving element and
     get
-
     .. math::
-
         \phi(L,z) = \frac{d_H d_M^2}{E(z)}  \Phi(L,z)\;.
 
     Examples
     --------
     >>> import skypy.galaxy.luminosity as lum
-
-    Sample 100 luminosity values at redshift z = 1.0 with
-    a_m = -0.9408582, b_m = -20.40492365, alpha = -1.3.
-
+    >>> # Sample 100 luminosity values at redshift z = 1.0 with
+    >>> # a_m = -0.9408582, b_m = -20.40492365, alpha = -1.3.
     >>> luminosities = lum.herbel_luminosities(1.0, -1.3, -0.9408582,
     ...                                         -20.40492365, size=100)
-
-    Sample a luminosity value for every redshift in an array z with
-    a_m = -0.9408582, b_m = -20.40492365, alpha = -1.3.
-
+    >>> # Sample a luminosity value for every redshift in an array z with
+    >>> # a_m = -0.9408582, b_m = -20.40492365, alpha = -1.3.
     >>> z = np.linspace(0,2, 100)
     >>> luminosities = lum.herbel_luminosities(z, -1.3, -0.9408582,
     ...                                         -20.40492365)
@@ -103,7 +83,6 @@ def herbel_luminosities(redshift, alpha, a_m, b_m, size=None,
     ----------
     .. [1] Herbel J., Kacprzak T., Amara A. et al., 2017, Journal of Cosmology
            and Astroparticle Physics, Issue 08, article id. 035 (2017)
-
     """
 
     if size is None and np.shape(redshift):
@@ -111,7 +90,7 @@ def herbel_luminosities(redshift, alpha, a_m, b_m, size=None,
 
     luminosity_star = _calculate_luminosity_star(redshift, a_m, b_m)
 
-    x_sample = schechter(alpha, x_min, x_max, resolution=100, size=None)
+    x_sample = schechter(alpha, x_min, x_max, resolution=100, size=size)
 
     return luminosity_star * x_sample
 
