@@ -15,12 +15,12 @@ Models
 import numpy as np
 
 import skypy.utils.astronomy as astro
-import skypy.utils.special as special
+from skypy.utils.random import schechter
 
 
 def herbel_luminosities(redshift, alpha, a_m, b_m, size=None,
-                        q_min=0.00305,
-                        q_max=1100.0, resolution=100):
+                        x_min=0.00305,
+                        x_max=1100.0, resolution=100):
 
     r"""Model of Herbel et al (2017)
 
@@ -41,7 +41,7 @@ def herbel_luminosities(redshift, alpha, a_m, b_m, size=None,
          is a scalar, a single sample is returned. If size is None and
          redshift is an array, an array of samples is returned with the same
          shape as redshift.
-    q_min, q_max : float or int, optional
+    x_min, x_max : float or int, optional
         Lower and upper luminosity bounds in units of L*.
     resolution : int, optional
         Resolution of the inverse transform sampling spline. Default is 100.
@@ -56,7 +56,6 @@ def herbel_luminosities(redshift, alpha, a_m, b_m, size=None,
     The Schechter luminosity function is given as
 
     .. math::
-
         \Phi(L, z) = \frac{\Phi_\star(z)}{L_\star(z)}
             \left(\frac{L}{L_\star(z)}\right)^\alpha
             /exp\left(-\frac{L}{L_\star(z)}\right) \;.
@@ -110,23 +109,10 @@ def herbel_luminosities(redshift, alpha, a_m, b_m, size=None,
         size = np.shape(redshift)
 
     luminosity_star = _calculate_luminosity_star(redshift, a_m, b_m)
-    q = np.logspace(np.log10(np.min(q_min)), np.log10(np.max(q_max)),
-                    resolution)
-    cdf = _cdf(q, np.min(q_min), np.max(q_max), alpha)
-    t_lower = np.interp(q_min, q, cdf)
-    t_upper = np.interp(q_max, q, cdf)
-    u = np.random.uniform(t_lower, t_upper, size=size)
-    q_sample = np.interp(u, cdf, q)
-    luminosity_sample = luminosity_star * q_sample
-    return luminosity_sample
 
+    x_sample = schechter(alpha, x_min, x_max, resolution=100, size=size)
 
-def _cdf(q, q_min, q_max, alpha):
-    a = special.upper_incomplete_gamma(alpha+1, q_min)
-    b = special.upper_incomplete_gamma(alpha+1, q)
-    c = special.upper_incomplete_gamma(alpha+1, q_min)
-    d = special.upper_incomplete_gamma(alpha+1, q_max)
-    return (a-b)/(c-d)
+    return luminosity_star * x_sample
 
 
 def _calculate_luminosity_star(redshift, a_m, b_m):
