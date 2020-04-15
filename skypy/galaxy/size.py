@@ -52,7 +52,6 @@ def angular_size(physical_size, redshift, cosmology):
 
     Examples
     --------
-    >>> import numpy as np
     >>> from astropy import units
     >>> from astropy.cosmology import FlatLambdaCDM
     >>> cosmology = FlatLambdaCDM(H0=67.04, Om0=0.3183, Ob0=0.047745)
