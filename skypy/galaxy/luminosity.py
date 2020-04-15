@@ -1,4 +1,4 @@
-r'''Models of galaxy luminosities.
+r"""Models of galaxy luminosities.
 
 
 Models
@@ -10,7 +10,7 @@ Models
 
    herbel_luminosities
 
-'''
+"""
 
 import numpy as np
 
@@ -58,7 +58,7 @@ def herbel_luminosities(redshift, alpha, a_m, b_m, size=None,
     .. math::
         \Phi(L, z) = \frac{\Phi_\star(z)}{L_\star(z)}
             \left(\frac{L}{L_\star(z)}\right)^\alpha
-            /exp\left(-\frac{L}{L_\star(z)}\right) \;.
+            \exp\left(-\frac{L}{L_\star(z)}\right) \;.
 
     Here the luminosity is defined as
 
@@ -81,6 +81,11 @@ def herbel_luminosities(redshift, alpha, a_m, b_m, size=None,
 
         \phi(L,z) = \frac{d_H d_M^2}{E(z)}  \Phi(L,z)\;.
 
+    References
+    ----------
+    .. [1] Herbel J., Kacprzak T., Amara A. et al., 2017, Journal of Cosmology
+        and Astroparticle Physics, Issue 08, article id. 035 (2017)
+
     Examples
     --------
     >>> import skypy.galaxy.luminosity as lum
@@ -98,10 +103,7 @@ def herbel_luminosities(redshift, alpha, a_m, b_m, size=None,
     >>> luminosities = lum.herbel_luminosities(z, -1.3, -0.9408582,
     ...                                         -20.40492365)
 
-    References
-    ----------
-    .. [1] Herbel J., Kacprzak T., Amara A. et al., 2017, Journal of Cosmology
-           and Astroparticle Physics, Issue 08, article id. 035 (2017)
+
 
     """
 
@@ -110,7 +112,7 @@ def herbel_luminosities(redshift, alpha, a_m, b_m, size=None,
 
     luminosity_star = _calculate_luminosity_star(redshift, a_m, b_m)
 
-    x_sample = schechter(alpha, x_min, x_max, resolution=100, size=size)
+    x_sample = schechter(alpha, x_min, x_max, resolution=resolution, size=size)
 
     return luminosity_star * x_sample
 
