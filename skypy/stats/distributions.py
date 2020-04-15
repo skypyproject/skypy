@@ -6,6 +6,7 @@ import scipy.special as sc
 
 # list of exported distributions
 __all__ = [
+    'genschechter',
     'schechter',
 ]
 
@@ -13,6 +14,23 @@ __all__ = [
 def gammaincc_m1(a, x):
     '''gammaincc for negative indices > -1'''
     return sc.gammaincc(a+1, x) - np.exp(sc.xlogy(a, x) - x - sc.gammaln(a+1))
+
+
+def _gammaincc(a, x):
+    '''gammaincc for negative indices'''
+    b = a
+    while b < 0:
+        b = b+1
+    g = sc.gammaincc(b, x)
+    f = np.exp(sc.xlogy(b, x) - x - sc.gammaln(b+1))
+    while b > a:
+        f *= b/x
+        g -= f
+        b -= 1
+    return g
+
+
+gammaincc = np.vectorize(_gammaincc, otypes=['float'])
 
 
 def _gammaincinv_m1_iter(a, t, sgx, glna, oma, tol):
@@ -104,3 +122,63 @@ class schechter_gen(rv_continuous):
 
 
 schechter = schechter_gen(a=0., name='schechter')
+
+
+@examples(name='genschechter', args=(-1.2, 1.5, 10.))
+class genschechter_gen(rv_continuous):
+    r'''Generalised Schechter random variable.
+
+    The generalised Schechter distribution is a generalised gamma distribution
+    with negative shape parameter :math:`\alpha` and a lower cut-off.
+
+    Parameters
+    ----------
+
+
+    Notes
+    -----
+    The probability distribution function for `genschechter` is
+
+    .. math::
+
+        f(x) = \frac{\gamma \, x^\alpha \, e^{-x^\gamma}}
+                {\Gamma\Bigl(\frac{\alpha+1}{\gamma}, a^\gamma\Bigr)} \;,
+
+    for :math:`x \ge a`, where :math:`\alpha > -2` and :math:`\gamma > 0` are
+    the shape parameters of the distribution, and:math:`a > 0` is the shape
+    parameter for the lower cut-off of the support.
+
+    The sampling has not yet been specialised and is very, very slow.
+    '''
+
+    def _argcheck(self, alpha, gamma, a):
+        return (alpha > -2) & (gamma > 0) & (a > 0)
+
+    def _get_support(self, alpha, gamma, a):
+        return a, self.b
+
+    def _pdf(self, x, alpha, gamma, a):
+        return np.exp(self._logpdf(x, alpha, gamma, a))
+
+    def _logpdf(self, x, alpha, gamma, a):
+        ap1og = (alpha+1)/gamma
+        norm = np.log(np.fabs(gammaincc(ap1og, a**gamma))) + sc.gammaln(ap1og)
+        return sc.xlogy(alpha, x) - x**gamma + np.log(gamma) - norm
+
+    def _cdf(self, x, alpha, gamma, a):
+        return 1 - self._sf(x, alpha, gamma, a)
+
+    def _sf(self, x, alpha, gamma, a):
+        ap1og = (alpha+1)/gamma
+        return gammaincc(ap1og, x**gamma)/gammaincc(ap1og, a**gamma)
+
+    def _munp(self, n, alpha, gamma, a):
+        a_to_gamma = a**gamma
+        ap1nog = (alpha+1+n)/gamma
+        ap1og = (alpha+1)/gamma
+        u = np.log(np.fabs(gammaincc(ap1nog, a_to_gamma))) + sc.gammaln(ap1nog)
+        v = np.log(np.fabs(gammaincc(ap1og, a_to_gamma))) + sc.gammaln(ap1og)
+        return np.exp(u - v)
+
+
+genschechter = genschechter_gen(a=0., name='genschechter')

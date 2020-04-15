@@ -2,7 +2,7 @@ import numpy as np
 import scipy.stats
 from astropy import log
 
-from skypy.stats import *
+from skypy.stats import parametrise
 
 
 _WRAPPED_METHODS = [

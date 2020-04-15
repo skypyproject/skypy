@@ -44,4 +44,5 @@ Generic Distributions
    :nosignatures:
    :toctree: ../api/
 
+   genschechter
    schechter
