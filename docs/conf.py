@@ -158,7 +158,8 @@ if eval(setup_cfg.get('edit_on_github')):
     extensions += ['sphinx_astropy.ext.edit_on_github']
 
     versionmod = import_module(setup_cfg['name'] + '.version')
-    edit_on_github_project = setup_cfg['github_project']
+    edit_on_github_project = '/'.join([setup_cfg['github_project'],
+                                       setup_cfg['name']])
     if versionmod.release:
         edit_on_github_branch = "v" + versionmod.version
     else:
