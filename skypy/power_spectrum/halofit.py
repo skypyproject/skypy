@@ -11,11 +11,11 @@ Models
    :nosignatures:
    :toctree: ../api/
 
-   halofit
+   power_spectrum_nl
    HalofitParameters
-   halofit_smith
-   halofit_takahashi
-   halofit_bird
+   power_spectrum_nl_smith
+   power_spectrum_nl_takahashi
+   power_spectrum_nl_bird
 
 """
 
@@ -72,8 +72,8 @@ _bird_parameters = HalofitParameters(
     2.080, 1.2e-3, 26.3, -6.49, 1.44, 12.4)
 
 
-def halofit(wavenumber, redshift, linear_power_spectrum,
-            cosmology, parameters):
+def power_spectrum_nl(wavenumber, redshift, linear_power_spectrum,
+                      cosmology, parameters):
     r'''Computation of the non-linear halo power spectrum.
 
     This function computes the non-linear halo power spectrum, as a function
@@ -115,7 +115,7 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
     >>> zvalue = 0.0
     >>> pvec = np.array([388.6725682632502, 0.21676249605280398])
     >>> cosmo = FlatLambdaCDM(H0=67.04, Om0=0.21479, Ob0=0.04895)
-    >>> halofit(kvec, zvalue, pvec, cosmo, _takahashi_parameters)
+    >>> power_spectrum_nl(kvec, zvalue, pvec, cosmo, _takahashi_parameters)
     array([388.67064424,   0.72797614])
     '''
 
@@ -233,6 +233,9 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
     return pknl.T.reshape(return_shape)
 
 
-halofit_smith = partial(halofit, parameters=_smith_parameters)
-halofit_takahashi = partial(halofit, parameters=_takahashi_parameters)
-halofit_bird = partial(halofit, parameters=_bird_parameters)
+power_spectrum_nl_smith = partial(power_spectrum_nl,
+                                  parameters=_smith_parameters)
+power_spectrum_nl_takahashi = partial(power_spectrum_nl,
+                                      parameters=_takahashi_parameters)
+power_spectrum_nl_bird = partial(power_spectrum_nl,
+                                 parameters=_bird_parameters)
