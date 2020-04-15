@@ -1,6 +1,8 @@
 Package for modelling the universe.
 -----------------------------------
 
+.. image:: docs/graphics/skypy_logo.png
+
 |Astropy Badge| |CircleCI Status| |Coverage Status| |Documentation Status|
 
 This package contains methods for modelling the universe, galaxies and Milky
