@@ -26,8 +26,10 @@ class build_docs(AstropyBuildDocs):
     def run(self):
         import shutil
         super().run()
-        shutil.move('docs/_resources/skypy_image.png',
-                    './docs/_build/html/_static/astropy_linkout_20.png')
+        shutil.copy('images/skypy_image.png',
+                    './docs/_build/html/_static/astropy_logo_32.png')
+        shutil.copy('images/skypy_image.svg',
+                    './docs/_build/html/_static/astropy_logo.svg')
 cmdclass['build_docs'] = build_docs
 
 # Freeze build information in version.py. Note that this gets information
