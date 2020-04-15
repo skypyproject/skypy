@@ -119,34 +119,28 @@ class smail_gen(stats.rv_continuous):
 smail = smail_gen(a=0., name='smail', shapes='z_median, alpha, beta')
 
 
-def herbel_redshift(alpha, a_phi, a_m, b_phi, b_m, cosmology, low=0.0,
+def herbel_redshift(alpha, a_phi, b_phi, a_m, b_m, cosmology, low=0.0,
                     high=2.0,
                     size=None, absolute_magnitude_max=-16.0, resolution=100):
     r""" Redshift following the Schechter luminosity function marginalised over
-        luminosities following the Herbel et al. (2017) model.
+    luminosities following the Herbel et al. [1]_ model.
 
     Parameters
     ----------
     alpha : float or scalar
         The alpha parameter in the Schechter luminosity function
-    a_phi : float or scalar
-        Parametrisation factor of the normalisation factor Phi_* as a function
-        of redshift according to Herbel et al. (2017) equation (3.4).
-    a_m : float or scalar
-        Parametrisation factor of the characteristic absolute magnitude M_* as
-        a function of redshift according to Herbel et al. (2017) equation (3.3)
-    b_phi : float or scalar
-        Parametrisation factor of the normalisation factor Phi_* as a function
-        of redshift according to Herbel et al. (2017) equation (3.4).
-    b_m : float or scalar
-        Parametrisation factor of the characteristic absolute magnitude M_* as
-        a function of redshift according to Herbel et al. (2017) equation (3.3)
+    a_phi, b_phi : float or scalar
+        Parametrisation factors of the normalisation factor Phi_* as a function
+        of redshift according to Herbel et al. [1]_ equation (3.4).
+    a_m, b_m : float or scalar
+        Parametrisation factors of the characteristic absolute magnitude M_* as
+        a function of redshift according to Herbel et al. [1]_ equation (3.3).
     cosmology : instance
         Instance of an Astropy Cosmology class.
     low : float or array_like of floats, optional
         The lower boundary of teh output interval. All values generated will be
         greater than or equal to low.
-        It has to be larger than 0. The default value is 0.01.
+        The default value is 0.0.
     high : float or array_like of floats, optional
         Upper boundary of output interval. All values generated will be less
         than high. The default value is 2.0
@@ -171,7 +165,7 @@ def herbel_redshift(alpha, a_phi, a_m, b_phi, b_m, cosmology, low=0.0,
 
         \Phi(L, z) = \frac{\Phi_\star(z)}{L_\star(z)}
             \left(\frac{L}{L_\star(z)}\right)^\alpha
-            /exp\left(-\frac{L}{L_\star(z)}\right) \;.
+            \exp\left(-\frac{L}{L_\star(z)}\right) \;.
 
     Here the luminosity is defined as
 
@@ -179,7 +173,7 @@ def herbel_redshift(alpha, a_phi, a_m, b_phi, b_m, cosmology, low=0.0,
 
         L = 10^{-0.4M} \;,
 
-    with absolute magnitude :math:`M`. Furthermore, Herbel et al. (2017)
+    with absolute magnitude :math:`M`. Furthermore, Herbel et al. [1]_
     introduced
 
     .. math::
@@ -192,7 +186,12 @@ def herbel_redshift(alpha, a_phi, a_m, b_phi, b_m, cosmology, low=0.0,
 
     .. math::
 
-        \phi(L,z) = \frac{d_H d_M^2}{E(z)}  \Phi(L,z)
+        \phi(L,z) = \frac{d_H d_M^2}{E(z)}  \Phi(L,z) \;.
+
+     References
+    ----------
+    .. [1] Herbel J., Kacprzak T., Amara A. et al., 2017, Journal of Cosmology
+           and Astroparticle Physics, Issue 08, article id. 035 (2017)
 
     Examples
     --------
@@ -209,18 +208,12 @@ def herbel_redshift(alpha, a_phi, a_m, b_phi, b_m, cosmology, low=0.0,
     ...                     b_m=-20.40492365, cosmology=cosmology,
     ...                     absolute_magnitude_max=-16.)
 
-    References
-    ----------
-    .. [1] Herbel J., Kacprzak T., Amara A. et al., 2017, Journal of Cosmology
-           and Astroparticle Physics, Issue 08, article id. 035 (2017)
-
-
     """
 
     luminosity_min = astro.luminosity_from_absolute_magnitude(
         absolute_magnitude_max)
     redshift = np.linspace(low, high, resolution)
-    pdf = herbel_pdf(redshift, alpha, a_phi, a_m, b_phi, b_m, cosmology,
+    pdf = herbel_pdf(redshift, alpha, a_phi, b_phi, a_m, b_m, cosmology,
                      luminosity_min)
     cdf = scipy.integrate.cumtrapz(pdf, redshift, initial=0)
     cdf = cdf / cdf[-1]
@@ -230,13 +223,15 @@ def herbel_redshift(alpha, a_phi, a_m, b_phi, b_m, cosmology, low=0.0,
     return redshift_sample
 
 
-def herbel_pdf(redshift, alpha, a_phi, a_m, b_phi, b_m, cosmology,
+def herbel_pdf(redshift, alpha, a_phi, b_phi, a_m, b_m, cosmology,
                luminosity_min):
-    """Calculates the redshift pdf of the Schechter luminosity function
-    according to the model of Herbel et al. (2017) equation (3.6). That is,
-    changing the absolute magnitude M in equation (3.2) to luminosity L,
-    integrate over all possible L and multiplying by the comovin element
-    using a flat LamdaCDM model to get the corresponding pdf.
+    r"""Calculates the redshift pdf of the Schechter luminosity function
+    according to the model of Herbel et al. [1]_ equation (3.6).
+
+    That is, changing the absolute magnitude M in equation (3.2) to luminosity
+    L, integrate over all possible L and multiplying by the comoving element
+    using a flat :math:`\Lambda \mathrm{CDM}` model to get the corresponding
+    pdf.
 
     Parameters
     ----------
@@ -244,19 +239,12 @@ def herbel_pdf(redshift, alpha, a_phi, a_m, b_phi, b_m, cosmology,
         Input redshifts.
     alpha : float or scalar
         The alpha parameter in the Schechter luminosity function
-    a_phi : float or scalar
-        Parametrisation factor of the normalisation factor Phi_* as a function
-        of redshift according to Herbel et al. (2017) equation (3.4).
-    a_m : float or scalar
-        Parametrisation factor of the characteristic absolute magnitude M_* as
-        a function of redshift according to Herbel et al. (2017) equation (3.3)
-    b_phi : float or scalar
-        Parametrisation factor of the normalisation factor Phi_* as a function
-        of redshift according to Herbel et al. (2017) equation (3.4).
-    b_m : float or scalar
-        Parametrisation factor of the characteristic absolute magnitude M_* as
-        a function of redshift according to Herbel et al. (2017) equation
-        (3.3)
+    a_phi, b_phi : float or scalar
+        Parametrisation factors of the normalisation factor Phi_* as a function
+        of redshift according to Herbel et al. [1]_ equation (3.4).
+    a_m, b_m : float or scalar
+        Parametrisation factors of the characteristic absolute magnitude M_* as
+        a function of redshift according to Herbel et al. [1]_ equation (3.3).
     cosmology : instance
         Instance of an Astropy Cosmology class.
     luminosity_min : float or scalar
@@ -265,12 +253,49 @@ def herbel_pdf(redshift, alpha, a_phi, a_m, b_phi, b_m, cosmology,
 
     Returns
     -------
-    ndarray or float
+    pdf : ndarray or float
     Un-normalised probability density function as a function of redshift
-    according to Herbel et al. (2017)
+    according to Herbel et al. [1]_.
+
+    Notes
+    -----
+    This module calculates the function
+
+    .. math::
+
+        \mathrm{pdf}(z) = \Phi_\star(z) \cdot \frac{d_H d_M^2}{E(z)} \cdot
+            \Gamma\left(\alpha + 1, \frac{L_\mathrm{min}}{L_\star(z)}\right)\:,
+
+    with :math:`\Phi_\star(z) = b_\phi \exp(a_\phi z)` and the second term the
+    comoving element.
+
+    References
+    ----------
+    .. [1] Herbel J., Kacprzak T., Amara A. et al., 2017, Journal of Cosmology
+           and Astroparticle Physics, Issue 08, article id. 035 (2017)
+
+    Examples
+    --------
+    >>> from skypy.galaxy.redshift import herbel_pdf
+    >>> import skypy.utils.astronomy as astro
+    >>> from astropy.cosmology import FlatLambdaCDM
+    >>> import numpy as np
+
+    Calculate the pdf for 100 redshift values between 0 and 2 with
+    a_m = -0.9408582, b_m = -20.40492365, a_phi = -0.10268436,
+    b_phi = 0.00370253, alpha = -1.3 for a flat cosmology.
+
+    >>> cosmology = FlatLambdaCDM(H0=70, Om0=0.3, Tcmb0=2.725)
+    >>> redshift = np.linspace(0, 2, 100)
+    >>> luminosity_min = astro.luminosity_from_absolute_magnitude(-16.0)
+    >>> redshift = herbel_pdf(redshift=redshift, alpha=-1.3,
+    ...                     a_phi=-0.10268436,a_m=-0.9408582, b_phi=0.00370253,
+    ...                     b_m=-20.40492365, cosmology=cosmology,
+    ...                     luminosity_min=luminosity_min)
     """
     dv = cosmology.differential_comoving_volume(redshift).value
     x = luminosity_min \
         * 1./astro.luminosity_from_absolute_magnitude(a_m*redshift + b_m)
     value_gamma = special.upper_incomplete_gamma(alpha + 1, x)
-    return dv * b_phi * np.exp(a_phi * redshift) * value_gamma
+    pdf = dv * b_phi * np.exp(a_phi * redshift) * value_gamma
+    return pdf

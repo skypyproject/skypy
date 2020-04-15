@@ -79,7 +79,7 @@ def test_herbel_pdf():
     cosmology = FlatLambdaCDM(H0=70, Om0=0.3, Tcmb0=2.725)
     pdf = herbel_pdf(np.array([0.01, 0.5, 1, 2]),
                      -0.5, -0.70596888,
-                     -0.70798041, 0.0035097,
+                     0.0035097, -0.70798041,
                      -20.37196157, cosmology, np.power(10, -0.4 * -16.0))
     result = np.array(
         [4.09063927e+04, 4.45083420e+07, 7.26629445e+07, 5.40766813e+07])
