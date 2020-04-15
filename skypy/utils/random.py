@@ -1,9 +1,26 @@
+"""Random utility module.
+
+This module provides methods to draw from random distributions.
+
+
+Utility Functions
+=================
+
+.. autosummary::
+   :nosignatures:
+   :toctree: ../api/
+
+   schechter
+
+"""
+
 import numpy as np
 import skypy.utils.special as special
 
 
 def schechter(alpha, x_min, x_max, resolution=100, size=None):
     """Sample from the Schechter function.
+
     Parameters
     ----------
     alpha : float or int
@@ -14,6 +31,7 @@ def schechter(alpha, x_min, x_max, resolution=100, size=None):
         Resolution of the inverse transform sampling spline. Default is 100.
     size: int, optional
         Output shape of samples. Default is None.
+
     Returns
     -------
     x_sample : array_like
