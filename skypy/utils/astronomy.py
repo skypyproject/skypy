@@ -1,3 +1,20 @@
+"""Astronomy utility module.
+
+This module provides methods to convert among astronomical quantities
+like luminosity and magnitude.
+
+Utility functions
+=================
+
+.. autosummary::
+   :nosignatures:
+   :toctree: ../api/
+
+   luminosity_from_absolute_magnitude
+   absolute_magnitude_from_luminosity
+
+"""
+
 import numpy as np
 
 
@@ -18,7 +35,7 @@ def luminosity_from_absolute_magnitude(absolute_magnitude):
 
 
 def absolute_magnitude_from_luminosity(luminosity):
-    """
+    """ Converts luminosities into absolute magnitudes
 
     Parameters
     ----------

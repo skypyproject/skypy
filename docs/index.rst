@@ -29,6 +29,7 @@ Packages
    galaxy/index
    halo/index
    power_spectrum/index
+   utils/index
 
 Pipeline
 --------
