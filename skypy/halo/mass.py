@@ -25,7 +25,7 @@ def press_schechter(n, m_star, size=None, x_min=0.00305,
 
     Masses following the Press-Schechter mass function following the
     Press et al. [1]_ formalism.
-    
+
     Parameters
     ----------
     n : float or int
@@ -38,7 +38,7 @@ def press_schechter(n, m_star, size=None, x_min=0.00305,
         Lower and upper bounds in units of M*.
     resolution : int, optional
         Resolution of the inverse transform sampling spline. Default is 100.
-        
+
     Returns
     -------
     mass : array_like
@@ -54,7 +54,7 @@ def press_schechter(n, m_star, size=None, x_min=0.00305,
     References
     ----------
     .. [1] Press, W. H. and Schechter, P., APJ, (1974).
-    
+
     """
 
     alpha = - 0.5 * (n + 9.0) / (n + 3.0)
