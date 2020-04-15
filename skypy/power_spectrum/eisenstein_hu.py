@@ -2,7 +2,7 @@
 
 This module provides transfer functions and linear matter power spectra using
 the Eisenstein & Hu (1998) approximations with or without baryon acoustic
-oscilation wiggles.
+oscillation wiggles.
 
 
 Models
@@ -24,7 +24,7 @@ import numpy as np
 
 def transfer_with_wiggles(wavenumber, A_s, n_s, cosmology, kwmap=0.02):
     """ Eisenstein & Hu fitting formula for the transfer function with
-    baryon acoustic oscilation wiggles.
+    baryon acoustic oscillation wiggles.
 
     Parameters
     ----------
@@ -147,7 +147,7 @@ def transfer_with_wiggles(wavenumber, A_s, n_s, cosmology, kwmap=0.02):
 
 def transfer_no_wiggles(wavenumber, A_s, n_s, cosmology):
     """ Eisenstein & Hu fitting formula for the transfer function without
-    baryon acoustic oscilation wiggles.
+    baryon acoustic oscillation wiggles.
 
     Parameters
     ----------
@@ -213,7 +213,7 @@ def transfer_no_wiggles(wavenumber, A_s, n_s, cosmology):
 
 def power_spectrum(wavenumber, A_s, n_s, cosmology, kwmap=0.02, wiggle=True):
     """ Eisenstein & Hu fitting function for the linear matter
-    power spectrum with (or without) baryon acoustic oscilations using
+    power spectrum with (or without) baryon acoustic oscillations using
     formulation from Komatsu et al (2009).
 
     Parameters
@@ -230,7 +230,7 @@ def power_spectrum(wavenumber, A_s, n_s, cosmology, kwmap=0.02, wiggle=True):
         WMAP normalization for the amplitude of primordial scalar fluctuations,
         as described in [3], in units of [Mpc^-1]. Default is 0.02.
     wiggle : bool
-        Boolean flag to set the use of baryion acoustic oscilations wiggles.
+        Boolean flag to set the use of baryion acoustic oscillations wiggles.
         Default is True, for which the power spectrum is computed with the
         wiggles.
 
