@@ -1,3 +1,19 @@
+"""Special functions.
+
+This module computes useful special functions.
+
+
+Utility functions
+=================
+
+.. autosummary::
+   :nosignatures:
+   :toctree: ../api/
+
+   upper_incomplete_gamma
+
+"""
+
 import numpy as np
 
 import scipy.special
