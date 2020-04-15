@@ -1,7 +1,9 @@
 Package for modelling the universe.
 -----------------------------------
 
-|Astropy Badge| |CircleCI Status| |Coverage Status| |Documentation Status|
+.. image:: docs/graphics/skypy_logo.png
+
+|Astropy Badge| |CircleCI Status| |Coverage Status| |PyPI Status| |Documentation Status|
 
 This package contains methods for modelling the universe, galaxies and Milky
 Way. Also included are methods for generating observed data.
@@ -53,13 +55,21 @@ skypy based on its use in the README file for the
     :target: http://www.astropy.org
     :alt: Powered by Astropy Badge
 
-.. |CircleCI Status| image:: https://https://circleci.com/gh/skypyproject/skypy.svg?style=svg
+.. |Test Status| image:: https://github.com/skypyproject/skypy/workflows/Tests/badge.svg
+    :target: https://github.com/skypyproject/skypy/actions
+    :alt: SkyPy's Test Status
+
+.. |CircleCI Status| image:: https://circleci.com/gh/skypyproject/skypy.svg?style=svg
     :target: https://circleci.com/gh/skypyproject/skypy
-    :alt: Astropy's CircleCI Status
+    :alt: SkyPy's CircleCI Status
 
 .. |Coverage Status| image:: https://codecov.io/gh/skypyproject/skypy/branch/master/graph/badge.svg
     :target: https://codecov.io/gh/skypyproject/skypy
-    :alt: Astropy's Coverage Status
+    :alt: SkyPy's Coverage Status
+
+.. |PyPI Status| image:: https://img.shields.io/pypi/v/skypy.svg
+    :target: https://pypi.python.org/pypi/skypy
+    :alt: SkyPy's PyPI Status
 
 .. |Documentation Status| image:: https://readthedocs.org/projects/githubapps/badge/?version=latest
     :target: https://skypy.readthedocs.io/en/latest/?badge=latest
