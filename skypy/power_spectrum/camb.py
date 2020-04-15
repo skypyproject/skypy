@@ -19,7 +19,7 @@ import numpy as np
 from astropy import units as u
 
 
-def camb(wavenumber, redshift, cosmology, A_s, n_s):
+def power_spectrum(wavenumber, redshift, cosmology, A_s, n_s):
     """ Return the CAMB computation of the linear matter power spectrum, on a
     two dimensional grid of wavenumber and redshift
 
