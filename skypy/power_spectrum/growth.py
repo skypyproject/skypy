@@ -71,7 +71,7 @@ def growth_factor(redshift, cosmology, gamma=6.0/11.0):
     """Computation of the growth factor.
 
     Function used to calculate f(z), parametrised growth factor at different
-    redshifts, as described in [1]_.
+    redshifts, as described in [1]_ equation 17.
 
     Parameters
     ----------
@@ -87,7 +87,7 @@ def growth_factor(redshift, cosmology, gamma=6.0/11.0):
     Returns
     -------
     growth_factor : ndarray, or float if input scalar
-      The redshift scaling of the growth factor, equation 17 in [1].
+      The redshift scaling of the growth factor.
 
     Examples
     --------
@@ -113,7 +113,7 @@ def growth_function(redshift, cosmology, gamma=6.0/11.0):
     """Computation of the growth function.
 
     Function used to calculate D(z), growth function at different redshifts,
-    as described in [1]_.
+    as described in [1]_ equation 16.
 
     Parameters
     ----------
@@ -129,7 +129,7 @@ def growth_function(redshift, cosmology, gamma=6.0/11.0):
     Returns
     -------
     growth_function : ndarray
-      The redshift scaling of the growth function, equation 16 in [1].
+      The redshift scaling of the growth function.
 
     Examples
     --------
@@ -173,7 +173,7 @@ def growth_function_derivative(redshift, cosmology, gamma=6.0/11.0):
     """Computation of the first derivative of the growth function.
 
     Function used to calculate D'(z), derivative of the growth function
-    with respect to redshift, described in [1].
+    with respect to redshift, described in [1]_ equation 16.
 
     Parameters
     ----------
@@ -190,7 +190,6 @@ def growth_function_derivative(redshift, cosmology, gamma=6.0/11.0):
     -------
     growth_function_derivative : ndarray, or float if input scalar
       The redshift scaling of the derivative of the growth function.
-      Analytic expression derived from equation 16 in [1].
 
     Examples
     --------
