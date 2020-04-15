@@ -11,11 +11,11 @@ Models
    :nosignatures:
    :toctree: ../api/
 
-   halofit
+   power_spectrum_nl
    HalofitParameters
-   halofit_smith
-   halofit_takahashi
-   halofit_bird
+   power_spectrum_nl_smith
+   power_spectrum_nl_takahashi
+   power_spectrum_nl_bird
 
 """
 

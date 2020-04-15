@@ -11,7 +11,7 @@ Models
    :nosignatures:
    :toctree: ../api/
 
-   camb
+   power_spectrum
 
 """
 
