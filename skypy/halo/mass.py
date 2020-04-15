@@ -1,10 +1,17 @@
-r'''Models of galaxy masses.
+r'''Halo mass module.
+
+This module provides methods to sample the  masses of dark matter halos.
+
 Models
 ======
+
 .. autosummary::
+
    :nosignatures:
    :toctree: ../api/
+
    press_schechter
+
 '''
 
 import numpy as np
