@@ -1,5 +1,7 @@
 :tocdepth: 3
 
+.. image:: docs/graphics/skypy_logo.png
+
 ###################
 SkyPy Documentation
 ###################
