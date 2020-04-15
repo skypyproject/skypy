@@ -84,7 +84,7 @@ def _test_wrap(dist, argsfn, wrap_args):
     log.debug('... method `stats`')
     dist_mvsk = dist.stats(*dist_args, moments='mvsk')
     wrap_mvsk = wrap.stats(*wrap_args, moments='mvsk')
-    assert dist_mvsk == wrap_mvsk, 'wrapped stats are different' 
+    assert dist_mvsk == wrap_mvsk, 'wrapped stats are different'
 
     # compare a number of moments
     log.debug('... method `moment`')
@@ -103,9 +103,8 @@ def _test_wrap(dist, argsfn, wrap_args):
     # expect needs loc and scale split from args
     a, loc, scale = dist._parse_args(*dist_args)
     # function to take expectation of
-    f = lambda x: x/np.sqrt(1 + x**2)
-    dist_expe = dist.expect(f, a, loc, scale)
-    wrap_expe = wrap.expect(f, wrap_args)
+    dist_expe = dist.expect(lambda x: x/np.sqrt(1 + x**2), a, loc, scale)
+    wrap_expe = wrap.expect(lambda x: x/np.sqrt(1 + x**2), wrap_args)
     assert dist_expe == wrap_expe, 'wrapped expectation is different'
 
 
