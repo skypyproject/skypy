@@ -4,7 +4,7 @@
 SkyPy Documentation
 ###################
 
-This is the documentation for SkyPy.
+This package contains methods for modelling the universe, galaxies and Milky Way. Also included are methods for generating observed data.
 
 
 .. _getting-started:
@@ -29,6 +29,7 @@ Packages
    galaxy/index
    halo/index
    power_spectrum/index
+   utils/index
 
 Pipeline
 --------
