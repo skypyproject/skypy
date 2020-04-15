@@ -73,7 +73,7 @@ _bird_parameters = HalofitParameters(
 
 
 def power_spectrum_nl(wavenumber, redshift, linear_power_spectrum,
-                             cosmology, parameters):
+                      cosmology, parameters):
     r'''Computation of the non-linear halo power spectrum.
 
     This function computes the non-linear halo power spectrum, as a function
@@ -115,7 +115,7 @@ def power_spectrum_nl(wavenumber, redshift, linear_power_spectrum,
     >>> zvalue = 0.0
     >>> pvec = np.array([388.6725682632502, 0.21676249605280398])
     >>> cosmo = FlatLambdaCDM(H0=67.04, Om0=0.21479, Ob0=0.04895)
-    >>> halofit(kvec, zvalue, pvec, cosmo, _takahashi_parameters)
+    >>> power_spectrum_nl(kvec, zvalue, pvec, cosmo, _takahashi_parameters)
     array([388.67064424,   0.72797614])
     '''
 
