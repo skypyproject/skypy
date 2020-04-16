@@ -2,7 +2,7 @@
 SkyPy: A package for modelling the Universe
 ===========================================
 
-|Astropy Badge| |Test Status| |CircleCI Status| |Coverage Status| |PyPI Status| |Documentation Status|
+|Astropy Badge| |Test Status| |Coverage Status| |PyPI Status| |Documentation Status|
 
 This package contains methods for modelling the universe, galaxies and Milky
 Way. Also included are methods for generating observed data.
@@ -57,10 +57,6 @@ SkyPy based on its use in the README file for the
 .. |Test Status| image:: https://github.com/skypyproject/skypy/workflows/Tests/badge.svg
     :target: https://github.com/skypyproject/skypy/actions
     :alt: SkyPy's Test Status
-
-.. |CircleCI Status| image:: https://circleci.com/gh/skypyproject/skypy.svg?style=svg
-    :target: https://circleci.com/gh/skypyproject/skypy
-    :alt: SkyPy's CircleCI Status
 
 .. |Coverage Status| image:: https://codecov.io/gh/skypyproject/skypy/branch/master/graph/badge.svg
     :target: https://codecov.io/gh/skypyproject/skypy
