@@ -11,18 +11,7 @@ __all__ = [
 ]
 
 
-def gammaincc_m1(a, x):
-    '''gammaincc for negative indices > -1'''
-    return sc.gammaincc(a+1, x) - np.exp(sc.xlogy(a, x) - x - sc.gammaln(a+1))
-
-
-def _gammaincc(a, x):
-    '''gammaincc for negative indices'''
-    b = a
-    while b < 0:
-        b = b+1
-    g = sc.gammaincc(b, x)
-    f = np.exp(sc.xlogy(b, x) - x - sc.gammaln(b+1))
+def _gammaincc_iter(a, b, f, g, x):
     while b > a:
         f *= b/x
         g -= f
@@ -30,28 +19,40 @@ def _gammaincc(a, x):
     return g
 
 
-gammaincc = np.vectorize(_gammaincc, otypes=['float'])
+_gammaincc_iter_vec = np.vectorize(_gammaincc_iter, otypes=['float'])
 
 
-def _gammaincinv_m1_iter(a, t, sgx, glna, oma, tol):
+def gammaincc(a, x):
+    '''gammaincc for negative indices'''
+    b = np.copy(a)
+    np.divmod(b, 1, out=(None, b), where=(a<0))
+    g = sc.gammaincc(b, x)
+    f = np.exp(sc.xlogy(b, x) - x - sc.gammaln(b+1))
+    return _gammaincc_iter_vec(a, b, f, g, x)
+
+
+def _gammainccinv_iter(a, t, sgx, glna, oma, tol):
     dt = np.inf
     while dt > tol:
-        u = np.fabs(gammaincc_m1(a, t)) - sgx
+        u = np.fabs(gammaincc(a, t)) - sgx
         dt = u*np.exp(t + sc.xlogy(oma, t) + glna)
         t += dt
     return t
 
 
-def gammainccinv_m1(a, x, tol=1e-8):
+_gammainccinv_iter_vec = np.vectorize(_gammainccinv_iter, otypes=['float'])
+
+
+def gammainccinv(a, x, tol=1e-8):
     '''gammainccinv for indices a > -1
 
     Reference: Gil et al. (2012) for 0 < a < 1; NT
     '''
-    sgx = np.sign(a)*x
+    sgx = sc.gammasgn(a)*x
     t = np.exp((np.log(1-x) + sc.gammaln(a+1))/a)
     glna = sc.gammaln(a)
     oma = 1-a
-    return np.vectorize(_gammaincinv_m1_iter)(a, t, sgx, glna, oma, tol)
+    return _gammainccinv_iter_vec(a, t, sgx, glna, oma, tol)
 
 
 @examples(name='schechter', args=(-1.2, 10.))
@@ -96,7 +97,7 @@ class schechter_gen(rv_continuous):
 
     def _logpdf(self, x, alpha, a):
         ap1 = alpha+1
-        norm = np.log(np.fabs(gammaincc_m1(ap1, a))) + sc.gammaln(ap1)
+        norm = np.log(np.fabs(gammaincc(ap1, a))) + sc.gammaln(ap1)
         return sc.xlogy(alpha, x) - x - norm
 
     def _cdf(self, x, alpha, a):
@@ -104,20 +105,20 @@ class schechter_gen(rv_continuous):
 
     def _sf(self, x, alpha, a):
         ap1 = alpha+1
-        return gammaincc_m1(ap1, x)/gammaincc_m1(ap1, a)
+        return gammaincc(ap1, x)/gammaincc(ap1, a)
 
     def _ppf(self, q, alpha, a):
         return self._isf(1-q, alpha, a)
 
     def _isf(self, q, alpha, a):
         ap1 = alpha+1
-        return gammainccinv_m1(ap1, q*gammaincc_m1(ap1, a))
+        return gammainccinv(ap1, q*gammaincc(ap1, a))
 
     def _munp(self, n, alpha, a):
         ap1n = alpha+1+n
         ap1 = alpha+1
-        u = np.log(np.fabs(gammaincc_m1(ap1n, a))) + sc.gammaln(ap1n)
-        v = np.log(np.fabs(gammaincc_m1(ap1, a))) + sc.gammaln(ap1)
+        u = np.log(np.fabs(gammaincc(ap1n, a))) + sc.gammaln(ap1n)
+        v = np.log(np.fabs(gammaincc(ap1, a))) + sc.gammaln(ap1)
         return np.exp(u - v)
 
 
@@ -171,6 +172,13 @@ class genschechter_gen(rv_continuous):
     def _sf(self, x, alpha, gamma, a):
         ap1og = (alpha+1)/gamma
         return gammaincc(ap1og, x**gamma)/gammaincc(ap1og, a**gamma)
+
+    def _ppf(self, q, alpha, gamma, a):
+        return self._isf(1-q, alpha, gamma, a)
+
+    def _isf(self, q, alpha, gamma, a):
+        ap1og = (alpha+1)/gamma
+        return gammainccinv(ap1og, q*gammaincc(ap1og, a**gamma))**(1/gamma)
 
     def _munp(self, n, alpha, gamma, a):
         a_to_gamma = a**gamma
