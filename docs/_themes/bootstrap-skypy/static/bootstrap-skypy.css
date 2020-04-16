@@ -372,8 +372,8 @@ div.topbar ul li a.homelink {
   display: block;
   height: 20px;
   padding: 5px 0px;
-  background: transparent url("astropy_linkout_20.png") no-repeat 10px 5px;
-  background-image: url("astropy_linkout.svg"), none;
+  background: transparent url("skypy_text.png") no-repeat 10px 5px;
+  background-image: url("skypy_text.svg"), none;
   background-size: 91px 20px;
 }
 
