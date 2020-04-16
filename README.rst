@@ -4,7 +4,7 @@ SkyPy: A package for modelling the Universe
 
 |Astropy Badge| |Test Status| |Coverage Status| |PyPI Status| |Documentation Status|
 
-This package contains methods for modelling the universe, galaxies and Milky
+This package contains methods for modelling the Universe, galaxies and the Milky
 Way. Also included are methods for generating observed data.
 
 
