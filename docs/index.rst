@@ -63,3 +63,9 @@ Index
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+
+****************
+Acknowledgements
+****************
+
+Logo Credit: `Maria Fonseca de la Bella <https://www.linkedin.com/in/mariadelabella>`_
