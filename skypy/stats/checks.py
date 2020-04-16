@@ -112,7 +112,7 @@ def check_sample_distribution(rv, args, equiv=None):
                     rv.name, args, str(other_dist), other_args, p)
 
 
-def check_rv(rv, args, equiv=None):
+def check_rv(rv, args, equiv=None, sample=True):
     '''standard checks for rv'''
 
     check_internals(rv, args)
@@ -120,5 +120,6 @@ def check_rv(rv, args, equiv=None):
     check_functions(rv, args)
     if rv._stats_has_moments:
         check_moments(rv, args)
-    check_sample_size(rv, args)
-    check_sample_distribution(rv, args, equiv)
+    if sample:
+        check_sample_size(rv, args)
+        check_sample_distribution(rv, args, equiv)
