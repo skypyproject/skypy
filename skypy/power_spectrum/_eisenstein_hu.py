@@ -1,25 +1,12 @@
-"""Eisenstein-Hu matter power spectrum module.
-
-This module provides transfer functions and linear matter power spectra using
-the Eisenstein & Hu (1998) approximations with or without baryon acoustic
-oscillation wiggles.
-
-
-Models
-======
-
-.. autosummary::
-   :nosignatures:
-   :toctree: ../api/
-
-   power_spectrum
-   transfer_no_wiggles
-   transfer_with_wiggles
-
-"""
-
 from astropy.utils import isiterable
 import numpy as np
+
+
+__all__ = [
+    'eisenstein_hu',
+    'transfer_with_wiggles',
+    'transfer_no_wiggles',
+]
 
 
 def transfer_with_wiggles(wavenumber, A_s, n_s, cosmology, kwmap=0.02):
@@ -211,7 +198,7 @@ def transfer_no_wiggles(wavenumber, A_s, n_s, cosmology):
     return transfer
 
 
-def power_spectrum(wavenumber, A_s, n_s, cosmology, kwmap=0.02, wiggle=True):
+def eisenstein_hu(wavenumber, A_s, n_s, cosmology, kwmap=0.02, wiggle=True):
     """ Eisenstein & Hu fitting function for the linear matter
     power spectrum with (or without) baryon acoustic oscillations using
     formulation from Komatsu et al (2009).
@@ -248,8 +235,8 @@ def power_spectrum(wavenumber, A_s, n_s, cosmology, kwmap=0.02, wiggle=True):
     >>> wavenumber = np.logspace(-3, 1, num=5, base=10.0)
     >>> A_s, n_s = 2.1982e-09, 0.969453
     >>> cosmology = default_cosmology.get()
-    >>> power_spectrum(wavenumber, A_s, n_s, cosmology, kwmap=0.02, \
-                       wiggle=True)
+    >>> eisenstein_hu(wavenumber, A_s, n_s, cosmology, kwmap=0.02,
+    ...               wiggle=True)
     array([6.47460158e+03, 3.71610099e+04, 9.65702614e+03, 1.14604456e+02,
        3.91399918e-01])
 
