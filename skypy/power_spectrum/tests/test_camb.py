@@ -27,16 +27,16 @@ def test_camb():
     '''
     Test a default astropy cosmology
     '''
-    from skypy.power_spectrum.camb import power_spectrum
+    from skypy.power_spectrum import camb
 
     redshift = [0.0, 1.0]
     wavenumber = np.logspace(-4.0, np.log10(2.0), 200)
-    pkz = power_spectrum(wavenumber, redshift, Planck15, 2.e-9, 0.965)
+    pkz = camb(wavenumber, redshift, Planck15, 2.e-9, 0.965)
     assert pkz.shape == (len(wavenumber), len(redshift))
     assert allclose(pkz, mock_pkz, rtol=1.e-4)
 
     # also check redshifts are ordered correctly
     redshift = [1.0, 0.0]
-    pkz = power_spectrum(wavenumber, redshift, Planck15, 2.e-9, 0.965)
+    pkz = camb(wavenumber, redshift, Planck15, 2.e-9, 0.965)
     assert pkz.shape == (len(wavenumber), len(redshift))
     assert allclose(pkz, mock_pkz[:, np.argsort(redshift)], rtol=1.e-4)
