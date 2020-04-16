@@ -1,5 +1,6 @@
 from scipy.stats import rv_discrete
 from scipy._lib._util import check_random_state
+from astropy.utils import isiterable
 
 import inspect
 
@@ -145,22 +146,30 @@ class ExamplesGenerator:
 examples = ExamplesGenerator.as_decorator
 
 
-def parametrise(dist, argsfn, name=None):
-    return rv_wrapped(dist, argsfn, name=name)
+def parametrise(dist, argsfn, name=None, units=None):
+    return rv_wrapped(dist, argsfn, name=name, units=units)
 
 
 class rv_wrapped(object):
 
-    def _attach_units(self, x, args, power=1):
-        _, loc, scale = self.dist._parse_args(*args)
-        unit = getattr(loc + scale, 'unit', 1)**power
-        return x*unit
+    def _attach_units(self, x, power=1):
+        if self.units is not None:
+            u = self.units if power == 1 else self.units**power
+            if isiterable(x):
+                return type(x)([y*u for y in x])
+            else:
+                return x*u
+        return x
 
-    def _detach_units(self, x, args):
-        _, loc, scale = self.dist._parse_args(*args)
-        return getattr(0*(loc + scale) + x, 'value', x)
+    def _detach_units(self, x):
+        if self.units is not None:
+            try:
+                return x.to_value(self.units)
+            except AttributeError:
+                raise TypeError('units not a Quantity')
+        return x
 
-    def __init__(self, dist, argsfn, name=None):
+    def __init__(self, dist, argsfn, name=None, units=None):
         # create a new rv instance
         self.dist = dist.__class__(**dist._updated_ctor_param())
 
@@ -177,6 +186,9 @@ class rv_wrapped(object):
         if not self.__doc__:
             self.__doc__ = argsfn.__doc__
 
+        # set units
+        self.units = units
+
         # inherit some r.v. properties
         self._stats_has_moments = self.dist._stats_has_moments
 
@@ -190,43 +202,43 @@ class rv_wrapped(object):
 
     def pdf(self, x, *args, **kwargs):
         args = self.argsfn(*args, **kwargs)
-        pdf = self.dist.pdf(self._detach_units(x, args), *args)
-        return self._attach_units(pdf, args, -1)
+        pdf = self.dist.pdf(self._detach_units(x), *args)
+        return self._attach_units(pdf, -1)
 
     def logpdf(self, x, *args, **kwargs):
         args = self.argsfn(*args, **kwargs)
-        return self.dist.logpdf(self._detach_units(x, args), *args)
+        return self.dist.logpdf(self._detach_units(x), *args)
 
     def cdf(self, x, *args, **kwargs):
         args = self.argsfn(*args, **kwargs)
-        return self.dist.cdf(self._detach_units(x, args), *args)
+        return self.dist.cdf(self._detach_units(x), *args)
 
     def logcdf(self, x, *args, **kwargs):
         args = self.argsfn(*args, **kwargs)
-        return self.dist.logcdf(self._detach_units(x, args), *args)
+        return self.dist.logcdf(self._detach_units(x), *args)
 
     def ppf(self, q, *args, **kwargs):
         args = self.argsfn(*args, **kwargs)
-        return self._attach_units(self.dist.ppf(q, *args), args)
+        return self._attach_units(self.dist.ppf(q, *args))
 
     def isf(self, q, *args, **kwargs):
         args = self.argsfn(*args, **kwargs)
-        return self._attach_units(self.dist.isf(q, *args), args)
+        return self._attach_units(self.dist.isf(q, *args))
 
     def rvs(self, *args, **kwargs):
         size = kwargs.pop('size', None)
         rndm = kwargs.pop('random_state', None)
         args = self.argsfn(*args, **kwargs)
         rvs = self.dist.rvs(*args, size=size, random_state=rndm)
-        return self._attach_units(rvs, args)
+        return self._attach_units(rvs)
 
     def sf(self, x, *args, **kwargs):
         args = self.argsfn(*args, **kwargs)
-        return self.dist.sf(self._detach_units(x, args), *args)
+        return self.dist.sf(self._detach_units(x), *args)
 
     def logsf(self, x, *args, **kwargs):
         args = self.argsfn(*args, **kwargs)
-        return self.dist.logsf(self._detach_units(x, args), *args)
+        return self.dist.logsf(self._detach_units(x), *args)
 
     def stats(self, *args, **kwargs):
         moments = kwargs.pop('moments', 'mv')
@@ -235,23 +247,23 @@ class rv_wrapped(object):
 
     def median(self, *args, **kwargs):
         args = self.argsfn(*args, **kwargs)
-        return self._attach_units(self.dist.median(*args), args)
+        return self._attach_units(self.dist.median(*args))
 
     def mean(self, *args, **kwargs):
         args = self.argsfn(*args, **kwargs)
-        return self._attach_units(self.dist.mean(*args), args)
+        return self._attach_units(self.dist.mean(*args))
 
     def var(self, *args, **kwargs):
         args = self.argsfn(*args, **kwargs)
-        return self._attach_units(self.dist.var(*args), args, 2)
+        return self._attach_units(self.dist.var(*args), 2)
 
     def std(self, *args, **kwargs):
         args = self.argsfn(*args, **kwargs)
-        return self._attach_units(self.dist.std(*args), args)
+        return self._attach_units(self.dist.std(*args))
 
     def moment(self, n, *args, **kwargs):
         args = self.argsfn(*args, **kwargs)
-        return self.dist.moment(n, *args)
+        return self._attach_units(self.dist.moment(n, *args), n)
 
     def entropy(self, *args, **kwargs):
         args = self.argsfn(*args, **kwargs)
@@ -267,24 +279,21 @@ class rv_wrapped(object):
 
     def interval(self, alpha, *args, **kwargs):
         args = self.argsfn(*args, **kwargs)
-        return self.dist.interval(alpha, *args)
+        return self._attach_units(self.dist.interval(alpha, *args))
 
     def expect(self, func=None, args=(), lb=None, ub=None, conditional=False,
                **kwds):
         args = self.argsfn(*args)
         a, loc, scale = self.dist._parse_args(*args)
-        # treat units
-        _loc = getattr(loc + 0*scale, 'value', loc)
-        _scale = getattr(scale + 0*loc, 'value', scale)
         if isinstance(self.dist, rv_discrete):
-            return self.dist.expect(func, a, _loc, lb, ub, conditional, **kwds)
+            return self.dist.expect(func, a, loc, lb, ub, conditional, **kwds)
         else:
-            return self.dist.expect(func, a, _loc, _scale, lb, ub,
+            return self.dist.expect(func, a, loc, scale, lb, ub,
                                     conditional, **kwds)
 
     def support(self, *args, **kwargs):
         args = self.argsfn(*args, **kwargs)
-        return self._attach_units(self.dist.support(*args), args)
+        return self._attach_units(self.dist.support(*args))
 
     def __call__(self, *args, **kwargs):
         raise NotImplementedError('freezing not yet implemented')

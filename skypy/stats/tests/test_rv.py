@@ -32,14 +32,25 @@ _WRAPPED_METHODS_OF_Q = [
 ]
 
 
-def _test_wrap(dist, argsfn, wrap_args, units={}):
+def _test_wrap(dist, argsfn, wrap_args, units=None):
     logging.debug('testing wrapped %s' % str(dist))
 
     # wrap the distribution
-    wrap = parametrise(dist, argsfn)
+    wrap = parametrise(dist, argsfn, units=units)
 
     # arguments for distribution
     dist_args = argsfn(*wrap_args)
+
+    # return units of methods
+    units_dict = {}
+    if units:
+        units_dict['median'] = units
+        units_dict['mean'] = units
+        units_dict['var'] = units**2
+        units_dict['std'] = units
+        units_dict['pdf'] = 1/units
+        units_dict['ppf'] = units
+        units_dict['isf'] = units
 
     # sample random number
     logging.debug('... method `rvs`')
@@ -49,7 +60,7 @@ def _test_wrap(dist, argsfn, wrap_args, units={}):
     np.random.seed(1234)
     y = wrap.rvs(*wrap_args)
     logging.debug('    y = {}'.format(y))
-    u = units.get('rvs', 1)
+    u = units or 1
     assert x*u == y, 'wrapped distribution sampled different value'
 
     # test plain methods
@@ -62,7 +73,7 @@ def _test_wrap(dist, argsfn, wrap_args, units={}):
             logging.debug('    a = {}'.format(a))
             b = g(*wrap_args)
             logging.debug('    b = {}'.format(b))
-            u = units.get(m, 1)
+            u = units_dict.get(m, 1)
             assert a*u == b, 'different result for wrapped method `%s`' % m
 
     # test methods of x or k
@@ -75,7 +86,7 @@ def _test_wrap(dist, argsfn, wrap_args, units={}):
             logging.debug('    a = {}'.format(a))
             b = g(y, *wrap_args)
             logging.debug('    b = {}'.format(b))
-            u = units.get(m, 1)
+            u = units_dict.get(m, 1)
             assert a*u == b, 'different result for wrapped method `%s`' % m
 
     # test methods of quantile
@@ -89,14 +100,18 @@ def _test_wrap(dist, argsfn, wrap_args, units={}):
             logging.debug('    a = {}'.format(a))
             b = g(q, *wrap_args)
             logging.debug('    b = {}'.format(b))
-            u = units.get(m, 1)
+            u = units_dict.get(m, 1)
             assert a*u == b, 'different result for wrapped method `%s`' % m
 
     # compare supports
     logging.debug('... method `support`')
     dist_supp = dist.support(*dist_args)
+    logging.debug('    dist_supp = {}'.format(dist_supp))
     wrap_supp = wrap.support(*wrap_args)
-    assert np.allclose(dist_supp, wrap_supp), 'wrapped support is different'
+    logging.debug('    wrap_supp = {}'.format(wrap_supp))
+    if units:
+        dist_supp = type(dist_supp)([x*units for x in dist_supp])
+    assert dist_supp == wrap_supp, 'wrapped support is different'
 
     # compare stats
     logging.debug('... method `stats`')
@@ -106,24 +121,27 @@ def _test_wrap(dist, argsfn, wrap_args, units={}):
 
     # compare a number of moments
     logging.debug('... method `moment`')
-    unit_moms = units.get('moment', 1)
-    dist_moms = [dist.moment(n, *dist_args)*unit_moms**n for n in range(5)]
+    u = units or 1
+    dist_moms = [dist.moment(n, *dist_args)*u**n for n in range(5)]
+    logging.debug('    dist_moms = {}'.format(dist_moms))
     wrap_moms = [wrap.moment(n, *wrap_args) for n in range(5)]
+    logging.debug('    wrap_moms = {}'.format(wrap_moms))
     assert dist_moms == wrap_moms, 'wrapped moments are different'
 
     # compare confidence intervals
     logging.debug('... method `interval`')
-    dist_intv = dist.interval(0.1, *dist_args)*units.get('interval', 1)
+    dist_intv = dist.interval(0.1, *dist_args)
+    logging.debug('    dist_intv = {}'.format(dist_intv))
     wrap_intv = wrap.interval(0.1, *wrap_args)
+    logging.debug('    wrap_intv = {}'.format(wrap_intv))
+    if units:
+        dist_intv = type(dist_intv)([x*units for x in dist_intv])
     assert dist_intv == wrap_intv, 'wrapped interval is different'
 
     # compare expectations
     logging.debug('... method `expect`')
     # expect needs loc and scale split from args
     a, loc, scale = dist._parse_args(*dist_args)
-    # treat units
-    loc = getattr(loc, 'value', loc)
-    scale = getattr(scale, 'value', scale)
     logging.debug('    a = {}, loc = {}, scale = {}'.format(a, loc, scale))
     # function to take expectation of
     dist_expe = dist.expect(lambda x: x/np.sqrt(1 + x**2), a, loc, scale)
@@ -155,23 +173,8 @@ def test_wrap_discrete():
 def test_wrap_units():
     logging.debug('testing wrapping with units')
 
-    # reparametrise truncexpon with units
-    def scale_in_meters(cutoff):
-        loc = 0*u.m
-        scale = 1*u.m
-        return cutoff, loc, scale
-
     # test with truncexpon and units
-    _test_wrap(scipy.stats.truncexpon, scale_in_meters, (1.,), {
-        'rvs': u.m,
-        'median': u.m,
-        'mean': u.m,
-        'var': u.m**2,
-        'std': u.m,
-        'pdf': 1/u.m,
-        'ppf': u.m,
-        'isf': u.m,
-    })
+    _test_wrap(scipy.stats.truncexpon, lambda x: (x,), (1.,), u.m)
 
 
 def test_examples():
