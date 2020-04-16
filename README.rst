@@ -1,7 +1,7 @@
 Package for modelling the universe.
 -----------------------------------
 
-.. image:: docs/graphics/skypy_logo.png
+.. image:: docs/_themes/bootstrap-skypy/static/skypy_image.png
 
 |Astropy Badge| |CircleCI Status| |Coverage Status| |PyPI Status| |Documentation Status|
 
