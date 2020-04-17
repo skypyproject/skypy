@@ -14,7 +14,6 @@ Models
    
 """
 
-import numpy as np
 from astropy import units
 
 def Ia_redshift_rate(redshift,r0 = 2.27e-5,a = 1.7):
