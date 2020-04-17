@@ -35,14 +35,3 @@ Testing Random Variable
    check_moments
    check_sample_size
    check_sample_distribution
-
-
-Generic Distributions
-=====================
-
-.. autosummary::
-   :nosignatures:
-   :toctree: ../api/
-
-   genschechter
-   schechter
