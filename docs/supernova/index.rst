@@ -1,5 +1,5 @@
-*************************
- Supernovae (`skypy.supernova`)
- *************************
+******************************
+Supernovae (`skypy.supernova`)
+******************************
 
  .. automodule:: skypy.supernova
