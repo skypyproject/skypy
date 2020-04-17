@@ -1,6 +1,7 @@
 import numpy as np
 import scipy.stats
 import astropy.units as u
+from astropy.tests.helper import raises
 import logging
 
 from skypy.stats import parametrise, examples
@@ -175,6 +176,14 @@ def test_wrap_units():
 
     # test with truncexpon and units
     _test_wrap(scipy.stats.truncexpon, lambda x: (x,), (1.,), u.m)
+
+
+@raises(TypeError)
+def test_wrap_incorrect_units():
+    logging.debug('testing wrapping with incorrect units')
+
+    # test with incorrect units
+    _test_wrap(scipy.stats.norm, lambda x: (x,), (1.,), units=3.)
 
 
 def test_examples():
