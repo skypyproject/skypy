@@ -4,8 +4,7 @@
 SkyPy Documentation
 ###################
 
-This package contains methods for modelling the Universe, galaxies and the
-Milky Way. Also included are methods for generating observed data.
+This package contains methods for modelling the Universe, galaxies and the Milky Way. Also included are methods for generating observed data.
 
 
 .. _getting-started:
