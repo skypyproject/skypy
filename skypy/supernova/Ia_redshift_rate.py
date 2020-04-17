@@ -16,7 +16,7 @@ Models
 from astropy import units
 
 
-def Ia_redshift_rate(redshift,r0 = 2.27e-5,a = 1.7):
+def Ia_redshift_rate(redshift, r0=2.27e-5, a=1.7):
     """Creates a redshift distribution of Type Ia Supernovae
     This function computes the redshift distribution of Type Ia Supernovae
     using the rate parameters as given in [1].
@@ -27,7 +27,8 @@ def Ia_redshift_rate(redshift,r0 = 2.27e-5,a = 1.7):
     Returns
     -------
     rate : astropy.Quantity
-        Volumetric rate of Type Ia's the redshifts given in units of [SNe Ia yr−1 Mpc−3]
+        Volumetric rate of Type Ia's the redshifts given in units of
+        [SNe Ia yr−1 Mpc−3]
 
     Examples
     --------
