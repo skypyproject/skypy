@@ -2,9 +2,9 @@ import numpy as np
 from astropy.cosmology import Planck15
 from astropy.units import allclose
 import pytest
-from skypy.power_spectrum.halofit import power_spectrum_nl_smith
-from skypy.power_spectrum.halofit import power_spectrum_nl_takahashi
-from skypy.power_spectrum.halofit import power_spectrum_nl_bird
+from skypy.power_spectrum import halofit_smith
+from skypy.power_spectrum import halofit_takahashi
+from skypy.power_spectrum import halofit_bird
 
 
 def test_halofit():
@@ -31,10 +31,9 @@ def test_halofit():
     truth_bird = np.array(tb)
 
     # Non-linear power spectra from Smith, Takahashi and Bird models
-    nl_power_smith = power_spectrum_nl_smith(k, z, linear_power, Planck15)
-    nl_power_takahashi = power_spectrum_nl_takahashi(k, z, linear_power,
-                                                     Planck15)
-    nl_power_bird = power_spectrum_nl_bird(k, z, linear_power, Planck15)
+    nl_power_smith = halofit_smith(k, z, linear_power, Planck15)
+    nl_power_takahashi = halofit_takahashi(k, z, linear_power, Planck15)
+    nl_power_bird = halofit_bird(k, z, linear_power, Planck15)
 
     # Test shape of outputs
     assert np.shape(nl_power_smith) == np.shape(linear_power)
@@ -50,8 +49,7 @@ def test_halofit():
     z_scalar = z[0]
     power_1d = linear_power[:, 0]
     truth_scalar_redshift = truth_smith[:, 0]
-    smith_scalar_redshift = power_spectrum_nl_smith(k, z_scalar, power_1d,
-                                                    Planck15)
+    smith_scalar_redshift = halofit_smith(k, z_scalar, power_1d, Planck15)
     assert allclose(smith_scalar_redshift, truth_scalar_redshift)
     assert np.shape(smith_scalar_redshift) == np.shape(power_1d)
 
@@ -59,43 +57,43 @@ def test_halofit():
     k_scalar = k[0]
     power_1d = linear_power[0, :]
     with pytest.raises(TypeError):
-        power_spectrum_nl_smith(k_scalar, z, power_1d, Planck15)
+        halofit_smith(k_scalar, z, power_1d, Planck15)
 
     # Test for failure when wavenumber array is the wrong size
     k_wrong_size = np.logspace(-4.0, 2.0, 7)
     with pytest.raises(ValueError):
-        power_spectrum_nl_smith(k_wrong_size, z, linear_power, Planck15)
+        halofit_smith(k_wrong_size, z, linear_power, Planck15)
 
     # Test for failure when redshift arry is the wrong size
     z_wrong_size = np.linspace(0.0, 2.0, 3)
     with pytest.raises(TypeError):
-        power_spectrum_nl_smith(k, z_wrong_size, linear_power, Planck15)
+        halofit_smith(k, z_wrong_size, linear_power, Planck15)
 
     # Test for failure when wavenumber is negative
     k_negative = np.copy(k)
     k_negative[0] = -1.0
     with pytest.raises(ValueError):
-        power_spectrum_nl_smith(k_negative, z, linear_power, Planck15)
+        halofit_smith(k_negative, z, linear_power, Planck15)
 
     # Test for failure when wavenumber is zero
     k_zero = np.copy(k)
     k_zero[0] = 0.0
     with pytest.raises(ValueError):
-        power_spectrum_nl_smith(k_zero, z, linear_power, Planck15)
+        halofit_smith(k_zero, z, linear_power, Planck15)
 
     # Test for failure when redshift is negative
     z_negative = np.copy(z)
     z_negative[0] = -1.0
     with pytest.raises(ValueError):
-        power_spectrum_nl_smith(k, z_negative, linear_power, Planck15)
+        halofit_smith(k, z_negative, linear_power, Planck15)
 
     # Test for failure when linear power spectrum is negative
     power_negative = np.copy(linear_power)
     power_negative[0, 0] = -1.0
     with pytest.raises(ValueError):
-        power_spectrum_nl_smith(k, z, power_negative, Planck15)
+        halofit_smith(k, z, power_negative, Planck15)
 
     # Test for failure when wavenumber array is not in asscending order
     k_wrong_order = k[::-1]
     with pytest.raises(ValueError):
-        power_spectrum_nl_smith(k_wrong_order, z, linear_power, Planck15)
+        halofit_smith(k_wrong_order, z, linear_power, Planck15)

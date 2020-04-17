@@ -1,12 +1,10 @@
 :tocdepth: 3
 
-.. image:: docs/graphics/skypy_logo.png
-
 ###################
 SkyPy Documentation
 ###################
 
-This package contains methods for modelling the universe, galaxies and Milky Way. Also included are methods for generating observed data.
+This package contains methods for modelling the Universe, galaxies and the Milky Way. Also included are methods for generating observed data.
 
 
 .. _getting-started:
@@ -71,3 +69,9 @@ Index
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+
+****************
+Acknowledgements
+****************
+
+Logo Credit: `Maria Fonseca de la Bella <https://www.linkedin.com/in/mariadelabella>`_
