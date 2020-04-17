@@ -27,6 +27,7 @@ Packages
    :maxdepth: 1
 
    galaxy/index
+   gravitational_wave/index
    halo/index
    power_spectrum/index
    supernova/index
