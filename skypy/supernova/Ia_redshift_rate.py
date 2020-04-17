@@ -22,11 +22,8 @@ def Ia_redshift_rate(redshift,r0 = 2.27e-5,a = 1.7):
     using the rate parameters as given in [1].
     Parameters
     ----------
-    redshift : float
+    redshift : numpy.array
         Redshift at which to evaluate the Type Ia supernovae rate.
-    cosmology : astropy.cosmology.Cosmology
-        Cosmology object providing methods for the evolution history of
-        omega_matter and omega_lambda with redshift.
     Returns
     -------
     rate : astropy.Quantity
