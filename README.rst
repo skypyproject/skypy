@@ -2,7 +2,7 @@
 SkyPy: A package for modelling the Universe
 ===========================================
 
-|Astropy Badge| |Test Status| |Coverage Status| |PyPI Status| |Documentation Status|
+|Zenodo Badge| |Astropy Badge| |Test Status| |Coverage Status| |PyPI Status| |Documentation Status|
 
 This package contains methods for modelling the Universe, galaxies and the Milky
 Way. Also included are methods for generating observed data.
@@ -49,6 +49,10 @@ Note: This disclaimer was originally written by
 `PyCon talk <https://www.youtube.com/watch?v=6Uj746j9Heo>`_, and was adapted by
 SkyPy based on its use in the README file for the
 `MetPy project <https://github.com/Unidata/MetPy>`_.
+
+.. |Zenodo Badge| image:: https://zenodo.org/badge/221432358.svg
+   :target: https://zenodo.org/badge/latestdoi/221432358
+   :alt: DOI of Latest SkyPy Release
 
 .. |Astropy Badge| image:: http://img.shields.io/badge/powered%20by-AstroPy-orange.svg?style=flat
     :target: http://www.astropy.org
