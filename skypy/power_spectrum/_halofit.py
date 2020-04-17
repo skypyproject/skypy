@@ -1,24 +1,3 @@
-"""Halofit module.
-
-This module computes the non-linear halo power spectrum as a function of
-redshift and wavenumbers.
-
-
-Models
-======
-
-.. autosummary::
-   :nosignatures:
-   :toctree: ../api/
-
-   halofit
-   HalofitParameters
-   halofit_smith
-   halofit_takahashi
-   halofit_bird
-
-"""
-
 from astropy.utils import isiterable
 from collections import namedtuple
 from functools import partial
@@ -26,6 +5,16 @@ import numpy as np
 from scipy import interpolate
 from scipy import integrate
 from scipy import optimize
+
+
+__all__ = [
+   'HalofitParameters',
+   'halofit',
+   'halofit_smith',
+   'halofit_takahashi',
+   'halofit_bird',
+]
+
 
 HalofitParameters = namedtuple(
     'HalofitParameters',

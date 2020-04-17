@@ -1,9 +1,10 @@
-Package for modelling the universe.
------------------------------------
+===========================================
+SkyPy: A package for modelling the Universe
+===========================================
 
-|Astropy Badge| |CircleCI Status| |Coverage Status| |Documentation Status|
+|Astropy Badge| |Test Status| |Coverage Status| |PyPI Status| |Documentation Status|
 
-This package contains methods for modelling the universe, galaxies and Milky
+This package contains methods for modelling the Universe, galaxies and the Milky
 Way. Also included are methods for generating observed data.
 
 
@@ -13,14 +14,14 @@ License
 This project is Copyright (c) SkyPy Team and licensed under
 the terms of the BSD 3-Clause license. This package is based upon
 the `Astropy package template <https://github.com/astropy/package-template>`_
-which is licensed under the BSD 3-clause licence. See the licenses folder for
-more information.
+which is licensed under the BSD 3-clause licence. See the
+`LICENSE.rst <LICENSE.rst>`_ file for more information.
 
 
 Contributing
 ------------
 
-We love contributions! skypy is open source,
+We love contributions! SkyPy is open source,
 built on open source, and we'd love to have you hang out in our community.
 
 **Imposter syndrome disclaimer**: We want your help. No, really.
@@ -46,20 +47,24 @@ the errors and assumptions that seasoned contributors have glossed over.
 Note: This disclaimer was originally written by
 `Adrienne Lowe <https://github.com/adriennefriend>`_ for a
 `PyCon talk <https://www.youtube.com/watch?v=6Uj746j9Heo>`_, and was adapted by
-skypy based on its use in the README file for the
+SkyPy based on its use in the README file for the
 `MetPy project <https://github.com/Unidata/MetPy>`_.
 
 .. |Astropy Badge| image:: http://img.shields.io/badge/powered%20by-AstroPy-orange.svg?style=flat
     :target: http://www.astropy.org
     :alt: Powered by Astropy Badge
 
-.. |CircleCI Status| image:: https://https://circleci.com/gh/skypyproject/skypy.svg?style=svg
-    :target: https://circleci.com/gh/skypyproject/skypy
-    :alt: Astropy's CircleCI Status
+.. |Test Status| image:: https://github.com/skypyproject/skypy/workflows/Tests/badge.svg
+    :target: https://github.com/skypyproject/skypy/actions
+    :alt: SkyPy's Test Status
 
 .. |Coverage Status| image:: https://codecov.io/gh/skypyproject/skypy/branch/master/graph/badge.svg
     :target: https://codecov.io/gh/skypyproject/skypy
-    :alt: Astropy's Coverage Status
+    :alt: SkyPy's Coverage Status
+
+.. |PyPI Status| image:: https://img.shields.io/pypi/v/skypy.svg
+    :target: https://pypi.python.org/pypi/skypy
+    :alt: SkyPy's PyPI Status
 
 .. |Documentation Status| image:: https://readthedocs.org/projects/githubapps/badge/?version=latest
     :target: https://skypy.readthedocs.io/en/latest/?badge=latest
