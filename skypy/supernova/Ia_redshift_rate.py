@@ -11,10 +11,10 @@ Models
    :nosignatures:
    :toctree: ../api/
    Ia_redshift_rate
-   
 """
 
 from astropy import units
+
 
 def Ia_redshift_rate(redshift,r0 = 2.27e-5,a = 1.7):
     """Creates a redshift distribution of Type Ia Supernovae
