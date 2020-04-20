@@ -6,7 +6,6 @@ Models
 ======
 
 .. autosummary::
-
    :nosignatures:
    :toctree: ../api/
 
