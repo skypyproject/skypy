@@ -8,4 +8,4 @@ Pipeline (`skypy.pipeline`)
 Driver (`skypy.pipeline.driver`)
 ================================
 
-.. automodule:: skypy.pipeline.driver
+.. automodapi:: skypy.pipeline.driver
