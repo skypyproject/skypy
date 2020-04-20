@@ -1,5 +1,6 @@
 import numpy as np
 import numpy.testing as npt
+from astropy.tests.helper import raises
 
 from skypy.utils.special import gammaincc
 
@@ -83,7 +84,7 @@ GAMMAINCC_VALUES = np.fromstring('''\
 ''', sep=' ').reshape(15, 15)
 
 
-def test_gammaincc():
+def test_gammaincc_edge_cases():
     # test with scalar
     npt.assert_allclose(gammaincc(1.2, 1.5), 0.28893139222051745)
 
@@ -125,6 +126,20 @@ def test_gammaincc():
     assert gammaincc(-2.5, 0) == -np.inf
     npt.assert_equal(gammaincc([-0.5, -1.5], 0), [-np.inf, np.inf])
 
+
+def test_gammaincc_precision():
     # test precision against precomputed values
     a, x = np.ogrid[-2.95:2.95:0.4, 0.1:3:0.2]
     npt.assert_allclose(gammaincc(a, x), GAMMAINCC_VALUES)
+
+
+@raises(ValueError)
+def test_gammaincc_neg_x_scalar():
+    # negative x raises an exception
+    gammaincc(0.5, -1.0)
+
+
+@raises(ValueError)
+def test_gammaincc_neg_x_array():
+    # negative x in array raises an exception
+    gammaincc(0.5, [3.0, 2.0, 1.0, 0.0, -1.0])
