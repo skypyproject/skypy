@@ -1,33 +1,18 @@
 r"""Galaxy size module.
 
 This modules computes the angular size of galaxies from their physical size.
-
-
-Utility functions
-=================
-
-.. autosummary::
-   :nosignatures:
-   :toctree: ../api/
-
-   angular_size
-
-
-Models
-======
-
-.. autosummary::
-   :nosignatures:
-   :toctree: ../api/
-
-   early_type_lognormal
-   late_type_lognormal
-   linear_lognormal
-
 """
 
 import numpy as np
 from astropy import units
+
+
+__all__ = [
+    'angular_size',
+    'early_type_lognormal',
+    'late_type_lognormal',
+    'linear_lognormal',
+]
 
 
 def angular_size(physical_size, redshift, cosmology):

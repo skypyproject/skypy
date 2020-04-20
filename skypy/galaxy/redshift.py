@@ -2,19 +2,6 @@
 
 This module provides facilities to sample galaxy redshifts using a number of
 models.
-
-
-Models
-======
-
-.. autosummary::
-   :nosignatures:
-   :toctree: ../api/
-
-   herbel_redshift
-   herbel_pdf
-   smail
-
 """
 
 import numpy as np
@@ -24,6 +11,12 @@ import scipy.integrate
 
 import skypy.utils.special as special
 import skypy.utils.astronomy as astro
+
+
+__all__ = [
+    'herbel_redshift',
+    'smail',
+]
 
 
 class smail_gen(stats.rv_continuous):
