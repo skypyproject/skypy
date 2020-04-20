@@ -9,6 +9,11 @@ import networkx
 import re
 
 
+__all__ = [
+    'SkyPyDriver',
+]
+
+
 class SkyPyDriver:
     r'''Class for running pipelines.
 
