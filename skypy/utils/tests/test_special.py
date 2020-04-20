@@ -84,10 +84,12 @@ GAMMAINCC_VALUES = np.fromstring('''\
 ''', sep=' ').reshape(15, 15)
 
 
-def test_gammaincc_edge_cases():
-    # test with scalar
+def test_gammaincc_scalar():
+    # test with scalar input and expect scalar output
     npt.assert_allclose(gammaincc(1.2, 1.5), 0.28893139222051745)
 
+
+def test_gammaincc_array():
     # test with vector a
     npt.assert_allclose(gammaincc([-1.2, 1.2], 1.5),
                         [0.008769092458747352, 0.28893139222051745])
@@ -96,6 +98,17 @@ def test_gammaincc_edge_cases():
     npt.assert_allclose(gammaincc(1.2, [0.5, 1.5]),
                         [0.6962998597584569, 0.28893139222051745])
 
+    # test with vector a and x
+    npt.assert_allclose(gammaincc([1.2, -1.2], [0.5, 1.5]),
+                        [0.6962998597584569, 0.008769092458747352])
+
+    # test with broadcast
+    npt.assert_allclose(gammaincc([[1.2], [-1.2]], [0.5, 1.5]),
+                        [[0.6962998597584569, 0.28893139222051745],
+                         [0.1417443053403289, 0.008769092458747352]])
+
+
+def test_gammaincc_edge_cases():
     # gammaincc is zero for x = inf
     assert gammaincc(1.2, np.inf) == 0
     assert gammaincc(-1.2, np.inf) == 0
