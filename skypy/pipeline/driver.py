@@ -2,18 +2,16 @@
 
 This module provides methods to run pipelines of functions with dependencies
 and handle their results.
-
-.. autosummary::
-   :nosignatures:
-   :toctree: ../api/
-
-   SkyPyDriver
-
 """
 
 from astropy.table import Table
 import networkx
 import re
+
+
+__all__ = [
+    'SkyPyDriver',
+]
 
 
 class SkyPyDriver:
