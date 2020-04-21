@@ -42,7 +42,7 @@ def _gammaincc(a, x):
 
 
 def gammaincc(a, x):
-    '''Regularized upper incomplete gamma function.
+    r'''Regularized upper incomplete gamma function.
 
     This implementation of `gammaincc` allows :math:`a` real and :math:`x`
     nonnegative.
