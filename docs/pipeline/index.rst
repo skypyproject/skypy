@@ -2,10 +2,18 @@
 Pipeline (`skypy.pipeline`)
 ***************************
 
-.. automodule:: skypy.pipeline
+.. currentmodule:: skypy.pipeline
 
 
-Driver (`skypy.pipeline.driver`)
-================================
+Running SkyPy
+=============
 
-.. automodule:: skypy.pipeline.driver
+The Pipeline package contains the functionality to run a SkyPy simulation from
+end to end. This is implemented in `~driver.SkyPyDriver`.
+
+
+Reference/API
+=============
+
+.. automodapi:: skypy.pipeline
+.. automodapi:: skypy.pipeline.driver
