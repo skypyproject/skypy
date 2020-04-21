@@ -28,12 +28,12 @@ def _gammaincc(a, x):
     if np.isinf(x):
         return 0
     if a < 0:
-        n, b = np.divmod(a, 1)
+        n = np.floor(a)
     else:
-        n, b = 0, a
-    g = sc.gammaincc(b, x)
+        n = 0
+    g = sc.gammaincc(a-n, x)
     if n < 0:
-        f = np.exp(sc.xlogy(b, x) - x - sc.gammaln(b+1))
+        f = np.exp(sc.xlogy(a-n, x)-x-sc.gammaln(a-n+1))
         while n < 0:
             f *= (a-n)/x
             g -= f
@@ -63,8 +63,8 @@ def gammaincc(a, x):
     Notes
     -----
     The function value is computed via a recurrence from the value of
-    `scipy.special.gammaincc` for arguments :math:`b, x` where :math:`b` is the
-    lowest nonnegative number such that :math:`b = a + n`, :math:`n` integer.
+    `scipy.special.gammaincc` for arguments :math:`a-n, x` where :math:`n` is
+    the smallest integer such that :math:`a-n \ge 0`.
 
     See also
     --------
@@ -89,17 +89,15 @@ def gammaincc(a, x):
     # nonpositive a need special treatment
     i = a <= 0
 
-    # find n, b such that a + n = b with b >= 0 and n integer
-    n = np.zeros_like(a)
-    b = np.copy(a)
-    np.divmod(b, 1, out=(n, b), where=i)
+    # find integer n such that a + n >= 0
+    n = np.where(i, np.floor(a), 0)
 
-    # compute gammaincc for b and x as usual
-    g = sc.gammaincc(b, x)
+    # compute gammaincc for a-n and x as usual
+    g = sc.gammaincc(a-n, x)
 
     # deal with nonpositive a
     # the number n keeps track of iterations still to do
-    if np.sum(i) > 0:
+    if np.any(i) > 0:
         # all x = inf are done
         n[i & np.isinf(x)] = 0
 
@@ -114,8 +112,8 @@ def gammaincc(a, x):
 
         # recurrence
         f = np.empty_like(g)
-        f[i] = np.exp(sc.xlogy(b[i], x[i]) - x[i] - sc.gammaln(b[i]+1))
-        while np.sum(i) > 0:
+        f[i] = np.exp(sc.xlogy(a[i]-n[i], x[i])-x[i]-sc.gammaln(a[i]-n[i]+1))
+        while np.any(i):
             f[i] *= (a[i]-n[i])/x[i]
             g[i] -= f[i]
             n[i] += 1
