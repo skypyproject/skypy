@@ -53,3 +53,4 @@ def main(args=None):
     config = yaml.safe_load(args.config)
     driver = SkyPyDriver()
     driver.execute(config, file_format=args.format)
+    return(0)

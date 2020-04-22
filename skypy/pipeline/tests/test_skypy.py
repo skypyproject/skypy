@@ -1,3 +1,4 @@
+from astropy.utils.data import get_pkg_data_filename
 import pytest
 from skypy.pipeline.scripts import skypy
 
@@ -23,3 +24,12 @@ def test_skypy():
     with pytest.raises(SystemExit) as e:
         skypy.main(['--config', 'config.filename', '--format', 'invalid'])
     assert e.value.code == 2
+
+    # Process empty config file
+    filename = get_pkg_data_filename('data/empty_config.yaml')
+    with pytest.raises(TypeError) as e:
+        assert skypy.main(['--config', filename]) == 0
+
+    # Process cosmology config file
+    filename = get_pkg_data_filename('data/cosmology_config.yaml')
+    assert skypy.main(['--config', filename]) == 0
