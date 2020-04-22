@@ -1,6 +1,6 @@
-#!/usr/bin/env python
 import argparse
 from skypy.pipeline.driver import SkyPyDriver
+import sys
 import yaml
 
 parser = argparse.ArgumentParser(description="SkyPy pipeline driver")
@@ -10,9 +10,9 @@ parser.add_argument('-f', '--format', required=False,
                     choices=['fits', 'hdf5'], help='Table file format')
 
 
-if __name__ == "__main__":
+def main(args=None):
 
-    args = parser.parse_args()
+    args = parser.parse_args(args or sys.argv[1:] or ['--help'])
     config = yaml.safe_load(args.config)
     driver = SkyPyDriver()
     driver.execute(config, file_format=args.format)
