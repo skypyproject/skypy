@@ -37,10 +37,11 @@ values as keyword arguments.
 import argparse
 from skypy.pipeline.driver import SkyPyDriver
 import sys
-import yaml
 
 
 def main(args=None):
+
+    import yaml
 
     parser = argparse.ArgumentParser(description="SkyPy pipeline driver")
     parser.add_argument('-c', '--config', required=True,
