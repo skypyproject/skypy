@@ -26,6 +26,7 @@ Packages
 .. toctree::
    :maxdepth: 1
 
+   cluster/index
    galaxy/index
    gravitational_wave/index
    halo/index
