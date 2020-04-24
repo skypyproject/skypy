@@ -1,7 +1,7 @@
 import numpy as np
 import scipy.stats
 import scipy.integrate
-import scipy.stats
+import scipy.special
 import pytest
 
 import skypy.galaxy.luminosity as lum
