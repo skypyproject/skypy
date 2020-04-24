@@ -1,21 +1,16 @@
 r"""Models of galaxy luminosities.
 
-
-Models
-======
-
-.. autosummary::
-   :nosignatures:
-   :toctree: ../api/
-
-   herbel_luminosities
-
 """
 
 import numpy as np
 
 import skypy.utils.astronomy as astro
 from skypy.utils.random import schechter
+
+
+__all__ = [
+    'herbel_luminosities',
+]
 
 
 def herbel_luminosities(redshift, alpha, a_m, b_m, size=None,

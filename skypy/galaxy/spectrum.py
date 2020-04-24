@@ -1,18 +1,13 @@
 r"""Galaxy spectrum module.
 
-
-Models
-======
-
-.. autosummary::
-   :nosignatures:
-   :toctree: ../api/
-
-   dirichlet_coefficients
-
 """
 
 import numpy as np
+
+
+__all__ = [
+    'dirichlet_coefficients',
+]
 
 
 def dirichlet_coefficients(redshift, alpha0, alpha1, z1=1.):
