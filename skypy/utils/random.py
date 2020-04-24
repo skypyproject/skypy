@@ -62,9 +62,9 @@ def schechter(alpha, x_min, x_max, resolution=100, size=None):
 
 
 def _schechter_cdf(x, x_min, x_max, alpha):
-    a = special.upper_incomplete_gamma(alpha + 1, x_min)
-    b = special.upper_incomplete_gamma(alpha + 1, x)
-    c = special.upper_incomplete_gamma(alpha + 1, x_min)
-    d = special.upper_incomplete_gamma(alpha + 1, x_max)
+    a = special.gammaincc(alpha + 1, x_min)
+    b = special.gammaincc(alpha + 1, x)
+    c = special.gammaincc(alpha + 1, x_min)
+    d = special.gammaincc(alpha + 1, x_max)
 
     return (a - b) / (c - d)

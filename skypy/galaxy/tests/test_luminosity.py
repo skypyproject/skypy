@@ -1,6 +1,7 @@
 import numpy as np
 import scipy.stats
 import scipy.integrate
+import scipy.special
 import pytest
 
 import skypy.galaxy.luminosity as lum
@@ -36,12 +37,10 @@ def test_herbel_luminosities():
         luminosity_max = astro.luminosity_from_absolute_magnitude(
             absolute_magnitude_min)
         lum_star = lum._calculate_luminosity_star(z, a_m, b_m)
-        c = special.upper_incomplete_gamma(alpha + 1,
-                                           luminosity_min / lum_star)
-        d = special.upper_incomplete_gamma(alpha + 1,
-                                           luminosity_max / lum_star)
-        return 1. / lum_star * np.power(luminosity / lum_star, alpha) * np.exp(
-            - luminosity / lum_star) / (c - d)
+        c = np.fabs(special.gammaincc(alpha+1, luminosity_min/lum_star))
+        d = np.fabs(special.gammaincc(alpha+1, luminosity_max/lum_star))
+        return 1./lum_star*np.power(luminosity/lum_star, alpha)*np.exp(
+                -luminosity/lum_star-scipy.special.gammaln(alpha+1))/(c - d)
 
     def calc_cdf(L):
         a_m = -0.9408582

@@ -289,6 +289,7 @@ def herbel_pdf(redshift, alpha, a_phi, b_phi, a_m, b_m, cosmology,
     dv = cosmology.differential_comoving_volume(redshift).value
     x = luminosity_min \
         * 1./astro.luminosity_from_absolute_magnitude(a_m*redshift + b_m)
-    value_gamma = special.upper_incomplete_gamma(alpha + 1, x)
-    pdf = dv * b_phi * np.exp(a_phi * redshift) * value_gamma
+    lg = sc.gammaln(alpha+1)
+    gx = np.fabs(special.gammaincc(alpha+1, x))
+    pdf = dv * b_phi * np.exp(a_phi * redshift + lg) * gx
     return pdf

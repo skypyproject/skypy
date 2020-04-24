@@ -22,10 +22,10 @@ def test_schechter():
     x_max = 1e2
 
     def calc_cdf(x):
-        a = special.upper_incomplete_gamma(alpha + 1, x_min)
-        b = special.upper_incomplete_gamma(alpha + 1, x)
-        c = special.upper_incomplete_gamma(alpha + 1, x_min)
-        d = special.upper_incomplete_gamma(alpha + 1, x_max)
+        a = special.gammaincc(alpha + 1, x_min)
+        b = special.gammaincc(alpha + 1, x)
+        c = special.gammaincc(alpha + 1, x_min)
+        d = special.gammaincc(alpha + 1, x_max)
         return (a - b) / (c - d)
 
     sample = random.schechter(alpha, x_min=x_min, x_max=x_max,
