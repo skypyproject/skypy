@@ -120,10 +120,11 @@ if SETUP_CFG.has_option('options', 'python_requires'):
     python_version = platform.python_version().strip('+')
     # allow pre-releases to count as 'new enough'
     if not req.specifier.contains(python_version, True):
+        message = f"ERROR: Python {req.specifier} is required by "
         if parent_package is None:
-            message = f"ERROR: Python {req.specifier} is required by this package\n"
+            message += "this package\n"
         else:
-            message = f"ERROR: Python {req.specifier} is required by {parent_package}\n"
+            message = f"{parent_package}\n"
         sys.stderr.write(message)
         sys.exit(1)
 
@@ -385,7 +386,7 @@ class _Bootstrapper:
         """
 
         return {optname: getattr(self, optname)
-                    for optname, _ in CFG_OPTIONS if hasattr(self, optname)}
+                for optname, _ in CFG_OPTIONS if hasattr(self, optname)}
 
     def get_local_directory_dist(self):
         """
