@@ -67,12 +67,12 @@ def test_beta_ellipticity():
 
     # Kolmogorov-Smirnov test comparing ellipticity and beta distributions
     D, p = stats.kstest(ellipticity_dist.rvs, beta_dist.cdf, N=1000)
-    assert p > 0.01, 'D = {}, p = {}'.format(D, p)
+    assert p > 0.01, f'D = {D}, p = {p}'
 
     # Kolmogorov-Smirnov test comparing ellipticity and uniform distributions
     D, p = stats.kstest(ellipticity_uniform.rvs, 'uniform', N=1000)
-    assert p > 0.01, 'D = {}, p = {}'.format(D, p)
+    assert p > 0.01, f'D = {D}, p = {p}'
 
     # Kolmogorov-Smirnov test comparing ellipticity and arcsine distributions
     D, p = stats.kstest(ellipticity_arcsine.rvs, 'arcsine', N=1000)
-    assert p > 0.01, 'D = {}, p = {}'.format(D, p)
+    assert p > 0.01, f'D = {D}, p = {p}'

@@ -90,9 +90,9 @@ if os.path.exists('setup.cfg'):
             raise
 
         log.error(
-            "Error reading setup.cfg: {0!r}\n{1} will not be "
+            "Error reading setup.cfg: {!r}\n{} will not be "
             "automatically bootstrapped and package installation may fail."
-            "\n{2}".format(e, PACKAGE_NAME, _err_help_msg))
+            "\n{}".format(e, PACKAGE_NAME, _err_help_msg))
 
 # We used package_name in the package template for a while instead of name
 if SETUP_CFG.has_option('metadata', 'name'):
@@ -121,9 +121,9 @@ if SETUP_CFG.has_option('options', 'python_requires'):
     # allow pre-releases to count as 'new enough'
     if not req.specifier.contains(python_version, True):
         if parent_package is None:
-            message = "ERROR: Python {} is required by this package\n".format(req.specifier)
+            message = f"ERROR: Python {req.specifier} is required by this package\n"
         else:
-            message = "ERROR: Python {} is required by {}\n".format(req.specifier, parent_package)
+            message = f"ERROR: Python {req.specifier} is required by {parent_package}\n"
         sys.stderr.write(message)
         sys.exit(1)
 
@@ -197,7 +197,7 @@ except:
 # End compatibility imports...
 
 
-class _Bootstrapper(object):
+class _Bootstrapper:
     """
     Bootstrapper implementation.  See ``use_astropy_helpers`` for parameter
     documentation.
@@ -341,7 +341,7 @@ class _Bootstrapper(object):
         self.is_submodule = self._check_submodule()
 
         for strategy in strategies:
-            method = getattr(self, 'get_{0}_dist'.format(strategy))
+            method = getattr(self, f'get_{strategy}_dist')
             dist = method()
             if dist is not None:
                 break
@@ -384,8 +384,8 @@ class _Bootstrapper(object):
         with.
         """
 
-        return dict((optname, getattr(self, optname))
-                    for optname, _ in CFG_OPTIONS if hasattr(self, optname))
+        return {optname: getattr(self, optname)
+                    for optname, _ in CFG_OPTIONS if hasattr(self, optname)}
 
     def get_local_directory_dist(self):
         """
@@ -396,7 +396,7 @@ class _Bootstrapper(object):
         if not os.path.isdir(self.path):
             return
 
-        log.info('Attempting to import astropy_helpers from {0} {1!r}'.format(
+        log.info('Attempting to import astropy_helpers from {} {!r}'.format(
                  'submodule' if self.is_submodule else 'directory',
                  self.path))
 
@@ -426,7 +426,7 @@ class _Bootstrapper(object):
             return
 
         log.info('Attempting to unpack and import astropy_helpers from '
-                 '{0!r}'.format(self.path))
+                 '{!r}'.format(self.path))
 
         try:
             dist = self._do_download(find_links=[self.path])
@@ -435,8 +435,8 @@ class _Bootstrapper(object):
                 raise
 
             log.warn(
-                'Failed to import {0} from the specified archive {1!r}: '
-                '{2}'.format(PACKAGE_NAME, self.path, str(e)))
+                'Failed to import {} from the specified archive {!r}: '
+                '{}'.format(PACKAGE_NAME, self.path, str(e)))
             dist = None
 
         if dist is not None and self.auto_upgrade:
@@ -450,11 +450,11 @@ class _Bootstrapper(object):
 
     def get_index_dist(self):
         if not self.download:
-            log.warn('Downloading {0!r} disabled.'.format(DIST_NAME))
+            log.warn(f'Downloading {DIST_NAME!r} disabled.')
             return None
 
         log.warn(
-            "Downloading {0!r}; run setup.py with the --offline option to "
+            "Downloading {!r}; run setup.py with the --offline option to "
             "force offline installation.".format(DIST_NAME))
 
         try:
@@ -463,8 +463,8 @@ class _Bootstrapper(object):
             if DEBUG:
                 raise
             log.warn(
-                'Failed to download and/or install {0!r} from {1!r}:\n'
-                '{2}'.format(DIST_NAME, self.index_url, str(e)))
+                'Failed to download and/or install {!r} from {!r}:\n'
+                '{}'.format(DIST_NAME, self.index_url, str(e)))
             dist = None
 
         # No need to run auto-upgrade here since we've already presumably
@@ -531,12 +531,12 @@ class _Bootstrapper(object):
                 return opts
 
         if version:
-            req = '{0}=={1}'.format(DIST_NAME, version)
+            req = f'{DIST_NAME}=={version}'
         else:
             if UPPER_VERSION_EXCLUSIVE is None:
                 req = DIST_NAME
             else:
-                req = '{0}<{1}'.format(DIST_NAME, UPPER_VERSION_EXCLUSIVE)
+                req = f'{DIST_NAME}<{UPPER_VERSION_EXCLUSIVE}'
 
         attrs = {'setup_requires': [req]}
 
@@ -583,7 +583,7 @@ class _Bootstrapper(object):
         next_version = _next_version(dist.parsed_version)
 
         req = pkg_resources.Requirement.parse(
-            '{0}>{1},<{2}'.format(DIST_NAME, dist.version, next_version))
+            f'{DIST_NAME}>{dist.version},<{next_version}')
 
         package_index = PackageIndex(index_url=self.index_url)
 
@@ -622,7 +622,7 @@ class _Bootstrapper(object):
         cmd = ['git', 'submodule', 'status', '--', self.path]
 
         try:
-            log.info('Running `{0}`; use the --no-git option to disable git '
+            log.info('Running `{}`; use the --no-git option to disable git '
                      'commands'.format(' '.join(cmd)))
             returncode, stdout, stderr = run_cmd(cmd)
         except _CommandNotFound:
@@ -649,7 +649,7 @@ class _Bootstrapper(object):
             if not stderr.strip().endswith(perl_warning):
                 # Some other unknown error condition occurred
                 log.warn('git submodule command failed '
-                         'unexpectedly:\n{0}'.format(stderr))
+                         'unexpectedly:\n{}'.format(stderr))
                 return False
 
         # Output of `git submodule status` is as follows:
@@ -680,8 +680,8 @@ class _Bootstrapper(object):
             return True
         else:
             log.warn(
-                'Unexpected output from `git submodule status`:\n{0}\n'
-                'Will attempt import from {1!r} regardless.'.format(
+                'Unexpected output from `git submodule status`:\n{}\n'
+                'Will attempt import from {!r} regardless.'.format(
                     stdout, self.path))
             return False
 
@@ -708,7 +708,7 @@ class _Bootstrapper(object):
         gitmodules_fileobj = io.StringIO()
 
         # Must use io.open for cross-Python-compatible behavior wrt unicode
-        with io.open(gitmodules_path) as f:
+        with open(gitmodules_path) as f:
             for line in f:
                 # gitconfig files are more flexible with leading whitespace; just
                 # go ahead and remove it
@@ -727,8 +727,8 @@ class _Bootstrapper(object):
         try:
             cfg.readfp(gitmodules_fileobj)
         except Exception as exc:
-            log.warn('Malformatted .gitmodules file: {0}\n'
-                     '{1} cannot be assumed to be a git submodule.'.format(
+            log.warn('Malformatted .gitmodules file: {}\n'
+                     '{} cannot be assumed to be a git submodule.'.format(
                          exc, self.path))
             return False
 
@@ -750,7 +750,7 @@ class _Bootstrapper(object):
         elif status == '-':
             if self.offline:
                 raise _AHBootstrapSystemExit(
-                    "Cannot initialize the {0} submodule in --offline mode; "
+                    "Cannot initialize the {} submodule in --offline mode; "
                     "this requires being able to clone the submodule from an "
                     "online repository.".format(submodule))
             cmd = ['update', '--init']
@@ -762,24 +762,24 @@ class _Bootstrapper(object):
                 cmd.append('--no-fetch')
         elif status == 'U':
             raise _AHBootstrapSystemExit(
-                'Error: Submodule {0} contains unresolved merge conflicts.  '
+                'Error: Submodule {} contains unresolved merge conflicts.  '
                 'Please complete or abandon any changes in the submodule so that '
                 'it is in a usable state, then try again.'.format(submodule))
         else:
-            log.warn('Unknown status {0!r} for git submodule {1!r}.  Will '
+            log.warn('Unknown status {!r} for git submodule {!r}.  Will '
                      'attempt to use the submodule as-is, but try to ensure '
                      'that the submodule is in a clean state and contains no '
-                     'conflicts or errors.\n{2}'.format(status, submodule,
+                     'conflicts or errors.\n{}'.format(status, submodule,
                                                         _err_help_msg))
             return
 
         err_msg = None
         cmd = ['git', 'submodule'] + cmd + ['--', submodule]
-        log.warn('{0} {1} submodule with: `{2}`'.format(
+        log.warn('{} {} submodule with: `{}`'.format(
             action, submodule, ' '.join(cmd)))
 
         try:
-            log.info('Running `{0}`; use the --no-git option to disable git '
+            log.info('Running `{}`; use the --no-git option to disable git '
                      'commands'.format(' '.join(cmd)))
             returncode, stdout, stderr = run_cmd(cmd)
         except OSError as e:
@@ -790,7 +790,7 @@ class _Bootstrapper(object):
 
         if err_msg is not None:
             log.warn('An unexpected error occurred updating the git submodule '
-                     '{0!r}:\n{1}\n{2}'.format(submodule, err_msg,
+                     '{!r}:\n{}\n{}'.format(submodule, err_msg,
                                                _err_help_msg))
 
 class _CommandNotFound(OSError):
@@ -819,12 +819,12 @@ def run_cmd(cmd):
             raise
 
         if e.errno == errno.ENOENT:
-            msg = 'Command not found: `{0}`'.format(' '.join(cmd))
+            msg = 'Command not found: `{}`'.format(' '.join(cmd))
             raise _CommandNotFound(msg, cmd)
         else:
             raise _AHBootstrapSystemExit(
                 'An unexpected error occurred when running the '
-                '`{0}` command:\n{1}'.format(' '.join(cmd), str(e)))
+                '`{}` command:\n{}'.format(' '.join(cmd), str(e)))
 
 
     # Can fail of the default locale is not configured properly.  See
@@ -878,10 +878,10 @@ def _next_version(version):
 
     major, minor, micro = parts[:3]
 
-    return '{0}.{1}.{2}'.format(major, minor + 1, 0)
+    return '{}.{}.{}'.format(major, minor + 1, 0)
 
 
-class _DummyFile(object):
+class _DummyFile:
     """A noop writeable object."""
 
     errors = ''  # Required for Python 3.x
@@ -938,7 +938,7 @@ class _AHBootstrapSystemExit(SystemExit):
 
         msg += '\n' + _err_help_msg
 
-        super(_AHBootstrapSystemExit, self).__init__(msg, *args[1:])
+        super().__init__(msg, *args[1:])
 
 
 BOOTSTRAPPER = _Bootstrapper.main()

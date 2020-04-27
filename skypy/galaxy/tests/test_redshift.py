@@ -58,20 +58,20 @@ def test_smail():
 
     # check sampling against own CDF
     D, p = stats.kstest(smail.rvs, smail.cdf, args=args, N=1000)
-    assert p > 0.01, 'D = {}, p = {}'.format(D, p)
+    assert p > 0.01, f'D = {D}, p = {p}'
 
     # check sampling, for alpha=0, beta=1, the distribution is exponential
     D, p = stats.kstest(smail.rvs(0.69315, 1e-100, 1., size=1000), 'expon')
-    assert p > 0.01, 'D = {}, p = {}'.format(D, p)
+    assert p > 0.01, f'D = {D}, p = {p}'
 
     # check sampling, for beta=1, the distribution matches a gamma distribution
     D, p = stats.kstest(smail.rvs(2.674, 2, 1, size=1000), 'gamma', args=(3,))
-    assert p > 0.01, 'D = {}, p = {}'.format(D, p)
+    assert p > 0.01, f'D = {D}, p = {p}'
 
     # check sampling, the distribution is a generalised gamma distribution
     D, p = stats.kstest(smail.rvs(0.832555, 1, 2, size=1000),
                         'gengamma', args=(1, 2))
-    assert p > 0.01, 'D = {}, p = {}'.format(D, p)
+    assert p > 0.01, f'D = {D}, p = {p}'
 
 
 def test_herbel_pdf():

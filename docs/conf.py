@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 #
 # Astropy documentation build configuration file.
@@ -70,7 +69,7 @@ rst_epilog += """
 # This does not *have* to match the package name, but typically does
 project = setup_cfg['name']
 author = setup_cfg['author']
-copyright = '{0}, {1}'.format(
+copyright = '{}, {}'.format(
     datetime.datetime.now().year, setup_cfg['author'])
 
 # The version info for the project you're documenting, acts as replacement for
@@ -131,7 +130,7 @@ html_favicon = '_themes/bootstrap-skypy/static/skypy_image.ico'
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
-html_title = '{0} v{1}'.format(project, release)
+html_title = f'{project} v{release}'
 
 # Output file base name for HTML help builder.
 htmlhelp_basename = project + 'doc'
@@ -141,7 +140,7 @@ htmlhelp_basename = project + 'doc'
 
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
-latex_documents = [('index', project + '.tex', project + u' Documentation',
+latex_documents = [('index', project + '.tex', project + ' Documentation',
                     author, 'manual')]
 
 
@@ -149,7 +148,7 @@ latex_documents = [('index', project + '.tex', project + u' Documentation',
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [('index', project.lower(), project + u' Documentation',
+man_pages = [('index', project.lower(), project + ' Documentation',
               [author], 1)]
 
 
@@ -170,7 +169,7 @@ if eval(setup_cfg.get('edit_on_github')):
     edit_on_github_doc_root = "docs"
 
 # -- Resolving issue number to links in changelog -----------------------------
-github_issues_url = 'https://github.com/{0}/issues/'.format(setup_cfg['github_project'])
+github_issues_url = 'https://github.com/{}/issues/'.format(setup_cfg['github_project'])
 
 # -- Turn on nitpicky mode for sphinx (to warn about references not found) ----
 #
