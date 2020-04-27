@@ -56,7 +56,7 @@ from setuptools import Distribution
 from setuptools.package_index import PackageIndex
 
 # This is the minimum Python version required for astropy-helpers
-__minimum_python_version__ = (3, 5)
+__minimum_python_version__ = (3, 6)
 
 # TODO: Maybe enable checking for a specific version of astropy_helpers?
 DIST_NAME = 'astropy-helpers'
