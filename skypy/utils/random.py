@@ -16,6 +16,8 @@ Utility Functions
 
 import numpy as np
 import skypy.utils.special as special
+from scipy import integrate
+import scipy.special as sp
 
 
 def schechter(alpha, x_min, x_max, resolution=100, size=None):
@@ -68,3 +70,42 @@ def _schechter_cdf(x, x_min, x_max, alpha):
     d = special.gammaincc(alpha + 1, x_max)
 
     return (a - b) / (c - d)
+    
+    
+
+	
+	
+def conditional_prob_shmr(x_min, x_max, size=None): 
+    """ Stellar-to-halo- mass relation.
+       	Sample conditional probabilities P(Mstar|Mhalo) based on Birrer et al. 2018 
+       	stellar-to-halo-mass relation.
+
+    Parameters
+    ----------
+    x_min, x_max : array_like
+        Lower and upper bounds for the random variable x representing the log halo mass.
+    size: int, optional
+        Output shape of samples. Default is None.
+
+    Returns
+    -------
+    cdf : array_like
+        Conditional probability samples drawn from the SHMR.
+
+    Examples
+    --------
+    >>> import skypy.utils.random as random
+    >>> sample = random.conditional_prob_shmr(x_min=11., x_max=15.,
+    ...                           size=1000)
+
+
+    References
+    ----------
+    .. [1] https://arxiv.org/pdf/1401.3162.pdf
+    """
+
+    x=np.linspace(x_min,x_max,size)
+    cdf = integrate.cumtrapz(sp.erf(x), x, initial=0)
+    cdf = cdf/cdf[-1]
+    return cdf
+
