@@ -76,3 +76,30 @@ def test_beta_ellipticity():
     # Kolmogorov-Smirnov test comparing ellipticity and arcsine distributions
     D, p = stats.kstest(ellipticity_arcsine.rvs, 'arcsine', N=1000)
     assert p > 0.01, 'D = {}, p = {}'.format(D, p)
+
+
+def test_ryden04():
+    from skypy.galaxy.ellipticity import ryden04
+
+    # sample a single ellipticity
+    e = ryden04(0.222, 0.056, -1.85, 0.89)
+    assert np.isscalar(e)
+
+    # sample many ellipticities
+    e = ryden04(0.222, 0.056, -1.85, 0.89, size=1000)
+    assert np.shape(e) == (1000,)
+
+    # sample with explicit shape
+    e = ryden04(0.222, 0.056, -1.85, 0.89, size=(10, 10))
+    assert np.shape(e) == (10, 10)
+
+    # sample with implicit size
+    e1 = ryden04([0.222, 0.333], 0.056, -1.85, 0.89)
+    e2 = ryden04(0.222, [0.056, 0.067], -1.85, 0.89)
+    e3 = ryden04(0.222, 0.056, [-1.85, -2.85], 0.89)
+    e4 = ryden04(0.222, 0.056, -1.85, [0.89, 1.001])
+    assert np.shape(e1) == np.shape(e2) == np.shape(e3) == np.shape(e4) == (2,)
+
+    # sample with broadcasting rule
+    e = ryden04([[0.2, 0.3], [0.4, 0.5]], 0.1, [-1.9, -2.9], 0.9)
+    assert np.shape(e) == (2, 2)
