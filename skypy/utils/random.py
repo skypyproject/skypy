@@ -11,7 +11,6 @@ Utility Functions
    :toctree: ../api/
 
    schechter
-
 """
 
 import numpy as np
@@ -59,7 +58,6 @@ def schechter(alpha, x_min, x_max, resolution=100, size=None):
     t_upper = np.interp(x_max, x, cdf)
     u = np.random.uniform(t_lower, t_upper, size=size)
     x_sample = np.interp(u, cdf, x)
-
     return x_sample
 
 
@@ -68,22 +66,19 @@ def _schechter_cdf(x, x_min, x_max, alpha):
     b = special.gammaincc(alpha + 1, x)
     c = special.gammaincc(alpha + 1, x_min)
     d = special.gammaincc(alpha + 1, x_max)
-
     return (a - b) / (c - d)
-    
-    
 
-	
-	
-def conditional_prob_shmr(x_min, x_max, size=None): 
+
+def conditional_prob_shmr(x_min, x_max, size=None):
     """ Stellar-to-halo- mass relation.
-       	Sample conditional probabilities P(Mstar|Mhalo) based on Birrer et al. 2018 
-       	stellar-to-halo-mass relation.
+    Sample conditional probabilities P(Mstar|Mhalo) based
+    on Birrer et al. 2018 stellar-to-halo-mass relation.
 
     Parameters
     ----------
     x_min, x_max : array_like
-        Lower and upper bounds for the random variable x representing the log halo mass.
+        Lower and upper bounds for the random variable x
+        representing the log halo mass.
     size: int, optional
         Output shape of samples. Default is None.
 
@@ -103,9 +98,7 @@ def conditional_prob_shmr(x_min, x_max, size=None):
     ----------
     .. [1] https://arxiv.org/pdf/1401.3162.pdf
     """
-
-    x=np.linspace(x_min,x_max,size)
+    x = np.linspace(x_min, x_max, size)
     cdf = integrate.cumtrapz(sp.erf(x), x, initial=0)
     cdf = cdf/cdf[-1]
     return cdf
-
