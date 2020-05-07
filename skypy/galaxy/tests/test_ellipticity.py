@@ -103,3 +103,12 @@ def test_ryden04():
     # sample with broadcasting rule
     e = ryden04([[0.2, 0.3], [0.4, 0.5]], 0.1, [-1.9, -2.9], 0.9)
     assert np.shape(e) == (2, 2)
+
+    # sample with random parameters and check that result is in unit range
+    args = np.random.rand(4)*[1., .1, -2., 1.]
+    e = ryden04(*args, size=1000)
+    assert np.all((e >= 0.) & (e <= 1.))
+
+    # sample a spherical distribution
+    e = ryden04(1-1e-99, 1e-99, -1e99, 1e-99, size=1000)
+    assert np.allclose(e, 0.)
