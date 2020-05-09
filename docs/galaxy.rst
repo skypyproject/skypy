@@ -24,6 +24,7 @@ The following models are found in the `skypy.galaxy.ellipticity` package.
    :nosignatures:
 
    beta_ellipticity
+   ryden04
 
 
 Luminosity
