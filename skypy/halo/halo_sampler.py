@@ -24,9 +24,9 @@ __all__ = [
  ]
 
 
-def halo_mass_function(A, a, p, M, m_min, m_max, m_star, redshift,
-                       power_spectrum, k_min, k_max, cosmology,
-                       number=100, resolution=100, size=None):
+def halo_mass_function(A, a, p, m_min, m_max, m_star, redshift,
+                       power_spectrum, wavenumber, cosmology,
+                       resolution=100, size=None):
     """Peak height.
     This function samples haloes from their mass function following Sheth &
     Tormen formalism, see equation 10 in [1]_ or [2]_.
@@ -44,13 +44,12 @@ def halo_mass_function(A, a, p, M, m_min, m_max, m_star, redshift,
     power_spectrum: (nk,) array_like
         Linear power spectrum at a single redshift in [Mpc^3].
         The first axis correspond to k values in [Mpc^-1].
-    k_min, k_max : float
-        Lower and upper bounds for the wavenumbers, in units of [Mpc^-1].
+    wavenumber : (nk,) array_like
+        Array of wavenumbers at which the power spectrum is evaluated,
+        in units of [Mpc^-1].
     cosmology : astropy.cosmology.Cosmology
         Cosmology object providing methods for the evolution history of
         omega_matter and omega_lambda with redshift.
-    number : integer, optional
-        Number of wavenumber samples to generate, nk. Default is 100.
     resolution : int, optional
         Resolution of the inverse transform sampling spline. Default is 100.
     size: int, optional
@@ -73,8 +72,7 @@ def halo_mass_function(A, a, p, M, m_min, m_max, m_star, redshift,
     .. [2] https://www.slac.stanford.edu/econf/C070730/talks/
         Wechsler_080207.pdf
     """
-    k = np.np.logspace(np.log10(np.min(k_min)), np.log10(np.max(k_max)),
-                       num=number)
+    k = wavenumber
     Pk = power_spectrum
     Hz = cosmology.H(redshift)
 
