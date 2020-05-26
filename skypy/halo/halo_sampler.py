@@ -1,32 +1,65 @@
-"""Halo sampler.
-This code samples haloes from their mass function."""
+r'''Halo sampler.
+This code samples haloes from their mass function.
+
+Models
+======
+.. autosummary::
+   :nosignatures:
+   :toctree: ../api/
+
+   Press_Schechter_sampler
+   Sheth_Tormen_sampler
+'''
 
 import numpy as np
 from scipy import integrate
+from functools import partial
+from astropy.constants import G
+
 
 __all__ = [
-     'nu',
+     'halo_mass_function',
+     'Press_Schechter_sampler',
+     'Sheth_Tormen_sampler',
  ]
 
 
-def nu(r_min, r_max, k_min, k_max, number):
-    """Nu function.
+def halo_mass_function(A, a, p, M, m_min, m_max, m_star, redshift,
+                       power_spectrum, k_min, k_max, cosmology,
+                       number=100, resolution=100, size=None):
+    """Peak height.
     This function samples haloes from their mass function following Sheth &
     Tormen formalism, see equation 10 in [1]_ or [2]_.
 
     Parameters
     -----------
-    r_min, r_max : float
-        Minimum and maximum values for the viral radius in units of [Mpc].
+    A,a,p: float
+        Parameters
+    m_min, m_max : array_like
+        Lower and upper bounds for the random variable m.
+    m_star: float or int
+        Factors parameterising the characteristic mass.
+    redshift : float
+        Redshift value at which to evaluate the variance of the power spectrum.
+    power_spectrum: (nk,) array_like
+        Linear power spectrum at a single redshift in [Mpc^3].
+        The first axis correspond to k values in [Mpc^-1].
     k_min, k_max : float
-        Minimum and maximum values for the viral wavenumber, units [Mpc^-1].
-    number : integer
-        Number of  radius and wavenumber elements. Default is 1000.
+        Lower and upper bounds for the wavenumbers, in units of [Mpc^-1].
+    cosmology : astropy.cosmology.Cosmology
+        Cosmology object providing methods for the evolution history of
+        omega_matter and omega_lambda with redshift.
+    number : integer, optional
+        Number of wavenumber samples to generate, nk. Default is 100.
+    resolution : int, optional
+        Resolution of the inverse transform sampling spline. Default is 100.
+    size: int, optional
+        Output shape of samples. Default is None.
 
     Returns
     --------
-    nu : numpy.ndarray
-       nu in equation () in [].
+    sample: array_like
+        Samples drawn from the Sheth-Tormen function, equation (10) in [1].
 
     Examples
     ---------
@@ -40,39 +73,39 @@ def nu(r_min, r_max, k_min, k_max, number):
     .. [2] https://www.slac.stanford.edu/econf/C070730/talks/
         Wechsler_080207.pdf
     """
+    k = np.np.logspace(np.log10(np.min(k_min)), np.log10(np.max(k_max)),
+                       num=number)
+    Pk = power_spectrum
+    Hz = cosmology.H(redshift)
 
-    r = np.linspace(r_min, r_max, number)  # virial radius Mpc/h!!!!!
-    k = np.linspace(k_min, k_max, number)
+    def sigma_squared(M):
+        R = np.power(2 * G.value * M / Hz, 1.0 / 3.0)
+        j1 = (np.sin(k * R) - np.cos(k * R) * k * R) / (k * R)
+        top_hat = 3 * j1 / (k * R)**2
+        integrand = Pk * top_hat**2.0 * k**2.0
+        return integrate.simps(integrand, k) / (2. * np.pi ** 2.)
 
-    top_hat = 3. * (np.sin(k * r) - k * r * np.cos(k * r) / (k * r) ** 3)
+    delta_critical_squared = sigma_squared(m_star)
 
-    integrand = 0.5 * k * k * np.power(top_hat * k, 2) / (np.pi**2)
-    sigma_squared = integrate.cumtrapz(integrand, k, initial=1)
+    m = np.logspace(np.log10(np.min(m_min)), np.log10(np.max(m_max)),
+                    resolution)
+    nu = delta_critical_squared / sigma_squared(m)
 
-    return np.power(1.68647, 2) / sigma_squared
+    cdf = _sheth_tormen_cdf(nu, A, a, p)
+    t_lower = np.interp(np.min(nu), nu, cdf)
+    t_upper = np.interp(np.max(nu), nu, cdf)
+    nu_uniform = np.random.uniform(t_lower, t_upper, size=size)
+    nu_sample = np.interp(nu_uniform, cdf, nu)
 
-
-# This bit should go to utils
-def unnormPDF(nu):  # (r_min, r_max, k_min, k_max, res):
-    nu = np.linspace(0.1, 200, 100)
-    uPDF = (0.5 / (np.sqrt(np.pi) * nu)) * (1.0 + 1.0 / (0.707 * nu)**0.3) *\
-        np.sqrt(0.707 * nu / 2.0) * np.exp(-(0.707 * nu / 2.0))
-    return uPDF
-
-
-# normalised PDF(nu(sigma(M(R))))
-def PDF(nu):
-    nu = np.linspace(0.1, 200, 100)
-    CDF = integrate.cumtrapz(unnormPDF(nu), nu, initial=0)
-    norm = CDF[-1]
-    return unnormPDF(nu) / norm
+    return nu_sample
 
 
-# sampler as a function of nu
-def sample_HMF(nu, size):
-    nu = np.linspace(0.1, 200, 100)
-    CDF = integrate.cumtrapz(unnormPDF(nu), nu, initial=0)
-    CDF = CDF/CDF[-1]
-    nurand = np.random.uniform(0, 1, size)
-    sample = np.interp(nurand, CDF, nu)
-    return sample
+def _sheth_tormen_cdf(x, A, a, p):
+    PDF = (A / (np.sqrt(np.pi) * x)) * (1.0 + 1.0 / (a * x)**p) *\
+        np.sqrt(a * x / 2.0) * np.exp(-(a * x / 2.0))
+    CDF = integrate.cumtrapz(PDF, x, initial=0)
+    return CDF/CDF[-1]
+
+
+Press_Schechter_sampler = partial(halo_mass_function, 0.5, 1, 0)
+Sheth_Tormen_sampler = partial(halo_mass_function, 0.3222, 0.707, 0.3)
