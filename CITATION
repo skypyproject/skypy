@@ -1,6 +1,14 @@
 If you use SkyPy for work/research presented in a publication (whether
-directly, or as a dependency to another package), we recommend and encourage
-the following acknowledgement:
+directly, or as a dependency to another package) please cite both:
+
+  - The SkyPy Concept DoI: https://doi.org/10.5281/zenodo.3755531
+
+and:
+
+  - The Version DoI for the exact version of SkyPy you have used.
+    e.g. for v0.1: https://doi.org/10.5281/zenodo.3755532
+
+We also recommend and encourage the following acknowledgement:
 
   This research made use of SkyPy, a Python package for forward modeling
   astronomical surveys (http://skypy.info).
