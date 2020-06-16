@@ -17,6 +17,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install tox
+        sudo apt-get install graphviz
     - name: Add sphinx Matcher
       run: |
         echo ::add-matcher::.github/problem_matchers/sphinx.json
