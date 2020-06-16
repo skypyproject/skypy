@@ -7,7 +7,7 @@ def test_skypy():
 
     # No arguments
     with pytest.raises(SystemExit) as e:
-        skypy.main()
+        skypy.main([])
     assert e.value.code == 0
 
     # Argparse help

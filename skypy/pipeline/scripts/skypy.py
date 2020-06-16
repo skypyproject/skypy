@@ -49,7 +49,11 @@ def main(args=None):
     parser.add_argument('-f', '--format', required=False,
                         choices=['fits', 'hdf5'], help='Table file format')
 
-    args = parser.parse_args(args or sys.argv[1:] or ['--help'])
+    # get system args if none passed
+    if args is None:
+        args = sys.argv[1:]
+
+    args = parser.parse_args(args or ['--help'])
     config = yaml.safe_load(args.config)
     driver = SkyPyDriver()
     driver.execute(config, file_format=args.format)
