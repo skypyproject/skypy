@@ -7,7 +7,5 @@ div.topbar a.brand {
 }
 
 div.topbar ul li a.homelink {
-  background: transparent url("skypy_text.png") no-repeat 10px 5px;
-  background-image: url("skypy_text.png"), none;
-  background-size: 91px 20px;
+  display: none;
 }
