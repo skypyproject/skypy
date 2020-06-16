@@ -58,7 +58,6 @@ highlight_language = 'python3'
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 exclude_patterns.append('_templates')
-exclude_patterns.append('_themes')
 
 # This is added to the end of RST files - a good place to put substitutions to
 # be used globally.
@@ -98,13 +97,16 @@ release = package.__version__
 
 # Add any paths that contain custom themes here, relative to this directory.
 # To use a different custom theme, add the directory containing the theme.
-html_theme_path = ['./_themes']
+#html_theme_path = []
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes. To override the custom theme, set this to the
 # name of a builtin theme or the name of a custom theme in html_theme_path.
-html_theme = 'bootstrap-skypy'
+#html_theme = None
 
+# Static files to copy after template files
+html_static_path = ['_static']
+html_style = 'skypy.css'
 
 html_theme_options = {
     'logotext1': 'skypy',  # white,  semi-bold
@@ -123,7 +125,7 @@ html_theme_options = {
 # The name of an image file (within the static path) to use as favicon of the
 # docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
 # pixels large.
-html_favicon = '_themes/bootstrap-skypy/static/skypy_image.ico'
+html_favicon = '_static/skypy_image.ico'
 
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
 # using the given strftime format.
@@ -155,16 +157,12 @@ man_pages = [('index', project.lower(), project + u' Documentation',
 
 # -- Options for the edit_on_github extension ---------------------------------
 
-if eval(setup_cfg.get('edit_on_github')):
+if setup_cfg.get('edit_on_github').lower() == 'true':
+
     extensions += ['sphinx_astropy.ext.edit_on_github']
 
-    versionmod = import_module(setup_cfg['name'] + '.version')
-    edit_on_github_project = '/'.join([setup_cfg['github_project'],
-                                       setup_cfg['name']])
-    if versionmod.release:
-        edit_on_github_branch = "v" + versionmod.version
-    else:
-        edit_on_github_branch = "master"
+    edit_on_github_project = setup_cfg['github_project']
+    edit_on_github_branch = "master"
 
     edit_on_github_source_root = ""
     edit_on_github_doc_root = "docs"
