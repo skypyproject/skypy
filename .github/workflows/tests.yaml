@@ -23,11 +23,8 @@ jobs:
     - name: Add pytest Matcher
       run: |
         echo ::add-matcher::.github/problem_matchers/pytest.json
-    - name: Run Tests
+    - name: Run Tests with Coverage
       run: |
-        tox -e py36-test-cov
-    - name: Generate Coverage
-      run: |
-        coverage xml -i
+        tox -e py36-test-cov -- --cov-report xml
     - name: Report Coverage
       uses: codecov/codecov-action@v1
