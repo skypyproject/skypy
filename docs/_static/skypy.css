@@ -1,0 +1,15 @@
+@import url("bootstrap-astropy.css");
+
+div.topbar {
+    width: auto;
+}
+
+div.topbar a.brand {
+  background: transparent url("skypy_image.png") no-repeat 10px 4px;
+  background-image: url("skypy_image.svg"), none;
+  background-size: 32px 32px;
+}
+
+div.topbar ul li a.homelink {
+  display: none;
+}
