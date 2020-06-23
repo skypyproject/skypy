@@ -116,25 +116,6 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
     >>> halofit(kvec, zvalue, pvec, cosmo, _takahashi_parameters)
     array([[388.67064424,   0.72797614]])
 
-    Create a plot for the Smith halofit model at redshift 0
-    and Planck15 cosmology:
-
-    >>> from skypy.power_spectrum import halofit
-    >>> from astropy.cosmology import Planck15
-    >>> z = 0.0
-    >>> k = np.logspace(-4.0, 0.0, 5)
-    >>> pk = [[705.54997046, 6474.60158058, 37161.00990355, 9657.02613688,
-    ...           114.60445565]]
-    >>> p = np.array(pk)
-    >>> smith = halofit_smith(k, z, p, Planck15)
-    >>> import matplotlib.pyplot as plt  # doctest: +SKIP
-    >>> plt.loglog(k, smith.T, label='Smith')  # doctest: +SKIP
-    >>> plt.loglog(k,p.T, label='Linear')  # doctest: +SKIP
-    >>> plt.xlabel(r'k $(1/Mpc)$')  # doctest: +SKIP
-    >>> plt.ylabel(r'P $(Mpc^3)$')  # doctest: +SKIP
-    >>> plt.legend()  # doctest: +SKIP
-    >>> plt.show()  # doctest: +SKIP
-
     '''
 
     # Manage shapes of input arrays
