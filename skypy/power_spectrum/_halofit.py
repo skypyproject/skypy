@@ -112,16 +112,19 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
 
     >>> zvalue = 0.0
     >>> kvec = np.array([1.00000000e-04, 1.01000000e+01])
-    >>> pvec = np.array([[388.6725682632502, 0.21676249605280398]])
-    >>> halofit(kvec, zvalue, pvec, cosmo, _takahashi_parameters)
-    array([[388.67064424,   0.72797614]])
+    >>> pvec = np.array([388.6725682632502, 0.21676249605280398])
+    >>> halofit_takahashi(kvec, zvalue, pvec, cosmo)
+    array([388.67064424,   0.72797614])
 
     '''
 
     # Manage shapes of input arrays
+    return_shape = np.shape(linear_power_spectrum)
     redshift = np.atleast_1d(redshift)
+
     if np.ndim(linear_power_spectrum) == 1:
-        linear_power_spectrum = linear_power_spectrum[:, np.newaxis]
+        length_pk = len(linear_power_spectrum)
+        linear_power_spectrum = linear_power_spectrum.reshape(1,length_pk)
 
     # Declaration of variables
     if isiterable(redshift):
@@ -227,6 +230,9 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
 
     # Halofit non-linear power spectrum, Smith et al. 2003 equation C1
     pknl = 2 * np.pi * np.pi * (dq2 + dh2) / k3
+
+    if len(redshift) == 1:
+        pknl = pknl.reshape(return_shape)
 
     return pknl
 
