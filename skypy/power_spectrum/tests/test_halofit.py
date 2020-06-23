@@ -51,8 +51,8 @@ def test_halofit():
 
     # Test when redshift is a scalar
     z_scalar = z[0]
-    power_1d = linear_power[0, :].reshape(1, len(k))
-    truth_scalar_redshift = truth_smith[0, :].reshape(1, len(k))
+    power_1d = linear_power[0, :]
+    truth_scalar_redshift = truth_smith[0, :]
     smith_scalar_redshift = halofit_smith(k, z_scalar, power_1d, Planck15)
     assert allclose(smith_scalar_redshift, truth_scalar_redshift)
     assert np.shape(smith_scalar_redshift) == np.shape(power_1d)
