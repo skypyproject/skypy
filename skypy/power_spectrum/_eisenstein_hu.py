@@ -1,3 +1,9 @@
+"""Eisenstein and Hu module.
+
+This module facilitates the computation of the Eisenstein and Hu fitting
+formula for the matter power spectrum.
+"""
+
 from astropy.utils import isiterable
 import numpy as np
 
@@ -10,14 +16,16 @@ __all__ = [
 
 
 def transfer_with_wiggles(wavenumber, A_s, n_s, cosmology, kwmap=0.02):
-    """ Eisenstein & Hu fitting formula for the transfer function with
-    baryon acoustic oscillation wiggles.
+    r''' Eisenstein & Hu transfer function with wiggles.
+    This function returns the Eisenstein & Hu fitting formula for the transfer
+    function with baryon acoustic oscillation wiggles. This is described in
+    [1]_ and [2]_.
 
     Parameters
     ----------
-    wavenumber : array_like
-        Array of wavenumbers in units of [Mpc^-1] at which to evaluate the
-        linear matter power spectrum.
+    wavenumber : (nk,) array_like
+        Array of wavenumbers in units of :math:`[Mpc^-1]` at which to evaluate
+        the linear matter power spectrum.
     cosmology : astropy.cosmology.Cosmology
         Cosmology object providing omega_matter, omega_baryon, Hubble parameter
         and CMB temperature at the present day.
@@ -25,17 +33,22 @@ def transfer_with_wiggles(wavenumber, A_s, n_s, cosmology, kwmap=0.02):
         Amplitude and spectral index of primordial scalar fluctuations.
     kwmap : float
         WMAP normalization for the amplitude of primordial scalar fluctuations,
-        as described in [3], in units of [Mpc^-1]. Default is 0.02.
+        as described in [3]_, in units of :math:`[Mpc^-1]`.
+        Default is 0.02/Mpc.
 
     Returns
     -------
-    transfer : array_like
+    transfer : (nk,) array_like
         Transfer function evaluated at the given array of wavenumbers for the
         input primordial power spectrum parameters A_s and n_s, cosmology and
         kwmap normalization.
 
     Examples
     --------
+
+    This returns the transfer function with wiggles for the Astropy default
+    cosmology at a given array of wavenumbers:
+
     >>> import numpy as np
     >>> from astropy.cosmology import default_cosmology
     >>> wavenumber = np.logspace(-3, 1, num=5, base=10.0)
@@ -50,7 +63,8 @@ def transfer_with_wiggles(wavenumber, A_s, n_s, cosmology, kwmap=0.02):
     .. [1] Eisenstein D. J., Hu W., ApJ, 496, 605 (1998)
     .. [2] Eisenstein D. J., Hu W., ApJ, 511, 5 (1999)
     .. [3] Komatsu et al., ApJS, 180, 330 (2009)
-    """
+
+    '''
 
     if isiterable(wavenumber):
         wavenumber = np.asarray(wavenumber)
@@ -133,14 +147,16 @@ def transfer_with_wiggles(wavenumber, A_s, n_s, cosmology, kwmap=0.02):
 
 
 def transfer_no_wiggles(wavenumber, A_s, n_s, cosmology):
-    """ Eisenstein & Hu fitting formula for the transfer function without
-    baryon acoustic oscillation wiggles.
+    r'''Eisenstein & Hu transfer function without wiggles.
+    Eisenstein & Hu fitting formula for the transfer function without
+    baryon acoustic oscillation wiggles. This is described in
+    [1]_ and [2]_.
 
     Parameters
     ----------
-    wavenumber : array_like
-        Array of wavenumbers in units of [Mpc^-1] at which to evaluate the
-        linear matter power spectrum.
+    wavenumber : (nk,) array_like
+        Array of wavenumbers in units of :math:`[Mpc^-1]` at which to evaluate
+        the linear matter power spectrum.
     A_s, n_s: float
         Amplitude and spectral index of primordial scalar fluctuations.
     cosmology : astropy.cosmology.Cosmology
@@ -149,13 +165,17 @@ def transfer_no_wiggles(wavenumber, A_s, n_s, cosmology):
 
     Returns
     -------
-    transfer : array_like
+    transfer : (nk, ) array_like
         Transfer function evaluated at the given wavenumbers for the input
         primordial power spectrum parameters A_s and n_s, cosmology and kwmap
         normalization.
 
     Examples
     --------
+
+    This returns the transfer function without wiggles for the Astropy default
+    cosmology at a given array of wavenumbers:
+
     >>> import numpy as np
     >>> from astropy.cosmology import default_cosmology
     >>> wavenumber = np.logspace(-3, 1, num=5, base=10.0)
@@ -170,7 +190,8 @@ def transfer_no_wiggles(wavenumber, A_s, n_s, cosmology):
     .. [1] Eisenstein D. J., Hu W., ApJ, 496, 605 (1998)
     .. [2] Eisenstein D. J., Hu W., ApJ, 511, 5 (1999)
     .. [3] Komatsu et al., ApJS, 180, 330 (2009)
-    """
+
+    '''
 
     if isiterable(wavenumber):
         wavenumber = np.asarray(wavenumber)
@@ -199,15 +220,16 @@ def transfer_no_wiggles(wavenumber, A_s, n_s, cosmology):
 
 
 def eisenstein_hu(wavenumber, A_s, n_s, cosmology, kwmap=0.02, wiggle=True):
-    """ Eisenstein & Hu fitting function for the linear matter
-    power spectrum with (or without) baryon acoustic oscillations using
-    formulation from Komatsu et al (2009).
+    """ Eisenstein & Hu matter power spectrum.
+    This function returns the Eisenstein and Hu fitting function for the linear
+    matter power spectrum with (or without) baryon acoustic oscillations using
+    formulation from Komatsu et al (2009) in [3]_.
 
     Parameters
     ----------
-    wavenumber : array_like
-        Array of wavenumbers in units of [Mpc^-1] at which to evaluate the
-        linear matter power spectrum.
+    wavenumber : (nk, ) array_like
+        Array of wavenumbers in units of :math:`[Mpc^-1]` at which to evaluate
+        the linear matter power spectrum.
     A_s, n_s: float
         Amplitude and spectral index of primordial scalar fluctuations.
     cosmology : astropy.cosmology.Cosmology
@@ -230,6 +252,11 @@ def eisenstein_hu(wavenumber, A_s, n_s, cosmology, kwmap=0.02, wiggle=True):
 
     Examples
     --------
+
+    This example returns the Eisenstein and Hu matter power spectrum with
+    baryon acoustic oscillations for the Astropy default
+    cosmology at a given array of wavenumbers:
+
     >>> import numpy as np
     >>> from astropy.cosmology import default_cosmology
     >>> wavenumber = np.logspace(-3, 1, num=5, base=10.0)
