@@ -46,15 +46,13 @@ def camb(wavenumber, redshift, cosmology, A_s, n_s):
 
     Examples
     --------
-    >>> import numpy as np
-    >>> from skypy.power_spectrum import camb
-    >>> from astropy.cosmology import default_cosmology, Planck15
-    >>> import matplotlib.pyplot as plt  # doctest: +SKIP
 
     This will return the linear matter power spectrum in :math:`Mpc^3`
     at several values of redshift and wavenumers in :math:`1/Mpc`
     for the Astropy default cosmology:
 
+    >>> import numpy as np
+    >>> from astropy.cosmology import default_cosmology
     >>> cosmology = default_cosmology.get()
     >>> redshift = np.array([0, 1])
     >>> wavenumber = np.array([1.e-2, 1.e-1, 1e0])
