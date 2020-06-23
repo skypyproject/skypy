@@ -29,6 +29,7 @@ def test_camb():
     '''
     from skypy.power_spectrum import camb
 
+    # test shape and compare with the mocked power spectrum
     redshift = [0.0, 1.0]
     wavenumber = np.logspace(-4.0, np.log10(2.0), 200)
     pkz = camb(wavenumber, redshift, Planck15, 2.e-9, 0.965)
