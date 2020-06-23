@@ -64,19 +64,6 @@ def camb(wavenumber, redshift, cosmology, A_s, n_s):
     array([[2.36646871e+04, 3.02592011e+03, 2.49336836e+01],
        [8.77864738e+03, 1.12441960e+03, 9.26749240e+00]])
 
-    Create a plot for the linear matter power spectrum at redshift 0
-    and Planck15 cosmology:
-
-    >>> redshift = 0.0
-    >>> wavenumber = np.logspace(-4.0, 0.0, 100)
-    >>> A_s, ns = 2.e-9, 0.965
-    >>> pc = camb(wavenumber, redshift, cosmology, A_s, n_s)
-    >>> plt.loglog(k, smith.T, label='Smith')  # doctest: +SKIP
-    >>> plt.loglog(k,p.T, label='Linear')  # doctest: +SKIP
-    >>> plt.xlabel(r'k $(1/Mpc)$')  # doctest: +SKIP
-    >>> plt.ylabel(r'P $(Mpc^3)$')  # doctest: +SKIP
-    >>> plt.show()  # doctest: +SKIP
-
     References
     ----------
     .. [1] Lewis, A. and Challinor, A. and Lasenby, A. (2000),
@@ -125,7 +112,7 @@ def camb(wavenumber, redshift, cosmology, A_s, n_s):
                                                    maxkh=np.max(k_h.value),
                                                    npoints=len(k_h.value))
 
-    if len(redshift) > 1:
+    if len(redshift_order) > 1:
         power_output = pzk[redshift_order[::-1]]
     else:
         power_output = pzk[redshift_order[::-1]].reshape(return_shape)
