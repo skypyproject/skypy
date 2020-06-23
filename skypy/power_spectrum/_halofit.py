@@ -71,11 +71,12 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
     Parameters
     ----------
     k : (nk,) array_like
-        Input wavenumbers in units of [Mpc^-1].
+        Input wavenumbers in units of :math:`[Mpc^-1]`.
     z : (nz,) array_like
         Input redshifts
-    P : (nk, nz) array_like
-        Linear power spectrum for given wavenumbers and redshifts [Mpc^3].
+    P : (nz, nk) array_like
+        Linear power spectrum for given wavenumbers and
+        redshifts :math:`[Mpc^3]`.
     cosmology : astropy.cosmology.Cosmology
                 Cosmology object providing method for the evolution of
                 omega_matter with redshift.
@@ -84,8 +85,8 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
 
     Returns
     -------
-    pknl : (nk, nz) array_like
-           Non-linear halo power spectrum in units of [Mpc^3].
+    pknl : (nz, nk) array_like
+           Non-linear halo power spectrum in units of :math:`[Mpc^3]`.
 
     References
     ----------
@@ -98,18 +99,43 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
 
     Examples
     --------
+
+    This will return the halofit power spectrum for a given wavenumber,
+    redshift and linear power spectrum:
+
     >>> import numpy as np
     >>> from astropy.cosmology import FlatLambdaCDM
-    >>> kvec = np.array([1.00000000e-04, 1.01000000e+01])
-    >>> zvalue = 0.0
-    >>> pvec = np.array([388.6725682632502, 0.21676249605280398])
     >>> cosmo = FlatLambdaCDM(H0=67.04, Om0=0.21479, Ob0=0.04895)
+
+    The Takahashi halofit power spectrum in :math:`Mpc^3` at redshift 0 and at
+    wavenumers :math:`k=0.0001/Mpc` and :math:`k=10.1/Mpc`:
+
+    >>> zvalue = 0.0
+    >>> kvec = np.array([1.00000000e-04, 1.01000000e+01])
+    >>> pvec = np.array([[388.6725682632502, 0.21676249605280398]])
     >>> halofit(kvec, zvalue, pvec, cosmo, _takahashi_parameters)
-    array([388.67064424,   0.72797614])
+    array([[388.67064424,   0.72797614]])
+
+    Create a plot for the Smith halofit model at redshift 0
+    and Planck15 cosmology:
+
+    >>> from astropy.cosmology import Planck15
+    >>> z = 0.0
+    >>> k = np.logspace(-4.0, 0.0, 5)
+    >>> pk = [[705.54997046, 6474.60158058, 37161.00990355, 9657.02613688,
+    ...           114.60445565]]
+    >>> p = np.array(pk)
+    >>> import matplotlib.pyplot as plt  # doctest: +SKIP
+    >>> plt.loglog(k, smith.T, label='Smith')  # doctest: +SKIP
+    >>> plt.loglog(k,p.T, label='Linear')  # doctest: +SKIP
+    >>> plt.xlabel(r'k $(1/Mpc)$')  # doctest: +SKIP
+    >>> plt.ylabel(r'P $(Mpc^3)$')  # doctest: +SKIP
+    >>> plt.legend()  # doctest: +SKIP
+    >>> plt.show()  # doctest: +SKIP
+
     '''
 
     # Manage shapes of input arrays
-    return_shape = np.shape(linear_power_spectrum)
     redshift = np.atleast_1d(redshift)
     if np.ndim(linear_power_spectrum) == 1:
         linear_power_spectrum = linear_power_spectrum[:, np.newaxis]
@@ -140,7 +166,7 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
     # Linear power spectrum interpolated at each redshift
     k2 = np.square(wavenumber)
     k3 = np.power(wavenumber, 3)
-    dl2kz = (linear_power_spectrum.T * k3) / (2 * np.pi * np.pi)
+    dl2kz = (linear_power_spectrum * k3) / (2 * np.pi * np.pi)
     dl2k = [interpolate.interp1d(np.log(wavenumber), np.log(d)) for d in dl2kz]
     lnk_lo = np.log(wavenumber[0])
     lnk_up = np.log(wavenumber[-1])
@@ -219,7 +245,7 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
     # Halofit non-linear power spectrum, Smith et al. 2003 equation C1
     pknl = 2 * np.pi * np.pi * (dq2 + dh2) / k3
 
-    return pknl.T.reshape(return_shape)
+    return pknl
 
 
 halofit_smith = partial(halofit, parameters=_smith_parameters)
