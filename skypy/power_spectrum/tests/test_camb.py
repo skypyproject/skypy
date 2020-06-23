@@ -32,11 +32,11 @@ def test_camb():
     redshift = [0.0, 1.0]
     wavenumber = np.logspace(-4.0, np.log10(2.0), 200)
     pkz = camb(wavenumber, redshift, Planck15, 2.e-9, 0.965)
-    assert pkz.shape == (len(wavenumber), len(redshift))
-    assert allclose(pkz, mock_pkz, rtol=1.e-4)
+    assert pkz.shape == (len(redshift), len(wavenumber))
+    assert allclose(pkz, mock_pkz.T, rtol=1.e-4)
 
     # also check redshifts are ordered correctly
     redshift = [1.0, 0.0]
     pkz = camb(wavenumber, redshift, Planck15, 2.e-9, 0.965)
-    assert pkz.shape == (len(wavenumber), len(redshift))
-    assert allclose(pkz, mock_pkz[:, np.argsort(redshift)], rtol=1.e-4)
+    assert pkz.shape == (len(redshift), len(wavenumber))
+    assert allclose(pkz, mock_pkz[:, np.argsort(redshift)].T, rtol=1.e-4)

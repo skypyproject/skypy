@@ -87,7 +87,7 @@ def camb(wavenumber, redshift, cosmology, A_s, n_s):
     try:
         from camb import CAMBparams, get_results, model
     except ImportError:
-        raise Exception("camb is required to use skypy.linear.camb")
+        raise Exception("camb is required to use skypy.power_spectrum.camb")
 
     return_shape = np.shape(wavenumber)
     redshift = np.atleast_1d(redshift)
@@ -125,9 +125,9 @@ def camb(wavenumber, redshift, cosmology, A_s, n_s):
                                                    maxkh=np.max(k_h.value),
                                                    npoints=len(k_h.value))
 
-    if len(z) > 1:
+    if len(redshift) > 1:
         power_output = pzk[redshift_order[::-1]]
-    elif len(z) == 1:
+    else:
         power_output = pzk[redshift_order[::-1]].reshape(return_shape)
 
     return power_output
