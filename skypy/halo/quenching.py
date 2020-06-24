@@ -1,37 +1,29 @@
-r'''Galaxy quenching.
-This code implement the model proposed by A.Amara for environment and mass
-quenching.
+"""Galaxy quenching.
 
-Models
-======
-.. autosummary::
-   :nosignatures:
-   :toctree: ../api/
-
-   environment_quenching
-   mass_quenching
-'''
+This module facilitates the implementation of environment and mass
+quenching phenomena.
+"""
 
 import numpy as np
-
+from scipy import special
 
 __all__ = [
-     'environment_quenching',
-     'mass_quenching',
- ]
+    'environment_quenching',
+    'mass_quenching',
+    ]
 
 
-def environment_quenching(subhalo_mass, probability=0.5):
-    """Environment quenching.
+def environment_quenching(number_subhalos, probability=0.5):
+    r'''Environment quenching.
     This function implements the model proposed by A.Amara where the
-    probability of a subhalo's host galaxy being quenched is a fixed
-    probability.
+    probability of a subhalo being quenched is a fixed
+    probability. The model is inspired on [1]_ and [2]_.
 
     Parameters
     ----------
-    subhalo_mass: (nh,) array_like
-        Array of halo masses.
-    probability: float
+    number_subhalos: integer
+        Number of subhalos hosting blue star-forming galaxies.
+    probability: float, optional
         Fixed “killing” probability. Default is 0.5.
     Returns
     -------
@@ -46,27 +38,25 @@ def environment_quenching(subhalo_mass, probability=0.5):
 
     References
     ----------
-    .. [1] Birrer et al. 2018.
+    .. [1] Peng et al. 2010, doi 10.1088/0004-637X/721/1/193.
+    .. [2] Birrer et al. 2014, arXiv 1401.3162.
 
-    """
-    number_subhalos = len(subhalo_mass)
+    '''
+
     quenched = np.zeros(number_subhalos, dtype=bool)
     subhalos_probability = np.random.uniform(0, 1, number_subhalos)
 
-    for s in subhalo_mass:
-        if subhalos_probability > probability:
-            quenched = True
+    quenched = subhalos_probability < probability
 
     return quenched
 
 
 def mass_quenching(halo_mass, offset, width):
-    """Mass quenching.
+    r'''Mass quenching.
     This function implements the model proposed by A.Amara where the
-    probability of a halo's host galaxy being quenched is an error function
+    probability of a halo being quenched is an error function
     of the logarithm of the halo's mass standardised by an offset and width
-    parameter (c.f. standardising a gaussian distribution by it's mean and
-    standard deviation).
+    parameter.  The model is inspired on [1]_ and [2]_.
 
     Parameters
     ----------
@@ -79,7 +69,7 @@ def mass_quenching(halo_mass, offset, width):
 
     Returns
     -------
-    quenched: boolean, (nh,) array_like
+    quenched: (nh,) array_like, boolean
         Boolean array indicating which halo's host galaxies are mass-quenched.
 
     Examples
@@ -89,8 +79,18 @@ def mass_quenching(halo_mass, offset, width):
 
     References
     ----------
-    .. [1] Birrer et al. 2018.
+    .. [1] Peng et al. 2010, doi 10.1088/0004-637X/721/1/193.
+    .. [2] Birrer et al. 2014, arXiv 1401.3162.
 
-    """
-    quenched = True
+    '''
+
+    standardised_mass = (halo_mass - offset) / width
+    probability = special.erf(standardised_mass)
+
+    number_halos = len(halo_mass)
+    quenched = np.zeros(number_halos, dtype=bool)
+    halos_probability = np.random.uniform(-1, 1, number_halos)
+
+    quenched = halos_probability < probability
+
     return quenched
