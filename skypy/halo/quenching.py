@@ -33,8 +33,18 @@ def environment_quenching(number_subhalos, probability=0.5):
 
     Examples
     ---------
+
+    This example shows how many subhalos are environtment quenched (True)
+    and how many survive (False) from a list of 1000 halos:
+
     >>> import numpy as np
+    >>> import random
     >>> import skypy.halo.quenching as q
+    >>> from collections import Counter
+    >>> random.seed(42)
+    >>> quenched = q.environment_quenching(1000)
+    >>> Counter(quenched)
+    Counter({True: 521, False: 479})
 
     References
     ----------
@@ -74,8 +84,21 @@ def mass_quenching(halo_mass, offset, width):
 
     Examples
     ---------
+
+    This example shows how many halos are mass quenched (True)
+    and how many survive (False) from a list of 1000 halos:
+
     >>> import numpy as np
+    >>> import random
     >>> import skypy.halo.quenching as q
+    >>> from collections import Counter
+    >>> random.seed(42)
+    >>> offset = 12
+    >>> width = 6
+    >>> halo_mass = np.linspace(0,24, num=1000)
+    >>> quenched = q.mass_quenching(halo_mass, offset, width)
+    >>> Counter(quenched)
+    Counter({False: 486, True: 514})
 
     References
     ----------
