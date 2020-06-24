@@ -44,7 +44,7 @@ def environment_quenching(number_subhalos, probability=0.5):
     >>> random.seed(42)
     >>> quenched = q.environment_quenching(1000)
     >>> Counter(quenched)
-    Counter({True: 521, False: 479})
+    Counter({True: 516, False: 484})
 
     References
     ----------
@@ -98,7 +98,7 @@ def mass_quenching(halo_mass, offset, width):
     >>> halo_mass = np.linspace(0,24, num=1000)
     >>> quenched = q.mass_quenching(halo_mass, offset, width)
     >>> Counter(quenched)
-    Counter({False: 486, True: 514})
+    Counter({True: 506, False: 494})
 
     References
     ----------
