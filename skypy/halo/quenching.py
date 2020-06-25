@@ -1,7 +1,7 @@
 """Galaxy quenching.
 
-This module facilitates the implementation of environment and mass
-quenching phenomena.
+This module implements models for environment and mass
+quenching by dark matter halos.
 """
 
 import numpy as np
@@ -13,7 +13,7 @@ __all__ = [
     ]
 
 
-def environment_quenching(number_subhalos, probability=0.5):
+def environment_quenching(nh=None, probability=0.5):
     r'''Environment quenching.
     This function implements the model proposed by A.Amara where the
     probability of a subhalo being quenched is a fixed
@@ -21,10 +21,11 @@ def environment_quenching(number_subhalos, probability=0.5):
 
     Parameters
     ----------
-    number_subhalos: integer
-        Number of subhalos hosting blue star-forming galaxies.
+    nh: integer
+        Number of subhalos. Default is None.
     probability: float, optional
-        Fixed “killing” probability. Default is 0.5.
+        Quenching probability. Default is 0.5.
+
     Returns
     -------
     quenched: (nh,) array_like,  boolean
@@ -38,13 +39,11 @@ def environment_quenching(number_subhalos, probability=0.5):
     and how many survive (False) from a list of 1000 halos:
 
     >>> import numpy as np
-    >>> import random
-    >>> import skypy.halo.quenching as q
+    >>> from skypy.halo.quenching import environment_quenching
     >>> from collections import Counter
-    >>> random.seed(42)
-    >>> quenched = q.environment_quenching(1000)
+    >>> quenched = environment_quenching(1000)
     >>> Counter(quenched)
-    Counter({True: 516, False: 484})
+    Counter({True: ..., False: ...})
 
     References
     ----------
@@ -53,12 +52,7 @@ def environment_quenching(number_subhalos, probability=0.5):
 
     '''
 
-    quenched = np.zeros(number_subhalos, dtype=bool)
-    subhalos_probability = np.random.uniform(0, 1, number_subhalos)
-
-    quenched = subhalos_probability < probability
-
-    return quenched
+    return np.random.uniform(size=nh) < probability
 
 
 def mass_quenching(halo_mass, offset, width):
