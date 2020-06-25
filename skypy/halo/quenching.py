@@ -8,12 +8,12 @@ import numpy as np
 from scipy import special
 
 __all__ = [
-    'environment_quenching',
-    'mass_quenching',
+    'environment_quenched',
+    'mass_quenched',
     ]
 
 
-def environment_quenching(nh=None, probability=0.5):
+def environment_quenched(nh=None, probability=0.5):
     r'''Environment quenching.
     This function implements the model proposed by A.Amara where the
     probability of a subhalo being quenched is a fixed
@@ -39,9 +39,9 @@ def environment_quenching(nh=None, probability=0.5):
     and how many survive (False) from a list of 1000 halos:
 
     >>> import numpy as np
-    >>> from skypy.halo.quenching import environment_quenching
+    >>> from skypy.halo.quenching import environment_quenched
     >>> from collections import Counter
-    >>> quenched = environment_quenching(1000)
+    >>> quenched = environment_quenched(1000)
     >>> Counter(quenched)
     Counter({True: ..., False: ...})
 
@@ -55,7 +55,7 @@ def environment_quenching(nh=None, probability=0.5):
     return np.random.uniform(size=nh) < probability
 
 
-def mass_quenching(halo_mass, offset, width):
+def mass_quenched(halo_mass, offset, width):
     r'''Mass quenching.
     This function implements the model proposed by A.Amara where the
     probability of a halo being quenched is an error function
@@ -65,11 +65,11 @@ def mass_quenching(halo_mass, offset, width):
     Parameters
     ----------
     halo_mass: (nh,) array_like
-        Array of halo masses.
+        Array of halo masses in units of solar mass, :math:`M_{sun}`.
     offset: float
-        Offset parameter (halo mass at which quenching probability = 0.5)
+        Halo mass in :math:`M_{sun}` at which quenching probability is 50%.
     width: float
-        Width parameter.
+        Width of the error function.
 
     Returns
     -------
@@ -83,16 +83,15 @@ def mass_quenching(halo_mass, offset, width):
     and how many survive (False) from a list of 1000 halos:
 
     >>> import numpy as np
-    >>> import random
-    >>> import skypy.halo.quenching as q
+    >>> from astropy import units
+    >>> from skypy.halo.quenching import mass_quenched
     >>> from collections import Counter
-    >>> random.seed(42)
-    >>> offset = 12
-    >>> width = 6
-    >>> halo_mass = np.linspace(0, 24, num=1000)
-    >>> quenched = q.mass_quenching(halo_mass, offset, width)
+    >>> offset, width = 1.0e12, 0.5
+    >>> halo_mass = np.random.lognormal(mean=np.log(offset), sigma=width,
+                                        size=1000)
+    >>> quenched = mass_quenched(halo_mass, offset, width)
     >>> Counter(quenched)
-    Counter({True: 506, False: 494})
+    Counter({True: ..., False: ...})
 
     References
     ----------
@@ -101,13 +100,7 @@ def mass_quenching(halo_mass, offset, width):
 
     '''
 
-    standardised_mass = (halo_mass - offset) / width
-    probability = special.erf(standardised_mass)
-
-    number_halos = len(halo_mass)
-    quenched = np.zeros(number_halos, dtype=bool)
-    halos_probability = np.random.uniform(-1, 1, number_halos)
-
-    quenched = halos_probability < probability
-
-    return quenched
+    standardised_mass = np.log10(halo_mass / offset) / width
+    probability = 0.5 * (1.0 + special.erf(standardised_mass/np.sqrt(2)))
+    nh = len(halo_mass)
+    return np.random.uniform(size=nh) < probability
