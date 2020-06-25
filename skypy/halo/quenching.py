@@ -14,7 +14,7 @@ __all__ = [
 
 
 def environment_quenched(nh=None, probability=0.5):
-    r'''Environment quenching.
+    r'''Environment quenching function.
     This function implements the model proposed by A.Amara where the
     probability of a subhalo being quenched is a fixed
     probability. The model is inspired on [1]_ and [2]_.
@@ -56,7 +56,7 @@ def environment_quenched(nh=None, probability=0.5):
 
 
 def mass_quenched(halo_mass, offset, width):
-    r'''Mass quenching.
+    r'''Mass quenching function.
     This function implements the model proposed by A.Amara where the
     probability of a halo being quenched is an error function
     of the logarithm of the halo's mass standardised by an offset and width
