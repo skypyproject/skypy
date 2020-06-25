@@ -6,7 +6,6 @@ Models
 .. autosummary::
    :nosignatures:
    :toctree: ../api/
-
    press_schechter
    Press_Schechter_sampler
    Sheth_Tormen_sampler
@@ -20,10 +19,10 @@ from astropy.constants import G
 from skypy.utils.random import schechter
 
 __all__ = [
-     'press_schechter',
-     'halo_mass_function',
-     'Press_Schechter_sampler',
-     'Sheth_Tormen_sampler',
+    'press_schechter',
+    'halo_mass_function',
+    'Press_Schechter_sampler',
+    'Sheth_Tormen_sampler',
  ]
 
 
