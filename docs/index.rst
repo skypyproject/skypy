@@ -4,7 +4,7 @@
 SkyPy Documentation
 ###################
 
-This is the documentation for SkyPy.
+This package contains methods for modelling the Universe, galaxies and the Milky Way. Also included are methods for generating observed data.
 
 
 .. _getting-started:
@@ -26,9 +26,21 @@ Packages
 .. toctree::
    :maxdepth: 1
 
-   galaxy/index
-   linear/index
-   nonlinear/index
+   cluster/index
+   galaxy
+   gravitational_wave/index
+   halo/index
+   power_spectrum/index
+   supernova/index
+   utils/index
+
+Pipeline
+--------
+
+.. toctree::
+   :maxdepth: 1
+
+   pipeline/index
 
 
 .. _developer-docs:
@@ -52,3 +64,9 @@ Index
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+
+****************
+Acknowledgements
+****************
+
+Logo Credit: `Maria Fonseca de la Bella <https://www.linkedin.com/in/mariadelabella>`_

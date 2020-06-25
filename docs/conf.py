@@ -104,6 +104,9 @@ release = package.__version__
 # name of a builtin theme or the name of a custom theme in html_theme_path.
 #html_theme = None
 
+# Static files to copy after template files
+html_static_path = ['_static']
+html_style = 'skypy.css'
 
 html_theme_options = {
     'logotext1': 'skypy',  # white,  semi-bold
@@ -122,7 +125,7 @@ html_theme_options = {
 # The name of an image file (within the static path) to use as favicon of the
 # docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
 # pixels large.
-#html_favicon = ''
+html_favicon = '_static/skypy_image.ico'
 
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
 # using the given strftime format.
@@ -154,15 +157,12 @@ man_pages = [('index', project.lower(), project + u' Documentation',
 
 # -- Options for the edit_on_github extension ---------------------------------
 
-if eval(setup_cfg.get('edit_on_github')):
+if setup_cfg.get('edit_on_github').lower() == 'true':
+
     extensions += ['sphinx_astropy.ext.edit_on_github']
 
-    versionmod = import_module(setup_cfg['name'] + '.version')
     edit_on_github_project = setup_cfg['github_project']
-    if versionmod.release:
-        edit_on_github_branch = "v" + versionmod.version
-    else:
-        edit_on_github_branch = "master"
+    edit_on_github_branch = "master"
 
     edit_on_github_source_root = ""
     edit_on_github_doc_root = "docs"
@@ -195,3 +195,46 @@ github_issues_url = 'https://github.com/{0}/issues/'.format(setup_cfg['github_pr
 #     dtype, target = line.split(None, 1)
 #     target = target.strip()
 #     nitpick_ignore.append((dtype, six.u(target)))
+
+
+# -----------------------------------------------------------------------------
+# Numpy extensions
+# -----------------------------------------------------------------------------
+
+# Generate plots for example sections
+numpydoc_use_plots = True
+
+
+#------------------------------------------------------------------------------
+# Matplotlib plot_directive options
+#------------------------------------------------------------------------------
+
+plot_pre_code = """
+import numpy as np
+np.random.seed(123)
+"""
+plot_include_source = True
+plot_formats = [('png', 96), 'pdf']
+plot_html_show_formats = False
+plot_html_show_source_link = False
+
+import math
+phi = (math.sqrt(5) + 1)/2
+
+font_size = 13*72/96.0  # 13 px
+
+plot_rcparams = {
+    'font.size': font_size,
+    'axes.titlesize': font_size,
+    'axes.labelsize': font_size,
+    'xtick.labelsize': font_size,
+    'ytick.labelsize': font_size,
+    'legend.fontsize': font_size,
+    'figure.figsize': (3*phi, 3),
+    'figure.subplot.bottom': 0.2,
+    'figure.subplot.left': 0.2,
+    'figure.subplot.right': 0.9,
+    'figure.subplot.top': 0.85,
+    'figure.subplot.wspace': 0.4,
+    'text.usetex': False,
+}
