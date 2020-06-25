@@ -88,7 +88,7 @@ def mass_quenched(halo_mass, offset, width):
     >>> from collections import Counter
     >>> offset, width = 1.0e12, 0.5
     >>> halo_mass = np.random.lognormal(mean=np.log(offset), sigma=width,
-                                        size=1000)
+    ...                                 size=1000)
     >>> quenched = mass_quenched(halo_mass, offset, width)
     >>> Counter(quenched)
     Counter({True: ..., False: ...})

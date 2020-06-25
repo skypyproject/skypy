@@ -2,7 +2,6 @@ import numpy as np
 from scipy import stats
 from collections import Counter
 
-
 from skypy.halo.quenching import environment_quenched, mass_quenched
 
 
