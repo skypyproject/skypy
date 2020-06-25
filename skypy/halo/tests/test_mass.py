@@ -24,3 +24,7 @@ def test_press_schechter():
     # Test the distribution of galaxy mass follows the right distribution
     p_value = scipy.stats.kstest(sample, calc_cdf)[1]
     assert p_value > 0.01
+
+
+def test_halo_mass_function():
+    return 0

@@ -109,7 +109,6 @@ def halo_mass_function(A, a, p, m_min, m_max, m_star, redshift,
     Examples
     ---------
     >>> import numpy as np
-    >>> import skypy.halo.halo_sampler as hs
 
     References
     ----------
