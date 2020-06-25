@@ -13,16 +13,7 @@ __all__ = [
 ]
 
 
-def _ellipticity_parameterization(beta_method):
-    def reparameterize(self, *args):
-        *beta_args, e_ratio, e_sum = args
-        a = e_sum * e_ratio
-        b = e_sum * (1.0 - e_ratio)
-        return beta_method(self, *beta_args, a, b)
-    return reparameterize
-
-
-class beta_ellipticity_gen(stats._continuous_distns.beta_gen):
+def beta_ellipticity(e_ratio, e_sum, size=None):
     r'''Galaxy ellipticities sampled from a reparameterized beta distribution.
 
     The ellipticities follow a beta distribution parameterized by
@@ -57,46 +48,19 @@ class beta_ellipticity_gen(stats._continuous_distns.beta_gen):
     --------
     >>> from skypy.galaxy.ellipticity import beta_ellipticity
 
-    Sample 10 random variates from the Kacprzak model with
+    Sample 10000 random variates from the Kacprzak model with
     :math:`e_{\rm ratio} = 0.5` and :math:`e_{\rm sum} = 1.0`:
 
-    >>> ellipticity = beta_ellipticity.rvs(0.5, 1.0, size=10)
+    >>> ellipticity = beta_ellipticity(0.5, 1.0, size=10000)
 
-    Fix distribution parameters for repeated use:
-
-    >>> ellipticity_distribution = beta_ellipticity(0.5, 1.0)
-    >>> ellipticity_distribution.mean()
-    0.5
-    >>> ellipticity = ellipticity_distribution.rvs(size=10)
     '''
 
-    @_ellipticity_parameterization
-    def _rvs(self, *args):
-        return super()._rvs(*args)
+    # convert to beta distribution parameters
+    a = e_sum * e_ratio
+    b = e_sum * (1.0 - e_ratio)
 
-    @_ellipticity_parameterization
-    def _logpdf(self, *args):
-        return super()._logpdf(*args)
-
-    @_ellipticity_parameterization
-    def _cdf(self, *args):
-        return super()._cdf(*args)
-
-    @_ellipticity_parameterization
-    def _ppf(self, *args):
-        return super()._ppf(*args)
-
-    @_ellipticity_parameterization
-    def _stats(self, *args):
-        return super()._stats(*args)
-
-    def fit(self, data, *args, **kwargs):
-        return super(stats._continuous_distns.beta_gen, self).fit(
-            data, *args, **kwargs)
-
-
-beta_ellipticity = beta_ellipticity_gen(a=0.0, b=1.0, name='beta_ellipticity',
-                                        shapes="e_ratio e_sum")
+    # sample from the beta distribution
+    return np.random.beta(a, b, size)
 
 
 def ryden04(mu_gamma, sigma_gamma, mu, sigma, size=None):

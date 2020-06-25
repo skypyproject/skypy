@@ -1,8 +1,8 @@
 version: 2
 jobs:
-  build-docs:
+  build_docs:
     docker:
-      - image: circleci/python:3.5
+      - image: circleci/python:3.6
     steps:
       - checkout
       - run:
@@ -13,14 +13,11 @@ jobs:
       - run:
           name: Install Dependencies
           command: |
-            python3 -m venv venv
-            . venv/bin/activate
-            pip install scipy astropy sphinx-astropy networkx "setuptools>=30.3" wheel
+            pip install tox
       - run:
           name: Build Docs
           command: |
-            . venv/bin/activate
-            python setup.py build_docs
+            tox -e build_docs
       - run:
           name: Prepare Upload
           command: |
@@ -40,7 +37,7 @@ workflows:
   version: 2
   run_all_checks:
     jobs:
-      - build-docs
+      - build_docs
 notify:
   webhooks:
     - url: https://giles.cadair.dev/circleci
