@@ -83,9 +83,11 @@ def mass_quenched(halo_mass, offset, width):
     and how many survive (False) from a list of 1000 halos:
 
     >>> import numpy as np
+    >>> import random
     >>> from astropy import units
     >>> from skypy.halo.quenching import mass_quenched
     >>> from collections import Counter
+    >>> random.seed(42)
     >>> offset, width = 1.0e12, 0.5
     >>> halo_mass = np.random.lognormal(mean=np.log(offset), sigma=width,
     ...                                 size=1000)
