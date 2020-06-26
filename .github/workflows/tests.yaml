@@ -11,10 +11,10 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python: [3.6, 3.7, 3.8]
+        python: [3.6, 3.8]
         astropy: [astropy30, astropy40]
-        numpy: [numpy116, numpy117, numpy118]
-        scipy: [scipy12, scipy13, scipy14, scipy15]
+        numpy: [numpy116, numpy118]
+        scipy: [scipy12, scipy15]
         include:
         - python: 3.6
           astropy: astropy40
