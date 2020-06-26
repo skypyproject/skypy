@@ -18,17 +18,17 @@ jobs:
 
           - name: latest supported versions
             os: ubuntu-latest
-            python: 3.7
+            python: 3.8
             experimental: false
             coverage: true
-            toxenv: py37-test-astropy40-numpy118-scipy14-alldeps-cov
+            toxenv: py38-test-all-latest-cov
             toxposargs: --cov-report xml
 
           - name: oldest supported versions
             os: ubuntu-latest
             python: 3.6
             experimental: false
-            toxenv: py36-test-oldestdeps
+            toxenv: py36-test-oldest
 
           - name: latest experimental versions
             os: ubuntu-latest
@@ -36,17 +36,17 @@ jobs:
             experimental: true
             toxenv: py38-test
 
-          - name: macOS experimental
+          - name: macOS latest
             os: macos-latest
             python: 3.8
             experimental: true
-            toxenv: py38-test-alldeps
+            toxenv: py38-test-all-latest
 
-          - name: Windows experimental
+          - name: Windows latest
             os: windows-latest
             python: 3.8
             experimental: true
-            toxenv: py38-test-alldeps
+            toxenv: py38-test-all-latest
 
     steps:
     - name: Checkout Repository
