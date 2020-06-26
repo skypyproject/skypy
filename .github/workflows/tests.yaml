@@ -8,22 +8,46 @@ on:
     - master
 jobs:
   test:
-    runs-on: ubuntu-latest
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    continue-on-error: ${{ matrix.experimental }}
     strategy:
       fail-fast: false
       matrix:
-        python: [3.6, 3.8]
-        astropy: [astropy30, astropy40]
-        numpy: [numpy116, numpy118]
-        scipy: [scipy12, scipy15]
         include:
-        - python: 3.6
-          astropy: astropy40
-          numpy: numpy118
-          scipy: scipy15
-          cov: true
-    env:
-      toxenv: test-${{ matrix.astropy }}-${{ matrix.numpy }}-${{ matrix.scipy }}
+
+          - name: latest supported versions
+            os: ubuntu-latest
+            python: 3.7
+            experimental: false
+            coverage: true
+            toxenv: py37-test-astropy40-numpy118-scipy14-alldeps-cov
+            toxposargs: --cov-report xml
+
+          - name: oldest supported versions
+            os: ubuntu-latest
+            python: 3.6
+            experimental: false
+            toxenv: py36-test-oldestdeps
+
+          - name: latest experimental versions
+            os: ubuntu-latest
+            python: 3.8
+            experimental: true
+            toxenv: py38-test
+
+          - name: macOS experimental
+            os: macos-latest
+            python: 3.8
+            experimental: true
+            toxenv: py38-test-alldeps
+
+          - name: Windows experimental
+            os: windows-latest
+            python: 3.8
+            experimental: true
+            toxenv: py38-test-alldeps
+
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v2
@@ -38,14 +62,9 @@ jobs:
     - name: Add pytest Matcher
       run: |
         echo ::add-matcher::.github/problem_matchers/pytest.json
-    - if: ${{ !matrix.cov }}
-      name: Run Tests
+    - name: Run Tests
       run: |
-        tox -e $toxenv
-    - if: ${{ matrix.cov }}
-      name: Run Tests with Coverage
-      run: |
-        tox -e $toxenv-cov -- --cov-report xml
-    - if: ${{ matrix.cov }}
+        tox -e ${{ matrix.toxenv }} ${{ matrix.toxargs }} -- ${{ matrix.toxposargs }}
+    - if: matrix.coverage
       name: Report Coverage
       uses: codecov/codecov-action@v1
