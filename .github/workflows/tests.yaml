@@ -9,43 +9,43 @@ on:
 jobs:
   test:
     name: ${{ matrix.name }}
+    continue-on-error: ${{ !matrix.required }}
     runs-on: ${{ matrix.os }}
-    continue-on-error: ${{ matrix.experimental }}
     strategy:
       fail-fast: false
       matrix:
         include:
 
           - name: latest supported versions
+            required: true
             os: ubuntu-latest
             python: 3.8
-            experimental: false
-            coverage: true
             toxenv: py38-test-all-latest-cov
             toxposargs: --cov-report xml
+            coverage: true
 
           - name: oldest supported versions
+            required: true
             os: ubuntu-latest
             python: 3.6
-            experimental: false
             toxenv: py36-test-oldest
 
           - name: latest experimental versions
+            required: false
             os: ubuntu-latest
             python: 3.8
-            experimental: true
             toxenv: py38-test
 
           - name: macOS latest
+            required: false
             os: macos-latest
             python: 3.8
-            experimental: true
             toxenv: py38-test-all-latest
 
           - name: Windows latest
+            required: false
             os: windows-latest
             python: 3.8
-            experimental: true
             toxenv: py38-test-all-latest
 
     steps:
