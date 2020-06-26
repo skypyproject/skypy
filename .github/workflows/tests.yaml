@@ -9,13 +9,27 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: [3.6, 3.7, 3.8]
+        astropy: [astropy30, astropy40]
+        numpy: [numpy116, numpy117, numpy118]
+        scipy: [scipy12, scipy13, scipy14, scipy15]
+        include:
+        - python: 3.6
+          astropy: astropy40
+          numpy: numpy118
+          scipy: scipy15
+          cov: true
+    env:
+      toxenv: test-${{ matrix.astropy }}-${{ matrix.numpy }}-${{ matrix.scipy }}
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v2
-    - name: Install Python 3.6
+    - name: Install Python ${{ matrix.python }}
       uses: actions/setup-python@v2
       with:
-        python-version: 3.6
+        python-version: ${{ matrix.python }}
     - name: Install Dependencies
       run: |
         python -m pip install --upgrade pip
@@ -23,8 +37,14 @@ jobs:
     - name: Add pytest Matcher
       run: |
         echo ::add-matcher::.github/problem_matchers/pytest.json
-    - name: Run Tests with Coverage
+    - if: ${{ !matrix.cov }}
+      name: Run Tests
       run: |
-        tox -e py36-test-numpy118-scipy14-astropy40-cov -- --cov-report xml
-    - name: Report Coverage
+        tox -e $toxenv
+    - if: ${{ matrix.cov }}
+      name: Run Tests with Coverage
+      run: |
+        tox -e $toxenv-cov -- --cov-report xml
+    - if: ${{ matrix.cov }}
+      name: Report Coverage
       uses: codecov/codecov-action@v1
