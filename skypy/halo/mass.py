@@ -214,21 +214,22 @@ def _derivative(f, a, method='central', step=0.01):
 def press_schechter(n, m_star, size=None, x_min=0.00305,
                     x_max=1100.0, resolution=100):
     """Sampling from Press-Schechter mass function (1974).
-
     Masses following the Press-Schechter mass function following the
     Press and Schechter [1]_ formalism.
+
     Parameters
     ----------
-    n : float or int
+    n : float
         The n parameter in the Press-Schechter mass function.
-    m_star : float or int
+    m_star : float
         Factors parameterising the characteristic mass.
     size: int, optional
-         Output shape of luminosity samples.
+        Output shape of luminosity samples.
     x_min, x_max : float or int, optional
         Lower and upper bounds in units of M*.
     resolution : int, optional
         Resolution of the inverse transform sampling spline. Default is 100.
+
     Returns
     -------
     mass : array_like
