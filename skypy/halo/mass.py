@@ -6,6 +6,7 @@ Models
 .. autosummary::
    :nosignatures:
    :toctree: ../api/
+   
    press_schechter
    halo_mass_function
    sheth_tormen_collapse_function
@@ -122,17 +123,22 @@ def halo_mass_function(collapse_function, m_min, m_max, m_star, redshift,
     return n_sample
 
 
-def sheth_tormen_collapse_function(x, A, a, p):
+def sheth_tormen_collapse_function(sigma, delta_critical, redshift, params):
     """Sheth & Tormen collapse fraction.
     This function computes the Sheth & Tormen mass fumction for ellipsoidal
     collapse, see equation 10 in [1]_ or [2]_.
 
     Parameters
     -----------
-    x: (nx,) array_like ## work on this
-        Array of the random variable :math:`\nu` appearing in equation 10 [1].
-    A,a,p: float
-        Parameters of the Sheth-Tormen formalism.
+    sigma: (ns,) array_like
+        Array of the mass variance at different scales and at a given redshift.
+    delta_critical: float
+        Critical density. Collapsed objects denser than :math:`\delta_c` would
+        form virialised objects.
+    redshift : float
+        Redshift value at which to evaluate the mass variance.
+    params: float
+        The :math:`\{A,a,p\}` parameters of the Sheth-Tormen formalism.
 
     Returns
     --------
@@ -150,13 +156,14 @@ def sheth_tormen_collapse_function(x, A, a, p):
     .. [2] https://www.slac.stanford.edu/econf/C070730/talks/
         Wechsler_080207.pdf
     """
+    x = np.power(delta_critical / sigma, 2)
 
     return (A / (np.sqrt(np.pi) * x)) * (1.0 + 1.0 / (a * x)**p) *\
         np.sqrt(a * x / 2.0) * np.exp(-(a * x / 2.0))
 
 
 press_schechter_collapse_function = partial(sheth_tormen_collapse_function,
-                                            0.5, 1, 0)
+                                            params=(0.5, 1, 0))
 
 
 def _derivative(f, a, method='central', step=0.01):
@@ -205,7 +212,6 @@ def _derivative(f, a, method='central', step=0.01):
 
 def press_schechter(n, m_star, size=None, x_min=0.00305,
                     x_max=1100.0, resolution=100):
-
     """Sampling from Press-Schechter mass function (1974).
 
     Masses following the Press-Schechter mass function following the
