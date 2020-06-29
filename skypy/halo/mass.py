@@ -6,7 +6,7 @@ Models
 .. autosummary::
    :nosignatures:
    :toctree: ../api/
-   
+
    press_schechter
    halo_mass_function
    sheth_tormen_collapse_function
@@ -124,7 +124,7 @@ def halo_mass_function(collapse_function, m_min, m_max, m_star, redshift,
 
 
 def sheth_tormen_collapse_function(sigma, delta_critical, redshift, params):
-    """Sheth & Tormen collapse fraction.
+    r'''Sheth & Tormen collapse fraction.
     This function computes the Sheth & Tormen mass fumction for ellipsoidal
     collapse, see equation 10 in [1]_ or [2]_.
 
@@ -133,12 +133,12 @@ def sheth_tormen_collapse_function(sigma, delta_critical, redshift, params):
     sigma: (ns,) array_like
         Array of the mass variance at different scales and at a given redshift.
     delta_critical: float
-        Critical density. Collapsed objects denser than :math:`\delta_c` would
+        Critical density. Collapsed objects denser than :math:`delta_c` would
         form virialised objects.
     redshift : float
         Redshift value at which to evaluate the mass variance.
     params: float
-        The :math:`\{A,a,p\}` parameters of the Sheth-Tormen formalism.
+        The :math:`{A,a,p}` parameters of the Sheth-Tormen formalism.
 
     Returns
     --------
@@ -155,7 +155,8 @@ def sheth_tormen_collapse_function(sigma, delta_critical, redshift, params):
         (1999), astro-ph/9901122.
     .. [2] https://www.slac.stanford.edu/econf/C070730/talks/
         Wechsler_080207.pdf
-    """
+    '''
+    A, a, p = params
     x = np.power(delta_critical / sigma, 2)
 
     return (A / (np.sqrt(np.pi) * x)) * (1.0 + 1.0 / (a * x)**p) *\
