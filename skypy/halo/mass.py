@@ -30,22 +30,31 @@ __all__ = [
  ]
 
 
-def _sigma_squared(M, wavenumber, linear_power_today, redshift, cosmology):
+def _sigma_squared(M, wavenumber, linear_power_today, cosmology, redshift):
     k = wavenumber
     Pk = linear_power_today
-    Hz = cosmology.H(redshift)
+    Hz = cosmology.H(redshift).value
+    if isinstance(M, np.ndarray):
+        M = M[:, np.newaxis]
+
+    # The linear frowth function
+    D0 = growth_function(0, cosmology)
+    Dz = growth_function(redshift, cosmology) / D0
 
     R = np.power(2 * G.value * M / Hz, 1.0 / 3.0)
     j1 = (np.sin(k * R) - np.cos(k * R) * k * R) / (k * R)
     top_hat = 3 * j1 / (k * R)**2
     integrand = Pk * top_hat**2.0 * k**2.0
-    return integrate.simps(integrand, k) / (2. * np.pi ** 2.)
+    return Dz**2 * integrate.simps(integrand, k) / (2. * np.pi ** 2.)
+
+
+_delta_critical_squared = partial(_sigma_squared, redshift=0)
 
 
 def halo_mass_function(collapse_function, m_min, m_max, m_star, redshift,
                        wavenumber, power_spectrum, cosmology,
                        resolution=100, size=None):
-    """Halo mass function.
+    r'''Halo mass function.
     This function samples haloes from their mass function following Sheth &
     Tormen formalism, see equation 7.46 in [1]_.
 
@@ -54,10 +63,10 @@ def halo_mass_function(collapse_function, m_min, m_max, m_star, redshift,
     collapse_function: function
         Collapse function to choose from a variety of models:
         `sheth_tormen_collapse_function`, `press_schechter_collapse_function`.
-    m_min, m_max : (nm,) array_like
-        Lower and upper bounds for the random variable `m`.
+    m_min, m_max : float
+        Lower and upper bounds for the random variable `m` in solar mass.
     m_star: float
-        Factors parameterising the characteristic mass.
+        Factors parameterising the characteristic mass, in solar mass.
     redshift : float
         Redshift value at which to evaluate the variance of the power spectrum.
     wavenumber : (nk,) array_like
@@ -82,48 +91,59 @@ def halo_mass_function(collapse_function, m_min, m_max, m_star, redshift,
     ---------
     >>> import numpy as np
     >>> from skypy.halo import mass
+    >>> from skypy.power_spectrum import _eisenstein_hu as eh
 
-    Note here that the variable :math:`nu` that appears in the Sheth and Tormen
-    collapse function is the squared version of the variable :math:`nu` in
-    equation 7.46 in [1].
+    This example will sample from the Sheth and Tormen mass function for a
+    Planck15 cosmology
+
+    >>> from astropy.cosmology import Planck15
+    >>> cosmology = Planck15
+    >>> m_star, m_min, m_max = 1.0, 1.0, 10.0
+    >>> k = np.logspace(-3, 1, num=5, base=10.0)
+    >>> A_s, n_s = 2.1982e-09, 0.969453
+    >>> Pk = eh.eisenstein_hu(k, A_s, n_s, cosmology, kwmap=0.02, wiggle=True)
+    >>> s = _sigma_squared(m_star, k, Pk, cosmology, 0)
+    >>> ds = np.sqrt(mass._delta_critical_squared(m_star, k, Pk, cosmology))
+    >>> fst = mass.sheth_tormen_collapse_function(s, params=(0.5, 1, 0, ds))
+    >>> mass.halo_mass_function(fst, m_min, m_max, m_star, 0, k, Pk, cosmology,
+    ...                    resolution=100, size=None)
+    1.7515561760514318
 
     References
     ----------
     .. [1] Mo, H. and van den Bosch, F. and White, S. (2010), Cambridge
         University Press, ISBN: 9780521857932.
-    """
+    '''
     f_c = collapse_function
     k = wavenumber
     Pk = power_spectrum
 
-    # The linear frowth function
-    D0 = growth_function(0, cosmology)
-    Dz = growth_function(redshift, cosmology) / D0
-
-    # nu as a function of mass for a given redshift
+    # Log nu as a function of log mass for a given redshift
     m = np.logspace(np.log10(np.min(m_min)), np.log10(np.max(m_max)),
-                    resolution)
-    delta_critical_squared = _sigma_squared(m_star)
-    nu = np.sqrt(delta_critical_squared / _sigma_squared(m)) / Dz
+                    num=resolution)
+
+    def log_nu(log_M):
+        sigma2 = _sigma_squared(np.exp(log_M), k, Pk, cosmology, redshift)
+        delta_c2 = _delta_critical_squared(m_star, k, Pk, cosmology)
+        return np.log(delta_c2 / sigma2) / 2
 
     # Rest of prefactors
     rho_bar = cosmology.critical_density0 * (cosmology.efunc(redshift)) ** 2
     rho_bar = (rho_bar.to(u.kg / u.m ** 3)).value
-    dlognu_dlogm = nu * Pk * k  # work on this. This is nothing now
+    dlognu_dlogm = np.absolute(_derivative(log_nu, np.log(m)))
 
     # Sampling from the halo mass function
     PDF = rho_bar * f_c * dlognu_dlogm / np.power(m, 2)
     CDF = integrate.cumtrapz(PDF, m, initial=0)
     cdf = CDF/CDF[-1]
-    t_lower = np.interp(np.min(m), m, cdf)
-    t_upper = np.interp(np.max(m), m, cdf)
+    t_lower = np.interp(m_min, m, cdf)
+    t_upper = np.interp(m_max, m, cdf)
     n_uniform = np.random.uniform(t_lower, t_upper, size=size)
-    n_sample = np.interp(n_uniform, cdf, m)
 
-    return n_sample
+    return np.interp(n_uniform, cdf, m)
 
 
-def sheth_tormen_collapse_function(sigma, delta_critical, redshift, params):
+def sheth_tormen_collapse_function(sigma, params):
     r'''Sheth & Tormen collapse fraction.
     This function computes the Sheth & Tormen mass fumction for ellipsoidal
     collapse, see equation 10 in [1]_ or [2]_.
@@ -132,13 +152,8 @@ def sheth_tormen_collapse_function(sigma, delta_critical, redshift, params):
     -----------
     sigma: (ns,) array_like
         Array of the mass variance at different scales and at a given redshift.
-    delta_critical: float
-        Critical density. Collapsed objects denser than :math:`delta_c` would
-        form virialised objects.
-    redshift : float
-        Redshift value at which to evaluate the mass variance.
     params: float
-        The :math:`{A,a,p}` parameters of the Sheth-Tormen formalism.
+        The :math:`{A,a,p, delta_c}` parameters of the Sheth-Tormen formalism.
 
     Returns
     --------
@@ -156,15 +171,15 @@ def sheth_tormen_collapse_function(sigma, delta_critical, redshift, params):
     .. [2] https://www.slac.stanford.edu/econf/C070730/talks/
         Wechsler_080207.pdf
     '''
-    A, a, p = params
-    x = np.power(delta_critical / sigma, 2)
+    A, a, p, delta_c = params
+    x = np.power(delta_c / sigma, 2)
 
     return (A / (np.sqrt(np.pi) * x)) * (1.0 + 1.0 / (a * x)**p) *\
         np.sqrt(a * x / 2.0) * np.exp(-(a * x / 2.0))
 
 
 press_schechter_collapse_function = partial(sheth_tormen_collapse_function,
-                                            params=(0.5, 1, 0))
+                                            params=(0.5, 1, 0, 1.69))
 
 
 def _derivative(f, a, method='central', step=0.01):
