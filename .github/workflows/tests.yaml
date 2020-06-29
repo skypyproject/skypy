@@ -15,29 +15,29 @@ jobs:
       matrix:
         include:
 
-          - name: 🐣 latest supported versions
+          - name: latest supported versions
             os: ubuntu-latest
             python: 3.8
             toxenv: py38-test-all-latest-cov
             toxposargs: --cov-report xml
             coverage: true
 
-          - name: 🏚 oldest supported versions
+          - name: oldest supported versions
             os: ubuntu-latest
             python: 3.6
             toxenv: py36-test-oldest
 
-          - name: 🧪 latest experimental versions
+          - name: latest experimental versions
             os: ubuntu-latest
             python: 3.8
             toxenv: py38-test
 
-          - name: 🍏 macOS latest
+          - name: macOS latest
             os: macos-latest
             python: 3.8
             toxenv: py38-test-all-latest
 
-          - name: 💻 Windows latest
+          - name: Windows latest
             os: windows-latest
             python: 3.8
             toxenv: py38-test-all-latest
