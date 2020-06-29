@@ -35,12 +35,12 @@ jobs:
           - name: macOS latest
             os: macos-latest
             python: 3.8
-            toxenv: py38-test-all-latest
+            toxenv: py38-test-latest
 
           - name: Windows latest
             os: windows-latest
             python: 3.8
-            toxenv: py38-test-all-latest
+            toxenv: py38-test-latest
 
     steps:
     - name: Checkout Repository
