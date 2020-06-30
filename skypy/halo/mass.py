@@ -15,6 +15,7 @@ Models
 
 import numpy as np
 from scipy import integrate
+from scipy.misc import derivative
 from functools import partial
 from astropy.constants import G
 from astropy import units as u
@@ -53,7 +54,7 @@ _delta_critical_squared = partial(_sigma_squared, redshift=0)
 
 def halo_mass_function(collapse_function, m_min, m_max, m_star, redshift,
                        wavenumber, power_spectrum, cosmology,
-                       resolution=100, size=None):
+                       resolution=100, size=None, step=1.0e-6):
     r'''Halo mass function.
     This function samples haloes from their mass function following Sheth &
     Tormen formalism, see equation 7.46 in [1]_.
@@ -81,6 +82,8 @@ def halo_mass_function(collapse_function, m_min, m_max, m_star, redshift,
         Resolution of the inverse transform sampling spline. Default is 100.
     size: int, optional
         Output shape of samples. Default is None.
+    step : float
+        Step size used in the derivative. Default is 1.0e-6.
 
     Returns
     --------
@@ -107,7 +110,7 @@ def halo_mass_function(collapse_function, m_min, m_max, m_star, redshift,
     >>> fst = mass.sheth_tormen_collapse_function(s, params=(0.5, 1, 0, ds))
     >>> mass.halo_mass_function(fst, m_min, m_max, m_star, 0, k, Pk, cosmology,
     ...                    resolution=100, size=None)
-    1.7515561760514318
+    1.8520940096860243
 
     References
     ----------
@@ -130,7 +133,7 @@ def halo_mass_function(collapse_function, m_min, m_max, m_star, redshift,
     # Rest of prefactors
     rho_bar = cosmology.critical_density0 * (cosmology.efunc(redshift)) ** 2
     rho_bar = (rho_bar.to(u.kg / u.m ** 3)).value
-    dlognu_dlogm = np.absolute(_derivative(log_nu, np.log(m)))
+    dlognu_dlogm = np.absolute(derivative(log_nu, np.log(m), dx=step))
 
     # Sampling from the halo mass function
     PDF = rho_bar * f_c * dlognu_dlogm / np.power(m, 2)
@@ -180,50 +183,6 @@ def sheth_tormen_collapse_function(sigma, params):
 
 press_schechter_collapse_function = partial(sheth_tormen_collapse_function,
                                             params=(0.5, 1, 0, 1.69))
-
-
-def _derivative(f, a, method='central', step=0.01):
-    r'''Numerical derivative.
-    This function computes the difference formula for f'(a) with step size h.
-
-    Parameters
-    ----------
-    f : function
-        Vectorized function of one variable.
-    a : number
-        Compute derivative at :math:`x = a`.
-    method : string
-        Difference formula: 'forward', 'backward' or 'central'.
-    step : number
-        Step size in difference formula.
-
-    Returns
-    -------
-    float
-
-    Notes
-    -----
-    The difference formula:
-        central: :math:`(f(a+h) - f(a-h))/2h`
-        forward: :math:`(f(a+h) - f(a))/h`
-        backward: :math:`(f(a) - f(a-h))/h`
-
-    Examples
-    --------
-    >>> import numpy as np
-    >>> _derivative(np.cos, 0, method='forward', step=1e-8)
-    0.0
-    '''
-    h = step
-
-    if method == 'central':
-        return (f(a + h) - f(a - h)) / (2 * h)
-    elif method == 'forward':
-        return (f(a + h) - f(a)) / h
-    elif method == 'backward':
-        return (f(a) - f(a - h)) / h
-    else:
-        raise ValueError("Method must be 'central', 'forward' or 'backward'.")
 
 
 def press_schechter(n, m_star, size=None, x_min=0.00305,
