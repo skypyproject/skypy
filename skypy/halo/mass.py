@@ -51,10 +51,7 @@ def _sigma_squared(M, wavenumber, linear_power_today, cosmology, redshift):
     return Dz**2 * integrate.simps(integrand, k) / (2. * np.pi ** 2.)
 
 
-_delta_critical_squared = partial(_sigma_squared, redshift=0)
-
-
-def halo_mass_function(collapse_function, m_min, m_max, m_star, redshift,
+def halo_mass_function(collapse_function, m_min, m_max, delta_c, redshift,
                        wavenumber, power_spectrum, cosmology,
                        resolution=100, step=1.0e-6):
     r'''Halo mass function.
@@ -68,8 +65,8 @@ def halo_mass_function(collapse_function, m_min, m_max, m_star, redshift,
         `sheth_tormen_collapse_function`, `press_schechter_collapse_function`.
     m_min, m_max : float
         Lower and upper bounds for the random variable `m` in solar mass.
-    m_star: float
-        Factors parameterising the characteristic mass, in solar mass.
+    delta_c: float
+        Critical density for collapsed objects.
     redshift : float
         Redshift value at which to evaluate the variance of the power spectrum.
     wavenumber : (nk,) array_like
@@ -96,21 +93,21 @@ def halo_mass_function(collapse_function, m_min, m_max, m_star, redshift,
     >>> from skypy.halo import mass
     >>> from skypy.power_spectrum import _eisenstein_hu as eh
 
-    This example will sample from the Sheth and Tormen mass function for a
+    This example will compute the halo mass function for a
     Planck15 cosmology
 
     >>> from astropy.cosmology import Planck15
     >>> cosmology = Planck15
-    >>> m_star, m_min, m_max = 1.0, 1.0, 10.0
+    >>> m_min, m_max = 0.1, 10.0
+    >>> m = np.logspace(np.log10(m_min), np.log10(m_max), num=4)
     >>> k = np.logspace(-3, 1, num=5, base=10.0)
     >>> A_s, n_s = 2.1982e-09, 0.969453
     >>> Pk = eh.eisenstein_hu(k, A_s, n_s, cosmology, kwmap=0.02, wiggle=True)
-    >>> s = _sigma_squared(m_star, k, Pk, cosmology, 0)
-    >>> ds = np.sqrt(mass._delta_critical_squared(m_star, k, Pk, cosmology))
-    >>> fst = mass.sheth_tormen_collapse_function(s, params=(0.5, 1, 0, ds))
-    >>> mass.halo_mass_function(fst, m_min, m_max, m_star, 0, k, Pk, cosmology,
+    >>> s = _sigma_squared(m, k, Pk, cosmology, 0)
+    >>> fst = mass.sheth_tormen_collapse_function(s, params=(0.5, 1, 0, 1.686))
+    >>> mass.halo_mass_function(fst, m_min, m_max, 1.686, 0, k, Pk, cosmology,
     ...                    resolution=4)
-    array([4.45099029e-26, 6.17786298e-27, 9.53421687e-29, 1.54649239e-29])
+    array([1.21845778e-23, 6.09429465e-25, 2.80742696e-26, 7.02778618e-29])
 
     References
     ----------
@@ -127,8 +124,7 @@ def halo_mass_function(collapse_function, m_min, m_max, m_star, redshift,
 
     def log_nu(log_M):
         sigma2 = _sigma_squared(np.exp(log_M), k, Pk, cosmology, redshift)
-        delta_c2 = _delta_critical_squared(m_star, k, Pk, cosmology)
-        return np.log(delta_c2 / sigma2) / 2.0
+        return np.log(delta_c**2 / sigma2) / 2.0
 
     dlognu_dlogm = np.absolute(derivative(log_nu, np.log(m), dx=step))
     rho_bar = cosmology.critical_density0 * (cosmology.efunc(redshift)) ** 2
@@ -169,17 +165,17 @@ def halo_mass_sampler(mass_function, m_min, m_max, resolution=100, size=None):
 
     >>> from astropy.cosmology import Planck15
     >>> cosmology = Planck15
-    >>> m_star, m_min, m_max = 1.0, 1.0, 10.0
+    >>> m_min, m_max = 0.1, 10.0
+    >>> m = np.logspace(np.log10(m_min), np.log10(m_max), num=4)
     >>> k = np.logspace(-3, 1, num=5, base=10.0)
     >>> A_s, n_s = 2.1982e-09, 0.969453
     >>> Pk = eh.eisenstein_hu(k, A_s, n_s, cosmology, kwmap=0.02, wiggle=True)
-    >>> s = _sigma_squared(m_star, k, Pk, cosmology, 0)
-    >>> ds = np.sqrt(mass._delta_critical_squared(m_star, k, Pk, cosmology))
-    >>> fst = mass.sheth_tormen_collapse_function(s, params=(0.5, 1, 0, ds))
-    >>> mf = mass.halo_mass_function(fst, m_min, m_max, m_star, 0, k, Pk,
-    ...                              cosmology, resolution=4)
+    >>> s = _sigma_squared(m, k, Pk, cosmology, 0)
+    >>> fst = mass.sheth_tormen_collapse_function(s, params=(0.5, 1, 0, 1.686))
+    >>> mf = mass.halo_mass_function(fst, m_min, m_max, 1.686, 0, k, Pk,
+    ...                    cosmology, resolution=4)
     >>> mass.halo_mass_sampler(mf, m_min, m_max, resolution=4)
-    1.8215308441776168
+    0.3595307319328127
 
     References
     ----------
