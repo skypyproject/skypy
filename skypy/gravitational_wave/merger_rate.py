@@ -64,10 +64,10 @@ def abadie_tableIII_merger_rates(luminosity, population='NS-NS', optimism='low')
                           'NS-NS' : {'low' : 0.6,
                                      'realistic' : 60,
                                      'high' : 600,
-                                     'max' : 2000}
+                                     'max' : 2000},
                           'NS-BH' : {'low' : 0.03,
                                      'realistic' : 2,
-                                     'high' : 60}
+                                     'high' : 60},
                           'BH-BH' : {'low' : 0.006,
                                      'realistic' : 0.2,
                                      'high' : 20}
