@@ -110,7 +110,7 @@ def halo_mass_function(collapse_function, m_min, m_max, m_star, redshift,
     >>> fst = mass.sheth_tormen_collapse_function(s, params=(0.5, 1, 0, ds))
     >>> mass.halo_mass_function(fst, m_min, m_max, m_star, 0, k, Pk, cosmology,
     ...                    resolution=4)
-    array([4.45099029e-26, 6.17786298e-27, 1.49704437e-28, 1.54649239e-29])
+    array([4.45099029e-26, 6.17786298e-27, 9.53421687e-29, 1.54649239e-29])
 
     References
     ----------
@@ -179,7 +179,7 @@ def halo_mass_sampler(mass_function, m_min, m_max, resolution=100, size=None):
     >>> mf = mass.halo_mass_function(fst, m_min, m_max, m_star, 0, k, Pk,
     ...                              cosmology, resolution=4)
     >>> mass.halo_mass_sampler(mf, m_min, m_max, resolution=4)
-    1.8262206616878605
+    1.8215308441776168
 
     References
     ----------
