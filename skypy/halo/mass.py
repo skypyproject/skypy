@@ -18,7 +18,6 @@ import numpy as np
 from scipy import integrate
 from scipy.misc import derivative
 from functools import partial
-from astropy.constants import G
 from astropy import units as u
 
 from skypy.power_spectrum import growth_function
@@ -66,8 +65,9 @@ def halo_mass_function(collapse_function, m_min, m_max, delta_c, redshift,
 
     Returns
     --------
-    mass_function: (nm,) array_like
-        Halo mass function for a given mass array, cosmology and redshift.
+    mass_function: (resolution,) array_like
+        Halo mass function for a given mass array, cosmology and redshift, in
+        units of :math:`Mpc^{-3} M_{Sun}^{-1}`.
 
     Examples
     ---------
@@ -80,7 +80,7 @@ def halo_mass_function(collapse_function, m_min, m_max, delta_c, redshift,
 
     >>> from astropy.cosmology import Planck15
     >>> cosmology = Planck15
-    >>> m_min, m_max = 0.1, 10.0
+    >>> m_min, m_max = 1e10, 1e12
     >>> m = np.logspace(np.log10(m_min), np.log10(m_max), num=4)
     >>> k = np.logspace(-3, 1, num=5, base=10.0)
     >>> A_s, n_s = 2.1982e-09, 0.969453
@@ -89,7 +89,7 @@ def halo_mass_function(collapse_function, m_min, m_max, delta_c, redshift,
     >>> fst = mass.sheth_tormen_collapse_function(s, params=(0.5, 1, 0, 1.686))
     >>> mass.halo_mass_function(fst, m_min, m_max, 1.686, 0, k, Pk, cosmology,
     ...                    resolution=4)
-    array([1.21845778e-23, 6.09429465e-25, 2.80742696e-26, 7.02778618e-29])
+    array([3.93517241e-10, 2.05709151e-11, 2.48708413e-12, 2.68651928e-13])
 
     References
     ----------
@@ -110,7 +110,7 @@ def halo_mass_function(collapse_function, m_min, m_max, delta_c, redshift,
 
     dlognu_dlogm = np.absolute(derivative(log_nu, np.log(m), dx=step))
     rho_bar = cosmology.critical_density0 * (cosmology.efunc(redshift)) ** 2
-    rho_bar = (rho_bar.to(u.kg / u.m ** 3)).value
+    rho_bar = (rho_bar.to(u.Msun / u.Mpc ** 3)).value
 
     return rho_bar * f_c * dlognu_dlogm / np.power(m, 2)
 
@@ -157,7 +157,7 @@ def halo_mass_sampler(mass_function, m_min, m_max, resolution=100, size=None):
     >>> mf = mass.halo_mass_function(fst, m_min, m_max, 1.686, 0, k, Pk,
     ...                    cosmology, resolution=4)
     >>> mass.halo_mass_sampler(mf, m_min, m_max, resolution=4)
-    0.3595307319328127
+    0.314232873473079
 
     References
     ----------
@@ -220,7 +220,7 @@ press_schechter_collapse_function = partial(sheth_tormen_collapse_function,
 def _sigma_squared(M, wavenumber, linear_power_today, redshift, cosmology):
     k = wavenumber
     Pk = linear_power_today
-    Hz = cosmology.H(redshift).value
+
     if isinstance(M, np.ndarray):
         M = M[:, np.newaxis]
 
@@ -228,7 +228,11 @@ def _sigma_squared(M, wavenumber, linear_power_today, redshift, cosmology):
     D0 = growth_function(0, cosmology)
     Dz = growth_function(redshift, cosmology) / D0
 
-    R = np.power(2 * G.value * M / Hz, 1.0 / 3.0)
+    # Background density today
+    rho_bar = cosmology.critical_density0 * (cosmology.efunc(0)) ** 2
+    rho_bar = (rho_bar.to(u.Msun / u.Mpc ** 3)).value
+
+    R = np.power(3 * M / (4 * np.pi * rho_bar), 1.0 / 3.0)
     j1 = (np.sin(k * R) - np.cos(k * R) * k * R) / (k * R)
     top_hat = 3 * j1 / (k * R)**2
     integrand = Pk * top_hat**2.0 * k**2.0
