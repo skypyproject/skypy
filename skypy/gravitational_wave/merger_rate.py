@@ -83,7 +83,7 @@ def abadie_tableIII_merger_rates(luminosity,
                                       'high': 20}
                             }
 
-    merger_rate = abadie_tableIII_dict[population, optimism] * luminosity
+    merger_rate = abadie_tableIII_dict[population][optimism] * luminosity
     merger_rate = merger_rate / units.year
 
     return merger_rate
