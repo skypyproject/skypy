@@ -1,11 +1,10 @@
-  
+
 r"""Binary merger rate module.
 This module provides facilities to produce compact binary merger rates per
 year for individual galaxies.
 
 """
 
-import numpy as np
 from astropy import units
 
 
