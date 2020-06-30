@@ -33,24 +33,6 @@ __all__ = [
  ]
 
 
-def _sigma_squared(M, wavenumber, linear_power_today, cosmology, redshift):
-    k = wavenumber
-    Pk = linear_power_today
-    Hz = cosmology.H(redshift).value
-    if isinstance(M, np.ndarray):
-        M = M[:, np.newaxis]
-
-    # The linear frowth function
-    D0 = growth_function(0, cosmology)
-    Dz = growth_function(redshift, cosmology) / D0
-
-    R = np.power(2 * G.value * M / Hz, 1.0 / 3.0)
-    j1 = (np.sin(k * R) - np.cos(k * R) * k * R) / (k * R)
-    top_hat = 3 * j1 / (k * R)**2
-    integrand = Pk * top_hat**2.0 * k**2.0
-    return Dz**2 * integrate.simps(integrand, k) / (2. * np.pi ** 2.)
-
-
 def halo_mass_function(collapse_function, m_min, m_max, delta_c, redshift,
                        wavenumber, power_spectrum, cosmology,
                        resolution=100, step=1.0e-6):
@@ -103,7 +85,7 @@ def halo_mass_function(collapse_function, m_min, m_max, delta_c, redshift,
     >>> k = np.logspace(-3, 1, num=5, base=10.0)
     >>> A_s, n_s = 2.1982e-09, 0.969453
     >>> Pk = eh.eisenstein_hu(k, A_s, n_s, cosmology, kwmap=0.02, wiggle=True)
-    >>> s = _sigma_squared(m, k, Pk, cosmology, 0)
+    >>> s = _sigma_squared(m, k, Pk, 0, cosmology)
     >>> fst = mass.sheth_tormen_collapse_function(s, params=(0.5, 1, 0, 1.686))
     >>> mass.halo_mass_function(fst, m_min, m_max, 1.686, 0, k, Pk, cosmology,
     ...                    resolution=4)
@@ -123,7 +105,7 @@ def halo_mass_function(collapse_function, m_min, m_max, delta_c, redshift,
                     num=resolution)
 
     def log_nu(log_M):
-        sigma2 = _sigma_squared(np.exp(log_M), k, Pk, cosmology, redshift)
+        sigma2 = _sigma_squared(np.exp(log_M), k, Pk, redshift, cosmology)
         return np.log(delta_c**2 / sigma2) / 2.0
 
     dlognu_dlogm = np.absolute(derivative(log_nu, np.log(m), dx=step))
@@ -151,7 +133,7 @@ def halo_mass_sampler(mass_function, m_min, m_max, resolution=100, size=None):
 
     Returns
     --------
-    sample: (nm,) array_like
+    sample: (size,) array_like
         Samples drawn from the mass function.
 
     Examples
@@ -170,7 +152,7 @@ def halo_mass_sampler(mass_function, m_min, m_max, resolution=100, size=None):
     >>> k = np.logspace(-3, 1, num=5, base=10.0)
     >>> A_s, n_s = 2.1982e-09, 0.969453
     >>> Pk = eh.eisenstein_hu(k, A_s, n_s, cosmology, kwmap=0.02, wiggle=True)
-    >>> s = _sigma_squared(m, k, Pk, cosmology, 0)
+    >>> s = _sigma_squared(m, k, Pk, 0, cosmology)
     >>> fst = mass.sheth_tormen_collapse_function(s, params=(0.5, 1, 0, 1.686))
     >>> mf = mass.halo_mass_function(fst, m_min, m_max, 1.686, 0, k, Pk,
     ...                    cosmology, resolution=4)
@@ -233,6 +215,24 @@ def sheth_tormen_collapse_function(sigma, params):
 
 press_schechter_collapse_function = partial(sheth_tormen_collapse_function,
                                             params=(0.5, 1, 0, 1.69))
+
+
+def _sigma_squared(M, wavenumber, linear_power_today, redshift, cosmology):
+    k = wavenumber
+    Pk = linear_power_today
+    Hz = cosmology.H(redshift).value
+    if isinstance(M, np.ndarray):
+        M = M[:, np.newaxis]
+
+    # The linear frowth function
+    D0 = growth_function(0, cosmology)
+    Dz = growth_function(redshift, cosmology) / D0
+
+    R = np.power(2 * G.value * M / Hz, 1.0 / 3.0)
+    j1 = (np.sin(k * R) - np.cos(k * R) * k * R) / (k * R)
+    top_hat = 3 * j1 / (k * R)**2
+    integrand = Pk * top_hat**2.0 * k**2.0
+    return Dz**2 * integrate.simps(integrand, k) / (2. * np.pi ** 2.)
 
 
 def press_schechter(n, m_star, size=None, x_min=0.00305,
