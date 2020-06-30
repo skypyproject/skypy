@@ -1,5 +1,5 @@
 import skypy.galaxy.luminosity as lum
-import skypy.gravitational_waves.merger_rates as merg
+import skypy.gravitational_waves.merger_rate as merg
 
 def test_abadie_rates():
 
