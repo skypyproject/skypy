@@ -4,7 +4,7 @@ This module provides facilities to sample the ellipticities of galaxies.
 """
 
 import numpy as np
-from scipy import stats
+from scipy import stats, __version__ as SCIPY_VERSION
 
 
 __all__ = [
@@ -13,16 +13,7 @@ __all__ = [
 ]
 
 
-def _ellipticity_parameterization(beta_method):
-    def reparameterize(self, *args):
-        *beta_args, e_ratio, e_sum = args
-        a = e_sum * e_ratio
-        b = e_sum * (1.0 - e_ratio)
-        return beta_method(self, *beta_args, a, b)
-    return reparameterize
-
-
-class beta_ellipticity_gen(stats._continuous_distns.beta_gen):
+def beta_ellipticity(e_ratio, e_sum, size=None):
     r'''Galaxy ellipticities sampled from a reparameterized beta distribution.
 
     The ellipticities follow a beta distribution parameterized by
@@ -55,48 +46,20 @@ class beta_ellipticity_gen(stats._continuous_distns.beta_gen):
 
     Examples
     --------
-    >>> from skypy.galaxy.ellipticity import beta_ellipticity
-
-    Sample 10 random variates from the Kacprzak model with
+    Sample 10000 random variates from the Kacprzak model with
     :math:`e_{\rm ratio} = 0.5` and :math:`e_{\rm sum} = 1.0`:
 
-    >>> ellipticity = beta_ellipticity.rvs(0.5, 1.0, size=10)
+    >>> from skypy.galaxy.ellipticity import beta_ellipticity
+    >>> ellipticity = beta_ellipticity(0.5, 1.0, size=10000)
 
-    Fix distribution parameters for repeated use:
-
-    >>> ellipticity_distribution = beta_ellipticity(0.5, 1.0)
-    >>> ellipticity_distribution.mean()
-    0.5
-    >>> ellipticity = ellipticity_distribution.rvs(size=10)
     '''
 
-    @_ellipticity_parameterization
-    def _rvs(self, *args):
-        return super()._rvs(*args)
+    # convert to beta distribution parameters
+    a = e_sum * e_ratio
+    b = e_sum * (1.0 - e_ratio)
 
-    @_ellipticity_parameterization
-    def _logpdf(self, *args):
-        return super()._logpdf(*args)
-
-    @_ellipticity_parameterization
-    def _cdf(self, *args):
-        return super()._cdf(*args)
-
-    @_ellipticity_parameterization
-    def _ppf(self, *args):
-        return super()._ppf(*args)
-
-    @_ellipticity_parameterization
-    def _stats(self, *args):
-        return super()._stats(*args)
-
-    def fit(self, data, *args, **kwargs):
-        return super(stats._continuous_distns.beta_gen, self).fit(
-            data, *args, **kwargs)
-
-
-beta_ellipticity = beta_ellipticity_gen(a=0.0, b=1.0, name='beta_ellipticity',
-                                        shapes="e_ratio e_sum")
+    # sample from the beta distribution
+    return np.random.beta(a, b, size)
 
 
 def ryden04(mu_gamma, sigma_gamma, mu, sigma, size=None):
@@ -128,23 +91,18 @@ def ryden04(mu_gamma, sigma_gamma, mu, sigma, size=None):
 
     Examples
     --------
-    >>> from skypy.galaxy.ellipticity import ryden04
-
     Sample 10000 random variates from the Ryden (2004) model with parameters
     :math:`\mu_\gamma = 0.222`, :math:`\sigma_\gamma = 0.056`,
     :math:`\mu = -1.85`, and :math:`\sigma = 0.89`.
 
+    >>> from skypy.galaxy.ellipticity import ryden04
     >>> ellipticity = ryden04(0.222, 0.056, -1.85, 0.89, size=10000)
 
-    Create a plot of the resulting distribution:
-
-    >>> import matplotlib.pyplot as plt  # doctest: +SKIP
-    >>> plt.hist(ellipticity, bins=50, density=True)  # doctest: +SKIP
-    >>> plt.xlabel('e')  # doctest: +SKIP
-    >>> plt.ylabel('p(e)')  # doctest: +SKIP
-    >>> plt.show()  # doctest: +SKIP
-
     '''
+
+    # get size if not given
+    if size is None:
+        size = np.broadcast(mu_gamma, sigma_gamma, mu, sigma).shape
 
     # truncation for gamma standard normal
     a_gam = np.divide(np.negative(mu_gamma), sigma_gamma)
@@ -158,12 +116,13 @@ def ryden04(mu_gamma, sigma_gamma, mu, sigma, size=None):
     gam = stats.truncnorm.rvs(a_gam, b_gam, mu_gamma, sigma_gamma, size=size)
     eps = np.exp(stats.truncnorm.rvs(a_eps, b_eps, mu, sigma, size=size))
 
-    # get size of draw
-    size = np.broadcast(gam, eps).shape
+    # scipy 1.5.0 bug: make scalar if size is empty
+    if size == () and SCIPY_VERSION == '1.5.0':  # pragma: no cover
+        gam, eps = gam.item(), eps.item()
 
     # draw random viewing angle (theta, phi)
-    cos2_theta = stats.uniform.rvs(loc=-1.0, scale=2.0, size=size)**2
-    cos2_phi = np.cos(stats.uniform.rvs(scale=2*np.pi, size=size))**2
+    cos2_theta = np.random.uniform(low=-1., high=1., size=size)**2
+    cos2_phi = np.cos(np.random.uniform(low=0., high=2*np.pi, size=size))**2
     sin2_theta = 1 - cos2_theta
     sin2_phi = 1 - cos2_phi
 

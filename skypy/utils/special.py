@@ -31,7 +31,7 @@ def _gammaincc(a, x):
         n = np.floor(a)
     else:
         n = 0
-    g = sc.gammaincc(a-n, x)
+    g = sc.gammaincc(a-n, x) if a != n else 0
     if n < 0:
         f = np.exp(sc.xlogy(a-n, x)-x-sc.gammaln(a-n+1))
         while n < 0:
@@ -93,18 +93,18 @@ def gammaincc(a, x):
     n = np.where(i, np.floor(a), 0)
 
     # compute gammaincc for a-n and x as usual
-    g = sc.gammaincc(a-n, x)
+    g = np.where(a == n, 0, sc.gammaincc(a-n, x))
 
     # deal with nonpositive a
     # the number n keeps track of iterations still to do
-    if np.any(i) > 0:
+    if np.any(i):
         # all x = inf are done
         n[i & np.isinf(x)] = 0
 
         # do x = 0 for nonpositive a; depends on Gamma(a)
         i = i & (x == 0)
         s = sc.gammasgn(a[i])
-        g[i] = np.where(s == 0, 0, s*np.inf)
+        g[i] = np.where(s == 0, 0, np.copysign(np.inf, s))
         n[i] = 0
 
         # these are still to do

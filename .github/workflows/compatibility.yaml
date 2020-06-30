@@ -1,0 +1,37 @@
+name: Compatibility
+on:
+  schedule:
+    - cron: '0 4 * * SUN'
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        python: [3.8]
+        toxenv: [py38-test, py38-test-dev]
+        release: [master, latest]
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - if: matrix.release != 'master'
+      name: Checkout Release
+      run: |
+        git checkout tags/$(curl -s https://api.github.com/repos/skypyproject/skypy/releases/${{ matrix.release }} | python -c "import sys, json; print(json.load(sys.stdin)['tag_name'])")
+    - name: Install Python ${{ matrix.python }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python }}
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install tox
+    - name: Add pytest Matcher
+      run: |
+        echo ::add-matcher::.github/problem_matchers/pytest.json
+    - name: Run Tests
+      run: |
+        tox -e ${{ matrix.toxenv }} ${{ matrix.toxargs }} -- ${{ matrix.toxposargs }}
