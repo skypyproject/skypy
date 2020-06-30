@@ -9,6 +9,7 @@ Models
 
    press_schechter
    halo_mass_function
+   halo_mass_sampler
    sheth_tormen_collapse_function
    press_schechter_collapse_function
 '''
@@ -26,6 +27,7 @@ from skypy.utils.random import schechter
 __all__ = [
     'press_schechter',
     'halo_mass_function',
+    'halo_mass_sampler',
     'sheth_tormen_collapse_function',
     'press_schechter_collapse_function',
  ]
@@ -54,14 +56,14 @@ _delta_critical_squared = partial(_sigma_squared, redshift=0)
 
 def halo_mass_function(collapse_function, m_min, m_max, m_star, redshift,
                        wavenumber, power_spectrum, cosmology,
-                       resolution=100, size=None, step=1.0e-6):
+                       resolution=100, step=1.0e-6):
     r'''Halo mass function.
-    This function samples haloes from their mass function following Sheth &
-    Tormen formalism, see equation 7.46 in [1]_.
+    This function computes the halo mass function, defined
+    in equation 7.46 in [1]_.
 
     Parameters
     -----------
-    collapse_function: function
+    collapse_function: (nm,) array_like
         Collapse function to choose from a variety of models:
         `sheth_tormen_collapse_function`, `press_schechter_collapse_function`.
     m_min, m_max : float
@@ -80,15 +82,13 @@ def halo_mass_function(collapse_function, m_min, m_max, m_star, redshift,
         omega_matter and omega_lambda with redshift.
     resolution : int, optional
         Resolution of the inverse transform sampling spline. Default is 100.
-    size: int, optional
-        Output shape of samples. Default is None.
     step : float
         Step size used in the derivative. Default is 1.0e-6.
 
     Returns
     --------
-    sample: array_like
-        Samples drawn from the Sheth-Tormen function, equation (10) in [1].
+    mass_function: (nm,) array_like
+        Halo mass function for a given mass array, cosmology and redshift.
 
     Examples
     ---------
@@ -109,8 +109,8 @@ def halo_mass_function(collapse_function, m_min, m_max, m_star, redshift,
     >>> ds = np.sqrt(mass._delta_critical_squared(m_star, k, Pk, cosmology))
     >>> fst = mass.sheth_tormen_collapse_function(s, params=(0.5, 1, 0, ds))
     >>> mass.halo_mass_function(fst, m_min, m_max, m_star, 0, k, Pk, cosmology,
-    ...                    resolution=100, size=None)
-    1.8520940096860243
+    ...                    resolution=4)
+    array([4.45099029e-26, 6.17786298e-27, 1.49704437e-28, 1.54649239e-29])
 
     References
     ----------
@@ -128,15 +128,69 @@ def halo_mass_function(collapse_function, m_min, m_max, m_star, redshift,
     def log_nu(log_M):
         sigma2 = _sigma_squared(np.exp(log_M), k, Pk, cosmology, redshift)
         delta_c2 = _delta_critical_squared(m_star, k, Pk, cosmology)
-        return np.log(delta_c2 / sigma2) / 2
+        return np.log(delta_c2 / sigma2) / 2.0
 
-    # Rest of prefactors
+    dlognu_dlogm = np.absolute(derivative(log_nu, np.log(m), dx=step))
     rho_bar = cosmology.critical_density0 * (cosmology.efunc(redshift)) ** 2
     rho_bar = (rho_bar.to(u.kg / u.m ** 3)).value
-    dlognu_dlogm = np.absolute(derivative(log_nu, np.log(m), dx=step))
+
+    return rho_bar * f_c * dlognu_dlogm / np.power(m, 2)
+
+
+def halo_mass_sampler(mass_function, m_min, m_max, resolution=100, size=None):
+    r'''Halo mass sampler.
+    This function samples haloes from their mass function,
+    see equation 7.46 in [1]_.
+
+    Parameters
+    -----------
+    mass_function: (nm,) array_like
+        Array storing the values of the halo mass function.
+    m_min, m_max : float
+        Lower and upper bounds for the random variable `m` in solar mass.
+    resolution : int, optional
+        Resolution of the inverse transform sampling spline. Default is 100.
+    size: int, optional
+        Output shape of samples. Default is None.
+
+    Returns
+    --------
+    sample: (nm,) array_like
+        Samples drawn from the mass function.
+
+    Examples
+    ---------
+    >>> import numpy as np
+    >>> from skypy.halo import mass
+    >>> from skypy.power_spectrum import _eisenstein_hu as eh
+
+    This example will sample from the Sheth and Tormen mass function for a
+    Planck15 cosmology
+
+    >>> from astropy.cosmology import Planck15
+    >>> cosmology = Planck15
+    >>> m_star, m_min, m_max = 1.0, 1.0, 10.0
+    >>> k = np.logspace(-3, 1, num=5, base=10.0)
+    >>> A_s, n_s = 2.1982e-09, 0.969453
+    >>> Pk = eh.eisenstein_hu(k, A_s, n_s, cosmology, kwmap=0.02, wiggle=True)
+    >>> s = _sigma_squared(m_star, k, Pk, cosmology, 0)
+    >>> ds = np.sqrt(mass._delta_critical_squared(m_star, k, Pk, cosmology))
+    >>> fst = mass.sheth_tormen_collapse_function(s, params=(0.5, 1, 0, ds))
+    >>> mf = mass.halo_mass_function(fst, m_min, m_max, m_star, 0, k, Pk,
+    ...                              cosmology, resolution=4)
+    >>> mass.halo_mass_sampler(mf, m_min, m_max, resolution=4)
+    1.8262206616878605
+
+    References
+    ----------
+    .. [1] Mo, H. and van den Bosch, F. and White, S. (2010), Cambridge
+        University Press, ISBN: 9780521857932.
+    '''
+    m = np.logspace(np.log10(np.min(m_min)), np.log10(np.max(m_max)),
+                    num=resolution)
 
     # Sampling from the halo mass function
-    PDF = rho_bar * f_c * dlognu_dlogm / np.power(m, 2)
+    PDF = mass_function
     CDF = integrate.cumtrapz(PDF, m, initial=0)
     cdf = CDF/CDF[-1]
     t_lower = np.interp(m_min, m, cdf)
