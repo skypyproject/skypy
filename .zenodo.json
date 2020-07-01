@@ -1,7 +1,7 @@
 {
-    "description": "<p>SkyPy: A package for modelling the Universe</p>",
+    "title": "SkyPy",
+    "description": "A package for modelling the Universe",
     "license": "BSD-3-Clause",
-    "title": "skypyproject/skypy v0.1",
     "notes": "AA and PS supported by the Royal Society Wolfson Fellowship, JPC acknowledges support granted by Agencia Nacional de Investigaci\u00f3n y Desarrollo (ANID) DOCTORADO BECAS CHILE/2016 - 72170279.",
     "grants": [
         {
