@@ -9,13 +9,11 @@
         }
     ],
     "upload_type": "software",
-    "version": "v0.1",
     "keywords": [
         "Cosmology",
         "Astrophysics",
         "Forward modelling"
     ],
-    "publication_date": "2020-04-17",
     "creators": [
         {
             "orcid": "0000-0003-3481-3491",
@@ -105,11 +103,6 @@
     ],
     "access_right": "open",
     "related_identifiers": [
-        {
-            "scheme": "url",
-            "identifier": "https://github.com/skypyproject/skypy/tree/v0.1",
-            "relation": "isSupplementTo"
-        },
         {
             "scheme": "doi",
             "identifier": "10.5281/zenodo.3755531",
