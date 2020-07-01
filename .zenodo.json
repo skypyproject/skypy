@@ -18,44 +18,9 @@
     "publication_date": "2020-04-17",
     "creators": [
         {
-            "orcid": "0000-0003-1291-1023",
-            "affiliation": "University of Manchester",
-            "name": "Richard Rollins"
-        },
-        {
-            "orcid": "0000-0002-9696-7931",
-            "affiliation": "University of Manchester",
-            "name": "Nicolas Tessore"
-        },
-        {
-            "orcid": "0000-0001-9233-2341",
+            "orcid": "0000-0003-3481-3491",
             "affiliation": "University of Portsmouth",
-            "name": "Coleman Krawczyk"
-        },
-        {
-            "orcid": "0000-0002-1064-3400",
-            "affiliation": "University of Manchester",
-            "name": "Lucia F. de la Bella"
-        },
-        {
-            "orcid": "0000-0002-5304-9372",
-            "affiliation": "University of Portsmouth",
-            "name": "Ian Harry"
-        },
-        {
-            "orcid": "0000-0001-8685-2308",
-            "affiliation": "University of Portsmouth",
-            "name": "Philipp Sudek"
-        },
-        {
-            "orcid": "0000-0002-4437-0770",
-            "affiliation": "University of Manchester",
-            "name": "Ian Harrison"
-        },
-        {
-            "orcid": "0000-0002-6625-7656",
-            "affiliation": "University of Manchester",
-            "name": "Juan Pablo Cordero"
+            "name": "Adam Amara"
         },
         {
             "orcid": "0000-0003-3195-5507",
@@ -63,19 +28,19 @@
             "name": "Simon Birrer"
         },
         {
-            "orcid": "0000-0002-8599-8791",
-            "affiliation": "University of Portsmouth",
-            "name": "Laura Nuttall"
+            "orcid": "0000-0002-0128-1006",
+            "affiliation": "University of Manchester",
+            "name": "Sarah Bridle"
         },
         {
-            "orcid": "0000-0002-0363-4469",
-            "affiliation": "University of Portsmouth",
-            "name": "Andy Lundgren"
+            "orcid": "0000-0002-6625-7656",
+            "affiliation": "University of Manchester",
+            "name": "Juan Pablo Cordero"
         },
         {
-            "orcid": "0000-0003-3481-3491",
-            "affiliation": "University of Portsmouth",
-            "name": "Adam Amara"
+            "orcid": "0000-0002-1064-3400",
+            "affiliation": "University of Manchester",
+            "name": "Lucia F. de la Bella"
         },
         {
             "orcid": "0000-0002-8218-563X",
@@ -83,14 +48,49 @@
             "name": "Ginevra Favole"
         },
         {
-            "orcid": "0000-0002-0128-1006",
+            "orcid": "0000-0002-4437-0770",
             "affiliation": "University of Manchester",
-            "name": "Sarah Bridle"
+            "name": "Ian Harrison"
+        },
+        {
+            "orcid": "0000-0002-5304-9372",
+            "affiliation": "University of Portsmouth",
+            "name": "Ian Harry"
+        },
+        {
+            "orcid": "0000-0001-9233-2341",
+            "affiliation": "University of Portsmouth",
+            "name": "Coleman Krawczyk"
+        },
+        {
+            "orcid": "0000-0002-0363-4469",
+            "affiliation": "University of Portsmouth",
+            "name": "Andy Lundgren"
         },
         {
             "orcid": "0000-0001-6706-8972",
             "affiliation": "Fermilab",
             "name": "Brian Nord"
+        },
+        {
+            "orcid": "0000-0002-8599-8791",
+            "affiliation": "University of Portsmouth",
+            "name": "Laura Nuttall"
+        },
+        {
+            "orcid": "0000-0003-1291-1023",
+            "affiliation": "University of Manchester",
+            "name": "Richard Rollins"
+        },
+        {
+            "orcid": "0000-0001-8685-2308",
+            "affiliation": "University of Portsmouth",
+            "name": "Philipp Sudek"
+        },
+        {
+            "orcid": "0000-0002-9696-7931",
+            "affiliation": "University of Manchester",
+            "name": "Nicolas Tessore"
         },
         {
             "orcid": "0000-0002-7196-4822",
