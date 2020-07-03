@@ -43,7 +43,7 @@ def environment_quenched(nh, probability):
     >>> from collections import Counter
     >>> quenched = environment_quenched(1000, 0.5)
     >>> Counter(quenched)
-    Counter({True: ..., False: ...})
+    Counter({...})
 
     References
     ----------
@@ -90,8 +90,8 @@ def mass_quenched(halo_mass, offset, width):
     >>> halo_mass = np.random.lognormal(mean=np.log(offset), sigma=width,
     ...                                 size=1000)
     >>> quenched = mass_quenched(halo_mass, offset, width)
-    >>> Counter(quenched) # doctest: +SKIP
-    Counter({True: ..., False: ...})
+    >>> Counter(quenched)
+    Counter({...})
 
     References
     ----------
