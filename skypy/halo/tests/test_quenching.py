@@ -17,7 +17,8 @@ def test_environment_quenched():
 
 
 def test_mass_quenched():
-    # Test the quenching process follows a binomial distribution
+    # Test the quenching process follows a binomial distribution if the
+    # logarithmic halo masses are symmetrical about the offset
     n = 1000
     offset, width = 1.0e12, 0.5
     halo_mass = 10 ** np.random.uniform(11, 13, n)
