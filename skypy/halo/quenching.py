@@ -13,7 +13,7 @@ __all__ = [
     ]
 
 
-def environment_quenched(nh=None, probability=0.5):
+def environment_quenched(nh, probability):
     r'''Environment quenching function.
     This function implements the model proposed by A.Amara where the
     probability of a subhalo being quenched is a fixed
@@ -22,9 +22,9 @@ def environment_quenched(nh=None, probability=0.5):
     Parameters
     ----------
     nh: integer
-        Number of subhalos. Default is None.
+        Number of subhalos.
     probability: float, optional
-        Quenching probability. Default is 0.5.
+        Quenching probability.
 
     Returns
     -------
@@ -41,7 +41,7 @@ def environment_quenched(nh=None, probability=0.5):
     >>> import numpy as np
     >>> from skypy.halo.quenching import environment_quenched
     >>> from collections import Counter
-    >>> quenched = environment_quenched(1000)
+    >>> quenched = environment_quenched(1000, 0.5)
     >>> Counter(quenched)
     Counter({True: ..., False: ...})
 
@@ -58,7 +58,7 @@ def environment_quenched(nh=None, probability=0.5):
 def mass_quenched(halo_mass, offset, width):
     r'''Mass quenching function.
     This function implements the model proposed by A.Amara where the
-    probability of a halo being quenched is an error function
+    probability of a halo being quenched is related to the error function
     of the logarithm of the halo's mass standardised by an offset and width
     parameter.  The model is inspired on [1]_ and [2]_.
 
