@@ -80,7 +80,7 @@ def test_herbel_pdf():
     pdf = herbel_pdf(np.array([0.01, 0.5, 1, 2]),
                      -0.5, -0.70596888,
                      0.0035097, -0.70798041,
-                     -20.37196157, cosmology, np.power(10, -0.4 * -16.0))
+                     -20.37196157, cosmology, -16.0)
     result = np.array(
         [4.09063927e+04, 4.45083420e+07, 7.26629445e+07, 5.40766813e+07])
     np.testing.assert_allclose(pdf, result)
@@ -121,7 +121,7 @@ def test_herbel_redshift_sampling():
                          b_phi=0.00370253,
                          b_m=-20.40492365,
                          cosmology=cosmology,
-                         luminosity_min=2511886.4315095823)
+                         absolute_magnitude_max=-16)
         cdf = scipy.integrate.cumtrapz(pdf, z, initial=0)
         cdf = cdf / cdf[-1]
         return cdf

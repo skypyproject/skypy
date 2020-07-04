@@ -18,33 +18,58 @@ Utility functions
 import numpy as np
 
 
-def luminosity_from_absolute_magnitude(absolute_magnitude):
+# absolute AB magnitude in various bands in terms of solar luminosity
+# values depend on exact definition of bandpass and are approximate
+standard_bandpass_zeropoints = {
+    'U': -3.20,
+    'B': -3.11,
+    'V': -2.51,
+}
+
+
+def luminosity_from_absolute_magnitude(absolute_magnitude, band=None):
     """ Converts absolute magnitudes into luminosities
 
     Parameters
     ----------
     absolute_magnitude : array_like
-                    Input absolute magnitudes
+        Input absolute magnitudes
+    band : str, optional
+        Standard bandpass for conversion.
+
     Returns
     -------
     ndarray, or float if input is scalar
-    Luminosity values.
+    Luminosity values. If a standard bandpass is given, the luminosity is in
+    units of solar luminosity.
     """
 
-    return np.power(10, -0.4*absolute_magnitude)
+    zeropoint = 0
+    if band is not None:
+        zeropoint = standard_bandpass_zeropoints[band]
+
+    return 10.**(-0.4*np.add(absolute_magnitude, zeropoint))
 
 
-def absolute_magnitude_from_luminosity(luminosity):
+def absolute_magnitude_from_luminosity(luminosity, band=None):
     """ Converts luminosities into absolute magnitudes
 
     Parameters
     ----------
     luminosity : array_like
-            Input luminosity
+        Input luminosity
+    band : str, optional
+        Standard bandpass for conversion.
 
     Returns
     -------
     ndarray, or float if input is scalar
-    Absolute magnitude values
+    Absolute magnitude values. If a standard bandpass is given, the luminosity
+    is assumed in units of solar luminosity.
     """
-    return -np.log(luminosity)/(0.4 * np.log(10))
+
+    zeropoint = 0
+    if band is not None:
+        zeropoint = standard_bandpass_zeropoints[band]
+
+    return -2.5*np.log10(luminosity) - zeropoint

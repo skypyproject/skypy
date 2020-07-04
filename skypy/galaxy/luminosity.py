@@ -15,7 +15,7 @@ __all__ = [
 
 def herbel_luminosities(redshift, alpha, a_m, b_m, size=None,
                         x_min=0.00305,
-                        x_max=1100.0, resolution=100):
+                        x_max=1100.0, resolution=100, band=None):
 
     r"""Model of Herbel et al (2017)
 
@@ -40,11 +40,15 @@ def herbel_luminosities(redshift, alpha, a_m, b_m, size=None,
         Lower and upper luminosity bounds in units of L*.
     resolution : int, optional
         Resolution of the inverse transform sampling spline. Default is 100.
+    band : str, optional
+        Filter band for absolute magnitude to luminosity conversion. Default is
+        None.
 
     Returns
     -------
     luminosity : array_like
-        Drawn luminosities from the Schechter luminosity function.
+        Drawn luminosities from the Schechter luminosity function. If a filter
+        band is given, the luminosity is returned in units of solar luminosity.
 
     Notes
     -----
@@ -98,20 +102,18 @@ def herbel_luminosities(redshift, alpha, a_m, b_m, size=None,
     >>> luminosities = lum.herbel_luminosities(z, -1.3, -0.9408582,
     ...                                         -20.40492365)
 
-
-
     """
 
     if size is None and np.shape(redshift):
         size = np.shape(redshift)
 
-    luminosity_star = _calculate_luminosity_star(redshift, a_m, b_m)
+    luminosity_star = _calculate_luminosity_star(redshift, a_m, b_m, band)
 
     x_sample = schechter(alpha, x_min, x_max, resolution=resolution, size=size)
 
     return luminosity_star * x_sample
 
 
-def _calculate_luminosity_star(redshift, a_m, b_m):
+def _calculate_luminosity_star(redshift, a_m, b_m, band=None):
     absolute_magnitude_star = a_m * redshift + b_m
-    return astro.luminosity_from_absolute_magnitude(absolute_magnitude_star)
+    return astro.luminosity_from_absolute_magnitude(absolute_magnitude_star, band)

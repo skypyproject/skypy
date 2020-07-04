@@ -10,7 +10,6 @@ import scipy.special as sc
 import scipy.integrate
 
 import skypy.utils.special as special
-import skypy.utils.astronomy as astro
 
 
 __all__ = [
@@ -203,11 +202,9 @@ def herbel_redshift(alpha, a_phi, b_phi, a_m, b_m, cosmology, low=0.0,
 
     """
 
-    luminosity_min = astro.luminosity_from_absolute_magnitude(
-        absolute_magnitude_max)
     redshift = np.linspace(low, high, resolution)
     pdf = herbel_pdf(redshift, alpha, a_phi, b_phi, a_m, b_m, cosmology,
-                     luminosity_min)
+                     absolute_magnitude_max)
     cdf = scipy.integrate.cumtrapz(pdf, redshift, initial=0)
     cdf = cdf / cdf[-1]
     u = np.random.uniform(size=size)
@@ -217,7 +214,7 @@ def herbel_redshift(alpha, a_phi, b_phi, a_m, b_m, cosmology, low=0.0,
 
 
 def herbel_pdf(redshift, alpha, a_phi, b_phi, a_m, b_m, cosmology,
-               luminosity_min):
+               absolute_magnitude_max):
     r"""Calculates the redshift pdf of the Schechter luminosity function
     according to the model of Herbel et al. [1]_ equation (3.6).
 
@@ -270,7 +267,6 @@ def herbel_pdf(redshift, alpha, a_phi, b_phi, a_m, b_m, cosmology,
     Examples
     --------
     >>> from skypy.galaxy.redshift import herbel_pdf
-    >>> import skypy.utils.astronomy as astro
     >>> from astropy.cosmology import FlatLambdaCDM
     >>> import numpy as np
 
@@ -280,15 +276,15 @@ def herbel_pdf(redshift, alpha, a_phi, b_phi, a_m, b_m, cosmology,
 
     >>> cosmology = FlatLambdaCDM(H0=70, Om0=0.3, Tcmb0=2.725)
     >>> redshift = np.linspace(0, 2, 100)
-    >>> luminosity_min = astro.luminosity_from_absolute_magnitude(-16.0)
+    >>> mag_lim = -16.0
     >>> redshift = herbel_pdf(redshift=redshift, alpha=-1.3,
     ...                     a_phi=-0.10268436,a_m=-0.9408582, b_phi=0.00370253,
     ...                     b_m=-20.40492365, cosmology=cosmology,
-    ...                     luminosity_min=luminosity_min)
+    ...                     absolute_magnitude_max=mag_lim)
     """
+    abs_mag = a_m*redshift + b_m
     dv = cosmology.differential_comoving_volume(redshift).value
-    x = luminosity_min \
-        * 1./astro.luminosity_from_absolute_magnitude(a_m*redshift + b_m)
+    x = 10.**(-0.4*(absolute_magnitude_max - abs_mag))
     lg = sc.gammaln(alpha+1)
     gx = np.fabs(special.gammaincc(alpha+1, x))
     pdf = dv * b_phi * np.exp(a_phi * redshift + lg) * gx
