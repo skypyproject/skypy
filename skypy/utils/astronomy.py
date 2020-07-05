@@ -19,11 +19,11 @@ import numpy as np
 
 
 # absolute AB magnitude in various bands in terms of solar luminosity
-# values depend on exact definition of bandpass and are approximate
+# values depend on the particular bandpass used and are approximate
 standard_bandpass_zeropoints = {
-    'U': -3.20,
-    'B': -3.11,
-    'V': -2.51,
+    'U': -4.98,
+    'B': -4.73,
+    'V': -4.48,
 }
 
 
