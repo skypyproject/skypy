@@ -16,6 +16,7 @@ except ImportError:
 else:
     CAMB_NOT_FOUND = False
 
+
 @pytest.mark.skipif(CAMB_NOT_FOUND, reason='CAMB not found')
 def test_camb():
     '''
