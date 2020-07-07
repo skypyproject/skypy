@@ -9,10 +9,10 @@ def test_environment_quenched():
     # Test the quenching process follows a binomial distribution
     n, p = 1000, 0.7
     quenched = environment_quenched(n, p)
-    number_quenched = Counter(quenched)[0]
+    number_quenched = Counter(quenched)[True]
 
     p_value = stats.binom_test(number_quenched, n=n, p=p,
-                               alternative='greater')
+                               alternative='two-sided')
     assert p_value > 0.05
 
 
@@ -23,8 +23,8 @@ def test_mass_quenched():
     offset, width = 1.0e12, 0.5
     halo_mass = 10 ** np.random.uniform(11, 13, n)
     quenched = mass_quenched(halo_mass, offset, width)
-    number_quenched = Counter(quenched)[0]
+    number_quenched = Counter(quenched)[True]
 
     p_value = stats.binom_test(number_quenched, n=n, p=0.5,
-                               alternative='greater')
+                               alternative='two-sided')
     assert p_value > 0.05
