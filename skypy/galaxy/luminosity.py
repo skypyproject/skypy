@@ -105,9 +105,9 @@ def herbel_luminosities(redshift, alpha, a_m, b_m, size=None,
         size = np.shape(redshift)
 
     # this is the AB zeropoint of the B-band in units of solar luminosity
-    zeropt = -4.73
+    zeropoint = -4.73
 
-    luminosity_star = _calculate_luminosity_star(redshift, a_m, b_m, zeropt)
+    luminosity_star = _calculate_luminosity_star(redshift, a_m, b_m, zeropoint)
 
     x_sample = schechter(alpha, x_min, x_max, resolution=resolution, size=size)
 
