@@ -19,7 +19,6 @@ from scipy import integrate
 from functools import partial
 from astropy import units as u
 
-from skypy.power_spectrum import growth_function
 from skypy.utils.random import schechter
 
 __all__ = [
@@ -60,6 +59,7 @@ def halo_mass_function(M, sigma, collapse_function, cosmology):
     >>> import numpy as np
     >>> from skypy.halo import mass
     >>> from skypy.power_spectrum import _eisenstein_hu as eh
+    >>> from skypy.power_spectrum import growth_function
 
     This example will compute the halo mass function for spherical collapse
     and a Planck15 cosmology. The power spectrum is given by the Eisenstein
@@ -67,9 +67,12 @@ def halo_mass_function(M, sigma, collapse_function, cosmology):
 
     >>> from astropy.cosmology import Planck15
     >>> cosmology = Planck15
+    >>> redshift = 0.0
     >>> k = np.logspace(-3, 1, num=5, base=10.0)
     >>> A_s, n_s = 2.1982e-09, 0.969453
     >>> Pk = eh.eisenstein_hu(k, A_s, n_s, cosmology, kwmap=0.02, wiggle=True)
+    >>> D0 = growth_function(0, cosmology)
+    >>> Dz = growth_function(redshift, cosmology) / D0
 
     And the Press-Schechter mass function is computed
 
@@ -118,6 +121,7 @@ def halo_mass_sampler(mass_function, M, size=None):
     >>> import numpy as np
     >>> from skypy.halo import mass
     >>> from skypy.power_spectrum import _eisenstein_hu as eh
+    >>> from skypy.power_spectrum import growth_function
 
     This example will sample from the Press-Schechter halo mass function for
     a Planck15 cosmology. The power spectrum is given by the Eisenstein
@@ -125,14 +129,17 @@ def halo_mass_sampler(mass_function, M, size=None):
 
     >>> from astropy.cosmology import Planck15
     >>> cosmology = Planck15
+    >>> redshift = 0.0
     >>> k = np.logspace(-3, 1, num=5, base=10.0)
     >>> A_s, n_s = 2.1982e-09, 0.969453
     >>> Pk = eh.eisenstein_hu(k, A_s, n_s, cosmology, kwmap=0.02, wiggle=True)
+    >>> D0 = growth_function(0, cosmology)
+    >>> Dz = growth_function(redshift, cosmology) / D0
 
     And the Press-Schechter mass function is computed
 
     >>> m = 10**np.arange(9.0, 12.0, 2)
-    >>> sigma = np.sqrt(_sigma_squared(m, k, Pk, 0, cosmology))
+    >>> sigma = np.sqrt(_sigma_squared(m, k, Pk, Dz, cosmology))
     >>> fps = mass.press_schechter_collapse_function(sigma)
     >>> mf = mass.halo_mass_function(m, sigma, fps, cosmology)
 
@@ -146,17 +153,10 @@ def halo_mass_sampler(mass_function, M, size=None):
     .. [1] Mo, H. and van den Bosch, F. and White, S. (2010), Cambridge
         University Press, ISBN: 9780521857932.
     '''
-    m_min, m_max = np.min(M), np.max(M)
-
-    # Sampling from the halo mass function
-    PDF = mass_function
-    CDF = integrate.cumtrapz(PDF, M, initial=0)
-    cdf = CDF/CDF[-1]
-    t_lower = np.interp(m_min, M, cdf)
-    t_upper = np.interp(m_max, M, cdf)
-    n_uniform = np.random.uniform(t_lower, t_upper, size=size)
-
-    return np.interp(n_uniform, cdf, M)
+    CDF = integrate.cumtrapz(mass_function, M, initial=0)
+    CDF = CDF / CDF[-1]
+    n_uniform = np.random.uniform(size=size)
+    return np.interp(n_uniform, CDF, M)
 
 
 def sheth_tormen_collapse_function(sigma, params):
@@ -181,6 +181,7 @@ def sheth_tormen_collapse_function(sigma, params):
     >>> import numpy as np
     >>> from skypy.halo import mass
     >>> from skypy.power_spectrum import _eisenstein_hu as eh
+    >>> from skypy.power_spectrum import growth_function
 
     This example will compute the Press-Schecter function for
     spherical collapse and a Planck15 cosmology. The power spectrum is
@@ -188,14 +189,17 @@ def sheth_tormen_collapse_function(sigma, params):
 
     >>> from astropy.cosmology import Planck15
     >>> cosmology = Planck15
+    >>> redshift = 0.0
     >>> k = np.logspace(-3, 1, num=5, base=10.0)
     >>> A_s, n_s = 2.1982e-09, 0.969453
     >>> Pk = eh.eisenstein_hu(k, A_s, n_s, cosmology, kwmap=0.02, wiggle=True)
+    >>> D0 = growth_function(0, cosmology)
+    >>> Dz = growth_function(redshift, cosmology) / D0
 
     And the Press-Schechter function is computed
 
     >>> m = 10**np.arange(9.0, 12.0, 2)
-    >>> sigma = np.sqrt(_sigma_squared(m, k, Pk, 0, cosmology))
+    >>> sigma = np.sqrt(_sigma_squared(m, k, Pk, Dz, cosmology))
     >>> mass.press_schechter_collapse_function(sigma)
     array([0.17896132, 0.21613726])
 
@@ -217,16 +221,13 @@ press_schechter_collapse_function = partial(sheth_tormen_collapse_function,
                                             params=(0.5, 1, 0, 1.69))
 
 
-def _sigma_squared(M, wavenumber, linear_power_today, redshift, cosmology):
+def _sigma_squared(M, wavenumber, linear_power_today,
+                   growth_function, cosmology):
     k = wavenumber
     Pk = linear_power_today
+    Dz = growth_function
 
-    if isinstance(M, np.ndarray):
-        M = M[:, np.newaxis]
-
-    # The linear frowth function
-    D0 = growth_function(0, cosmology)
-    Dz = growth_function(redshift, cosmology) / D0
+    M = np.atleast_1d(M)[:, np.newaxis]
 
     # Matter mean density today
     rho_bar = (cosmology.critical_density(0).to(u.Msun / u.Mpc ** 3)).value
