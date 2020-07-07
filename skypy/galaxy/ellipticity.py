@@ -4,7 +4,7 @@ This module provides facilities to sample the ellipticities of galaxies.
 """
 
 import numpy as np
-from scipy import stats, __version__ as SCIPY_VERSION
+from scipy import stats
 
 
 __all__ = [
@@ -116,8 +116,8 @@ def ryden04(mu_gamma, sigma_gamma, mu, sigma, size=None):
     gam = stats.truncnorm.rvs(a_gam, b_gam, mu_gamma, sigma_gamma, size=size)
     eps = np.exp(stats.truncnorm.rvs(a_eps, b_eps, mu, sigma, size=size))
 
-    # scipy 1.5.0 bug: make scalar if size is empty
-    if size == () and SCIPY_VERSION == '1.5.0':  # pragma: no cover
+    # scipy 1.5.x bug: make scalar if size is empty
+    if size == () and not np.isscalar(gam):  # pragma: no cover
         gam, eps = gam.item(), eps.item()
 
     # draw random viewing angle (theta, phi)
