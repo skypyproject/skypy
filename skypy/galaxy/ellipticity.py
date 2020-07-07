@@ -46,11 +46,10 @@ def beta_ellipticity(e_ratio, e_sum, size=None):
 
     Examples
     --------
-    >>> from skypy.galaxy.ellipticity import beta_ellipticity
-
     Sample 10000 random variates from the Kacprzak model with
     :math:`e_{\rm ratio} = 0.5` and :math:`e_{\rm sum} = 1.0`:
 
+    >>> from skypy.galaxy.ellipticity import beta_ellipticity
     >>> ellipticity = beta_ellipticity(0.5, 1.0, size=10000)
 
     '''
@@ -92,23 +91,18 @@ def ryden04(mu_gamma, sigma_gamma, mu, sigma, size=None):
 
     Examples
     --------
-    >>> from skypy.galaxy.ellipticity import ryden04
-
     Sample 10000 random variates from the Ryden (2004) model with parameters
     :math:`\mu_\gamma = 0.222`, :math:`\sigma_\gamma = 0.056`,
     :math:`\mu = -1.85`, and :math:`\sigma = 0.89`.
 
+    >>> from skypy.galaxy.ellipticity import ryden04
     >>> ellipticity = ryden04(0.222, 0.056, -1.85, 0.89, size=10000)
 
-    Create a plot of the resulting distribution:
-
-    >>> import matplotlib.pyplot as plt  # doctest: +SKIP
-    >>> plt.hist(ellipticity, bins=50, density=True)  # doctest: +SKIP
-    >>> plt.xlabel('e')  # doctest: +SKIP
-    >>> plt.ylabel('p(e)')  # doctest: +SKIP
-    >>> plt.show()  # doctest: +SKIP
-
     '''
+
+    # get size if not given
+    if size is None:
+        size = np.broadcast(mu_gamma, sigma_gamma, mu, sigma).shape
 
     # truncation for gamma standard normal
     a_gam = np.divide(np.negative(mu_gamma), sigma_gamma)
@@ -122,12 +116,13 @@ def ryden04(mu_gamma, sigma_gamma, mu, sigma, size=None):
     gam = stats.truncnorm.rvs(a_gam, b_gam, mu_gamma, sigma_gamma, size=size)
     eps = np.exp(stats.truncnorm.rvs(a_eps, b_eps, mu, sigma, size=size))
 
-    # get size of draw
-    size = np.broadcast(gam, eps).shape
+    # scipy 1.5.x bug: make scalar if size is empty
+    if size == () and not np.isscalar(gam):  # pragma: no cover
+        gam, eps = gam.item(), eps.item()
 
     # draw random viewing angle (theta, phi)
-    cos2_theta = stats.uniform.rvs(loc=-1.0, scale=2.0, size=size)**2
-    cos2_phi = np.cos(stats.uniform.rvs(scale=2*np.pi, size=size))**2
+    cos2_theta = np.random.uniform(low=-1., high=1., size=size)**2
+    cos2_phi = np.cos(np.random.uniform(low=0., high=2*np.pi, size=size))**2
     sin2_theta = 1 - cos2_theta
     sin2_phi = 1 - cos2_phi
 

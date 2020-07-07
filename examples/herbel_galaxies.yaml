@@ -58,7 +58,7 @@ tables:
         cosmology: cosmology
     ellipticity:
       module: skypy.galaxy.ellipticity
-      function: beta_ellipticity.rvs
+      function: beta_ellipticity
       kwargs:
         e_ratio: 0.45
         e_sum: 3.5
@@ -116,7 +116,7 @@ tables:
         cosmology: cosmology
     ellipticity:
       module: skypy.galaxy.ellipticity
-      function: beta_ellipticity.rvs
+      function: beta_ellipticity
       kwargs:
         e_ratio: 0.45
         e_sum: 3.5
