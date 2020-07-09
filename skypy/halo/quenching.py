@@ -23,7 +23,7 @@ def environment_quenched(nh, probability):
     ----------
     nh: integer
         Number of subhalos.
-    probability: float, optional
+    probability: float
         Quenching probability.
 
     Returns
