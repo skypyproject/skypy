@@ -1,4 +1,4 @@
-r"""Models of galaxy luminosities.
+r"""Models of galaxy mass (total and stellar).
 
 """
 
@@ -8,30 +8,25 @@ from skypy.utils.random import schechter
 
 
 __all__ = [
-    'peng_masses',
+    'stellar_mass_function',
 ]
 
 
-def peng_masses(redshift, alpha, m_star, size=None,
-                x_min=0.0002138, x_max=213.8, resolution=100):
-    r"""Model of Peng et al (2010)
-
-    Stellar masses following the Schechter mass function following the
-    Peng et al. [1]_ model.
+def stellar_mass_function(alpha, m_star, size=None,
+                          x_min=0.0002138, x_max=213.8, resolution=100):
+    r""" Stellar masses following the Schechter mass function.
 
     Parameters
     ----------
-    redshift : (nz,) array-like
-        The redshift values at which to sample luminosities.
     alpha : float or int
         The alpha parameter in the Schechter stellar mass function.
-    m_star : float or int
+    m_star : array-like
         Characteristic stellar mass M_*.
     size: int, optional
-         Output shape of stellar mass samples. If size is None and redshift
+         Output shape of stellar mass samples. If size is None and m_star
          is a scalar, a single sample is returned. If size is None and
-         redshift is an array, an array of samples is returned with the same
-         shape as redshift.
+         m_star is an array, an array of samples is returned with the same
+         shape as m_star.
     x_min, x_max : float or int, optional
         Lower and upper stella mass bounds in units of M_*.
     resolution : int, optional
@@ -45,7 +40,7 @@ def peng_masses(redshift, alpha, m_star, size=None,
 
     Notes
     -----
-    The Schechter luminosity function is given as
+     The stellar mass function is given by a Schechter function as
 
     .. math::
         \Phi(M, z) = \frac{\Phi_\star(z)}{M_\star}
@@ -67,30 +62,28 @@ def peng_masses(redshift, alpha, m_star, size=None,
 
     References
     ----------
-    .. [1] Peng Y., Lilly S. J. et al., 2010, The Astrophysical Journal,
-    Issue 1, Volume 721, pages 193-221
 
     Examples
     --------
-    >>> import skypy.galaxy.mass as mass
+    >>> import skypy.galaxy.stellar_mass as mass
 
     Sample 100 stellar masses values at redshift z = 1.0 with alpha = -1.4, and
     m_star = 10**10.67.
 
-    >>> masses = mass.peng_masses(1.0, -1.4, 10**10.67, size=100)
+    >>> masses = mass.stellar_mass_function(1.0, -1.4, 10**10.67, size=100)
 
     Sample a luminosity value for every redshift in an array z with
     alpha = -1.3 amd m_star = 10**10.67.
 
     >>> z = np.linspace(0,2, 100)
-    >>> masses = mass.peng_masses(z, -1.4, m_star = 10**10.67)
+    >>> masses = mass.stellar_mass_function(z, -1.4, m_star = 10**10.67)
 
 
 
     """
 
-    if size is None and np.shape(redshift):
-        size = np.shape(redshift)
+    if size is None and np.shape(m_star):
+        size = np.shape(m_star)
 
     x_sample = schechter(alpha, x_min, x_max, resolution=resolution, size=size)
 

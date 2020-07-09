@@ -4,25 +4,25 @@ import scipy.integrate
 import scipy.special as sc
 import pytest
 
-import skypy.galaxy.mass as mass
+import skypy.galaxy.stellar_mass as mass
 import skypy.utils.special as special
 
 
 def test_exponential_distribution():
     # When alpha=0, M*=1 and x_min~0 we get a truncated exponential
     q_max = 1e2
-    sample = mass.peng_masses(0, 0, 1, size=1000,
-                              x_min=1e-10, x_max=q_max,
-                              resolution=1000)
+    sample = mass.stellar_mass_function(0, 1, size=1000,
+                                        x_min=1e-10, x_max=q_max,
+                                        resolution=1000)
     d, p_value = scipy.stats.kstest(sample, 'truncexpon', args=(q_max,))
     assert p_value >= 0.01
 
 
-def test_peng_masses():
-    # Test that error is returned if redshift input is an array but size !=
-    # None and size != redshift,size
+def test_stellar_masses():
+    # Test that error is returned if m_star input is an array but size !=
+    # None and size != m_star,size
     with pytest.raises(ValueError):
-        mass.peng_masses(np.array([1, 2]), -1.4, 10**10.67, size=3)
+        mass.stellar_mass_function(-1.4, np.array([1e10, 2e10]), size=3)
 
     # Test that sampling corresponds to sampling from the right pdf.
     # For this, we sample an array of luminosities for redshift z = 1.0 and we
@@ -49,8 +49,8 @@ def test_peng_masses():
     m_star = 10 ** 10.67
     m_min = 10 ** 7
     m_max = 10 ** 13
-    sample = mass.peng_masses(1.0, -1.4, m_star, size=1000000,
-                              x_min=m_min / m_star, x_max=m_max / m_star,
-                              resolution=100)
+    sample = mass.stellar_mass_function(-1.4, m_star, size=1000000,
+                                        x_min=m_min / m_star, x_max=m_max / m_star,
+                                        resolution=100)
     p_value = scipy.stats.kstest(sample, calc_cdf)[1]
     assert p_value >= 0.01
