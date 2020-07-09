@@ -14,6 +14,7 @@ import skypy.utils.astronomy as astro
 
 __all__ = [
     'herbel_redshift',
+    'peng_redshift',
     'smail',
 ]
 
@@ -249,3 +250,160 @@ def herbel_pdf(redshift, alpha, a_phi, b_phi, a_m, b_m, cosmology,
     gx = np.fabs(special.gammaincc(alpha+1, x))
     pdf = dv * b_phi * np.exp(a_phi * redshift + lg) * gx
     return pdf
+
+
+def peng_redshift(alpha, a_phi, b_phi, m_star, cosmology, low=0.0, high=2.0,
+                  size=None, m_min=10**7, resolution=100):
+    r""" Redshift following the Schechter luminosity function marginalised over
+    luminosities following the Herbel et al. [1]_ model.
+
+    Parameters
+    ----------
+    alpha : float or scalar
+        The alpha parameter in the Schechter stellar mass function
+    a_phi, b_phi : float or scalar
+        Slope and intercept of the linear parametrisation of Phi_*.
+    m_star : float or int
+        Characteristic stellar mass M_*.
+    cosmology : instance
+        Instance of an Astropy Cosmology class.
+    low : float or array_like of floats, optional
+        The lower boundary of the output interval. All values generated will be
+        greater than or equal to low.
+        The default value is 0.0.
+    high : float or array_like of floats, optional
+        Upper boundary of output interval. All values generated will be less
+        than high. The default value is 2.0
+    size : int or tuple of ints, optional
+        The number of redshifts to sample. If None one value is sampled.
+    m_min : float or int
+        Lower limit of the stalar mass.
+    resolution : int, optional
+        Characterises the resolution of the sampling. Default is 100.
+
+    Returns
+    -------
+    redshift_sample : ndarray or float
+        Drawn redshifts from the marginalised Schechter stellar mass function.
+
+    Notes
+    -----
+    The Schechter stellar function is given as
+
+    .. math::
+
+        \Phi(M, z) = \frac{\Phi_\star(z)}{M_\star}
+            \left(\frac{M}{M_\star}\right)^\alpha
+            \exp\left(-\frac{M}{M_\star}\right) \;.
+
+     The redshift dependence of :math:`\Phi_\star(z)` is given by
+
+    .. math::
+
+        \Phi_\star(z) = a_\phi z + b_phi;.
+
+    Now we have to rescale the Schechter function by the comoving element and
+    get
+
+    .. math::
+
+        \phi(M,z) = \frac{d_H d_M^2}{E(z)}  \Phi(M,z) \;.
+
+     References
+    ----------
+    .. [1] Peng Y., Lilly S. J. et al., 2010, The Astrophysical Journal,
+     Issue 1, Volume 721, pages 193-221
+
+    Examples
+    --------
+    >>> from skypy.galaxy.redshift import peng_redshift
+    >>> from astropy.cosmology import FlatLambdaCDM
+
+    Sample 100 redshift values from the Schechter luminosity function with
+    a_phi = -0.00011424, b_phi = 0.00033385, alpha = -1.4, m_min = 10**7 and
+    m_star = 10**10.67 for a flat cosmology.
+
+    >>> cosmology = FlatLambdaCDM(H0=70, Om0=0.3, Tcmb0=2.725)
+    >>> redshift = peng_redshift(size=1000, alpha=-1.4,
+    ...                     a_phi=-0.00011424, b_phi=0.00033385,
+    ...                     m_star=10**10.67, cosmology=cosmology)
+
+    """
+    redshift = np.linspace(low, high, resolution)
+    pdf = peng_pdf(redshift, alpha, m_star, m_min, a_phi, b_phi, cosmology)
+    cdf = scipy.integrate.cumtrapz(pdf, redshift, initial=0)
+    cdf = cdf / cdf[-1]
+    u = np.random.uniform(size=size)
+    redshift_sample = np.interp(u, cdf, redshift)
+
+    return redshift_sample
+
+
+def peng_pdf(redshift, alpha, m_star, m_min, a_phi, b_phi, cosmology):
+    r"""Calculates the redshift pdf of the Schechter stellar mass function
+    according to the model of Peng et al. [1]_ equation (25).
+
+    That is, multiplying by the comoving element
+    using a flat :math:`\Lambda \mathrm{CDM}` model to get the corresponding
+    pdf.
+
+    Parameters
+    ----------
+    redshift : array_like
+        Input redshifts.
+    alpha : float or scalar
+        The alpha parameter in the Schechter stellar mass function
+    m_star : float or int
+        Characteristic stellar mass M_*.
+    m_min : float or int
+        Lower limit of the stalar mass.
+    a_phi, b_phi : float or scalar
+        Slope and intercept of the linear parametrisation of Phi_*.
+    cosmology : instance
+        Instance of an Astropy Cosmology class.
+
+    Returns
+    -------
+    pdf : ndarray or float
+    Un-normalised probability density function as a function of redshift
+    according to Peng et al. [1]_.
+
+    Notes
+    -----
+    This module calculates the function
+
+    .. math::
+
+        \mathrm{pdf}(z) = \Phi_\star(z) \cdot \frac{d_H d_M^2}{E(z)} \cdot
+            \Gamma\left(\alpha + 1, \frac{M_\mathrm{min}}{M_\star}\right)\:,
+
+    with :math:`\Phi_\star(z) = a_\phi z + b_\phi` and the second term the
+    comoving element.
+
+    References
+    ----------
+    .. [1] Peng Y., Lilly S. J. et al., 2010, The Astrophysical Journal,
+    Issue 1, Volume 721, pages 193-221
+
+    Examples
+    --------
+    >>> from skypy.galaxy.redshift import peng_pdf
+    >>> import skypy.utils.astronomy as astro
+    >>> from astropy.cosmology import FlatLambdaCDM
+    >>> import numpy as np
+
+    Calculate the pdf for 100 redshift values between 0 and 2 with
+    a_phi = -0.00011424, b_phi = 0.00033385, alpha = -1.4, m_min = 10**7 and
+    m_star = 10**10.67 for a flat cosmology.
+
+    >>> cosmology = FlatLambdaCDM(H0=70, Om0=0.3, Tcmb0=2.725)
+    >>> redshift = np.linspace(0, 2, 100)
+    >>> redshift = herbel_pdf(redshift=redshift, alpha=-1.4,
+    ...                     m_star=10**10.67, m_min=10**7, a_phi=-0.00011424,
+    ...                     b_phi=0.00033385, cosmology=cosmology)
+    """
+    dv = cosmology.differential_comoving_volume(redshift).value
+    phi = a_phi * redshift + b_phi
+    lg = sc.gammaln(alpha+1)
+    gx = np.fabs(special.gammaincc(alpha+1, m_min/m_star))
+    return dv * phi * np.exp(lg) * gx

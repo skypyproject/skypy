@@ -1,6 +1,7 @@
 import numpy as np
 
-from skypy.galaxy.redshift import smail, herbel_redshift, herbel_pdf
+from skypy.galaxy.redshift import smail, herbel_redshift, herbel_pdf, \
+    peng_redshift, peng_pdf
 from unittest.mock import patch
 from scipy.stats import kstest, norm
 import scipy.integrate
@@ -81,6 +82,56 @@ def test_herbel_redshift_sampling():
                          b_m=-20.40492365,
                          cosmology=cosmology,
                          luminosity_min=2511886.4315095823)
+        cdf = scipy.integrate.cumtrapz(pdf, z, initial=0)
+        cdf = cdf / cdf[-1]
+        return cdf
+
+    p_value = kstest(sample, calc_cdf)[1]
+    assert p_value >= 0.01
+
+
+def test_peng_pdf():
+    from astropy.cosmology import FlatLambdaCDM
+    cosmology = FlatLambdaCDM(H0=70, Om0=0.3, Tcmb0=2.725)
+    pdf = peng_pdf(np.array([0.01, 0.5, 1, 2]),
+                   -1.4, 10 ** 10.67, 10 ** 7, -0.00011424,
+                   0.00033385, cosmology)
+    result = np.array(
+        [1.80599572e+05, 2.25251146e+08, 4.06575066e+08, 2.84607566e+08])
+    np.testing.assert_allclose(pdf, result, rtol=8e-4)
+
+
+# Test whether principle of the interpolation works. Let PDF return the PDF
+# of a Gaussian and sample from the corresponding CDF. Then compare the
+# first three moment of the returned sample with the Gaussian one.
+@patch('skypy.galaxy.redshift.peng_pdf')
+def test_peng_redshift_gauss(peng_pdf):
+    from astropy.cosmology import FlatLambdaCDM
+    cosmology = FlatLambdaCDM(H0=70, Om0=0.3, Tcmb0=2.725)
+    resolution = 100
+    x = np.linspace(-5, 5, resolution)
+    peng_pdf.side_effect = [norm.pdf(x)]
+    sample = peng_redshift(alpha=-1.4, a_phi=-0.00011424, b_phi=0.00033385,
+                           m_star=10 ** 10.67, cosmology=cosmology,
+                           low=-5., high=5.0, size=1000000,
+                           resolution=resolution)
+    p_value = kstest(sample, 'norm')[1]
+    assert p_value >= 0.01
+
+
+# Test that the sampling follows the pdf of Schechter function.
+def test_peng_redshift_sampling():
+    from astropy.cosmology import FlatLambdaCDM
+    cosmology = FlatLambdaCDM(H0=70, Om0=0.3, Tcmb0=2.725)
+    sample = peng_redshift(alpha=-1.4, a_phi=-0.00011424, b_phi=0.00033385,
+                           m_star=10 ** 10.67, cosmology=cosmology,
+                           low=0, high=3, size=1000)
+
+    def calc_cdf(z):
+        pdf = peng_pdf(z, alpha=-1.4, m_star=10**10.67, m_min=10 ** 7,
+                       a_phi=-0.00011424,
+                       b_phi=0.00033385,
+                       cosmology=cosmology)
         cdf = scipy.integrate.cumtrapz(pdf, z, initial=0)
         cdf = cdf / cdf[-1]
         return cdf
