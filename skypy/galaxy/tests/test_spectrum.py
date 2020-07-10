@@ -1,8 +1,10 @@
 import numpy as np
 import scipy.stats
 import pytest
+from astropy.io.fits import getdata
 
-from skypy.galaxy.spectrum import dirichlet_coefficients
+
+from skypy.galaxy.spectrum import dirichlet_coefficients, kcorrect_spectra
 
 
 def test_sampling_coefficients():
@@ -51,3 +53,34 @@ def test_sampling_coefficients():
     with pytest.raises(ValueError,
                        match="alpha0 and alpha1 must be array_like."):
         dirichlet_coefficients(redshift, alpha0, scalar_alpha)
+
+
+def test_kcorrect_spectra():
+    # Test that the shape of the returned flux density corresponds to (nz, nl)
+    kcorrect_templates_url = "https://github.com/blanton144/kcorrect/raw/" \
+                             "master/data/templates/k_nmf_derived.default.fits"
+    lam = getdata(kcorrect_templates_url, 11)
+    coefficients = np.array([[1, 1, 1, 1, 1],
+                            [1, 1, 1, 1, 1]])
+    z = np.array([0.5, 1])
+    mass = np.array([5 * 10 ** 10, 7 * 10 ** 9])
+    lam_o, sed = kcorrect_spectra(z, mass, coefficients)
+
+    assert sed.shape == (len(z), len(lam))
+
+    # Test it returns the right sed and wavelength
+    templates = getdata(kcorrect_templates_url, 1)
+
+    coefficients = np.array([1, 0, 0, 0, 0])
+
+    z = np.array([0])
+    mass = np.array([1])
+
+    sed_test = np.array([templates[0], templates[0]])
+    lam_o_test = np.matmul((1 + z).reshape(len(z), 1),
+                           lam.reshape(1, len(lam)))
+
+    lam_o, sed = kcorrect_spectra(z, mass, coefficients)
+
+    assert np.allclose(lam_o, lam_o_test)
+    assert np.allclose(sed, sed_test)
