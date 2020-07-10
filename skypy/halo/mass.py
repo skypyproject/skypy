@@ -178,7 +178,7 @@ def halo_mass_sampler(m_min, m_max, resolution, wavenumber, power_spectrum,
     And from the Press-Schechter mass function:
 
     >>> mass.press_schechter_mass_sampler(10**9, 10**12, 100, k, Pk, 0, cosmo)
-    7307845605.052011
+    29281420133.346985
 
     References
     ----------
