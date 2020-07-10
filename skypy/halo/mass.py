@@ -173,7 +173,7 @@ def halo_mass_sampler(m_min, m_max, resolution, wavenumber, power_spectrum,
     ...                        halo_mass_function,
     ...                        params=(sheth_tormen_collapse_function,
     ...                                (0.3222, 0.707, 0.3, 1.686)))
-    3386716481.3294
+    29585260719.18624
 
     And from the Press-Schechter mass function:
 
