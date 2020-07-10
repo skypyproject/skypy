@@ -8,11 +8,11 @@ from skypy.utils.random import schechter
 
 
 __all__ = [
-    'schechter_mass',
+    'schechter_smf',
 ]
 
 
-def schechter_mass(alpha, m_star, x_min, x_max, resolution=100, size=None):
+def schechter_smf(alpha, m_star, x_min, x_max, resolution=100, size=None):
     r""" Stellar masses following the Schechter mass function [1]_.
 
     Parameters
@@ -39,12 +39,14 @@ def schechter_mass(alpha, m_star, x_min, x_max, resolution=100, size=None):
 
     Notes
     -----
-     The stellar mass function is given by a Schechter function as
+     The stellar mass probability distribution (pdf) follows a Schechter
+    profile of the form
 
     .. math::
-        \Phi(M, z) = \frac{\Phi_\star(z)}{M_\star}
-            \left(\frac{M}{M_\star}\right)^\alpha
-            \exp\left(-\frac{M}{M_\star}\right) \;.
+        \Phi(M) = \frac{1}{M_*} \left(\frac{M}{M_*}\right)^\alpha
+            \exp\left(-\frac{M}{M_*}\right) \;.
+
+    From this pdf one can sample the stellar masses.
 
 
     References
@@ -60,7 +62,7 @@ def schechter_mass(alpha, m_star, x_min, x_max, resolution=100, size=None):
     Sample 100 stellar masses values at redshift z = 1.0 with alpha = -1.4,
     m_star = 10**10.67, x_min = 0.0002138 and x_max = 213.8
 
-    >>> masses = stellar_mass.schechter_mass(-1.4, 10**10.67, 0.0002138,
+    >>> masses = stellar_mass.schechter_smf(-1.4, 10**10.67, 0.0002138,
     ...                               213.8, size=100)
 
     """
