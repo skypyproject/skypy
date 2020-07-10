@@ -1,4 +1,4 @@
-r"""Models of galaxy mass (total and stellar).
+r"""Models of galaxy stellar mass.
 
 """
 
@@ -8,13 +8,13 @@ from skypy.utils.random import schechter
 
 
 __all__ = [
-    'stellar_mass_function',
+    'schechter_mass',
 ]
 
 
-def stellar_mass_function(alpha, m_star, size=None,
-                          x_min=0.0002138, x_max=213.8, resolution=100):
-    r""" Stellar masses following the Schechter mass function.
+def schechter_mass(alpha, m_star, size=None,
+                   x_min=0.0002138, x_max=213.8, resolution=100):
+    r""" Stellar masses following the Schechter mass function [1]_.
 
     Parameters
     ----------
@@ -62,6 +62,9 @@ def stellar_mass_function(alpha, m_star, size=None,
 
     References
     ----------
+    .. [1] Mo, H., Van den Bosch, F., & White, S. (2010). Galaxy Formation and
+    Evolution. Cambridge: Cambridge University Press.
+    doi:10.1017/CBO9780511807244
 
     Examples
     --------
@@ -70,13 +73,13 @@ def stellar_mass_function(alpha, m_star, size=None,
     Sample 100 stellar masses values at redshift z = 1.0 with alpha = -1.4, and
     m_star = 10**10.67.
 
-    >>> masses = mass.stellar_mass_function(1.0, -1.4, 10**10.67, size=100)
+    >>> masses = mass.schechter_mass(-1.4, 10**10.67, size=100)
 
     Sample a luminosity value for every redshift in an array z with
     alpha = -1.3 amd m_star = 10**10.67.
 
     >>> z = np.linspace(0,2, 100)
-    >>> masses = mass.stellar_mass_function(z, -1.4, m_star = 10**10.67)
+    >>> masses = mass.schechter_mass(-1.4, m_star = 10**10.67)
 
 
 
