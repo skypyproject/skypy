@@ -2,7 +2,6 @@ import numpy as np
 from astropy.cosmology import Planck15
 from astropy.units import allclose
 from skypy.power_spectrum import _eisenstein_hu as eh
-from skypy.power_spectrum import growth_function
 
 
 import skypy.halo.mass as mass
@@ -21,47 +20,58 @@ mass_funct = [3.35678772e-11, 3.87001910e-12, 4.46652718e-13, 5.15069390e-14,
               5.90581307e-15, 6.65419937e-16, 7.14923865e-17, 6.87084218e-18,
               5.22044135e-19, 2.43974103e-20]
 
-cosmology = Planck15
-redshift = 0.0
-k = np.logspace(-3, 1, num=5, base=10.0)
+cosmo = Planck15
+k = np.logspace(-3, 1, num=10, base=10.0)
 A_s, n_s = 2.1982e-09, 0.969453
-Pk = eh.eisenstein_hu(k, A_s, n_s, cosmology, kwmap=0.02, wiggle=True)
-D0 = growth_function(0, cosmology)
-Dz = growth_function(redshift, cosmology) / D0
+Pk = eh.eisenstein_hu(k, A_s, n_s, cosmo, kwmap=0.02, wiggle=True)
 
 
 def test_halo_mass_function():
     # Test the output shape is correct given an array of masses
     m_array = np.asarray(mass_array)
-    sigma = np.sqrt(mass._sigma_squared(m_array, k, Pk, Dz, cosmology))
-    fps = mass.press_schechter_collapse_function(sigma)
-    array_output = mass.halo_mass_function(m_array, sigma, fps, cosmology)
-    assert array_output.shape == m_array.shape
+    # Sheth and Tormen collapse model
+    param_ST = (0.3222, 0.707, 0.3, 1.686)
+    fST = mass.sheth_tormen_collapse_function
+    array_output_ST = mass.halo_mass_function(m_array, k, Pk, 0, cosmo,
+                                              fST, params=param_ST)
+    assert array_output_ST.shape == m_array.shape
+    # Press-Schechter collapse model
+    array_output_PS = mass.press_schechter_mass_function(m_array, k, Pk,
+                                                         0, cosmo)
+    assert array_output_PS.shape == m_array.shape
 
 
 def halo_mass_sampler():
     # Test the output shape is correct given the sample size
-    m_array = np.asarray(mass_array)
-    sigma = np.sqrt(mass._sigma_squared(m_array, k, Pk, Dz, cosmology))
-    fps = mass.press_schechter_collapse_function(sigma)
-    mf = mass.halo_mass_function(m_array, sigma, fps, cosmology)
     n_samples = 1000
-    array_output = mass.halo_mass_sampler(mf, m_array, size=n_samples)
-    assert len(array_output) == n_samples
+    m_min, m_max, resolution = 10**9, 10**12, 100
+    # Sheth and Tormen collapse model
+    param_ST = (mass.sheth_tormen_collapse_function,
+                (0.3222, 0.707, 0.3, 1.686))
+
+    array_output_ST = mass.halo_mass_sampler(m_min, m_max, resolution, k, Pk,
+                                             0, cosmo, mass.halo_mass_function,
+                                             params=param_ST, size=n_samples)
+    assert len(array_output_ST) == n_samples
+
+    # Press-Schechter collapse model
+    array_output_PS = mass.press_schechter_mass_sampler(10**9, 10**12, 100, k,
+                                                        Pk, 0, cosmo)
+    assert len(array_output_PS) == n_samples
 
 
 def test_sheth_tormen_collapse_function():
-    # Test agains precomputed values
+    # Test against precomputed values
     m_array = np.asarray(mass_array)
-    sigma = np.sqrt(mass._sigma_squared(m_array, k, Pk, Dz, cosmology))
+    sigma = np.sqrt(mass._sigma_squared(m_array, k, Pk, 0, cosmo))
     ST_params = (0.3222, 0.707, 0.3, 1.686)
     fst = mass.sheth_tormen_collapse_function(sigma, params=ST_params)
     assert allclose(fst, ST_fsigma)
 
 
 def test_press_schechter_collapse_function():
-    # Test agains precomputed values
+    # Test against precomputed values
     m_array = np.asarray(mass_array)
-    sigma = np.sqrt(mass._sigma_squared(m_array, k, Pk, Dz, cosmology))
+    sigma = np.sqrt(mass._sigma_squared(m_array, k, Pk, 0, cosmo))
     fps = mass.press_schechter_collapse_function(sigma)
     assert allclose(fps, PS_fsigma)
