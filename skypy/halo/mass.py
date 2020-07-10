@@ -12,6 +12,7 @@ Models
    halo_mass_sampler
    sheth_tormen_collapse_function
    press_schechter_collapse_function
+   press_schechter_mass_sampler
 '''
 
 import numpy as np
