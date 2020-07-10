@@ -1,19 +1,19 @@
 import numpy as np
 import scipy.stats
 import scipy.integrate
-import scipy.special as sc
+from scipy.special import gammaln
 import pytest
 
-import skypy.galaxy.stellar_mass as mass
-import skypy.utils.special as special
+from skypy.galaxy import stellar_mass
+from skypy.utils import special
 
 
 def test_exponential_distribution():
     # When alpha=0, M*=1 and x_min~0 we get a truncated exponential
     q_max = 1e2
-    sample = mass.schechter_mass(0, 1, size=1000,
-                                 x_min=1e-10, x_max=q_max,
-                                 resolution=1000)
+    sample = stellar_mass.schechter_mass(0, 1, size=1000,
+                                         x_min=1e-10, x_max=q_max,
+                                         resolution=1000)
     d, p_value = scipy.stats.kstest(sample, 'truncexpon', args=(q_max,))
     assert p_value >= 0.01
 
@@ -22,14 +22,20 @@ def test_stellar_masses():
     # Test that error is returned if m_star input is an array but size !=
     # None and size != m_star,size
     with pytest.raises(ValueError):
-        mass.schechter_mass(-1.4, np.array([1e10, 2e10]), size=3)
+        stellar_mass.schechter_mass(-1.4, np.array([1e10, 2e10]), 2, 1, size=3)
+
+    # Test that an array with the sme shape as m_star is returned if m_star is
+    # an array and size = None
+    m_star = np.array([1e10, 2e10])
+    sample = stellar_mass.schechter_mass(-1.4, m_star, 2, 1, size=None)
+    assert m_star.shape == sample.shape
 
     # Test that sampling corresponds to sampling from the right pdf.
     # For this, we sample an array of luminosities for redshift z = 1.0 and we
     # compare it to the corresponding cdf.
 
     def calc_pdf(m, alpha, mass_star, mass_min, mass_max):
-        lg = sc.gammaln(alpha + 1)
+        lg = gammaln(alpha + 1)
         c = np.fabs(special.gammaincc(alpha + 1, mass_min / mass_star))
         d = np.fabs(special.gammaincc(alpha + 1, mass_max / mass_star))
         norm = np.exp(lg) * (c - d)
@@ -49,9 +55,8 @@ def test_stellar_masses():
     m_star = 10 ** 10.67
     m_min = 10 ** 7
     m_max = 10 ** 13
-    sample = mass.schechter_mass(-1.4, m_star, size=1000000,
-                                 x_min=m_min / m_star,
-                                 x_max=m_max / m_star,
-                                 resolution=100)
+    sample = stellar_mass.schechter_mass(-1.4, m_star, m_min / m_star,
+                                         m_max / m_star, size=1000,
+                                         resolution=100)
     p_value = scipy.stats.kstest(sample, calc_cdf)[1]
     assert p_value >= 0.01

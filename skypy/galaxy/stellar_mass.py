@@ -12,13 +12,12 @@ __all__ = [
 ]
 
 
-def schechter_mass(alpha, m_star, size=None,
-                   x_min=0.0002138, x_max=213.8, resolution=100):
+def schechter_mass(alpha, m_star, x_min, x_max, resolution=100, size=None):
     r""" Stellar masses following the Schechter mass function [1]_.
 
     Parameters
     ----------
-    alpha : float or int
+    alpha : float
         The alpha parameter in the Schechter stellar mass function.
     m_star : array-like
         Characteristic stellar mass M_*.
@@ -27,8 +26,8 @@ def schechter_mass(alpha, m_star, size=None,
          is a scalar, a single sample is returned. If size is None and
          m_star is an array, an array of samples is returned with the same
          shape as m_star.
-    x_min, x_max : float or int, optional
-        Lower and upper stella mass bounds in units of M_*.
+    x_min, x_max : float
+        Lower and upper bounds for the random variable x in units of M_*.
     resolution : int, optional
         Resolution of the inverse transform sampling spline. Default is 100.
 
@@ -47,18 +46,6 @@ def schechter_mass(alpha, m_star, size=None,
             \left(\frac{M}{M_\star}\right)^\alpha
             \exp\left(-\frac{M}{M_\star}\right) \;.
 
-   The redshift dependence of :math:`\Phi_\star(z)` is given by
-
-    .. math::
-
-        \Phi_\star(z) = a_\phi z + b_phi \;.
-
-    Now we have to rescale the Schechter function by the comoving element and
-    get
-
-    .. math::
-
-        \phi(M,z) = \frac{d_H d_M^2}{E(z)}  \Phi(M,z)\;.
 
     References
     ----------
@@ -68,20 +55,13 @@ def schechter_mass(alpha, m_star, size=None,
 
     Examples
     --------
-    >>> import skypy.galaxy.stellar_mass as mass
+    >>> from skypy.galaxy import stellar_mass
 
-    Sample 100 stellar masses values at redshift z = 1.0 with alpha = -1.4, and
-    m_star = 10**10.67.
+    Sample 100 stellar masses values at redshift z = 1.0 with alpha = -1.4,
+    m_star = 10**10.67, x_min = 0.0002138 and x_max = 213.8
 
-    >>> masses = mass.schechter_mass(-1.4, 10**10.67, size=100)
-
-    Sample a luminosity value for every redshift in an array z with
-    alpha = -1.3 amd m_star = 10**10.67.
-
-    >>> z = np.linspace(0,2, 100)
-    >>> masses = mass.schechter_mass(-1.4, m_star = 10**10.67)
-
-
+    >>> masses = stellar_mass.schechter_mass(-1.4, 10**10.67, 0.0002138,
+    ...                               213.8, size=100)
 
     """
 
