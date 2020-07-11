@@ -191,7 +191,7 @@ def halo_mass_sampler(m_min, m_max, resolution, wavenumber, power_spectrum,
     >>> params_model = (0.3, 0.7, 0.3, 1.686)
     >>> mass.halo_mass_sampler(10**9, 10**12, 100, k, Pk, D0, cosmo,
     ...     ellipsoidal_collapse_function, params=params_model)
-    1986623652.2446365
+    1504984926.6402774
 
     References
     ----------
