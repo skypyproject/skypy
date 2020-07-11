@@ -17,14 +17,14 @@ class SkyPyDriver:
     r'''Class for running pipelines.
 
     This is the main class for running pipelines of functions with dependencies
-    and using their results to generate tables.
+    and using their results to generate variables and tables.
     '''
 
     def execute(self, config, file_format=None):
         r'''Run a pipeline.
 
-        This function runs a pipeline of functions to generate the cosmology
-        and the columns of a set of tables. It uses a Directed Acyclic Graph to
+        This function runs a pipeline of functions to generate variables and
+        the columns of a set of tables. It uses a Directed Acyclic Graph to
         determine a non-blocking order of execution that resolves any
         dependencies, see [1]_. Tables can optionally be written to file.
 
@@ -51,14 +51,15 @@ class SkyPyDriver:
         'requires' specifices the names of previous steps in the pipeline and
         uses their return values as keyword arguments.
 
-        'config' should contain 'cosmology' and/or 'tables'. 'cosmology' should
-        return a dictionary configuring a function that returns an
-        astropy.cosmology.Cosmology object. 'tables' should contain a set of
-        nested dictionaries, first giving the names of each table, then the
-        names of each column within each table. Each column should return a
-        dictionary configuring a function that returns an array-like object.
+        'config' should contain the name and configuration of each variable
+        and/or an entry named 'tables'. 'tables' should contain a set of nested
+        dictionaries, first containing the name of each table, then the name
+        and configuration of each column and optionally an entry named 'init'
+        with a configuration that initialises the table. If 'init' is not
+        specificed the table will be initialised as an empty astropy Table by
+        default.
 
-        See [3]_ for examples of pipeline configurations in yaml format.
+        See [3]_ for examples of pipeline configurations in YAML format.
 
         References
         ----------
