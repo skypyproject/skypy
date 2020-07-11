@@ -63,18 +63,22 @@ def halo_mass_sampler():
     # Test the output shape is correct given the sample size
     n_samples = 1000
     m_min, m_max, resolution = 10**9, 10**12, 100
-    # Sheth and Tormen collapse model
-    param_ST = (mass.sheth_tormen_collapse_function,
-                (0.3222, 0.707, 0.3, 1.686))
+    # Any particular ellipsoidal collapse model
+    params_E = (0.3, 0.7, 0.3, 1.686)
+    fE = mass.ellipsoidal_collapse_function
+    array_output_E = mass.halo_mass_sampler(m_min, m_max, resolution, k, Pk,
+                                            1.0, cosmo, fE, params=params_E,
+                                            size=n_samples)
+    assert len(array_output_E) == n_samples
 
-    array_output_ST = mass.halo_mass_sampler(m_min, m_max, resolution, k, Pk,
-                                             0, cosmo, mass.halo_mass_function,
-                                             params=param_ST, size=n_samples)
-    assert len(array_output_ST) == n_samples
+    # Sheth and Tormen collapse model
+    array_output_PS = mass.sheth_tormen(10**9, 10**12, 100, k,
+                                        Pk, 1.0, cosmo)
+    assert len(array_output_PS) == n_samples
 
     # Press-Schechter collapse model
-    array_output_PS = mass.press_schechter_mass_sampler(10**9, 10**12, 100, k,
-                                                        Pk, 0, cosmo)
+    array_output_PS = mass.press_schechter(10**9, 10**12, 100, k,
+                                           Pk, 1.0, cosmo)
     assert len(array_output_PS) == n_samples
 
 
