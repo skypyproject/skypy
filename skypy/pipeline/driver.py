@@ -75,6 +75,8 @@ class SkyPyDriver:
             dag.add_node(job)
         for table, columns in table_config.items():
             dag.add_node(table)
+            table_complete = '.'.join((table, "complete"))
+            dag.add_node(table_complete)
             for column in columns.keys():
                 job = '.'.join((table, column))
                 dag.add_node(job)
@@ -82,9 +84,11 @@ class SkyPyDriver:
             requirements = settings.get('requires', {}).values()
             dag.add_edges_from((r, job) for r in requirements)
         for table, columns in table_config.items():
+            table_complete = '.'.join((table, "complete"))
             for column, settings in columns.items():
                 job = '.'.join((table, column))
                 dag.add_edge(table, job)
+                dag.add_edge(job, table_complete)
                 requirements = settings.get('requires', {}).values()
                 dag.add_edges_from((r, job) for r in requirements)
 
@@ -97,6 +101,8 @@ class SkyPyDriver:
                 setattr(self, job, Table())
             else:
                 table, column = job.split('.')
+                if column == 'complete':
+                    continue
                 settings = table_config[table][column]
                 getattr(self, table)[column] = self._call_from_config(settings)
 
