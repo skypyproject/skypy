@@ -4,7 +4,6 @@ This module provides methods to run pipelines of functions with dependencies
 and handle their results.
 """
 
-from astropy.table import Table
 import networkx
 import re
 
@@ -71,6 +70,8 @@ class SkyPyDriver:
         # Create a Directed Acyclic Graph of all jobs and dependencies
         dag = networkx.DiGraph()
         table_config = config.pop('tables', {})
+        default_table = {'module': 'astropy.table', 'function': 'Table'}
+        table_init = {k: v.pop('init', default_table) for k, v in table_config.items()}
         for job in config.keys():
             dag.add_node(job)
         for table, columns in table_config.items():
@@ -85,8 +86,14 @@ class SkyPyDriver:
             dag.add_edges_from((r, job) for r in requirements)
             dependencies = settings.get('depends', [])
             dag.add_edges_from((d, job) for d in dependencies)
+        for table, settings in table_init.items():
+            requirements = settings.get('requires', {}).values()
+            dag.add_edges_from((r, table) for r in requirements)
+            dependencies = settings.get('depends', [])
+            dag.add_edges_from((d, table) for d in dependencies)
         for table, columns in table_config.items():
             table_complete = '.'.join((table, "complete"))
+            dag.add_edge(table, table_complete)
             for column, settings in columns.items():
                 job = '.'.join((table, column))
                 dag.add_edge(table, job)
@@ -101,8 +108,9 @@ class SkyPyDriver:
             if job in config:
                 settings = config.get(job)
                 setattr(self, job, self._call_from_config(settings))
-            elif job in table_config:
-                setattr(self, job, Table())
+            elif job in table_init:
+                settings = table_init.get(job)
+                setattr(self, job, self._call_from_config(settings))
             else:
                 table, column = job.split('.')
                 if column == 'complete':
