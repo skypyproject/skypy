@@ -83,6 +83,8 @@ class SkyPyDriver:
         for job, settings in config.items():
             requirements = settings.get('requires', {}).values()
             dag.add_edges_from((r, job) for r in requirements)
+            dependencies = settings.get('depends', [])
+            dag.add_edges_from((d, job) for d in dependencies)
         for table, columns in table_config.items():
             table_complete = '.'.join((table, "complete"))
             for column, settings in columns.items():
@@ -91,6 +93,8 @@ class SkyPyDriver:
                 dag.add_edge(job, table_complete)
                 requirements = settings.get('requires', {}).values()
                 dag.add_edges_from((r, job) for r in requirements)
+                dependencies = settings.get('depends', [])
+                dag.add_edges_from((d, job) for d in dependencies)
 
         # Execute jobs in order that resolves dependencies
         for job in networkx.topological_sort(dag):
