@@ -10,9 +10,11 @@ Models
    press_schechter
    halo_mass_function
    halo_mass_sampler
-   sheth_tormen_collapse_function
+   ellipsoidal_collapse_function
    press_schechter_collapse_function
-   press_schechter_mass_sampler
+   sheth_tormen_collapse_function
+   press_schechter
+   sheth_tormen
 '''
 
 import numpy as np
@@ -201,9 +203,9 @@ def halo_mass_sampler(m_min, m_max, resolution, wavenumber, power_spectrum,
     return np.interp(n_uniform, CDF, m)
 
 
-def sheth_tormen_collapse_function(sigma, params):
-    r'''Sheth & Tormen collapse fraction.
-    This function computes the Sheth & Tormen mass fumction for ellipsoidal
+def ellipsoidal_collapse_function(sigma, params):
+    r'''Spherical collapse function.
+    This function computes the mass fumction for ellipsoidal
     collapse, see equation 10 in [1]_ or [2]_.
 
     Parameters
@@ -262,8 +264,10 @@ def sheth_tormen_collapse_function(sigma, params):
         (1.0 + np.power(np.power(sigma / delta_c, 2.0) / a, p))
 
 
-press_schechter_collapse_function = partial(sheth_tormen_collapse_function,
+press_schechter_collapse_function = partial(ellipsoidal_collapse_function,
                                             params=(0.5, 1, 0, 1.69))
+sheth_tormen_collapse_function = partial(ellipsoidal_collapse_function,
+                                         params=(0.3222, 0.707, 0.3, 1.686))
 press_schechter_mass_function = partial(
                                 halo_mass_function,
                                 collapse_function=sheth_tormen_collapse_function,

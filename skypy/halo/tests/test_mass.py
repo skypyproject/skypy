@@ -64,8 +64,7 @@ def test_sheth_tormen_collapse_function():
     # Test against precomputed values
     m_array = np.asarray(mass_array)
     sigma = np.sqrt(mass._sigma_squared(m_array, k, Pk, 0, cosmo))
-    ST_params = (0.3222, 0.707, 0.3, 1.686)
-    fst = mass.sheth_tormen_collapse_function(sigma, params=ST_params)
+    fst = mass.sheth_tormen_collapse_function(sigma)
     assert allclose(fst, ST_fsigma)
 
 
