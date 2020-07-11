@@ -20,9 +20,7 @@ Models
 import numpy as np
 from scipy import integrate
 from functools import partial
-from astropy import units as u
-from skypy.power_spectrum import growth_function
-from skypy.utils.random import schechter
+from astropy import units
 
 __all__ = [
     'halo_mass_function',
@@ -30,7 +28,6 @@ __all__ = [
     'sheth_tormen_collapse_function',
     'press_schechter_collapse_function',
     'press_schechter_mass_function',
-    'press_schechter',
  ]
 
 
@@ -109,8 +106,8 @@ def halo_mass_function(M, wavenumber, power_spectrum, redshift, cosmology,
     f_c = collapse_function(sigma, params)
 
     dlognu_dlogm = _dlns_dlnM(sigma, M)
-    rho_bar = (cosmology.critical_density(0).to(u.Msun / u.Mpc ** 3)).value
-    rho_m0 = cosmology.Om(0) * rho_bar
+    rho_bar = (cosmology.critical_density0.to(units.Msun / units.Mpc ** 3)).value
+    rho_m0 = cosmology.Om0 * rho_bar
 
     return rho_m0 * f_c * dlognu_dlogm / np.power(M, 2)
 
@@ -278,70 +275,23 @@ press_schechter_mass_sampler = partial(halo_mass_sampler,
                                                (0.5, 1, 0, 1.69)))
 
 
-def _sigma_squared(M, wavenumber, linear_power_today,
-                   redshift, cosmology):
-    k = wavenumber
-    Pk = linear_power_today
+def _sigma_squared(M, k, Pk, growth_function, cosmology):
     M = np.atleast_1d(M)[:, np.newaxis]
 
     # Growth function
-    D0 = growth_function(0, cosmology)
-    Dz = growth_function(redshift, cosmology) / D0
+    Dz2 = np.power(growth_function, 2)
 
     # Matter mean density today
-    rho_bar = (cosmology.critical_density(0).to(u.Msun / u.Mpc ** 3)).value
-    rho_m0 = cosmology.Om(0) * rho_bar
+    rho_bar = (cosmology.critical_density0.to(units.Msun / units.Mpc ** 3)).value
+    rho_m0 = cosmology.Om0 * rho_bar
 
     R = np.power(3 * M / (4 * np.pi * rho_m0), 1.0 / 3.0)
     top_hat = 3. * (np.sin(k * R) - k * R * np.cos(k * R)) / ((k * R)**3.)
     integrand = Pk * np.power(top_hat * k, 2)
 
-    return Dz**2 * integrate.simps(integrand, k) / (2. * np.pi**2.)
+    return Dz2 * integrate.simps(integrand, k) / (2. * np.pi**2.)
 
 
 def _dlns_dlnM(sigma, M):
     ds = np.gradient(sigma, M)
     return np.absolute((M / sigma) * ds)
-
-
-def press_schechter(n, m_star, size=None, x_min=0.00305,
-                    x_max=1100.0, resolution=100):
-    """Sampling from Press-Schechter mass function (1974).
-    Masses following the Press-Schechter mass function following the
-    Press and Schechter [1]_ formalism.
-
-    Parameters
-    ----------
-    n : float
-        The n parameter in the Press-Schechter mass function.
-    m_star : float
-        Factors parameterising the characteristic mass.
-    size: int, optional
-        Output shape of luminosity samples.
-    x_min, x_max : float or int, optional
-        Lower and upper bounds in units of M*.
-    resolution : int, optional
-        Resolution of the inverse transform sampling spline. Default is 100.
-
-    Returns
-    -------
-    mass : array_like
-        Drawn masses from the Press-Schechter mass function.
-
-    Examples
-    --------
-    >>> import skypy.halo.mass as mass
-    >>> n, m_star = 1, 1e9
-    >>> sample = mass.press_schechter(n, m_star, size=1000, x_min=1e-10,
-    ...                               x_max=1e2, resolution=1000)
-
-    References
-    ----------
-    .. [1] Press, W. H. and Schechter, P., APJ, (1974).
-    """
-
-    alpha = - 0.5 * (n + 9.0) / (n + 3.0)
-
-    x_sample = schechter(alpha, x_min, x_max, resolution=resolution, size=size)
-
-    return m_star * np.power(x_sample, 3.0 / (n + 3.0))
