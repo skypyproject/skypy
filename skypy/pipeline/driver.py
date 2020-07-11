@@ -67,30 +67,31 @@ class SkyPyDriver:
         .. [3] https://github.com/skypyproject/skypy/tree/master/examples
         '''
 
-        # Create a Directed Acyclic Graph of all jobs and dependencies
-        dag = networkx.DiGraph()
+        # config contains settings for all variables and table initialisation
+        # table_config contains settings for all table columns
         table_config = config.pop('tables', {})
         default_table = {'module': 'astropy.table', 'function': 'Table'}
-        table_init = {k: v.pop('init', default_table) for k, v in table_config.items()}
-        for job in config.keys():
+        config.update({k: v.pop('init', default_table)
+                      for k, v in table_config.items()})
+
+        # Create a Directed Acyclic Graph of all jobs and dependencies
+        dag = networkx.DiGraph()
+
+        # Add nodes for each variable, table and column
+        for job in config:
             dag.add_node(job)
         for table, columns in table_config.items():
-            dag.add_node(table)
             table_complete = '.'.join((table, "complete"))
             dag.add_node(table_complete)
             for column in columns.keys():
                 job = '.'.join((table, column))
                 dag.add_node(job)
+
+        # Add edges for all requirements and dependencies
         for job, settings in config.items():
-            requirements = settings.get('requires', {}).values()
-            dag.add_edges_from((r, job) for r in requirements)
             dependencies = settings.get('depends', [])
+            dependencies += settings.get('requires', {}).values()
             dag.add_edges_from((d, job) for d in dependencies)
-        for table, settings in table_init.items():
-            requirements = settings.get('requires', {}).values()
-            dag.add_edges_from((r, table) for r in requirements)
-            dependencies = settings.get('depends', [])
-            dag.add_edges_from((d, table) for d in dependencies)
         for table, columns in table_config.items():
             table_complete = '.'.join((table, "complete"))
             dag.add_edge(table, table_complete)
@@ -98,23 +99,19 @@ class SkyPyDriver:
                 job = '.'.join((table, column))
                 dag.add_edge(table, job)
                 dag.add_edge(job, table_complete)
-                requirements = settings.get('requires', {}).values()
-                dag.add_edges_from((r, job) for r in requirements)
                 dependencies = settings.get('depends', [])
+                dependencies += settings.get('requires', {}).values()
                 dag.add_edges_from((d, job) for d in dependencies)
 
         # Execute jobs in order that resolves dependencies
         for job in networkx.topological_sort(dag):
-            if job in config:
+            if job.endswith('.complete'):
+                continue
+            elif job in config:
                 settings = config.get(job)
-                setattr(self, job, self._call_from_config(settings))
-            elif job in table_init:
-                settings = table_init.get(job)
                 setattr(self, job, self._call_from_config(settings))
             else:
                 table, column = job.split('.')
-                if column == 'complete':
-                    continue
                 settings = table_config[table][column]
                 getattr(self, table)[column] = self._call_from_config(settings)
 
