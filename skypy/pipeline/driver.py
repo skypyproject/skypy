@@ -70,35 +70,39 @@ class SkyPyDriver:
 
         # Create a Directed Acyclic Graph of all jobs and dependencies
         dag = networkx.DiGraph()
-        if 'cosmology' in config:
-            dag.add_node('cosmology')
-        for table, columns in config.get('tables', {}).items():
+        table_config = config.pop('tables', {})
+        for job in config.keys():
+            dag.add_node(job)
+        for table, columns in table_config.items():
             dag.add_node(table)
+            for column in columns.keys():
+                job = '.'.join((table, column))
+                dag.add_node(job)
+        for job, settings in config.items():
+            requirements = settings.get('requires', {}).values()
+            dag.add_edges_from((r, job) for r in requirements)
+        for table, columns in table_config.items():
             for column, settings in columns.items():
-                node = '.'.join((table, column))
-                dag.add_node(node)
-        for table, columns in config.get('tables', {}).items():
-            for column, settings in columns.items():
-                node = '.'.join((table, column))
-                dag.add_edge(table, node)
+                job = '.'.join((table, column))
+                dag.add_edge(table, job)
                 requirements = settings.get('requires', {}).values()
-                dag.add_edges_from((r, node) for r in requirements)
+                dag.add_edges_from((r, job) for r in requirements)
 
         # Execute jobs in order that resolves dependencies
         for job in networkx.topological_sort(dag):
-            if job == 'cosmology':
-                settings = config.get('cosmology')
-                self.cosmology = self._call_from_config(settings)
-            elif job in config.get('tables', {}):
+            if job in config:
+                settings = config.get(job)
+                setattr(self, job, self._call_from_config(settings))
+            elif job in table_config:
                 setattr(self, job, Table())
             else:
                 table, column = job.split('.')
-                settings = config['tables'][table][column]
+                settings = table_config[table][column]
                 getattr(self, table)[column] = self._call_from_config(settings)
 
         # Write tables to file
         if file_format:
-            for table in config.get('tables', {}).keys():
+            for table in table_config.keys():
                 filename = '.'.join((table, file_format))
                 getattr(self, table).write(filename)
 
