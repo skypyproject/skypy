@@ -78,6 +78,14 @@ class SkyPyDriver:
         # Create a Directed Acyclic Graph of all jobs and dependencies
         dag = networkx.DiGraph()
 
+        # Variables initialised by value don't require function evaluations
+        def isfunction(f):
+            return isinstance(f, dict) and 'module' in f and 'function' in f
+        variables = {k: v for k, v in config.items() if not isfunction(v)}
+        for v in variables:
+            dag.add_node(v)
+            setattr(self, v, config.pop(v))
+
         # Add nodes for each variable, table and column
         for job in config:
             dag.add_node(job)
@@ -106,7 +114,7 @@ class SkyPyDriver:
 
         # Execute jobs in order that resolves dependencies
         for job in networkx.topological_sort(dag):
-            if job.endswith('.complete'):
+            if job in variables or job.endswith('.complete'):
                 continue
             elif job in config:
                 settings = config.get(job)
