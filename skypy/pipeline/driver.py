@@ -4,6 +4,7 @@ This module provides methods to run pipelines of functions with dependencies
 and handle their results.
 """
 
+from copy import deepcopy
 import networkx
 import re
 
@@ -20,7 +21,7 @@ class SkyPyDriver:
     and using their results to generate variables and tables.
     '''
 
-    def execute(self, config, file_format=None):
+    def execute(self, configuration, file_format=None):
         r'''Run a pipeline.
 
         This function runs a pipeline of functions to generate variables and
@@ -30,7 +31,7 @@ class SkyPyDriver:
 
         Parameters
         ----------
-        config : dict-like
+        configuration : dict-like
             Configuration for the pipeline.
         file_format : str
             File format used to write tables. Files are written using the
@@ -70,6 +71,7 @@ class SkyPyDriver:
 
         # config contains settings for all variables and table initialisation
         # table_config contains settings for all table columns
+        config = deepcopy(configuration)
         table_config = config.pop('tables', {})
         default_table = {'module': 'astropy.table', 'function': 'Table'}
         config.update({k: v.pop('init', default_table)

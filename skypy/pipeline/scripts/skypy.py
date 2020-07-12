@@ -55,6 +55,7 @@ def main(args=None):
 
     args = parser.parse_args(args or ['--help'])
     config = yaml.safe_load(args.config)
+    config = {} if config is None else config
     driver = SkyPyDriver()
     driver.execute(config, file_format=args.format)
     return(0)
