@@ -9,13 +9,26 @@ from astropy import units
 
 
 __all__ = [
-           'abadie_tableIII_merger_rates',
+           'b_band_merger_rate',
 ]
 
 
+abadie_table_III = {
+                    'NS-NS': {'low': 0.6,
+                              'realistic': 60,
+                              'high': 600,
+                              'max': 2000},
+                    'NS-BH': {'low': 0.03,
+                              'realistic': 2,
+                              'high': 60},
+                    'BH-BH': {'low': 0.006,
+                              'realistic': 0.2,
+                              'high': 20}
+                    }
+
 def b_band_merger_rate(luminosity,
-                                 population='NS-NS',
-                                 optimism='low'):
+                       population='NS-NS',
+                       optimism='low'):
 
     r"""Model of Abadie et al (2010), Table III
 
@@ -49,6 +62,7 @@ def b_band_merger_rate(luminosity,
       ----------
       .. Abadie et al. 2010, Classical and Quantum Gravity,
           Volume 27, Issue 17, article id. 173001 (2010)
+          https://arxiv.org/abs/1003.2480
 
       Examples
       --------
@@ -70,20 +84,10 @@ def b_band_merger_rate(luminosity,
 
 
       """
-    abadie_table_III = {
-                            'NS-NS': {'low': 0.6,
-                                      'realistic': 60,
-                                      'high': 600,
-                                      'max': 2000},
-                            'NS-BH': {'low': 0.03,
-                                      'realistic': 2,
-                                      'high': 60},
-                            'BH-BH': {'low': 0.006,
-                                      'realistic': 0.2,
-                                      'high': 20}
-                            }
+    L_B = units.Lsun.to(units.erg / units.s) / 2.16e33 # to blue light solar
+    L_10 = luminosity / (L_B * 1.e10)
 
-    merger_rate = abadie_tableIII_dict[population][optimism] * luminosity
+    merger_rate = abadie_table_III[population][optimism] * L_10
     merger_rate = merger_rate / units.year
 
     return merger_rate
