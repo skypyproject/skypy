@@ -19,4 +19,4 @@ def test_abadie_rates():
                                        optimism='low')
 
     assert len(abIII_rates) == len(luminosities)
-    assert np.any(np.isclose(L_B_rate, 0.6 / units.year, rtol=1e-1))
+    assert np.isclose(L_B_rate.to(1. / units.year).value, 0.6, rtol=1e-1)
