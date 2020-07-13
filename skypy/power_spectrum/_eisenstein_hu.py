@@ -1,6 +1,6 @@
-"""Eisenstein and Hu module.
+"""Eisenstein and Hu.
 
-This module facilitates the computation of the Eisenstein and Hu fitting
+This implements the Eisenstein and Hu fitting
 formula for the matter power spectrum.
 """
 
@@ -24,7 +24,7 @@ def transfer_with_wiggles(wavenumber, A_s, n_s, cosmology, kwmap=0.02):
     Parameters
     ----------
     wavenumber : (nk,) array_like
-        Array of wavenumbers in units of :math:`[Mpc^-1]` at which to evaluate
+        Array of wavenumbers in units of :math:`1/Mpc` at which to evaluate
         the linear matter power spectrum.
     cosmology : astropy.cosmology.Cosmology
         Cosmology object providing omega_matter, omega_baryon, Hubble parameter
@@ -33,8 +33,8 @@ def transfer_with_wiggles(wavenumber, A_s, n_s, cosmology, kwmap=0.02):
         Amplitude and spectral index of primordial scalar fluctuations.
     kwmap : float
         WMAP normalization for the amplitude of primordial scalar fluctuations,
-        as described in [3]_, in units of :math:`[Mpc^-1]`.
-        Default is 0.02/Mpc.
+        as described in [3]_, in units of :math:`1/Mpc`.
+        Default is 0.02.
 
     Returns
     -------
@@ -155,7 +155,7 @@ def transfer_no_wiggles(wavenumber, A_s, n_s, cosmology):
     Parameters
     ----------
     wavenumber : (nk,) array_like
-        Array of wavenumbers in units of :math:`[Mpc^-1]` at which to evaluate
+        Array of wavenumbers in units of :math:`1/Mpc` at which to evaluate
         the linear matter power spectrum.
     A_s, n_s: float
         Amplitude and spectral index of primordial scalar fluctuations.
@@ -228,7 +228,7 @@ def eisenstein_hu(wavenumber, A_s, n_s, cosmology, kwmap=0.02, wiggle=True):
     Parameters
     ----------
     wavenumber : (nk, ) array_like
-        Array of wavenumbers in units of :math:`[Mpc^-1]` at which to evaluate
+        Array of wavenumbers in units of :math:`1/Mpc` at which to evaluate
         the linear matter power spectrum.
     A_s, n_s: float
         Amplitude and spectral index of primordial scalar fluctuations.
@@ -237,7 +237,7 @@ def eisenstein_hu(wavenumber, A_s, n_s, cosmology, kwmap=0.02, wiggle=True):
         and CMB temperature in the present day.
     kwmap : float
         WMAP normalization for the amplitude of primordial scalar fluctuations,
-        as described in [3], in units of [Mpc^-1]. Default is 0.02.
+        as described in [3], in units of :math:`1/Mpc`. Default is 0.02.
     wiggle : bool
         Boolean flag to set the use of baryion acoustic oscillations wiggles.
         Default is True, for which the power spectrum is computed with the

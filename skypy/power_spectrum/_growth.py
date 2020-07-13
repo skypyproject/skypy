@@ -1,6 +1,6 @@
-"""Growth function module.
+"""Growth function.
 
-This module facilitates the computation of the linear growth function in
+This computes the linear growth function in
 perturbation theory.
 """
 
@@ -53,7 +53,8 @@ def growth_function_carroll(redshift, cosmology):
 
     References
     ----------
-    .. [1] doi : 10.1146/annurev.aa.30.090192.002435
+    .. [1] Carroll, M. and Press, W. and Turner, E., (1992),
+        doi : 10.1146/annurev.aa.30.090192.002435
     '''
 
     if isiterable(redshift):
@@ -70,7 +71,7 @@ def growth_function_carroll(redshift, cosmology):
 def growth_factor(redshift, cosmology, gamma=6.0/11.0):
     r'''Growth factor.
 
-    Function used to calculate :math:`f(z)``, parametrised growth factor as a
+    Function used to calculate :math:`f(z)`, parametrised growth factor as a
     function of redshift, as described in [1]_ equation 17.
 
     Parameters
@@ -116,7 +117,7 @@ def growth_factor(redshift, cosmology, gamma=6.0/11.0):
 def growth_function(redshift, cosmology, gamma=6.0/11.0):
     r'''Growth function.
 
-    Function used to calculate :math:`D(z)``, growth function at different
+    Function used to calculate :math:`D(z)`, growth function at different
     redshifts, as described in [1]_ equation 16.
 
     Parameters
