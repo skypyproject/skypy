@@ -1,7 +1,7 @@
 
 r"""Binary merger rate module.
-This module provides facilities to produce compact binary merger rates per
-year for individual galaxies.
+This module provides functions to calculate compact binary merger rates
+for individual galaxies.
 
 """
 
