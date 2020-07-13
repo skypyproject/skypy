@@ -26,10 +26,9 @@ def test_skypy():
     assert e.value.code == 2
 
     # Process empty config file
-    filename = get_pkg_data_filename('data/empty_config.yaml')
-    with pytest.raises(TypeError) as e:
-        assert skypy.main(['--config', filename]) == 0
+    filename = get_pkg_data_filename('data/empty_config.yml')
+    assert skypy.main(['--config', filename]) == 0
 
-    # Process cosmology config file
-    filename = get_pkg_data_filename('data/cosmology_config.yaml')
+    # Process test config file
+    filename = get_pkg_data_filename('data/test_config.yml')
     assert skypy.main(['--config', filename]) == 0

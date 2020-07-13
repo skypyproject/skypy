@@ -29,14 +29,15 @@ def test_herbel_luminosities():
     # Test that sampling corresponds to sampling from the right pdf.
     # For this, we sample an array of luminosities for redshift z = 1.0 and we
     # compare it to the corresponding cdf.
+    # The B-band zeropoint for the model is -4.73.
 
     def calc_pdf(luminosity, z, alpha, a_m, b_m, absolute_magnitude_max=-16.0,
                  absolute_magnitude_min=-28.0):
         luminosity_min = astro.luminosity_from_absolute_magnitude(
-            absolute_magnitude_max)
+            absolute_magnitude_max, -4.73)
         luminosity_max = astro.luminosity_from_absolute_magnitude(
-            absolute_magnitude_min)
-        lum_star = lum._calculate_luminosity_star(z, a_m, b_m)
+            absolute_magnitude_min, -4.73)
+        lum_star = lum._calculate_luminosity_star(z, a_m, b_m, -4.73)
         c = np.fabs(special.gammaincc(alpha+1, luminosity_min/lum_star))
         d = np.fabs(special.gammaincc(alpha+1, luminosity_max/lum_star))
         return 1./lum_star*np.power(luminosity/lum_star, alpha)*np.exp(
@@ -59,8 +60,9 @@ def test_herbel_luminosities():
 
 def test_exponential_distribution():
     # When alpha=0, L*=1 and x_min~0 we get a truncated exponential
+    # the b_m value offsets the B-band zeropoint of -4.73
     q_max = 1e2
-    sample = lum.herbel_luminosities(0, 0, 0, 0, size=1000,
+    sample = lum.herbel_luminosities(0, 0, 0, 4.73, size=1000,
                                      x_min=1e-10, x_max=q_max,
                                      resolution=1000)
     d, p_value = scipy.stats.kstest(sample, 'truncexpon', args=(q_max,))
