@@ -19,8 +19,8 @@ def abadie_tableIII_merger_rates(luminosity,
 
     r"""Model of Abadie et al (2010), Table III
 
-      Compact binary merger rates as a linear function of L_10 blue light
-      luminosity.
+      Compact binary merger rates as a linear function of a galaxies
+      B-band luminosity.
 
       Parameters
       ----------
