@@ -70,7 +70,7 @@ def abadie_tableIII_merger_rates(luminosity,
 
 
       """
-    abadie_tableIII_dict = {
+    abadie_table_III = {
                             'NS-NS': {'low': 0.6,
                                       'realistic': 60,
                                       'high': 600,
