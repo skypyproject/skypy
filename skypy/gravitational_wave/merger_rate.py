@@ -26,6 +26,7 @@ abadie_table_III = {
                               'high': 20}
                     }
 
+
 def b_band_merger_rate(luminosity,
                        population='NS-NS',
                        optimism='low'):
@@ -67,7 +68,7 @@ def b_band_merger_rate(luminosity,
       Examples
       --------
       >>> import skypy.galaxy.luminosity as lum
-      >>> import skypy.gravitational_waves.merger_rate as merg
+      >>> import skypy.gravitational_wave.merger_rate as merg
 
       Sample 100 luminosity values at redshift z = 1.0 with
       a_m = -0.9408582, b_m = -20.40492365, alpha = -1.3.
@@ -77,14 +78,14 @@ def b_band_merger_rate(luminosity,
 
       Generate merger rates for these luminosities.
 
-      >>> rates = merg.abadie_tableIII_merger_rates(luminosities,
-      ...                                           population='NS-NS',
-      ...                                           optimism='low')
+      >>> rates = merg.b_band_merger_rate(luminosities,
+      ...                                 population='NS-NS',
+      ...                                 optimism='low')
 
 
 
       """
-    L_B = units.Lsun.to(units.erg / units.s) / 2.16e33 # to blue light solar
+    L_B = units.Lsun.to(units.erg / units.s) / 2.16e33  # to blue light solar
     L_10 = luminosity / (L_B * 1.e10)
 
     merger_rate = abadie_table_III[population][optimism] * L_10
