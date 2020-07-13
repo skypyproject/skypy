@@ -25,8 +25,8 @@ def abadie_tableIII_merger_rates(luminosity,
       Parameters
       ----------
       luminosity : (ngal,) array-like
-          The blue light luminosity L_10 of the galaxies to generate merger
-          rates for, where L_10 = 10^10 * 2.16e33 erg/s.
+          The B-band luminosity of the galaxies to generate merger
+          rates for, in units of solar luminosity.
       population : {'NS-NS', 'NS-BH', 'BH-BH'}
           Compact binary population to get rate for.
           'NS-NS' is neutron star - neutron star
