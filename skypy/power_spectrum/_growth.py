@@ -204,7 +204,9 @@ def growth_function_derivative(redshift, cosmology, gamma=6.0/11.0):
     -----
     The first derivative of the growth function, :math:`D(z)`,
     with respect to redshift reads
+
     ..math:: D'(z) = - \frac{D(z) f(z)}{1 + z} \;.
+    
     With :math:`f(z)` the growth factor.
 
 

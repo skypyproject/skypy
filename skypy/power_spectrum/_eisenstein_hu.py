@@ -247,8 +247,9 @@ def eisenstein_hu(wavenumber, A_s, n_s, cosmology, kwmap=0.02, wiggle=True):
     Returns
     -------
     power_spectrum : array_like
-        Linear matter power spectrum in units of :math:`Mpc^3`, evaluated at the
-        given wavenumbers for the input primordial power spectrum parameters
+        Linear matter power spectrum in units of :math:`Mpc^3`,
+        evaluated at the given wavenumbers for the input primordial
+        power spectrum parameters
         A_s and n_s, cosmology, and kwmap normalization.
 
     Examples
