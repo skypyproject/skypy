@@ -1,6 +1,0 @@
-cosmology:
-  module: astropy.cosmology
-  function: FlatLambdaCDM
-  kwargs:
-    H0: 67.74
-    Om0: 0.3075
