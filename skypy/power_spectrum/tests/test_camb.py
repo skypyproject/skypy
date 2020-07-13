@@ -6,7 +6,7 @@ import pytest
 
 # load the external camb result to test against
 camb_result_filename = get_pkg_data_filename('data/camb_result.txt')
-test_pkz = np.loadtxt(camb_result_filename, delimiter=',')
+test_pkz = np.loadtxt(camb_result_filename, delimiter=',').T
 
 # try to import the requirement, if it doesn't exist, skip test
 try:
