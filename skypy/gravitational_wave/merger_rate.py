@@ -13,7 +13,7 @@ __all__ = [
 ]
 
 
-def abadie_tableIII_merger_rates(luminosity,
+def b_band_merger_rate(luminosity,
                                  population='NS-NS',
                                  optimism='low'):
 
