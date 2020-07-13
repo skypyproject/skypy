@@ -4,7 +4,8 @@ This module provides methods to run pipelines of functions with dependencies
 and handle their results.
 """
 
-from astropy.table import Table
+from collections.abc import Mapping
+from copy import deepcopy
 import networkx
 import re
 
@@ -18,20 +19,20 @@ class SkyPyDriver:
     r'''Class for running pipelines.
 
     This is the main class for running pipelines of functions with dependencies
-    and using their results to generate tables.
+    and using their results to generate variables and tables.
     '''
 
-    def execute(self, config, file_format=None):
+    def execute(self, configuration, file_format=None):
         r'''Run a pipeline.
 
-        This function runs a pipeline of functions to generate the cosmology
-        and the columns of a set of tables. It uses a Directed Acyclic Graph to
+        This function runs a pipeline of functions to generate variables and
+        the columns of a set of tables. It uses a Directed Acyclic Graph to
         determine a non-blocking order of execution that resolves any
         dependencies, see [1]_. Tables can optionally be written to file.
 
         Parameters
         ----------
-        config : dict-like
+        configuration : dict-like
             Configuration for the pipeline.
         file_format : str
             File format used to write tables. Files are written using the
@@ -52,14 +53,15 @@ class SkyPyDriver:
         'requires' specifices the names of previous steps in the pipeline and
         uses their return values as keyword arguments.
 
-        'config' should contain 'cosmology' and/or 'tables'. 'cosmology' should
-        return a dictionary configuring a function that returns an
-        astropy.cosmology.Cosmology object. 'tables' should contain a set of
-        nested dictionaries, first giving the names of each table, then the
-        names of each column within each table. Each column should return a
-        dictionary configuring a function that returns an array-like object.
+        'configuration' should contain the name and configuration of each
+        variable and/or an entry named 'tables'. 'tables' should contain a set
+        of nested dictionaries, first containing the name of each table, then
+        the name and configuration of each column and optionally an entry named
+        'init' with a configuration that initialises the table. If 'init' is
+        not specificed the table will be initialised as an empty astropy Table
+        by default.
 
-        See [3]_ for examples of pipeline configurations in yaml format.
+        See [3]_ for examples of pipeline configurations in YAML format.
 
         References
         ----------
@@ -68,37 +70,66 @@ class SkyPyDriver:
         .. [3] https://github.com/skypyproject/skypy/tree/master/examples
         '''
 
+        # config contains settings for all variables and table initialisation
+        # table_config contains settings for all table columns
+        config = deepcopy(configuration)
+        table_config = config.pop('tables', {})
+        default_table = {'module': 'astropy.table', 'function': 'Table'}
+        config.update({k: v.pop('init', default_table)
+                      for k, v in table_config.items()})
+
         # Create a Directed Acyclic Graph of all jobs and dependencies
         dag = networkx.DiGraph()
-        if 'cosmology' in config:
-            dag.add_node('cosmology')
-        for table, columns in config.get('tables', {}).items():
-            dag.add_node(table)
+
+        # Variables initialised by value don't require function evaluations
+        def isfunction(f):
+            return isinstance(f, Mapping) and 'module' in f and 'function' in f
+        variables = {k: v for k, v in config.items() if not isfunction(v)}
+        for v in variables:
+            dag.add_node(v)
+            setattr(self, v, config.pop(v))
+
+        # Add nodes for each variable, table and column
+        for job in config:
+            dag.add_node(job)
+        for table, columns in table_config.items():
+            table_complete = '.'.join((table, 'complete'))
+            dag.add_node(table_complete)
+            for column in columns.keys():
+                job = '.'.join((table, column))
+                dag.add_node(job)
+
+        # Add edges for all requirements and dependencies
+        for job, settings in config.items():
+            dependencies = settings.get('depends', [])
+            dependencies += settings.get('requires', {}).values()
+            dag.add_edges_from((d, job) for d in dependencies)
+        for table, columns in table_config.items():
+            table_complete = '.'.join((table, 'complete'))
+            dag.add_edge(table, table_complete)
             for column, settings in columns.items():
-                node = '.'.join((table, column))
-                dag.add_node(node)
-        for table, columns in config.get('tables', {}).items():
-            for column, settings in columns.items():
-                node = '.'.join((table, column))
-                dag.add_edge(table, node)
-                requirements = settings.get('requires', {}).values()
-                dag.add_edges_from((r, node) for r in requirements)
+                job = '.'.join((table, column))
+                dag.add_edge(table, job)
+                dag.add_edge(job, table_complete)
+                dependencies = settings.get('depends', [])
+                dependencies += settings.get('requires', {}).values()
+                dag.add_edges_from((d, job) for d in dependencies)
 
         # Execute jobs in order that resolves dependencies
         for job in networkx.topological_sort(dag):
-            if job == 'cosmology':
-                settings = config.get('cosmology')
-                self.cosmology = self._call_from_config(settings)
-            elif job in config.get('tables', {}):
-                setattr(self, job, Table())
+            if job in variables or job.endswith('.complete'):
+                continue
+            elif job in config:
+                settings = config.get(job)
+                setattr(self, job, self._call_from_config(settings))
             else:
                 table, column = job.split('.')
-                settings = config['tables'][table][column]
+                settings = table_config[table][column]
                 getattr(self, table)[column] = self._call_from_config(settings)
 
         # Write tables to file
         if file_format:
-            for table in config.get('tables', {}).keys():
+            for table in table_config.keys():
                 filename = '.'.join((table, file_format))
                 getattr(self, table).write(filename)
 
