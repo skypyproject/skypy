@@ -4,6 +4,7 @@ This module provides methods to run pipelines of functions with dependencies
 and handle their results.
 """
 
+from collections.abc import Mapping
 from copy import deepcopy
 import networkx
 import re
@@ -52,13 +53,13 @@ class SkyPyDriver:
         'requires' specifices the names of previous steps in the pipeline and
         uses their return values as keyword arguments.
 
-        'config' should contain the name and configuration of each variable
-        and/or an entry named 'tables'. 'tables' should contain a set of nested
-        dictionaries, first containing the name of each table, then the name
-        and configuration of each column and optionally an entry named 'init'
-        with a configuration that initialises the table. If 'init' is not
-        specificed the table will be initialised as an empty astropy Table by
-        default.
+        'configuration' should contain the name and configuration of each
+        variable and/or an entry named 'tables'. 'tables' should contain a set
+        of nested dictionaries, first containing the name of each table, then
+        the name and configuration of each column and optionally an entry named
+        'init' with a configuration that initialises the table. If 'init' is
+        not specificed the table will be initialised as an empty astropy Table
+        by default.
 
         See [3]_ for examples of pipeline configurations in YAML format.
 
@@ -82,7 +83,7 @@ class SkyPyDriver:
 
         # Variables initialised by value don't require function evaluations
         def isfunction(f):
-            return isinstance(f, dict) and 'module' in f and 'function' in f
+            return isinstance(f, Mapping) and 'module' in f and 'function' in f
         variables = {k: v for k, v in config.items() if not isfunction(v)}
         for v in variables:
             dag.add_node(v)
@@ -92,7 +93,7 @@ class SkyPyDriver:
         for job in config:
             dag.add_node(job)
         for table, columns in table_config.items():
-            table_complete = '.'.join((table, "complete"))
+            table_complete = '.'.join((table, 'complete'))
             dag.add_node(table_complete)
             for column in columns.keys():
                 job = '.'.join((table, column))
@@ -104,7 +105,7 @@ class SkyPyDriver:
             dependencies += settings.get('requires', {}).values()
             dag.add_edges_from((d, job) for d in dependencies)
         for table, columns in table_config.items():
-            table_complete = '.'.join((table, "complete"))
+            table_complete = '.'.join((table, 'complete'))
             dag.add_edge(table, table_complete)
             for column, settings in columns.items():
                 job = '.'.join((table, column))
