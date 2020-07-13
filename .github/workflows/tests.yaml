@@ -19,8 +19,7 @@ jobs:
             os: ubuntu-latest
             python: 3.8
             toxenv: py38-test-all-latest-cov
-            toxposargs: --cov-report xml
-            coverage: true
+            toxposargs: --cov-report=xml:${GITHUB_WORKSPACE}/coverage.xml
 
           - name: oldest supported versions
             os: ubuntu-latest
@@ -46,14 +45,27 @@ jobs:
         python-version: ${{ matrix.python }}
     - name: Install Dependencies
       run: |
-        python -m pip install --upgrade pip
         pip install tox
+    - if: contains(matrix.toxenv, '-all') && runner.os == 'Linux'
+      name: Install Additional Dependencies (Linux)
+      run: |
+        sudo install $(which gfortran-9) /usr/bin/gfortran
+        echo gfortran=$(which gfortran)
     - name: Add pytest Matcher
       run: |
         echo ::add-matcher::.github/problem_matchers/pytest.json
     - name: Run Tests
       run: |
         tox -e ${{ matrix.toxenv }} ${{ matrix.toxargs }} -- ${{ matrix.toxposargs }}
-    - if: matrix.coverage
+    - if: contains(matrix.toxenv, '-cov')
       name: Report Coverage
       uses: codecov/codecov-action@v1
+    - if: contains(matrix.toxenv, '-cov')
+      name: Report Coverage
+      uses: paambaati/codeclimate-action@v2.6.0
+      env:
+        CC_TEST_REPORTER_ID: 31b8f5884f7bcfb65aa7db49a58daf6ff31b6eb3fea005dd5419e344e3e69ab4
+      with:
+        coverageCommand: touch coverage.xml
+        coverageLocations: coverage.xml:coverage.py
+        prefix: /${{ github.workspace }}/.tox/${{ matrix.toxenv }}/lib/python${{ matrix.python }}/site-packages/

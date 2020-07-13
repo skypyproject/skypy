@@ -4,6 +4,8 @@ cosmology:
   kwargs:
     H0: 67.7
     Om0: 0.307
+red_galaxy_sersic_index: 4
+blue_galaxy_sersic_index: 1
 tables:
   red_galaxies:
     redshift:
@@ -58,7 +60,7 @@ tables:
         cosmology: cosmology
     ellipticity:
       module: skypy.galaxy.ellipticity
-      function: beta_ellipticity.rvs
+      function: beta_ellipticity
       kwargs:
         e_ratio: 0.45
         e_sum: 3.5
@@ -116,7 +118,7 @@ tables:
         cosmology: cosmology
     ellipticity:
       module: skypy.galaxy.ellipticity
-      function: beta_ellipticity.rvs
+      function: beta_ellipticity
       kwargs:
         e_ratio: 0.45
         e_sum: 3.5
