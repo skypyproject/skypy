@@ -222,7 +222,8 @@ def transfer_no_wiggles(wavenumber, A_s, n_s, cosmology):
 def eisenstein_hu(wavenumber, A_s, n_s, cosmology, kwmap=0.02, wiggle=True):
     """ Eisenstein & Hu matter power spectrum.
     This function returns the Eisenstein and Hu fitting function for the linear
-    matter power spectrum with (or without) baryon acoustic oscillations using
+    matter power spectrum with (or without) baryon acoustic oscillations, c.f.
+    [1]_ and [2]_, using
     formulation from Komatsu et al (2009) in [3]_.
 
     Parameters
@@ -246,7 +247,7 @@ def eisenstein_hu(wavenumber, A_s, n_s, cosmology, kwmap=0.02, wiggle=True):
     Returns
     -------
     power_spectrum : array_like
-        Linear matter power spectrum in units of [Mpc^3], evaluated at the
+        Linear matter power spectrum in units of :math:`Mpc^3`, evaluated at the
         given wavenumbers for the input primordial power spectrum parameters
         A_s and n_s, cosmology, and kwmap normalization.
 
