@@ -42,13 +42,13 @@ def halo_mass_function(M, wavenumber, power_spectrum, growth_function,
 
     Parameters
     -----------
-    M : (nm,)
-        Array for the halo mass, in units of solar masses.
+    M : (nm,) array_like
+        Array for the halo mass, in units of solar mass.
     wavenumber : (nk,) array_like
         Array of wavenumbers at which the power spectrum is evaluated,
-        in units of [Mpc^-1].
+        in units of :math:`1/Mpc`.
     power_spectrum: (nk,) array_like
-        Linear power spectrum at redshift 0 in [Mpc^3].
+        Linear power spectrum at redshift 0 in :math:`Mpc^3`.
     growth_function : float
         The growth function evaluated at a given redshift for the given
         cosmology.
@@ -117,6 +117,50 @@ def halo_mass_function(M, wavenumber, power_spectrum, growth_function,
     rho_m0 = cosmology.Om0 * rho_bar
 
     return rho_m0 * f_c * dlognu_dlogm / np.power(M, 2)
+
+
+def subhalo_mass_function(M, halo_mass, params):
+    r'''Subhalo mass function.
+    This function computes the subhalo mass function, defined
+    in equation 3 in [1]_.
+
+    Parameters
+    -----------
+    M : (nm,) array_like
+        Array for the subhalo mass, in units of solar mass.
+    halo_mass : float
+        The mass of the halo parent, in units of solar mass.
+    params: tuple
+        List of parameters that determines the subhalo Schechter function,
+        `(A, alpha, beta)`.
+
+    Returns
+    --------
+    mass_function: (nm,) array_like
+        Subhalo mass function for a given mass array, and a given mass of
+        the parent halo. Units of :math:`Mpc^{-3} M_{Sun}^{-1}`.
+
+    Examples
+    ---------
+    >>> import numpy as np
+    >>> from skypy.halo import mass
+
+    This example will compute the subhalo mass function given a parent halo
+    of mass :math:`10^12 M_{Sun}`:
+
+    >>> m = 10**np.arange(9.0, 10.0, 0.5)
+    >>> params_model = (0.3, 1.9, 1.0)
+    >>> mass.subhalo_mass_function(m, 1.0e12, params_model)
+    array([1.50205889e-07, 1.68169756e-08])
+
+    References
+    ----------
+    .. [1] Vale, A. and Ostriker, J.P. (2005), arXiv: astro-ph/0511816.
+    '''
+    A, alpha, beta = params
+    x = M / (beta * halo_mass)
+
+    return A * np.power(x, -alpha) * np.exp(-x) / (beta * halo_mass)
 
 
 def halo_mass_sampler(m_min, m_max, resolution, wavenumber, power_spectrum,

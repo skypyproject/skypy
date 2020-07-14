@@ -101,3 +101,14 @@ def test_ellipsoidal_collapse_function():
     sigma = np.sqrt(mass._sigma_squared(m_array, k, Pk, 1.0, cosmo))
     fps = mass.press_schechter_collapse_function(sigma)
     assert allclose(fps, PS_fsigma)
+
+
+def test_subhalo_mass_function():
+    # Test the output and shape is correct given an array of masses
+    m_array = np.asarray(mass_array)
+
+    # Any particular ellipsoidal collapse model
+    params_subh = (0.3, 1.9, 1.0)
+    array_output_subh = mass.subhalo_mass_function(m_array, 1.0e12,
+                                                   params=params_subh)
+    assert array_output_subh.shape == m_array.shape
