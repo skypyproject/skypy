@@ -251,6 +251,59 @@ def halo_mass_sampler(m_min, m_max, resolution, wavenumber, power_spectrum,
     return np.interp(n_uniform, CDF, m)
 
 
+def subhalo_mass_sampler(m_min, m_max, resolution,
+                         halo_mass, params, size=None):
+    r'''Subhalo mass sampler.
+    This function samples subhaloes from their mass function, given the mass
+    of the parent halo. Refer to equation 3 in [1]_.
+
+    Parameters
+    -----------
+    m_min, m_max : array_like
+        Lower and upper bounds for the random variable m.
+    resolution: int
+        Resolution of the inverse transform sampling spline.
+    M : (nm,) array_like
+        Array for the subhalo mass, in units of solar mass.
+    halo_mass : float
+        The mass of the halo parent, in units of solar mass.
+    params: tuple
+        List of parameters that determines the subhalo Schechter function,
+        `(A, alpha, beta)`.
+    size: int, optional
+        Output shape of samples. Default is None.
+
+    Returns
+    --------
+    sample: (size,) array_like
+        Samples drawn from the mass function, in units of solar masses.
+
+    Examples
+    ---------
+    >>> import numpy as np
+    >>> from skypy.halo import mass
+
+    This example samples from the subhalo mass function given a parent halo
+    of mass :math:`10^12 M_{Sun}`:
+
+    >>> params_model = (0.3, 1.9, 1.0)
+    >>> sh = mass.subhalo_mass_sampler(1e9, 1e10, 100, 1.0e12, params_model)
+
+
+    References
+    ----------
+    .. [1] Vale, A. and Ostriker, J.P. (2005), arXiv: astro-ph/0511816.
+    '''
+    m = np.logspace(np.log10(m_min), np.log10(m_max), resolution)
+
+    massf = subhalo_mass_function(m, halo_mass, params=params)
+
+    CDF = integrate.cumtrapz(massf, m, initial=0)
+    CDF = CDF / CDF[-1]
+    n_uniform = np.random.uniform(size=size)
+    return np.interp(n_uniform, CDF, m)
+
+
 def ellipsoidal_collapse_function(sigma, params):
     r'''Spherical collapse function.
     This function computes the mass function for ellipsoidal
