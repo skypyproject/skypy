@@ -99,6 +99,7 @@ def dirichlet_coefficients(redshift, alpha0, alpha1, z1=1.):
     coefficients = np.divide(y.T, sum_y.T).T
     return coefficients.reshape(return_shape)
 
+
 def kcorrect_spectra(redshift, stellar_mass, coefficients):
     r"""Flux densities of galaxies.
 
@@ -135,9 +136,9 @@ def kcorrect_spectra(redshift, stellar_mass, coefficients):
 
     The kcorrect templates are given in units of
     erg/s/cm^2/Angstrom per solar mass and as it would be observed in a
-    distance of 10pc. To obtain the correct flux density if the object would be at 10 pc distance
-    we have to adjust the coefficients by the stellar mass :math:`M` of the
-    galaxy
+    distance of 10pc. To obtain the correct flux density if the object would be
+    at 10 pc distance we have to adjust the coefficients by the stellar mass
+    :math:`M` of the galaxy
 
     .. math::
          \tilde{c_i} = \tilde{c_i} \cdot M \;.
