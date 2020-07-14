@@ -3,10 +3,12 @@ r"""Galaxy spectrum module.
 """
 
 import numpy as np
+from astropy.io.fits import getdata
 
 
 __all__ = [
     'dirichlet_coefficients',
+    'kcorrect_spectra'
 ]
 
 
@@ -96,3 +98,97 @@ def dirichlet_coefficients(redshift, alpha0, alpha1, z1=1.):
     sum_y = y.sum(axis=1)
     coefficients = np.divide(y.T, sum_y.T).T
     return coefficients.reshape(return_shape)
+
+
+def kcorrect_spectra(redshift, stellar_mass, coefficients):
+    r"""Flux densities of galaxies.
+
+    The flux density as a sum of the 5 kcorrect templates [1]_.
+
+    Parameters
+    ----------
+    redshift : (nz,) array-like
+        The redshift values of the galaxies.
+    stellar_mass : (nz, ) array-like
+        The stellar masses of the galaxies.
+    coefficients: (nz, 5) array-like
+        Coefficients to be multiplied with the kcorrect templates.
+
+
+    Returns
+    -------
+    wavelength_observe : (nl, ) array_like
+        Wavelengths corresponding to the flux density. Given in units of
+        Angstrom
+    sed: (nz, nl) array-like
+        Flux density of the galaxies in units of erg/s/cm^2/Angstrom as it
+        would be observed at a distance of 10 pc.
+
+    Notes
+    -----
+    The rest-frame flux-density can be calculated as a sum of the five kcorrect
+    templates [1]_
+
+    .. math::
+        f_e(\lambda) = \sum_i c_i t_i(\lambda) \;,
+
+    with kcorrect templates :math:`t_i(\lambda)` and coefficients :math:`c_i`.
+
+    The kcorrect templates are given in units of
+    erg/s/cm^2/Angstrom per solar mass and as it would be observed in a
+    distance of 10pc. To obtain the correct flux density if the object would be
+    at 10 pc distance we have to adjust the coefficients by the stellar mass
+    :math:`M` of the galaxy
+
+    .. math::
+         \tilde{c_i} = \tilde{c_i} \cdot M \;.
+
+    Thus, the flux density is given by
+
+    .. math::
+        f_e(\lambda) = \sum_i \tilde{c_i} t_i(\lambda) \;.
+
+    To get the flux density in observed frame we have to redshift it
+
+    .. math::
+        f_o(\lambda_o) = \frac{f_e(\lambda)}{1+z} \;.
+
+
+
+    References
+    ----------
+    .. [1] Blanton M., Roweis S., 2006, The Astronomical Journal, Issue 2,
+        Volume 133, Pages 734 - 754
+
+    Examples
+    --------
+    >>> from skypy.galaxy.spectrum import kcorrect_spectra
+    >>> from astropy.cosmology import FlatLambdaCDM
+    >>> from skypy.galaxy.spectrum import dirichlet_coefficients
+
+    Calculate the flux density for two galaxies.
+
+    >>> cosmology = FlatLambdaCDM(H0=70, Om0=0.3)
+    >>> alpha0 = np.array([2.079, 3.524, 1.917, 1.992, 2.536])
+    >>> alpha1 = np.array([2.265, 3.862, 1.921, 1.685, 2.480])
+    >>> redshift = np.array([0.5,1])
+    >>> coefficients = dirichlet_coefficients(redshift, alpha0, alpha1)
+    >>> stellar_mass = np.array([5*10**10, 7*10**9])
+    >>>
+    >>> wavelength_o, sed = kcorrect_spectra(redshift, stellar_mass,
+    ...                                       coefficients)
+
+    """
+
+    kcorrect_templates_url = "https://github.com/blanton144/kcorrect/raw/" \
+                             "master/data/templates/k_nmf_derived.default.fits"
+    templates = getdata(kcorrect_templates_url, 1)
+    wavelength = getdata(kcorrect_templates_url, 11)
+
+    rescaled_coeff = (coefficients.T * stellar_mass).T
+
+    sed = (np.matmul(rescaled_coeff, templates).T / (1 + redshift)).T
+    wavelength_observed = np.matmul((1 + redshift).reshape(len(redshift), 1),
+                                    wavelength.reshape(1, len(wavelength)))
+
+    return wavelength_observed, sed

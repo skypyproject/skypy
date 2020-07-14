@@ -5,12 +5,10 @@ models.
 """
 
 import numpy as np
-from scipy import stats
 import scipy.special as sc
 import scipy.integrate
 
 import skypy.utils.special as special
-import skypy.utils.astronomy as astro
 
 
 __all__ = [
@@ -19,7 +17,7 @@ __all__ = [
 ]
 
 
-class smail_gen(stats.rv_continuous):
+def smail(z_median, alpha, beta, size=None):
     r'''Redshifts following the Smail et al. (1994) model.
 
     The redshift follows the Smail et al. [1]_ redshift distribution.
@@ -32,6 +30,9 @@ class smail_gen(stats.rv_continuous):
         Power law exponent (z/z0)^\alpha, must be positive.
     beta : float or array_like of floats
         Log-power law exponent exp[-(z/z0)^\beta], must be positive.
+    size : None or int or tuple
+        Size of the output. If `None`, the size is inferred from the arguments.
+        Default is None.
 
     Notes
     -----
@@ -43,7 +44,7 @@ class smail_gen(stats.rv_continuous):
         p(z) \sim \left(\frac{z}{z_0}\right)^\alpha
                     \exp\left[-\left(\frac{z}{z_0}\right)^\beta\right] \;.
 
-    This is the generalised gamma distribution `scipy.stats.gengamma`.
+    This is the generalised gamma distribution.
 
     References
     ----------
@@ -52,64 +53,18 @@ class smail_gen(stats.rv_continuous):
 
     Examples
     --------
-    >>> from skypy.galaxy.redshift import smail
-
     Sample 10 random variates from the Smail model with `alpha = 1.5` and
     `beta = 2` and median redshift `z_median = 1.2`.
 
-    >>> redshift = smail.rvs(1.2, 1.5, 2.0, size=10)
+    >>> from skypy.galaxy.redshift import smail
+    >>> redshift = smail(1.2, 1.5, 2.0, size=10)
 
-    Fix distribution parameters for repeated use.
-
-    >>> redshift_dist = smail(1.2, 1.5, 2.0)
-    >>> redshift_dist.median()
-    1.2
-    >>> redshift = redshift_dist.rvs(size=10)
     '''
 
-    def _rvs(self, zm, a, b):
-        sz, rs = self._size, self._random_state
-        k = (a+1)/b
-        t = zm**b/sc.gammainccinv(k, 0.5)
-        g = stats.gamma.rvs(k, scale=t, size=sz, random_state=rs)
-        return g**(1/b)
-
-    def _pdf(self, z, zm, a, b):
-        return np.exp(self._logpdf(z, zm, a, b))
-
-    def _logpdf(self, z, zm, a, b):
-        k = (a+1)/b
-        z0 = zm/sc.gammainccinv(k, 0.5)**(1/b)
-        lognorm = np.log(b) - np.log(z0) - sc.gammaln(k)
-        return lognorm + sc.xlogy(a, z/z0) - (z/z0)**b
-
-    def _cdf(self, z, zm, a, b):
-        k = (a+1)/b
-        t = sc.gammainccinv(k, 0.5)
-        return sc.gammainc(k, t*(z/zm)**b)
-
-    def _ppf(self, q, zm, a, b):
-        k = (a+1)/b
-        t = sc.gammainccinv(k, 0.5)
-        return zm*(sc.gammaincinv(k, q)/t)**(1/b)
-
-    def _sf(self, z, zm, a, b):
-        k = (a+1)/b
-        t = sc.gammainccinv(k, 0.5)
-        return sc.gammaincc(k, t*(z/zm)**b)
-
-    def _isf(self, q, zm, a, b):
-        k = (a+1)/b
-        t = sc.gammainccinv(k, 0.5)
-        return zm*(sc.gammainccinv(k, q)/t)**(1/b)
-
-    def _munp(self, n, zm, a, b):
-        k = (a+1)/b
-        z0 = zm/sc.gammainccinv(k, 0.5)**(1/b)
-        return z0**n*np.exp(sc.gammaln((a+n+1)/b) - sc.gammaln(k))
-
-
-smail = smail_gen(a=0., name='smail', shapes='z_median, alpha, beta')
+    k = (alpha+1)/beta
+    t = z_median**beta/sc.gammainccinv(k, 0.5)
+    g = np.random.gamma(shape=k, scale=t, size=size)
+    return g**(1/beta)
 
 
 def herbel_redshift(alpha, a_phi, b_phi, a_m, b_m, cosmology, low=0.0,
@@ -203,11 +158,9 @@ def herbel_redshift(alpha, a_phi, b_phi, a_m, b_m, cosmology, low=0.0,
 
     """
 
-    luminosity_min = astro.luminosity_from_absolute_magnitude(
-        absolute_magnitude_max)
     redshift = np.linspace(low, high, resolution)
     pdf = herbel_pdf(redshift, alpha, a_phi, b_phi, a_m, b_m, cosmology,
-                     luminosity_min)
+                     absolute_magnitude_max)
     cdf = scipy.integrate.cumtrapz(pdf, redshift, initial=0)
     cdf = cdf / cdf[-1]
     u = np.random.uniform(size=size)
@@ -217,7 +170,7 @@ def herbel_redshift(alpha, a_phi, b_phi, a_m, b_m, cosmology, low=0.0,
 
 
 def herbel_pdf(redshift, alpha, a_phi, b_phi, a_m, b_m, cosmology,
-               luminosity_min):
+               absolute_magnitude_max):
     r"""Calculates the redshift pdf of the Schechter luminosity function
     according to the model of Herbel et al. [1]_ equation (3.6).
 
@@ -270,7 +223,6 @@ def herbel_pdf(redshift, alpha, a_phi, b_phi, a_m, b_m, cosmology,
     Examples
     --------
     >>> from skypy.galaxy.redshift import herbel_pdf
-    >>> import skypy.utils.astronomy as astro
     >>> from astropy.cosmology import FlatLambdaCDM
     >>> import numpy as np
 
@@ -280,15 +232,15 @@ def herbel_pdf(redshift, alpha, a_phi, b_phi, a_m, b_m, cosmology,
 
     >>> cosmology = FlatLambdaCDM(H0=70, Om0=0.3, Tcmb0=2.725)
     >>> redshift = np.linspace(0, 2, 100)
-    >>> luminosity_min = astro.luminosity_from_absolute_magnitude(-16.0)
+    >>> mag_lim = -16.0
     >>> redshift = herbel_pdf(redshift=redshift, alpha=-1.3,
     ...                     a_phi=-0.10268436,a_m=-0.9408582, b_phi=0.00370253,
     ...                     b_m=-20.40492365, cosmology=cosmology,
-    ...                     luminosity_min=luminosity_min)
+    ...                     absolute_magnitude_max=mag_lim)
     """
+    abs_mag = a_m*redshift + b_m
     dv = cosmology.differential_comoving_volume(redshift).value
-    x = luminosity_min \
-        * 1./astro.luminosity_from_absolute_magnitude(a_m*redshift + b_m)
+    x = 10.**(-0.4*(absolute_magnitude_max - abs_mag))
     lg = sc.gammaln(alpha+1)
     gx = np.fabs(special.gammaincc(alpha+1, x))
     pdf = dv * b_phi * np.exp(a_phi * redshift + lg) * gx

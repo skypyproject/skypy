@@ -18,33 +18,45 @@ Utility functions
 import numpy as np
 
 
-def luminosity_from_absolute_magnitude(absolute_magnitude):
+def luminosity_from_absolute_magnitude(absolute_magnitude, zeropoint=None):
     """ Converts absolute magnitudes into luminosities
 
     Parameters
     ----------
     absolute_magnitude : array_like
-                    Input absolute magnitudes
+        Input absolute magnitudes
+    zeropoint : float, optional
+        Zeropoint for the conversion.
+
     Returns
     -------
     ndarray, or float if input is scalar
     Luminosity values.
     """
 
-    return np.power(10, -0.4*absolute_magnitude)
+    if zeropoint is None:
+        zeropoint = 0.
+
+    return 10.**(-0.4*np.add(absolute_magnitude, zeropoint))
 
 
-def absolute_magnitude_from_luminosity(luminosity):
+def absolute_magnitude_from_luminosity(luminosity, zeropoint=None):
     """ Converts luminosities into absolute magnitudes
 
     Parameters
     ----------
     luminosity : array_like
-            Input luminosity
+        Input luminosity
+    zeropoint : float, optional
+        Zeropoint for the conversion.
 
     Returns
     -------
     ndarray, or float if input is scalar
-    Absolute magnitude values
+    Absolute magnitude values.
     """
-    return -np.log(luminosity)/(0.4 * np.log(10))
+
+    if zeropoint is None:
+        zeropoint = 0.
+
+    return -2.5*np.log10(luminosity) - zeropoint

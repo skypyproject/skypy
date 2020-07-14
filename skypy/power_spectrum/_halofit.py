@@ -71,11 +71,12 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
     Parameters
     ----------
     k : (nk,) array_like
-        Input wavenumbers in units of [Mpc^-1].
+        Input wavenumbers in units of :math:`1/Mpc`.
     z : (nz,) array_like
         Input redshifts
     P : (nk, nz) array_like
-        Linear power spectrum for given wavenumbers and redshifts [Mpc^3].
+        Linear power spectrum for given wavenumbers
+        and redshifts :math:`Mpc^3`.
     cosmology : astropy.cosmology.Cosmology
                 Cosmology object providing method for the evolution of
                 omega_matter with redshift.
@@ -85,7 +86,7 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
     Returns
     -------
     pknl : (nk, nz) array_like
-           Non-linear halo power spectrum in units of [Mpc^3].
+           Non-linear halo power spectrum in units of :math:`Mpc^3`.
 
     References
     ----------
