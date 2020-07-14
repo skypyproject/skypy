@@ -219,11 +219,8 @@ def halo_mass_sampler(m_min, m_max, resolution, wavenumber, power_spectrum,
         Collapse function to choose from a variety of models:
         `sheth_tormen_collapse_function`, `press_schechter_collapse_function`.
     params: tuple
-        List of parameters that determines the subhalo Schechter function.
-        If model is `None`, the parameters are `(A, alpha, beta)`.
-        If model is `'Vale'`, the parameters are
-        `(subhalo_fraction0, alpha, beta, mcut)`
-        and the amplitude is defined by equation 4 in [1].
+        List of parameters that determines the model used for
+        the collapse function.
     size: int, optional
         Output shape of samples. Default is None.
 
@@ -298,8 +295,11 @@ def subhalo_mass_sampler(m_min, m_max, resolution,
     halo_mass : float
         The mass of the halo parent, in units of solar mass.
     params: tuple
-        List of parameters that determines the subhalo Schechter function,
-        `(A, alpha, beta)`.
+        List of parameters that determines the subhalo Schechter function.
+        If model is `None`, the parameters are `(A, alpha, beta)`.
+        If model is `'Vale'`, the parameters are
+        `(subhalo_fraction0, alpha, beta, mcut)`
+        and the amplitude is defined by equation 4 in [1].
     size: int, optional
         Output shape of samples. Default is None.
     model: str
@@ -324,7 +324,7 @@ def subhalo_mass_sampler(m_min, m_max, resolution,
     If we now choose the model given by equation 4 in [1]:
 
     >>> params_vale = (0.5, 1.9, 1.0, 1.0e9)
-    >>> sh = mass.subhalo_mass_sampler(1e9, 1e10, 100, 1.0e12, params_vale,
+    >>> mass.subhalo_mass_sampler(1e9, 1e10, 100, 1.0e12, params_vale,
     ...      model='Vale')
 
 
