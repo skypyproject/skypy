@@ -4,6 +4,8 @@ cosmology:
   kwargs:
     H0: 67.7
     Om0: 0.307
+red_galaxy_sersic_index: 4
+blue_galaxy_sersic_index: 1
 tables:
   red_galaxies:
     redshift:
