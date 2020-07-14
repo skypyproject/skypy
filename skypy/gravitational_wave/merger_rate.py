@@ -67,22 +67,20 @@ def b_band_merger_rate(luminosity,
 
       Examples
       --------
-      >>> import skypy.galaxy.luminosity as lum
-      >>> import skypy.gravitational_wave.merger_rate as merg
+      >>> from skypy.galaxy.luminosity import herbel_luminosities
+      >>> from skypy.gravitational_wave import b_band_merger_rate
 
       Sample 100 luminosity values at redshift z = 1.0 with
       a_m = -0.9408582, b_m = -20.40492365, alpha = -1.3.
 
-      >>> luminosities = lum.herbel_luminosities(1.0, -1.3, -0.9408582,
-      ...                                         -20.40492365, size=100)
+      >>> luminosities = herbel_luminosities(1.0, -1.3, -0.9408582,
+      ...                                    -20.40492365, size=100)
 
       Generate merger rates for these luminosities.
 
-      >>> rates = merg.b_band_merger_rate(luminosities,
-      ...                                 population='NS-NS',
-      ...                                 optimism='low')
-
-
+      >>> rates = b_band_merger_rate(luminosities,
+      ...                            population='NS-NS',
+      ...                            optimism='low')
 
       """
 
