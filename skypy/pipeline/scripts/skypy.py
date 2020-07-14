@@ -6,7 +6,7 @@
 a config file to generate tables of objects and write them to file.
 
 Using ``skypy`` to run one of the example pipelines and write the outputs to
-fits files::
+fits files:
 
     $ skypy --config examples/herbel_galaxies.yaml --format fits
 
@@ -49,8 +49,13 @@ def main(args=None):
     parser.add_argument('-f', '--format', required=False,
                         choices=['fits', 'hdf5'], help='Table file format')
 
-    args = parser.parse_args(args or sys.argv[1:] or ['--help'])
+    # get system args if none passed
+    if args is None:
+        args = sys.argv[1:]
+
+    args = parser.parse_args(args or ['--help'])
     config = yaml.safe_load(args.config)
+    config = {} if config is None else config
     driver = SkyPyDriver()
     driver.execute(config, file_format=args.format)
     return(0)

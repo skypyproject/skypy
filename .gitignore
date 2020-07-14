@@ -39,6 +39,7 @@ docs/_build
 dist
 build
 eggs
+.eggs
 parts
 bin
 var
@@ -55,6 +56,7 @@ distribute-*.tar.gz
 .project
 .pydevproject
 .settings
+pip-wheel-metadata/
 
 # Mac OSX
 .DS_Store
