@@ -44,7 +44,8 @@ def herbel_luminosities(redshift, alpha, a_m, b_m, size=None,
     Returns
     -------
     luminosity : array_like
-        Drawn luminosities from the Schechter luminosity function.
+        Drawn luminosities from the Schechter luminosity function. Luminosities
+        are B-band luminosities in units of solar luminosity.
 
     Notes
     -----
@@ -98,20 +99,21 @@ def herbel_luminosities(redshift, alpha, a_m, b_m, size=None,
     >>> luminosities = lum.herbel_luminosities(z, -1.3, -0.9408582,
     ...                                         -20.40492365)
 
-
-
     """
 
     if size is None and np.shape(redshift):
         size = np.shape(redshift)
 
-    luminosity_star = _calculate_luminosity_star(redshift, a_m, b_m)
+    # this is the AB zeropoint of the B-band in units of solar luminosity
+    zeropoint = -4.73
+
+    luminosity_star = _calculate_luminosity_star(redshift, a_m, b_m, zeropoint)
 
     x_sample = schechter(alpha, x_min, x_max, resolution=resolution, size=size)
 
     return luminosity_star * x_sample
 
 
-def _calculate_luminosity_star(redshift, a_m, b_m):
+def _calculate_luminosity_star(redshift, a_m, b_m, zeropoint=None):
     absolute_magnitude_star = a_m * redshift + b_m
-    return astro.luminosity_from_absolute_magnitude(absolute_magnitude_star)
+    return astro.luminosity_from_absolute_magnitude(absolute_magnitude_star, zeropoint)
