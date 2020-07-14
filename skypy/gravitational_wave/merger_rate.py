@@ -5,7 +5,7 @@ for individual galaxies.
 
 """
 
-from astropy import units
+from astropy import constants, units
 
 
 __all__ = [
@@ -85,10 +85,7 @@ def b_band_merger_rate(luminosity,
 
 
       """
-    L_B = units.Lsun.to(units.erg / units.s) / 2.16e33  # to blue light solar
-    L_10 = luminosity / (L_B * 1.e10)
 
-    merger_rate = abadie_table_III[population][optimism] * L_10
-    merger_rate = merger_rate / units.year
-
-    return merger_rate
+    # Convert luminosity to units of L_10 defined in Abadie et. al. 2010
+    L_10 = luminosity * constants.L_sun.to_value('erg/s') / (1e10 * 2.16e33)
+    return abadie_table_III[population][optimism] * L_10 / units.year
