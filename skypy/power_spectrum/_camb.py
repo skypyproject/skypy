@@ -74,7 +74,7 @@ def camb(wavenumber, redshift, cosmology, A_s, n_s):
     except ImportError:
         raise Exception("camb is required to use skypy.power_spectrum.camb")
 
-    return_shape = np.shape(wavenumber)
+    return_shape = (*np.shape(redshift), *np.shape(wavenumber))
     redshift = np.atleast_1d(redshift)
 
     h2 = cosmology.h * cosmology.h
@@ -110,9 +110,4 @@ def camb(wavenumber, redshift, cosmology, A_s, n_s):
                                                    maxkh=np.max(k_h.value),
                                                    npoints=len(k_h.value))
 
-    if len(redshift_order) > 1:
-        power_output = pzk[redshift_order[::-1]]
-    else:
-        power_output = pzk[redshift_order[::-1]].reshape(return_shape)
-
-    return power_output
+    return np.reshape(pzk[redshift_order[::-1]], return_shape)
