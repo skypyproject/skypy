@@ -1,0 +1,34 @@
+cosmology:
+  module: astropy.cosmology
+  function: default_cosmology.get
+tables:
+  galaxies:
+    redshift:
+      module: skypy.galaxy.redshift
+      function: herbel_redshift
+      kwargs:
+        alpha: -0.5
+        a_phi: -2.232
+        b_phi: 0.0141
+        a_m: -0.610
+        b_m: -20.416
+        size: 1000
+      requires:
+        cosmology: cosmology
+    luminosity:
+      module: skypy.galaxy.luminosity
+      function: herbel_luminosities
+      kwargs:
+        alpha: -0.5
+        a_m: -0.610
+        b_m: -20.416
+      requires:
+        redshift: galaxies.redshift
+    merger_rate:
+      module: skypy.gravitational_wave
+      function: b_band_merger_rate
+      kwargs:
+        population: NS-NS
+        optimism: low
+      requires:
+        luminosity: galaxies.luminosity
