@@ -73,12 +73,12 @@ def test_halo_mass_sampler():
 
     # Sheth and Tormen collapse model
     array_output_PS = mass.sheth_tormen(10**9, 10**12, 100, k,
-                                        Pk, 1.0, cosmo)
+                                        Pk, 1.0, cosmo, size=n_samples)
     assert len(array_output_PS) == n_samples
 
     # Press-Schechter collapse model
     array_output_PS = mass.press_schechter(10**9, 10**12, 100, k,
-                                           Pk, 1.0, cosmo)
+                                           Pk, 1.0, cosmo, size=n_samples)
     assert len(array_output_PS) == n_samples
 
 
