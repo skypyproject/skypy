@@ -9,7 +9,9 @@ Models
 
    press_schechter
    halo_mass_function
+   subhalo_mass_function
    halo_mass_sampler
+   subhalo_mass_sampler
    ellipsoidal_collapse_function
    press_schechter_collapse_function
    sheth_tormen_collapse_function
