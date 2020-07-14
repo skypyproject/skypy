@@ -324,7 +324,7 @@ def subhalo_mass_sampler(m_min, m_max, resolution,
     If we now choose the model given by equation 4 in [1]:
 
     >>> params_vale = (0.5, 1.9, 1.0, 1.0e9)
-    >>> sb = mass.subhalo_mass_sampler(1e9, 1e10, 100, 1.0e12, params_vale,
+    >>> sh = mass.subhalo_mass_sampler(1e9, 1e10, 100, 1.0e12, params_vale,
     ...      model='Vale')
 
 
