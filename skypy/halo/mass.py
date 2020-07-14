@@ -21,6 +21,7 @@ Models
 
 import numpy as np
 from scipy import integrate
+from scipy.special import gamma, gammainc
 from functools import partial
 from astropy import units
 
@@ -123,7 +124,7 @@ def halo_mass_function(M, wavenumber, power_spectrum, growth_function,
     return rho_m0 * f_c * dlognu_dlogm / np.power(M, 2)
 
 
-def subhalo_mass_function(M, halo_mass, params):
+def subhalo_mass_function(M, halo_mass, params, model=None):
     r'''Subhalo mass function.
     This function computes the subhalo mass function, defined
     in equation 3 in [1]_.
@@ -135,8 +136,11 @@ def subhalo_mass_function(M, halo_mass, params):
     halo_mass : float
         The mass of the halo parent, in units of solar mass.
     params: tuple
-        List of parameters that determines the subhalo Schechter function,
-        `(A, alpha, beta)`.
+        List of parameters that determines the subhalo Schechter function.
+        If model is `None`, the parameters are `(A, alpha, beta)`.
+        If model is `'Vale'`, the parameters are
+        `(subhalo_fraction0, alpha, beta, mcut)`
+        and the amplitude is defined by equation 4 in [1].
 
     Returns
     --------
@@ -157,14 +161,32 @@ def subhalo_mass_function(M, halo_mass, params):
     >>> mass.subhalo_mass_function(m, 1.0e12, params_model)
     array([1.50205889e-07, 1.68169756e-08])
 
+    If we now choose the model given by equation 4 in [1]:
+
+    >>> params_vale = (0.5, 1.9, 1.0, 1.0e9)
+    >>> mass.subhalo_mass_function(m, 1.0e12, params_vale, model='Vale')
+    array([2.78569506e-08, 3.11885015e-09])
+
     References
     ----------
     .. [1] Vale, A. and Ostriker, J.P. (2005), arXiv: astro-ph/0511816.
     '''
-    A, alpha, beta = params
+    if model == 'Vale':
+        subhalo_fraction0, alpha, beta, mcut = params
+        A = _subhalo_amplitude(halo_mass, params)
+    else:
+        A, alpha, beta = params
+
     x = M / (beta * halo_mass)
 
     return A * np.power(x, -alpha) * np.exp(-x) / (beta * halo_mass)
+
+
+def _subhalo_amplitude(M, params):
+    subhalo_fraction0, alpha, beta, mcut = params
+
+    return (subhalo_fraction0 / beta) / \
+           (gamma(2.0 - alpha) - gammainc(2.0 - alpha, mcut / (beta * M)))
 
 
 def halo_mass_sampler(m_min, m_max, resolution, wavenumber, power_spectrum,
