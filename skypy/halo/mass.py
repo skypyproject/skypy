@@ -24,7 +24,9 @@ from astropy import units
 
 __all__ = [
     'halo_mass_function',
+    'subhalo_mass_function',
     'halo_mass_sampler',
+    'subhalo_mass_sampler',
     'sheth_tormen_collapse_function',
     'press_schechter_collapse_function',
     'sheth_tormen_mass_function',
@@ -178,9 +180,9 @@ def halo_mass_sampler(m_min, m_max, resolution, wavenumber, power_spectrum,
         Resolution of the inverse transform sampling spline.
     wavenumber : (nk,) array_like
         Array of wavenumbers at which the power spectrum is evaluated,
-        in units of [Mpc^-1].
+        in units of :math:`1/Mpc`.
     power_spectrum: (nk,) array_like
-        Linear power spectrum at redshift 0 in [Mpc^3].
+        Linear power spectrum at redshift 0 in :math:`Mpc^3`.
     growth_function : float
         The growth function evaluated at a given redshift for the given
         cosmology.
