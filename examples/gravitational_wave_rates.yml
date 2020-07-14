@@ -2,7 +2,7 @@ cosmology:
   module: astropy.cosmology
   function: default_cosmology.get
 tables:
-  galaxies:
+  merger_rates:
     redshift:
       module: skypy.galaxy.redshift
       function: herbel_redshift
@@ -23,12 +23,28 @@ tables:
         a_m: -0.610
         b_m: -20.416
       requires:
-        redshift: galaxies.redshift
-    merger_rate:
+        redshift: merger_rates.redshift
+    ns_ns_rate:
       module: skypy.gravitational_wave
       function: b_band_merger_rate
       kwargs:
         population: NS-NS
         optimism: low
       requires:
-        luminosity: galaxies.luminosity
+        luminosity: merger_rates.luminosity
+    ns_bh_rate:
+      module: skypy.gravitational_wave
+      function: b_band_merger_rate
+      kwargs:
+        population: NS-BH
+        optimism: low
+      requires:
+        luminosity: merger_rates.luminosity
+    bh_bh_rate:
+      module: skypy.gravitational_wave
+      function: b_band_merger_rate
+      kwargs:
+        population: BH-BH
+        optimism: low
+      requires:
+        luminosity: merger_rates.luminosity
