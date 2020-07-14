@@ -11,3 +11,15 @@ where (SkyPy Collaboration, 2020) is a citation to this software DOI:
 
 We also encourage you to cite the software DOI in the main text wherever
 appropriate.
+
+The recommended BibTeX entry for the citation is:
+
+@software{skypy_collaboration_2020_3755531,
+  author       = {SkyPy Collaboration},
+  title        = {SkyPy},
+  month        = apr,
+  year         = 2020,
+  publisher    = {Zenodo},
+  doi          = {10.5281/zenodo.3755531},
+  url          = {https://doi.org/10.5281/zenodo.3755531}
+}
