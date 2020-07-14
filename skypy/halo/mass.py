@@ -141,6 +141,8 @@ def subhalo_mass_function(M, halo_mass, params, model=None):
         If model is `'Vale'`, the parameters are
         `(subhalo_fraction0, alpha, beta, mcut)`
         and the amplitude is defined by equation 4 in [1].
+    model: str
+        Model for the amplitude of the subhalo mass function. Default is None.
 
     Returns
     --------
@@ -216,13 +218,15 @@ def halo_mass_sampler(m_min, m_max, resolution, wavenumber, power_spectrum,
     collapse_function: function
         Collapse function to choose from a variety of models:
         `sheth_tormen_collapse_function`, `press_schechter_collapse_function`.
-    params : tuple
-        List of parameters that determines the model used for
-        the halo mass function. The first parameter should be the name of
-        collapse function, followed by a second tuple with the parameters
-        of the chosen collapse model.
+    params: tuple
+        List of parameters that determines the subhalo Schechter function.
+        If model is `None`, the parameters are `(A, alpha, beta)`.
+        If model is `'Vale'`, the parameters are
+        `(subhalo_fraction0, alpha, beta, mcut)`
+        and the amplitude is defined by equation 4 in [1].
     size: int, optional
         Output shape of samples. Default is None.
+
 
     Returns
     --------
@@ -278,7 +282,7 @@ def halo_mass_sampler(m_min, m_max, resolution, wavenumber, power_spectrum,
 
 
 def subhalo_mass_sampler(m_min, m_max, resolution,
-                         halo_mass, params, size=None):
+                         halo_mass, params, size=None, model=None):
     r'''Subhalo mass sampler.
     This function samples subhaloes from their mass function, given the mass
     of the parent halo. Refer to equation 3 in [1]_.
@@ -298,6 +302,8 @@ def subhalo_mass_sampler(m_min, m_max, resolution,
         `(A, alpha, beta)`.
     size: int, optional
         Output shape of samples. Default is None.
+    model: str
+        Model for the amplitude of the subhalo mass function. Default is None.
 
     Returns
     --------
@@ -315,6 +321,12 @@ def subhalo_mass_sampler(m_min, m_max, resolution,
     >>> params_model = (0.3, 1.9, 1.0)
     >>> sh = mass.subhalo_mass_sampler(1e9, 1e10, 100, 1.0e12, params_model)
 
+    If we now choose the model given by equation 4 in [1]:
+
+    >>> params_vale = (0.5, 1.9, 1.0, 1.0e9)
+    >>> sh = mass.subhalo_mass_sampler(1e9, 1e10, 100, 1.0e12, params_vale,
+    ...      model='Vale')
+
 
     References
     ----------
@@ -322,7 +334,7 @@ def subhalo_mass_sampler(m_min, m_max, resolution,
     '''
     m = np.logspace(np.log10(m_min), np.log10(m_max), resolution)
 
-    massf = subhalo_mass_function(m, halo_mass, params=params)
+    massf = subhalo_mass_function(m, halo_mass, params=params, model=model)
 
     CDF = integrate.cumtrapz(massf, m, initial=0)
     CDF = CDF / CDF[-1]
