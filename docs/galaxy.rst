@@ -48,7 +48,6 @@ The following models are found in the `skypy.galaxy.redshift` package.
 .. autosummary::
    :nosignatures:
 
-   herbel_pdf
    herbel_redshift
    smail
 
