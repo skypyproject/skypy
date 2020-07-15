@@ -11,7 +11,6 @@ Models
 
    environment_quenched
    mass_quenched
-   
 """
 
 import numpy as np
