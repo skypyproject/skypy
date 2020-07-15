@@ -17,7 +17,7 @@ Mass (`skypy.halo.mass`)
 .. automodule:: skypy.halo.mass
 
 
-Mass (`skypy.halo.quenching`)
+Quenching (`skypy.halo.quenching`)
 =============================
 
 .. automodule:: skypy.halo.quenching
