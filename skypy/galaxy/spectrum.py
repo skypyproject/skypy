@@ -103,7 +103,7 @@ def dirichlet_coefficients(redshift, alpha0, alpha1, z1=1.):
 def kcorrect_spectra(redshift, stellar_mass, coefficients):
     r"""Flux densities of galaxies.
 
-    The flux density as a sum of the 5 kcorrect templates [1]_.
+    The flux density as a sum of the 5 kcorrect templates.
 
     Parameters
     ----------
@@ -141,7 +141,7 @@ def kcorrect_spectra(redshift, stellar_mass, coefficients):
     :math:`M` of the galaxy
 
     .. math::
-         \tilde{c_i} = \tilde{c_i} \cdot M \;.
+         \tilde{c_i} = c_i \cdot M \;.
 
     Thus, the flux density is given by
 
@@ -151,9 +151,12 @@ def kcorrect_spectra(redshift, stellar_mass, coefficients):
     To get the flux density in observed frame we have to redshift it
 
     .. math::
-        f_o(\lambda_o) = \frac{f_e(\lambda)}{1+z} \;.
+        f_o(\lambda_o) = \frac{f_e(\lambda)}{1+z} \;
 
+    where
 
+    .. math::
+        \lambda_o = (1+z) \lambda \;.
 
     References
     ----------

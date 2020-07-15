@@ -61,6 +61,7 @@ The following models are found in the `skypy.galaxy.size` package.
 .. autosummary::
    :nosignatures:
 
+   angular_size
    early_type_lognormal
    late_type_lognormal
    linear_lognormal
@@ -76,6 +77,19 @@ The following models are found in the `skypy.galaxy.spectrum` package.
    :nosignatures:
 
    dirichlet_coefficients
+   kcorrect_spectra
+
+
+Stellar mass
+------------
+
+The following models are found in the `skypy.galaxy.stellar_mass` package.
+
+.. currentmodule:: skypy.galaxy.stellar_mass
+.. autosummary::
+  :nosignatures:
+
+  schechter_smf
 
 
 Reference/API
@@ -89,3 +103,4 @@ Reference/API
    :include-all-objects:
 .. automodapi:: skypy.galaxy.size
 .. automodapi:: skypy.galaxy.spectrum
+.. automodapi:: skypy.galaxy.stellar_mass
