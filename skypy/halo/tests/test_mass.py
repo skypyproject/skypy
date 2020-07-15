@@ -59,7 +59,7 @@ def test_halo_mass_function():
     assert allclose(array_output_PS, PS_massf)
 
 
-def halo_mass_sampler():
+def test_halo_mass_sampler():
     # Test the output shape is correct given the sample size
     n_samples = 1000
     m_min, m_max, resolution = 10**9, 10**12, 100
@@ -73,12 +73,14 @@ def halo_mass_sampler():
 
     # Sheth and Tormen collapse model
     array_output_PS = mass.sheth_tormen(10**9, 10**12, 100, k,
-                                        Pk, 1.0, cosmo)
+                                        Pk, 1.0, cosmo, size=n_samples)
+
     assert len(array_output_PS) == n_samples
 
     # Press-Schechter collapse model
     array_output_PS = mass.press_schechter(10**9, 10**12, 100, k,
-                                           Pk, 1.0, cosmo)
+                                           Pk, 1.0, cosmo, size=n_samples)
+
     assert len(array_output_PS) == n_samples
 
 
