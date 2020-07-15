@@ -154,7 +154,7 @@ def kcorrect_spectra(redshift, stellar_mass, coefficients):
         f_o(\lambda_o) = \frac{f_e(\lambda)}{1+z} \;
 
     where
-    
+
     .. math::
         \lambda_o = (1+z) \lambda \;.
 
