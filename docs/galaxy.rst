@@ -48,6 +48,7 @@ The following models are found in the `skypy.galaxy.redshift` package.
 .. autosummary::
    :nosignatures:
 
+   herbel_pdf
    herbel_redshift
    smail
 
@@ -61,6 +62,7 @@ The following models are found in the `skypy.galaxy.size` package.
 .. autosummary::
    :nosignatures:
 
+   angular_size
    early_type_lognormal
    late_type_lognormal
    linear_lognormal
@@ -76,6 +78,7 @@ The following models are found in the `skypy.galaxy.spectrum` package.
    :nosignatures:
 
    dirichlet_coefficients
+   kcorrect_spectra
 
 
 Reference/API
