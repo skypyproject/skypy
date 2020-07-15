@@ -4,8 +4,15 @@
 SkyPy Documentation
 ###################
 
-This package contains methods for modelling the Universe, galaxies and the Milky Way. Also included are methods for generating observed data.
+.. |logo_svg| image:: _static/skypy_image.svg
 
+.. |logo_png| image:: _static/skypy_image.png
+
+This is ``SkyPy``, a package containing methods for modelling the Universe. The package models Large Scale Structures, galaxies and the Milky Way, as well as synthetic observed data based on those objects.
+
+.. Important:: If you use SkyPy for work presented in a publication or talk
+   please help the project via proper `citation or acknowledgement
+   <hhttps://github.com/skypyproject/skypy/blob/master/CITATION>`_.
 
 .. _getting-started:
 
@@ -13,6 +20,11 @@ This package contains methods for modelling the Universe, galaxies and the Milky
 Getting Started
 ***************
 
+.. toctree::
+   :maxdepth: 1
+
+   install
+   importing_skypy
 
 .. _user-docs:
 
@@ -48,7 +60,6 @@ Pipeline
 ***********************
 Developer Documentation
 ***********************
-
 
 .. _project-details:
 
