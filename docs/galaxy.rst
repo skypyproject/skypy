@@ -81,8 +81,8 @@ The following models are found in the `skypy.galaxy.spectrum` package.
    kcorrect_spectra
 
 
-Spectrum
---------
+Stellar mass
+------------
 
 The following models are found in the `skypy.galaxy.stellar_mass` package.
 
