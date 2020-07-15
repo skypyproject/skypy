@@ -12,7 +12,6 @@ import skypy.utils.special as special
 
 
 __all__ = [
-    'herbel_pdf',
     'herbel_redshift',
     'smail',
 ]
