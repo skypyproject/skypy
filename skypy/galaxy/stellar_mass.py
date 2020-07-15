@@ -1,5 +1,4 @@
-r"""Models of galaxy stellar mass.
-
+"""Models of galaxy stellar mass.
 """
 
 import numpy as np
@@ -19,7 +18,7 @@ def schechter_smf(alpha, m_star, x_min, x_max, resolution=100, size=None):
     ----------
     alpha : float
         The alpha parameter in the Schechter stellar mass function.
-    m_star : array-like
+    m_star : (nm,) array-like
         Characteristic stellar mass M_*.
     size: int, optional
          Output shape of stellar mass samples. If size is None and m_star
@@ -33,27 +32,21 @@ def schechter_smf(alpha, m_star, x_min, x_max, resolution=100, size=None):
 
     Returns
     -------
-    stellar mass : array_like
+    stellar mass : (nm,) array_like
         Drawn stellar masses from the Schechter stellar mass function in units
-        of the solar mass
+        of the solar mass.
 
     Notes
     -----
-     The stellar mass probability distribution (pdf) follows a Schechter
+    The stellar mass probability distribution (pdf) follows a Schechter
     profile of the form
 
     .. math::
+
         \Phi(M) = \frac{1}{M_*} \left(\frac{M}{M_*}\right)^\alpha
             \exp\left(-\frac{M}{M_*}\right) \;.
 
     From this pdf one can sample the stellar masses.
-
-
-    References
-    ----------
-    .. [1] Mo, H., Van den Bosch, F., & White, S. (2010). Galaxy Formation and
-    Evolution. Cambridge: Cambridge University Press.
-    doi:10.1017/CBO9780511807244
 
     Examples
     --------
@@ -64,6 +57,12 @@ def schechter_smf(alpha, m_star, x_min, x_max, resolution=100, size=None):
 
     >>> masses = stellar_mass.schechter_smf(-1.4, 10**10.67, 0.0002138,
     ...                               213.8, size=100)
+
+    References
+    ----------
+    .. [1] Mo, H., Van den Bosch, F., & White, S. (2010). Galaxy Formation and
+        Evolution. Cambridge: Cambridge University Press.
+        doi:10.1017/CBO9780511807244
 
     """
 
