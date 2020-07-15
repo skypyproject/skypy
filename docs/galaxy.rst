@@ -81,6 +81,18 @@ The following models are found in the `skypy.galaxy.spectrum` package.
    kcorrect_spectra
 
 
+Spectrum
+--------
+
+The following models are found in the `skypy.galaxy.stellar_mass` package.
+
+.. currentmodule:: skypy.galaxy.stellar_mass
+.. autosummary::
+  :nosignatures:
+
+  schechter_smf
+
+
 Reference/API
 =============
 
@@ -92,3 +104,4 @@ Reference/API
    :include-all-objects:
 .. automodapi:: skypy.galaxy.size
 .. automodapi:: skypy.galaxy.spectrum
+.. automodapi:: skypy.galaxy.stellar_mass
