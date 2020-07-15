@@ -42,13 +42,13 @@ def halo_mass_function(M, wavenumber, power_spectrum, growth_function,
 
     Parameters
     -----------
-    M : (nm,)
-        Array for the halo mass, in units of solar masses.
+    M : (nm,) array_like
+        Array for the halo mass, in units of solar mass.
     wavenumber : (nk,) array_like
         Array of wavenumbers at which the power spectrum is evaluated,
-        in units of [Mpc^-1].
+        in units of :math:`1/Mpc`.
     power_spectrum: (nk,) array_like
-        Linear power spectrum at redshift 0 in [Mpc^3].
+        Linear power spectrum at redshift 0 in :math:`Mpc^3`.
     growth_function : float
         The growth function evaluated at a given redshift for the given
         cosmology.
@@ -134,9 +134,9 @@ def halo_mass_sampler(m_min, m_max, resolution, wavenumber, power_spectrum,
         Resolution of the inverse transform sampling spline.
     wavenumber : (nk,) array_like
         Array of wavenumbers at which the power spectrum is evaluated,
-        in units of [Mpc^-1].
+        in units of :math:`1/Mpc`.
     power_spectrum: (nk,) array_like
-        Linear power spectrum at redshift 0 in [Mpc^3].
+        Linear power spectrum at redshift 0 in :math:`Mpc^3`.
     growth_function : float
         The growth function evaluated at a given redshift for the given
         cosmology.
@@ -146,11 +146,9 @@ def halo_mass_sampler(m_min, m_max, resolution, wavenumber, power_spectrum,
     collapse_function: function
         Collapse function to choose from a variety of models:
         `sheth_tormen_collapse_function`, `press_schechter_collapse_function`.
-    params : tuple
+    params: tuple
         List of parameters that determines the model used for
-        the halo mass function. The first parameter should be the name of
-        collapse function, followed by a second tuple with the parameters
-        of the chosen collapse model.
+        the collapse function.
     size: int, optional
         Output shape of samples. Default is None.
 
@@ -208,7 +206,7 @@ def halo_mass_sampler(m_min, m_max, resolution, wavenumber, power_spectrum,
 
 
 def ellipsoidal_collapse_function(sigma, params):
-    r'''Spherical collapse function.
+    r'''Ellipsoidal collapse function.r
     This function computes the mass function for ellipsoidal
     collapse, see equation 10 in [1]_ or [2]_.
 
