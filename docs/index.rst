@@ -8,7 +8,9 @@ SkyPy Documentation
 
 .. |logo_png| image:: _static/skypy_image.png
 
-This is ``SkyPy``, a package containing methods for modelling the Universe. The package models Large Scale Structures, galaxies and the Milky Way, as well as synthetic observed data based on those objects.
+This is ``SkyPy``, a package containing methods for modelling the Universe.
+The package models Large Scale Structures, galaxies and the Milky Way,
+as well as synthetic observed data based on those objects.
 
 .. Important:: If you use SkyPy for work presented in a publication or talk
    please help the project via proper `citation or acknowledgement
