@@ -71,8 +71,8 @@ SkyPy, as well as coding, documentation and testing guidelines
    :maxdepth: 1
 
    Contributing to SkyPy <https://github.com/skypyproject/skypy/blob/master/CONTRIBUTING.md>
-   ..Communicating within SkyPy
-   ..SkyPy Membership Policy
+   .. Communicating within SkyPy
+   .. SkyPy Membership Policy
    SkyPy Code of Conduct <https://github.com/skypyproject/skypy/blob/master/CODE_OF_CONDUCT.md>
    How to Cite SkyPy <https://github.com/skypyproject/skypy/blob/master/CITATION>
 
