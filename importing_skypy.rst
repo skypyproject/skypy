@@ -15,36 +15,13 @@ with the syntax::
 
     >>> from skypy import subpackage  # doctest: +SKIP
 
-For example, to access the FITS-related functionality, you can import
-`astropy.io.fits` with::
+For example, to access the galaxy-related functionality, you can import
+`skypy.galaxy` with::
 
-    >>> from astropy.io import fits
-    >>> hdulist = fits.open('data.fits')  # doctest: +SKIP
-
-In specific cases, we have recommended shortcuts in the documentation for
-specific sub-packages. For example::
-
-    >>> from astropy import units as u
-    >>> from astropy import coordinates as coord
-    >>> coord.SkyCoord(ra=10.68458*u.deg, dec=41.26917*u.deg, frame='icrs')  # doctest: +FLOAT_CMP
-    <SkyCoord (ICRS): (ra, dec) in deg
-        ( 10.68458,  41.26917)>
-
-Finally, in some cases, most of the required functionality is contained in a
-single class (or a few classes). In those cases, the class can be directly
-imported::
-
-    >>> from astropy.cosmology import WMAP7
-    >>> from astropy.table import Table
-    >>> from astropy.wcs import WCS
+    >>> from skypy import galaxy
+    >>> redshift = galaxy.redshift.smail(1.2, 1.5, 2.0, size=10)  # doctest: +SKIP
 
 Note that for clarity, and to avoid any issues, we recommend **never**
-importing any Astropy functionality using ``*``, for example::
+importing any SkyPy functionality using ``*``, for example::
 
-    >>> from astropy.io.fits import *  # NOT recommended
-
-Some components of Astropy started off as standalone packages (e.g. PyFITS,
-PyWCS), so in cases where Astropy needs to be used as a drop-in replacement,
-the following syntax is also acceptable::
-
-    >>> from astropy.io import fits as pyfits
+    >>> from skyp.galaxy import *  # NOT recommended
