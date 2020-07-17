@@ -18,3 +18,7 @@ __all__ = []
 #__all__ += ['do_primes']   # noqa
 # or you can keep everything from the subpackage with the following instead
 # __all__ += example_mod.__all__
+__minimum_python_version__ = '3.6'
+__minimum_numpy_version__ = '1.16.0'
+__minimum_scipy_version__ = '1.2'
+__minimum_astropy_version__ = '3.2'

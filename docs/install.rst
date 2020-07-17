@@ -13,16 +13,25 @@ Requirements
 
 - `Numpy`_ |minimum_numpy_version| or later
 
-- `astropy`_ |minimum_numpy_version| or later
-
-``SkyPy`` also depends on other packages for optional features:
-
 - `scipy`_ |minimum_scipy_version| or later: To power a variety of features
   in several modules.
 
-.. - `matplotlib <https://matplotlib.org/>`_ 2.0 or later: To provide plotting
+- `astropy`_ |minimum_astropy_version| or later
+
+- `networkx <https://networkx.github.io/>`_
+
+- `PyYAML <https://pyyaml.org>`_
+
+``SkyPy`` also depends on other packages for optional features:
+
+- `matplotlib <https://matplotlib.org/>`_ 2.0 or later: To provide plotting
   functionality that `astropy.visualization` enhances.
 
+- `pytest-astropy <https://github.com/astropy/pytest-astropy>`_
+
+- `sphinx-astropy <https://github.com/astropy/sphinx-astropy>`_
+
+- `camb <<https://github.com/astropy/sphinx-astropy>`_
 .. - `setuptools <https://setuptools.readthedocs.io>`_: Used for discovery of
   entry points which are used to insert fitters into `astropy.modeling.fitting`.
 
