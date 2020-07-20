@@ -17,99 +17,111 @@
     "creators": [
         {
             "name": "SkyPy Collaboration"
-        },
+        }
+    ],
+    "contributors": [
         {
             "orcid": "0000-0003-3481-3491",
             "affiliation": "University of Portsmouth",
-            "name": "Adam Amara"
+            "name": "Adam Amara",
+            "type": "ProjectMember"
         },
         {
             "orcid": "0000-0002-1064-3400",
             "affiliation": "University of Manchester",
-            "name": "Lucia F. de la Bella"
+            "name": "Lucia F. de la Bella",
+            "type": "ProjectMember"
         },
         {
             "orcid": "0000-0003-3195-5507",
             "affiliation": "Stanford University",
-            "name": "Simon Birrer"
+            "name": "Simon Birrer",
+            "type": "ProjectMember"
         },
         {
             "orcid": "0000-0002-0128-1006",
             "affiliation": "University of Manchester",
-            "name": "Sarah Bridle"
+            "name": "Sarah Bridle",
+            "type": "ProjectMember"
         },
         {
             "orcid": "0000-0002-6625-7656",
             "affiliation": "University of Manchester",
-            "name": "Juan Pablo Cordero"
+            "name": "Juan Pablo Cordero",
+            "type": "ProjectMember"
         },
         {
             "orcid": "0000-0002-8218-563X",
             "affiliation": "University of Portsmouth",
-            "name": "Ginevra Favole"
+            "name": "Ginevra Favole",
+            "type": "ProjectMember"
         },
         {
             "orcid": "0000-0002-4437-0770",
             "affiliation": "University of Manchester",
-            "name": "Ian Harrison"
+            "name": "Ian Harrison",
+            "type": "ProjectMember"
         },
         {
             "orcid": "0000-0002-5304-9372",
             "affiliation": "University of Portsmouth",
-            "name": "Ian Harry"
+            "name": "Ian Harry",
+            "type": "ProjectMember"
         },
         {
             "orcid": "0000-0001-9233-2341",
             "affiliation": "University of Portsmouth",
-            "name": "Coleman Krawczyk"
+            "name": "Coleman Krawczyk",
+            "type": "ProjectMember"
         },
         {
             "orcid": "0000-0002-0363-4469",
             "affiliation": "University of Portsmouth",
-            "name": "Andy Lundgren"
+            "name": "Andy Lundgren",
+            "type": "ProjectMember"
         },
         {
             "orcid": "0000-0001-6706-8972",
             "affiliation": "Fermilab",
-            "name": "Brian Nord"
+            "name": "Brian Nord",
+            "type": "ProjectMember"
         },
         {
             "orcid": "0000-0002-8599-8791",
             "affiliation": "University of Portsmouth",
-            "name": "Laura Nuttall"
+            "name": "Laura Nuttall",
+            "type": "ProjectMember"
         },
         {
             "orcid": "0000-0003-1291-1023",
             "affiliation": "University of Manchester",
-            "name": "Richard Rollins"
+            "name": "Richard Rollins",
+            "type": "ProjectMember"
         },
         {
             "orcid": "0000-0001-8685-2308",
             "affiliation": "University of Portsmouth",
-            "name": "Philipp Sudek"
+            "name": "Philipp Sudek",
+            "type": "ProjectMember"
         },
         {
             "orcid": "0000-0002-9696-7931",
             "affiliation": "University of Manchester",
-            "name": "Nicolas Tessore"
+            "name": "Nicolas Tessore",
+            "type": "ProjectMember"
         },
         {
             "orcid": "0000-0002-7196-4822",
             "affiliation": "Institute of Astronomy and Astrophysics Academia Sinica",
-            "name": "Keiichi Umetsu"
+            "name": "Keiichi Umetsu",
+            "type": "ProjectMember"
         },
         {
             "orcid": "0000-0002-7627-8688",
             "affiliation": "University of Portsmouth",
-            "name": "Andrew R. Williamson"
+            "name": "Andrew R. Williamson",
+            "type": "ProjectMember"
         }
     ],
-    "access_right": "open",
-    "related_identifiers": [
-        {
-            "scheme": "doi",
-            "identifier": "10.5281/zenodo.3755531",
-            "relation": "isVersionOf"
-        }
-    ]
+    "access_right": "open"
 }
