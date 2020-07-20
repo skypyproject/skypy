@@ -44,8 +44,8 @@ def main(args=None):
     import yaml
 
     parser = argparse.ArgumentParser(description="SkyPy pipeline driver")
-    parser.add_argument('-c', '--config', required=True,
-                        type=argparse.FileType('r'), help='Config file name')
+    parser.add_argument('config', type=argparse.FileType('r'),
+                        help='Config file name')
     parser.add_argument('-f', '--format', required=False,
                         choices=['fits', 'hdf5'], help='Table file format')
     parser.add_argument('-o', '--overwrite', action='store_true',
