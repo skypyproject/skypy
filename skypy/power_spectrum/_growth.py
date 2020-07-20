@@ -159,21 +159,19 @@ def growth_function(redshift, cosmology, gamma=6.0/11.0):
         integrand = (growth_factor(x, cosmology, gamma) - 1) / (1 + x)
         return integrand
 
-    if isinstance(z, int) or isinstance(z, float):
-        integral = integrate.quad(integrand, z, 1100)[0]
-        g = np.exp(integral)
-        growth_function = g / (1 + z)
+    z_flat = np.ravel(z)
+    growth_function = np.empty_like(z_flat)
 
-    elif isinstance(z, np.ndarray):
-        growth_function = np.zeros(np.shape(z))
+    for i, zz in enumerate(z_flat):
+        integral = integrate.quad(integrand, zz, 1100)[0]
+        growth_function[i] = np.exp(integral)
 
-        for i, aux in enumerate(z):
-            integral = integrate.quad(integrand, aux, 1100)[0]
-            g = np.exp(integral)
-            growth_function[i] = g / (1 + aux)
+    growth_function /= 1 + z_flat
 
+    if np.ndim(z) == 0:
+        growth_function = growth_function.item()
     else:
-        raise ValueError('Redshift must be integer, float or ndarray ')
+        growth_function = growth_function.reshape(np.shape(z))
 
     return growth_function
 
