@@ -41,6 +41,17 @@ def test_driver():
     with fits.open('test_table.fits') as hdu:
         assert np.all(Table(hdu[1].data) == driver.test_table)
 
+    # Check for failure if output files already exist and overwrite is False
+    driver = SkyPyDriver()
+    with pytest.raises(OSError):
+        driver.execute(config, file_format='fits', overwrite=False)
+
+    # Check that the existing output files are modified if overwrite is True
+    timestamp = os.path.getmtime("test_table.fits")
+    driver = SkyPyDriver()
+    driver.execute(config, file_format='fits', overwrite=True)
+    assert(os.path.getmtime("test_table.fits") > timestamp)
+
     # Check for failure if 'column1' requires itself creating a cyclic
     # dependency graph
     config['tables']['test_table']['column1']['requires'] = \
