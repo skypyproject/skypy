@@ -48,8 +48,8 @@ def main(args=None):
                         type=argparse.FileType('r'), help='Config file name')
     parser.add_argument('-f', '--format', required=False,
                         choices=['fits', 'hdf5'], help='Table file format')
-    parser.add_argument('-o', '--overwrite', default=False,
-                        type=bool, help='Whether to overwrite existing files')
+    parser.add_argument('-o', '--overwrite', action='store_true',
+                        help='Whether to overwrite existing files')
 
     # get system args if none passed
     if args is None:
