@@ -160,17 +160,17 @@ def growth_function(redshift, cosmology, gamma=6.0/11.0):
         return integrand
 
     z_flat = np.ravel(z)
-    growth_function = np.empty_like(z_flat)
+    g_flat = np.empty(z_flat.size)
 
     for i, zz in enumerate(z_flat):
         integral = integrate.quad(integrand, zz, 1100)[0]
         g = np.exp(integral)
-        growth_function[i] = g / (1 + zz)
+        g_flat[i] = g / (1 + zz)
 
-    if np.ndim(z) == 0:
-        growth_function = growth_function.item()
+    if np.isscalar(z):
+        growth_function = g_flat.item()
     else:
-        growth_function = growth_function.reshape(np.shape(z))
+        growth_function = g_flat.reshape(np.shape(z))
 
     return growth_function
 
