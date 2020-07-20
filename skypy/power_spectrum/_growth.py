@@ -164,9 +164,8 @@ def growth_function(redshift, cosmology, gamma=6.0/11.0):
 
     for i, zz in enumerate(z_flat):
         integral = integrate.quad(integrand, zz, 1100)[0]
-        growth_function[i] = np.exp(integral)
-
-    growth_function /= 1 + z_flat
+        g = np.exp(integral)
+        growth_function[i] = g / (1 + zz)
 
     if np.ndim(z) == 0:
         growth_function = growth_function.item()
