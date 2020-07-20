@@ -30,6 +30,8 @@ import sys
 import datetime
 from importlib import import_module
 
+import skypy
+
 try:
     from sphinx_astropy.conf.v1 import *  # noqa
 except ImportError:
@@ -66,7 +68,7 @@ rst_epilog += """
 .. |minimum_numpy_version| replace:: {0.__minimum_numpy_version__}
 .. |minimum_scipy_version| replace:: {0.__minimum_scipy_version__}
 .. |minimum_astropy_version| replace:: {0.__minimum_astropy_version__}
-""".format(astropy)
+""".format(skypy)
 
 # -- Project information ------------------------------------------------------
 
