@@ -35,10 +35,12 @@ Requirements
 .. - `setuptools <https://setuptools.readthedocs.io>`_: Used for discovery of
   entry points which are used to insert fitters into `astropy.modeling.fitting`.
 
+
 The following packages can optionally be used when testing:
 
 - `tox <https://tox.readthedocs.io/en/latest/>`_: Used to automate testing
   and documentation builds.
+
 
 Installing ``SkyPy``
 ======================
