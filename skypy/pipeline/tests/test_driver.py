@@ -21,13 +21,14 @@ def test_driver():
 
     # Generate a simple two column table with a dependency. Also write the
     # table to a fits file and check it's contents.
+    size = 100
     config = {'tables': {
                 'test_table': {
                   'column1': {
                     'module': 'numpy.random',
                     'function': 'uniform',
                     'kwargs': {
-                      'size': 100}},
+                      'size': size}},
                   'column2': {
                     'module': 'numpy.random',
                     'function': 'uniform',
@@ -36,7 +37,7 @@ def test_driver():
 
     driver = SkyPyDriver()
     driver.execute(config, file_format='fits')
-    assert len(driver.test_table) == 100
+    assert len(driver.test_table) == size
     assert np.all(driver.test_table['column1'] < driver.test_table['column2'])
     with fits.open('test_table.fits') as hdu:
         assert np.all(Table(hdu[1].data) == driver.test_table)
@@ -47,10 +48,12 @@ def test_driver():
         driver.execute(config, file_format='fits', overwrite=False)
 
     # Check that the existing output files are modified if overwrite is True
-    timestamp = os.path.getmtime("test_table.fits")
+    new_size = 2 * size
+    config['tables']['test_table']['column1']['kwargs']['size'] = new_size
     driver = SkyPyDriver()
     driver.execute(config, file_format='fits', overwrite=True)
-    assert(os.path.getmtime("test_table.fits") > timestamp)
+    with fits.open('test_table.fits') as hdu:
+        assert len(hdu[1].data) == new_size
 
     # Check for failure if 'column1' requires itself creating a cyclic
     # dependency graph
