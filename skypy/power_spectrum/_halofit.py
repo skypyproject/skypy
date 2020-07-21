@@ -139,42 +139,32 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
     ode_1pw_z = omega_de_z * wp1_z
 
     # Linear power spectrum interpolated at each redshift
+    lnk = np.log(wavenumber)
     k2 = np.square(wavenumber)
     k3 = np.power(wavenumber, 3)
     dl2kz = (linear_power_spectrum.T * k3) / (2 * np.pi * np.pi)
-    dl2k = [interpolate.interp1d(np.log(wavenumber), np.log(d)) for d in dl2kz]
-    lnk_lo = np.log(wavenumber[0])
-    lnk_up = np.log(wavenumber[-1])
 
     # Integrals required to evaluate Smith et al. 2003 equations C5, C7 & C8
-    def integrand_kn(lnk, lnR, lnd, n):
-        R2 = np.exp(2*lnR)
-        k2 = np.exp(2*lnk)
-        dl2 = np.exp(lnd(lnk))
-        return dl2 * np.power(k2, n/2) * np.exp(-k2*R2)
-
-    def integral_kn(lnR, lnd, n, lnk_lo, lnk_up):
-        integrand = partial(integrand_kn, lnR=lnR, lnd=lnd, n=n)
-        return integrate.quad(integrand, lnk_lo, lnk_up)[0]
+    def integral_kn(lnR, n):
+        R2 = np.exp(2*lnR)[:, np.newaxis]
+        integrand = dl2kz * np.power(k2, n/2) * np.exp(-k2*R2)
+        return integrate.simps(integrand, lnk, axis=1)
 
     # Find root at which sigma^2(R) == 1.0 for each redshift
     # Smith et al. 2003 equation C5 & C6
     def log_sigma_squared(lnR):
-        ik0 = [integral_kn(r, d, 0, lnk_lo, lnk_up) for r, d in zip(lnR, dl2k)]
+        ik0 = integral_kn(lnR, 0)
         return np.log(ik0)
-    guess = np.zeros(np.size(redshift))
+    guess = np.zeros_like(redshift)
     root = optimize.fsolve(log_sigma_squared, guess)
     R = np.exp(root)[:, np.newaxis]
     ksigma = 1.0 / R
     y = wavenumber / ksigma
 
     # Evaluate integrals at lnR = root for each redshift
-    ik0 = [integral_kn(r, d, 0, lnk_lo, lnk_up) for r, d in zip(root, dl2k)]
-    ik2 = [integral_kn(r, d, 2, lnk_lo, lnk_up) for r, d in zip(root, dl2k)]
-    ik4 = [integral_kn(r, d, 4, lnk_lo, lnk_up) for r, d in zip(root, dl2k)]
-    ik0 = np.asarray(ik0)[:, np.newaxis]
-    ik2 = np.asarray(ik2)[:, np.newaxis]
-    ik4 = np.asarray(ik4)[:, np.newaxis]
+    ik0 = integral_kn(root, 0)[:, np.newaxis]
+    ik2 = integral_kn(root, 2)[:, np.newaxis]
+    ik4 = integral_kn(root, 4)[:, np.newaxis]
 
     # Effective spectral index neff and curvature C
     # Smith et al. 2003 equations C7 & C8
