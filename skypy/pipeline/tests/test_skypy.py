@@ -15,20 +15,20 @@ def test_skypy():
         skypy.main(['--help'])
     assert e.value.code == 0
 
-    # Missing required argument '-c'
+    # Missing positional argument 'config'
     with pytest.raises(SystemExit) as e:
         skypy.main(['--format', 'fits'])
     assert e.value.code == 2
 
     # Invalid file format
     with pytest.raises(SystemExit) as e:
-        skypy.main(['--config', 'config.filename', '--format', 'invalid'])
+        skypy.main(['--format', 'invalid', 'config.filename'])
     assert e.value.code == 2
 
     # Process empty config file
     filename = get_pkg_data_filename('data/empty_config.yml')
-    assert skypy.main(['--config', filename]) == 0
+    assert skypy.main([filename]) == 0
 
     # Process test config file
     filename = get_pkg_data_filename('data/test_config.yml')
-    assert skypy.main(['--config', filename]) == 0
+    assert skypy.main([filename]) == 0

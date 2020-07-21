@@ -22,7 +22,7 @@ class SkyPyDriver:
     and using their results to generate variables and tables.
     '''
 
-    def execute(self, configuration, file_format=None):
+    def execute(self, configuration, file_format=None, overwrite=False):
         r'''Run a pipeline.
 
         This function runs a pipeline of functions to generate variables and
@@ -38,6 +38,8 @@ class SkyPyDriver:
             File format used to write tables. Files are written using the
             Astropy unified file read/write interface; see [2]_ for supported
             file formats. If None (default) tables are not written to file.
+        overwrite : bool
+            Whether to overwrite any existing files without warning.
 
         Notes
         -----
@@ -131,7 +133,7 @@ class SkyPyDriver:
         if file_format:
             for table in table_config.keys():
                 filename = '.'.join((table, file_format))
-                getattr(self, table).write(filename)
+                getattr(self, table).write(filename, overwrite=overwrite)
 
     def _call_from_config(self, config):
 
