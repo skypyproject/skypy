@@ -159,11 +159,11 @@ def growth_function(redshift, cosmology, gamma=6.0/11.0):
         integrand = (growth_factor(x, cosmology, gamma) - 1) / (1 + x)
         return integrand
 
-    z_flat = np.ravel(z)
+    z_flat = np.ravel(redshift)
     g_flat = np.empty(z_flat.size)
 
-    for i, zz in enumerate(z_flat):
-        integral = integrate.quad(integrand, zz, 1100)[0]
+    for i, z in enumerate(z_flat):
+        integral = integrate.quad(integrand, zz, z_upper)[0]
         g = np.exp(integral)
         g_flat[i] = g / (1 + zz)
 
