@@ -131,7 +131,7 @@ def growth_function(redshift, cosmology, gamma=6.0/11.0, z_upper=1100):
         Growth index providing an efficient parametrization of the matter
         perturbations. Default is the 6/11 LCDM value.
     z_upper : float, optional
-        Redshift for to early-time integral cutoff. Default is 1100.
+        Redshift for the early-time integral cutoff. Default is 1100.
 
     Returns
     -------
