@@ -201,7 +201,7 @@ def kcorrect_spectra(redshift, stellar_mass, coefficients):
 def mag_ab(spec_lam, spec_flux, band_lam, band_tx, redshift=None):
     r'''Compute absolute AB magnitude from spectrum and bandpass.
 
-    This function takes an _emission_ spectrum and an observation bandpass and
+    This function takes an *emission* spectrum and an observation bandpass and
     computes the AB magnitude for a source at 10pc (i.e. absolute magnitude).
     The emission spectrum can optionally be redshifted.
 
@@ -226,7 +226,7 @@ def mag_ab(spec_lam, spec_flux, band_lam, band_tx, redshift=None):
     -------
     mag_ab : array_like
         The absolute AB magnitude. If redshifts are given, the output has the
-        same shape _and type_ as the `redshift` argument.
+        same shape *and type* as the `redshift` argument.
     '''
 
     assert np.ndim(spec_lam) == 1, 'spec_lam must be 1d array'
