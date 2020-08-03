@@ -18,7 +18,7 @@ import numpy as np
 import skypy.utils.special as special
 
 
-def schechter(alpha, x_min, x_max, resolution=100, size=None):
+def schechter(alpha, x_min, x_max, resolution=100, size=None, scale=1.):
     """Sample from the Schechter function.
 
     Parameters
@@ -31,6 +31,8 @@ def schechter(alpha, x_min, x_max, resolution=100, size=None):
         Resolution of the inverse transform sampling spline. Default is 100.
     size: int, optional
         Output shape of samples. Default is None.
+    scale: float, optional
+        Scale factor for the returned samples. Default is 1.
 
     Returns
     -------
@@ -58,7 +60,7 @@ def schechter(alpha, x_min, x_max, resolution=100, size=None):
     u = np.random.uniform(t_lower, t_upper, size=size)
     x_sample = np.interp(u, cdf, x)
 
-    return x_sample
+    return x_sample * scale
 
 
 def _schechter_cdf(x, x_min, x_max, alpha):
