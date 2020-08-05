@@ -5,17 +5,15 @@ n_s: 0.969453
 redshift: 1
 growth_function:
   function: skypy.power_spectrum.growth_function
-  requires:
+  args:
     redshift: redshift
     cosmology: cosmology
 wavenumber:
   function: numpy.logspace
   args: [-4, 2, 100]
-  kwargs:
-    base: 10
 power_spectrum:
   function: skypy.power_spectrum.eisenstein_hu
-  requires:
+  args:
     wavenumber: wavenumber
     A_s: A_s
     n_s: n_s
@@ -24,12 +22,11 @@ tables:
   halos:
     mass:
       function: skypy.halo.mass.press_schechter
-      kwargs:
+      args:
         m_min: 1.0E+9
         m_max: 1.0E+12
         resolution: 1000
         size: 1000
-      requires:
         wavenumber: wavenumber
         power_spectrum: power_spectrum
         growth_function: growth_function
@@ -37,17 +34,16 @@ tables:
   galaxies:
     luminosity:
       function: skypy.galaxy.luminosity.herbel_luminosities
-      kwargs:
+      args:
         alpha: -0.5
         a_m: -0.610
         b_m: -20.416
         size: 100
-      requires:
         redshift: redshift
   abundance_matching:
     init:
       function: skypy.halo.abundance_matching.vale_ostriker
-      requires:
+      args:
         halos: halos
         galaxies: galaxies
       depends: [halos.complete, galaxies.complete]

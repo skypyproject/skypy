@@ -25,11 +25,11 @@ def test_driver():
                 'test_table': {
                   'column1': {
                     'function': 'numpy.random.uniform',
-                    'kwargs': {
+                    'args': {
                       'size': size}},
                   'column2': {
                     'function': 'numpy.random.uniform',
-                    'requires': {
+                    'args': {
                       'low': 'test_table.column1'}}}}}
 
     driver = SkyPyDriver()
@@ -46,7 +46,7 @@ def test_driver():
 
     # Check that the existing output files are modified if overwrite is True
     new_size = 2 * size
-    config['tables']['test_table']['column1']['kwargs']['size'] = new_size
+    config['tables']['test_table']['column1']['args']['size'] = new_size
     driver = SkyPyDriver()
     driver.execute(config, file_format='fits', overwrite=True)
     with fits.open('test_table.fits') as hdu:
@@ -54,15 +54,13 @@ def test_driver():
 
     # Check for failure if 'column1' requires itself creating a cyclic
     # dependency graph
-    config['tables']['test_table']['column1']['requires'] = \
-        {'low': 'test_table.column1'}
+    config['tables']['test_table']['column1']['args'] = {'low': 'test_table.column1'}
     with pytest.raises(networkx.NetworkXUnfeasible):
         SkyPyDriver().execute(config)
 
     # Check for failure if 'column1' and 'column2' both require each other
     # creating a cyclic dependency graph
-    config['tables']['test_table']['column1']['requires'] = \
-        {'low': 'test_table.column2'}
+    config['tables']['test_table']['column1']['args'] = {'low': 'test_table.column2'}
     with pytest.raises(networkx.NetworkXUnfeasible):
         SkyPyDriver().execute(config)
 

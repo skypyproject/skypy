@@ -17,6 +17,13 @@ __all__ = [
 ]
 
 
+def _items(a):
+    '''return keys and values for dict or list'''
+    if hasattr(a, 'items'):
+        return a.items()
+    return enumerate(a)
+
+
 class SkyPyDriver:
     r'''Class for running pipelines.
 
@@ -48,13 +55,13 @@ class SkyPyDriver:
         Each step in the pipeline is configured by a dictionary specifying:
 
         - 'function' : the fully qualified name of the function
-        - 'args' : a list of positional arguments (by value)
-        - 'kwargs' : a dictionary of keyword arguments
-        - 'requires' : a dictionary of keyword arguments
+        - 'args' : a list of positional arguments (by value), or a dictionary
+                   of keyword arguments
 
-        Note that 'kwargs' specifices keyword arguments by value, wheras
-        'requires' specifices the names of previous steps in the pipeline and
-        uses their return values as keyword arguments.
+        Note that 'args' either specifices keyword arguments by value, or the
+        names of previous steps in the pipeline and uses their return values as
+        keyword arguments. Literal strings (i.e. not field names) are escaped
+        by an initial `~` (tilde).
 
         'configuration' should contain the name and configuration of each
         variable and/or an entry named 'tables'. 'tables' should contain a set
@@ -105,7 +112,10 @@ class SkyPyDriver:
         # Add edges for all requirements and dependencies
         for job, settings in config.items():
             dependencies = settings.get('depends', [])
-            dependencies += settings.get('requires', {}).values()
+            args = settings.get('args', [])
+            for k, v in _items(args):
+                if isinstance(v, str) and v[0] != '~':
+                    dependencies.append(v)
             dag.add_edges_from((d, job) for d in dependencies)
         for table, columns in table_config.items():
             table_complete = '.'.join((table, 'complete'))
@@ -115,7 +125,10 @@ class SkyPyDriver:
                 dag.add_edge(table, job)
                 dag.add_edge(job, table_complete)
                 dependencies = settings.get('depends', [])
-                dependencies += settings.get('requires', {}).values()
+                args = settings.get('args', [])
+                for k, v in _items(args):
+                    if isinstance(v, str) and v[0] != '~':
+                        dependencies.append(v)
                 dag.add_edges_from((d, job) for d in dependencies)
 
         # Execute jobs in order that resolves dependencies
@@ -154,14 +167,23 @@ class SkyPyDriver:
 
         # Parse arguments
         args = config.get('args', [])
-        kwargs = config.get('kwargs', {})
-        req = config.get('requires', {})
-        req = {k: self.__getitem__(v) for k, v in req.items()}
+        for k, v in _items(args):
+            if isinstance(v, str):
+                args[k] = self[v]
 
         # Call function
-        return function(*args, **kwargs, **req)
+        if isinstance(args, Mapping):
+            result = function(**args)
+        else:
+            result = function(*args)
+
+        return result
 
     def __getitem__(self, label):
+        # do not parse literal strings
+        if label[0] == '~':
+            return label[1:]
+
         name, key = re.search(r'^(\w*)\.?(\w*)$', label).groups()
         item = getattr(self, name)
         return item[key] if key else item
