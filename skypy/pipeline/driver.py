@@ -6,6 +6,8 @@ and handle their results.
 
 from collections.abc import Mapping
 from copy import deepcopy
+from importlib import import_module
+import builtins
 import networkx
 import re
 
@@ -45,8 +47,7 @@ class SkyPyDriver:
         -----
         Each step in the pipeline is configured by a dictionary specifying:
 
-        - 'function' : the name of the function
-        - 'module' : the name of the the module to import 'function' from
+        - 'function' : the fully qualified name of the function
         - 'args' : a list of positional arguments (by value)
         - 'kwargs' : a dictionary of keyword arguments
         - 'requires' : a dictionary of keyword arguments
@@ -76,7 +77,7 @@ class SkyPyDriver:
         # table_config contains settings for all table columns
         config = deepcopy(configuration)
         table_config = config.pop('tables', {})
-        default_table = {'module': 'astropy.table', 'function': 'Table'}
+        default_table = {'function': 'astropy.table.Table'}
         config.update({k: v.pop('init', default_table)
                       for k, v in table_config.items()})
 
@@ -85,7 +86,7 @@ class SkyPyDriver:
 
         # Variables initialised by value don't require function evaluations
         def isfunction(f):
-            return isinstance(f, Mapping) and 'module' in f and 'function' in f
+            return isinstance(f, Mapping) and 'function' in f
         variables = {k: v for k, v in config.items() if not isfunction(v)}
         for v in variables:
             dag.add_node(v)
@@ -138,16 +139,18 @@ class SkyPyDriver:
     def _call_from_config(self, config):
 
         # Import function
-        module_name = config.get('module')
-        object_name, function_name = re.search(r'^(\w*?)\.?(\w*)$',
-                                               config.get('function')).groups()
-        if object_name:
-            module = __import__(module_name, fromlist=object_name)
-            object = getattr(module, object_name)
-            function = getattr(object, function_name)
-        else:
-            module = __import__(module_name, fromlist=function_name)
-            function = getattr(module, function_name)
+        function_path = config.get('function').split('.')
+        module = builtins
+        for i, key in enumerate(function_path[:-1]):
+            if not hasattr(module, key):
+                module_name = '.'.join(function_path[:i+1])
+                try:
+                    module = import_module(module_name)
+                except ModuleNotFoundError:
+                    raise ModuleNotFoundError(module_name)
+            else:
+                module = getattr(module, key)
+        function = getattr(module, function_path[-1])
 
         # Parse arguments
         args = config.get('args', [])

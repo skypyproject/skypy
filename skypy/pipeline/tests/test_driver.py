@@ -12,8 +12,7 @@ def test_driver():
 
     # Evaluate and store the default astropy cosmology.
     config = {'test_cosmology': {
-                'module': 'astropy.cosmology',
-                'function': 'default_cosmology.get'}}
+                'function': 'astropy.cosmology.default_cosmology.get'}}
 
     driver = SkyPyDriver()
     driver.execute(config)
@@ -25,13 +24,11 @@ def test_driver():
     config = {'tables': {
                 'test_table': {
                   'column1': {
-                    'module': 'numpy.random',
-                    'function': 'uniform',
+                    'function': 'numpy.random.uniform',
                     'kwargs': {
                       'size': size}},
                   'column2': {
-                    'module': 'numpy.random',
-                    'function': 'uniform',
+                    'function': 'numpy.random.uniform',
                     'requires': {
                       'low': 'test_table.column1'}}}}}
 
