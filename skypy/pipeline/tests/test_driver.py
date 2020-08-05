@@ -21,6 +21,7 @@ def test_driver():
     # Generate a simple two column table with a dependency. Also write the
     # table to a fits file and check it's contents.
     size = 100
+    string = '~' + size*'a'
     config = {'tables': {
                 'test_table': {
                   'column1': {
@@ -30,7 +31,11 @@ def test_driver():
                   'column2': {
                     'function': 'numpy.random.uniform',
                     'args': {
-                      'low': 'test_table.column1'}}}}}
+                      'low': 'test_table.column1'}},
+                  'column3': {
+                      'function': 'list',
+                      'args': [
+                        string]}}}}
 
     driver = SkyPyDriver()
     driver.execute(config, file_format='fits')
@@ -46,11 +51,23 @@ def test_driver():
 
     # Check that the existing output files are modified if overwrite is True
     new_size = 2 * size
+    new_string = '~' + new_size*'a'
     config['tables']['test_table']['column1']['args']['size'] = new_size
+    config['tables']['test_table']['column3']['args'][0] = new_string
     driver = SkyPyDriver()
     driver.execute(config, file_format='fits', overwrite=True)
     with fits.open('test_table.fits') as hdu:
         assert len(hdu[1].data) == new_size
+
+    # Check for failure if 'column1' calls a nonexistant module
+    config['tables']['test_table']['column1']['function'] = 'nomodule.function'
+    with pytest.raises(ModuleNotFoundError):
+        SkyPyDriver().execute(config)
+
+    # Check for failure if 'column1' calls a nonexistant function
+    config['tables']['test_table']['column1']['function'] = 'builtins.nofunction'
+    with pytest.raises(AttributeError):
+        SkyPyDriver().execute(config)
 
     # Check for failure if 'column1' requires itself creating a cyclic
     # dependency graph
@@ -72,13 +89,30 @@ def test_driver():
 
     # Check variables intialised by value
     config = {'test_int': 1,
-              'test_float': 1.0}
+              'test_float': 1.0,
+              'test_string': 'hello world'}
     driver = SkyPyDriver()
     driver.execute(config)
     assert isinstance(driver.test_int, int)
     assert isinstance(driver.test_float, float)
+    assert isinstance(driver.test_string, str)
     assert driver.test_int == 1
     assert driver.test_float == 1.0
+    assert driver.test_string == 'hello world'
+
+    # Check variables intialised by function
+    config = {'test_func': {
+                'function': 'list',
+                'args': [
+                    '~hello world']},
+              'test_func2': {
+                'function': 'len',
+                'args': [
+                    'test_func']}}
+    driver = SkyPyDriver()
+    driver.execute(config)
+    assert driver.test_func == list('hello world')
+    assert driver.test_func2 == 11
 
 
 def teardown_module(module):

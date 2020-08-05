@@ -1,5 +1,6 @@
 test_int: 1
 test_float: 1.0
+test_str: hello world
 test_cosmology:
   function: astropy.cosmology.FlatLambdaCDM
   args:
