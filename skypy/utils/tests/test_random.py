@@ -34,3 +34,13 @@ def test_schechter():
     # Test the distribution of galaxy properties follows the right distribution
     p_value = scipy.stats.kstest(sample, calc_cdf)[1]
     assert p_value > 0.01
+
+    # Test output shape when scale is a scalar
+    scale = 5
+    samples = random.schechter(alpha, x_min, x_max, scale=scale)
+    assert np.shape(samples) == np.shape(scale)
+
+    # Test output shape when scale is an array
+    scale = np.random.uniform(size=10)
+    samples = random.schechter(alpha, x_min, x_max, scale=scale)
+    assert np.shape(samples) == np.shape(scale)
