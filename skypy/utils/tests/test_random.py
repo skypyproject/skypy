@@ -44,3 +44,9 @@ def test_schechter():
     scale = np.random.uniform(size=10)
     samples = random.schechter(alpha, x_min, x_max, scale=scale)
     assert np.shape(samples) == np.shape(scale)
+
+    # When alpha = 0 check the samples match an exponential distribution
+    alpha, scale, size = 0, 5, 1000
+    samples = random.schechter(alpha, x_min, x_max, size=size, scale=scale)
+    p_value = scipy.stats.kstest(samples, 'expon', args=(0, scale))[1]
+    assert p_value > 0.01
