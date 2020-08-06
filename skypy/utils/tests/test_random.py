@@ -1,36 +1,33 @@
 import numpy as np
-import scipy.stats
-import scipy.integrate
-from skypy.utils import random, special
 
-
-def test_schechter_cdf():
-    # Test the _schechter_cdf function against precomputed values
-    x = np.logspace(np.log10(0.1), np.log10(10), 10)
-    cdf = random._schechter_cdf(x, min(x), max(x), -1.3)
-    sample = np.array([0., 0.31938431, 0.57066007, 0.75733831, 0.88345969,
-                       0.95631112, 0.98886695, 0.99846589, 0.99992254, 1.])
-
-    np.testing.assert_allclose(cdf, sample)
+from scipy.stats import kstest
 
 
 def test_schechter():
+
+    from skypy.utils.random import schechter
+
+    def schechter_cdf_gen(alpha, x_min, x_max, resolution=100000):
+        lnx = np.linspace(np.log(x_min), np.log(x_max), resolution)
+
+        cdf = np.exp((alpha + 1)*lnx - np.exp(lnx))
+        np.cumsum((cdf[:-1] + cdf[1:])/2*np.diff(lnx), out=cdf[1:])
+        cdf[0] = 0
+        cdf /= cdf[-1]
+
+        return lambda x: np.interp(np.log(x), lnx, cdf)
 
     # Test the schechter function, sampling dimensionless x values
     alpha = -1.3
     x_min = 1e-10
     x_max = 1e2
 
-    def calc_cdf(x):
-        a = special.gammaincc(alpha + 1, x_min)
-        b = special.gammaincc(alpha + 1, x)
-        c = special.gammaincc(alpha + 1, x_min)
-        d = special.gammaincc(alpha + 1, x_max)
-        return (a - b) / (c - d)
+    x = schechter(alpha, x_min=x_min, x_max=x_max, resolution=100, size=1000)
 
-    sample = random.schechter(alpha, x_min=x_min, x_max=x_max,
-                              resolution=100, size=1000)
+    assert np.all(x >= x_min)
+    assert np.all(x <= x_max)
 
     # Test the distribution of galaxy properties follows the right distribution
-    p_value = scipy.stats.kstest(sample, calc_cdf)[1]
-    assert p_value > 0.01
+    cdf = schechter_cdf_gen(alpha, x_min, x_max)
+    _, p = kstest(x, cdf)
+    assert p > 0.01

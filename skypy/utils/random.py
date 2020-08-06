@@ -15,7 +15,6 @@ Utility Functions
 """
 
 import numpy as np
-import skypy.utils.special as special
 
 
 def schechter(alpha, x_min, x_max, resolution=100, size=None):
@@ -50,21 +49,19 @@ def schechter(alpha, x_min, x_max, resolution=100, size=None):
     .. [1] https://en.wikipedia.org/wiki/Luminosity_function_(astronomy)
     """
 
-    x = np.logspace(np.log10(np.min(x_min)), np.log10(np.max(x_max)),
-                    resolution)
-    cdf = _schechter_cdf(x, np.min(x_min), np.max(x_max), alpha)
-    t_lower = np.interp(x_min, x, cdf)
-    t_upper = np.interp(x_max, x, cdf)
+    lnx_min = np.log(x_min)
+    lnx_max = np.log(x_max)
+
+    lnx = np.linspace(np.min(lnx_min), np.max(lnx_max), resolution)
+
+    cdf = np.exp(np.add(alpha, 1)*lnx - np.exp(lnx))
+    np.cumsum((cdf[1:]+cdf[:-1])/2*np.diff(lnx), out=cdf[1:])
+    cdf[0] = 0
+    cdf /= cdf[-1]
+
+    t_lower = np.interp(lnx_min, lnx, cdf)
+    t_upper = np.interp(lnx_max, lnx, cdf)
     u = np.random.uniform(t_lower, t_upper, size=size)
-    x_sample = np.interp(u, cdf, x)
+    lnx_sample = np.interp(u, cdf, lnx)
 
-    return x_sample
-
-
-def _schechter_cdf(x, x_min, x_max, alpha):
-    a = special.gammaincc(alpha + 1, x_min)
-    b = special.gammaincc(alpha + 1, x)
-    c = special.gammaincc(alpha + 1, x_min)
-    d = special.gammaincc(alpha + 1, x_max)
-
-    return (a - b) / (c - d)
+    return np.exp(lnx_sample)
