@@ -55,7 +55,7 @@ def schechter(alpha, x_min, x_max, resolution=100, size=None, scale=1.):
     """
 
     if size is None and np.shape(scale):
-        size = np.shape(scale)
+        size = np.broadcast(x_min, x_max, scale).shape
 
     x = np.logspace(np.log10(np.min(x_min)), np.log10(np.max(x_max)),
                     resolution)
