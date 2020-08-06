@@ -30,8 +30,10 @@ def schechter(alpha, x_min, x_max, resolution=100, size=None, scale=1.):
     resolution : int
         Resolution of the inverse transform sampling spline. Default is 100.
     size: int, optional
-        Output shape of samples. Default is None.
-    scale: float, optional
+        Output shape of samples. If size is None and scale is a scalar, a
+        single sample is returned. If size is None and scale is an array, an
+        array of samples is returned with the same shape as scale.
+    scale: array-like, optional
         Scale factor for the returned samples. Default is 1.
 
     Returns
@@ -51,6 +53,9 @@ def schechter(alpha, x_min, x_max, resolution=100, size=None, scale=1.):
     ----------
     .. [1] https://en.wikipedia.org/wiki/Luminosity_function_(astronomy)
     """
+
+    if size is None and np.shape(scale):
+        size = np.shape(scale)
 
     x = np.logspace(np.log10(np.min(x_min)), np.log10(np.max(x_max)),
                     resolution)
