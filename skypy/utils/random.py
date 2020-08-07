@@ -54,8 +54,8 @@ def schechter(alpha, x_min, x_max, resolution=100, size=None, scale=1.):
     .. [1] https://en.wikipedia.org/wiki/Luminosity_function_(astronomy)
     """
 
-    if size is None and np.shape(scale):
-        size = np.broadcast(x_min, x_max, scale).shape
+    if size is None:
+        size = np.broadcast(x_min, x_max, scale).shape or None
 
     x = np.logspace(np.log10(np.min(x_min)), np.log10(np.max(x_max)),
                     resolution)
