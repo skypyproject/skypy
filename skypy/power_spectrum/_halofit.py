@@ -2,8 +2,6 @@ from astropy.utils import isiterable
 from collections import namedtuple
 from functools import partial
 import numpy as np
-from scipy import interpolate
-from scipy import integrate
 from scipy import optimize
 
 
@@ -148,7 +146,7 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
     def integral_kn(lnR, n):
         R2 = np.exp(2*lnR)[:, np.newaxis]
         integrand = dl2kz * np.power(k2, n/2) * np.exp(-k2*R2)
-        return integrate.simps(integrand, lnk, axis=1)
+        return np.trapz(integrand, lnk, axis=1)
 
     # Find root at which sigma^2(R) == 1.0 for each redshift
     # Smith et al. 2003 equation C5 & C6
