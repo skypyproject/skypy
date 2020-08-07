@@ -32,6 +32,16 @@ def test_schechter():
     _, p = kstest(x, cdf)
     assert p > 0.01
 
+    # Test output shape when scale is a scalar
+    scale = 5
+    samples = random.schechter(alpha, x_min, x_max, scale=scale)
+    assert np.shape(samples) == np.shape(scale)
+
+    # Test output shape when scale is an array
+    scale = np.random.uniform(size=10)
+    samples = random.schechter(alpha, x_min, x_max, scale=scale)
+    assert np.shape(samples) == np.shape(scale)
+
 
 def test_schechter_gamma():
 
