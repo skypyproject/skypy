@@ -6,11 +6,12 @@ from scipy.stats import kstest
 def test_schechter():
 
     from skypy.utils.random import schechter
+    from skypy.utils.special import gammaincc
 
     def schechter_cdf_gen(alpha, x_min, x_max):
-        a = special.gammaincc(alpha + 1, x_min)
-        b = special.gammaincc(alpha + 1, x_max)
-        return lambda x: (a - special.gammaincc(alpha + 1, x)) / (a - b)
+        a = gammaincc(alpha + 1, x_min)
+        b = gammaincc(alpha + 1, x_max)
+        return lambda x: (a - gammaincc(alpha + 1, x)) / (a - b)
 
     # Test the schechter function, sampling dimensionless x values
     alpha = -1.3
@@ -44,10 +45,10 @@ def test_schechter_gamma():
 
     # when alpha > -1, x_min ≈ 0, x_max ≈ ∞, distribution is gamma
     alpha = np.random.uniform(-1, 2)
-    x_min = 1e-10
-    x_max = 1e+10
+    x_min = 1e-20
+    x_max = 1e+20
+    scale = 2.5
 
-    scale = 5
     x = schechter(alpha, x_min, x_max, resolution=100000, size=1000, scale=scale)
 
     _, p = kstest(x, 'gamma', args=(alpha+1, 0, scale))
