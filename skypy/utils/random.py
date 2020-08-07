@@ -61,8 +61,9 @@ def schechter(alpha, x_min, x_max, resolution=100, size=None, scale=1.):
 
     lnx = np.linspace(np.min(lnx_min), np.max(lnx_max), resolution)
 
-    cdf = np.exp(np.add(alpha, 1)*lnx - np.exp(lnx))
-    np.cumsum((cdf[1:]+cdf[:-1])/2*np.diff(lnx), out=cdf[1:])
+    pdf = np.exp(np.add(alpha, 1)*lnx - np.exp(lnx))
+    cdf = pdf  # in place
+    np.cumsum((pdf[1:]+pdf[:-1])/2*np.diff(lnx), out=cdf[1:])
     cdf[0] = 0
     cdf /= cdf[-1]
 
