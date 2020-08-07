@@ -34,12 +34,12 @@ def test_schechter():
 
     # Test output shape when scale is a scalar
     scale = 5
-    samples = random.schechter(alpha, x_min, x_max, scale=scale)
+    samples = schechter(alpha, x_min, x_max, scale=scale)
     assert np.shape(samples) == np.shape(scale)
 
     # Test output shape when scale is an array
     scale = np.random.uniform(size=10)
-    samples = random.schechter(alpha, x_min, x_max, scale=scale)
+    samples = schechter(alpha, x_min, x_max, scale=scale)
     assert np.shape(samples) == np.shape(scale)
 
 
