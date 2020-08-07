@@ -18,7 +18,7 @@ import numpy as np
 import skypy.utils.special as special
 
 
-def schechter(alpha, x_min, x_max, resolution=100, size=None):
+def schechter(alpha, x_min, x_max, resolution=100, size=None, scale=1.):
     """Sample from the Schechter function.
 
     Parameters
@@ -30,7 +30,11 @@ def schechter(alpha, x_min, x_max, resolution=100, size=None):
     resolution : int
         Resolution of the inverse transform sampling spline. Default is 100.
     size: int, optional
-        Output shape of samples. Default is None.
+        Output shape of samples. If size is None and scale is a scalar, a
+        single sample is returned. If size is None and scale is an array, an
+        array of samples is returned with the same shape as scale.
+    scale: array-like, optional
+        Scale factor for the returned samples. Default is 1.
 
     Returns
     -------
@@ -50,6 +54,9 @@ def schechter(alpha, x_min, x_max, resolution=100, size=None):
     .. [1] https://en.wikipedia.org/wiki/Luminosity_function_(astronomy)
     """
 
+    if size is None:
+        size = np.broadcast(x_min, x_max, scale).shape or None
+
     x = np.logspace(np.log10(np.min(x_min)), np.log10(np.max(x_max)),
                     resolution)
     cdf = _schechter_cdf(x, np.min(x_min), np.max(x_max), alpha)
@@ -58,7 +65,7 @@ def schechter(alpha, x_min, x_max, resolution=100, size=None):
     u = np.random.uniform(t_lower, t_upper, size=size)
     x_sample = np.interp(u, cdf, x)
 
-    return x_sample
+    return x_sample * scale
 
 
 def _schechter_cdf(x, x_min, x_max, alpha):
