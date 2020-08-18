@@ -124,73 +124,6 @@ def halo_mass_function(M, wavenumber, power_spectrum, growth_function,
     return rho_m0 * f_c * dlognu_dlogm / np.power(M, 2)
 
 
-def subhalo_mass_function(M, halo_mass, params, model=None):
-    r'''Subhalo mass function.
-    This function computes the subhalo mass function, defined
-    in equation 3 in [1]_.
-
-    Parameters
-    -----------
-    M : (nm,) array_like
-        Array for the subhalo mass, in units of solar mass.
-    halo_mass : float
-        The mass of the halo parent, in units of solar mass.
-    params: tuple
-        List of parameters that determines the subhalo Schechter function.
-        If model is `None`, the parameters are `(A, alpha, beta)`.
-        If model is `'Vale'`, the parameters are
-        `(subhalo_fraction0, alpha, beta, mcut)`
-        and the amplitude is defined by equation 4 in [1].
-    model: str
-        Model for the amplitude of the subhalo mass function. Default is None.
-
-    Returns
-    --------
-    mass_function: (nm,) array_like
-        Subhalo mass function for a given mass array, and a given mass of
-        the parent halo. Units of :math:`Mpc^{-3} M_{Sun}^{-1}`.
-
-    Examples
-    ---------
-    >>> import numpy as np
-    >>> from skypy.halo import mass
-
-    This example will compute the subhalo mass function given a parent halo
-    of mass :math:`10^12 M_{Sun}`:
-
-    >>> m = 10**np.arange(9.0, 10.0, 0.5)
-    >>> params_model = (0.3, 1.9, 1.0)
-    >>> mass.subhalo_mass_function(m, 1.0e12, params_model)
-    array([1.50205889e-07, 1.68169756e-08])
-
-    If we now choose the model given by equation 4 in [1]:
-
-    >>> params_vale = (0.5, 1.9, 1.0, 1.0e9)
-    >>> mass.subhalo_mass_function(m, 1.0e12, params_vale, model='Vale')
-    array([2.78569506e-08, 3.11885015e-09])
-
-    References
-    ----------
-    .. [1] Vale, A. and Ostriker, J.P. (2005), arXiv: astro-ph/0511816.
-    '''
-    if model == 'Vale':
-        subhalo_fraction0, alpha, beta, mcut = params
-        A = _subhalo_amplitude(halo_mass, params)
-    else:
-        A, alpha, beta = params
-
-    x = M / (beta * halo_mass)
-
-    return A * np.power(x, -alpha) * np.exp(-x) / (beta * halo_mass)
-
-
-def _subhalo_amplitude(M, params):
-    subhalo_fraction0, alpha, beta, mcut = params
-
-    return (subhalo_fraction0 / beta) / \
-           (gamma(2.0 - alpha) - gammainc(2.0 - alpha, mcut / (beta * M)))
-
-
 def halo_mass_sampler(m_min, m_max, resolution, wavenumber, power_spectrum,
                       growth_function, cosmology,
                       collapse_function, params, size=None):
@@ -271,70 +204,6 @@ def halo_mass_sampler(m_min, m_max, resolution, wavenumber, power_spectrum,
     massf = halo_mass_function(
             m, wavenumber, power_spectrum, growth_function,
             cosmology, collapse_function, params=params)
-
-    CDF = integrate.cumtrapz(massf, m, initial=0)
-    CDF = CDF / CDF[-1]
-    n_uniform = np.random.uniform(size=size)
-    return np.interp(n_uniform, CDF, m)
-
-
-def subhalo_mass_sampler(m_min, m_max, resolution,
-                         halo_mass, params, size=None, model=None):
-    r'''Subhalo mass sampler.
-    This function samples subhaloes from their mass function, given the mass
-    of the parent halo. Refer to equation 3 in [1]_.
-
-    Parameters
-    -----------
-    m_min, m_max : array_like
-        Lower and upper bounds for the random variable m.
-    resolution: int
-        Resolution of the inverse transform sampling spline.
-    M : (nm,) array_like
-        Array for the subhalo mass, in units of solar mass.
-    halo_mass : float
-        The mass of the halo parent, in units of solar mass.
-    params: tuple
-        List of parameters that determines the subhalo Schechter function.
-        If model is `None`, the parameters are `(A, alpha, beta)`.
-        If model is `'Vale'`, the parameters are
-        `(subhalo_fraction0, alpha, beta, mcut)`
-        and the amplitude is defined by equation 4 in [1].
-    size: int, optional
-        Output shape of samples. Default is None.
-    model: str
-        Model for the amplitude of the subhalo mass function. Default is None.
-
-    Returns
-    --------
-    sample: (size,) array_like
-        Samples drawn from the mass function, in units of solar masses.
-
-    Examples
-    ---------
-    >>> import numpy as np
-    >>> from skypy.halo import mass
-
-    This example samples from the subhalo mass function given a parent halo
-    of mass :math:`10^12 M_{Sun}`:
-
-    >>> params_model = (0.3, 1.9, 1.0)
-    >>> sh = mass.subhalo_mass_sampler(1e9, 1e10, 100, 1.0e12, params_model)
-
-    If we now choose the model given by equation 4 in [1]:
-
-    >>> params_vale = (0.5, 1.9, 1.0, 1.0e9)
-    >>> sh = mass.subhalo_mass_sampler(1e9, 1e10, 100, 1.0e12, params_vale,
-    ...      model='Vale')
-
-
-    References
-    ----------
-    .. [1] Vale, A. and Ostriker, J.P. (2005), arXiv: astro-ph/0511816.
-    '''
-    m = np.logspace(np.log10(m_min), np.log10(m_max), resolution)
-
-    massf = subhalo_mass_function(m, halo_mass, params=params, model=model)
 
     CDF = integrate.cumtrapz(massf, m, initial=0)
     CDF = CDF / CDF[-1]
@@ -449,3 +318,143 @@ def _sigma_squared(M, k, Pk, growth_function, cosmology):
 def _dlns_dlnM(sigma, M):
     ds = np.gradient(sigma, M)
     return np.absolute((M / sigma) * ds)
+
+
+def subhalo_mass_function(M, halo_mass, params, model=None):
+    r'''Subhalo mass function.
+    This function computes the subhalo mass function, defined
+    in equation 3 in [1]_.
+
+    Parameters
+    -----------
+    M : (nm,) array_like
+        Array for the subhalo mass, in units of solar mass.
+    halo_mass : float
+        The mass of the halo parent, in units of solar mass.
+    params: tuple
+        List of parameters that determines the subhalo Schechter function.
+        If model is `None`, the parameters are `(A, alpha, beta)`.
+        If model is `'Vale'`, the parameters are
+        `(subhalo_fraction0, alpha, beta, mcut)`
+        and the amplitude is defined by equation 4 in [1].
+    model: str
+        Model for the amplitude of the subhalo mass function. Default is None.
+
+    Returns
+    --------
+    mass_function: (nm,) array_like
+        Subhalo mass function for a given mass array, and a given mass of
+        the parent halo. Units of :math:`Mpc^{-3} M_{Sun}^{-1}`.
+
+    Examples
+    ---------
+    >>> import numpy as np
+    >>> from skypy.halo import mass
+
+    This example will compute the subhalo mass function given a parent halo
+    of mass :math:`10^12 M_{Sun}`:
+
+    >>> m = 10**np.arange(9.0, 10.0, 0.5)
+    >>> params_model = (0.3, 1.9, 1.0)
+    >>> mass.subhalo_mass_function(m, 1.0e12, params_model)
+    array([1.50205889e-07, 1.68169756e-08])
+
+    If we now choose the model given by equation 4 in [1]:
+
+    >>> params_vale = (0.5, 1.9, 1.0, 1.0e9)
+    >>> mass.subhalo_mass_function(m, 1.0e12, params_vale, model='Vale')
+    array([2.78569506e-08, 3.11885015e-09])
+
+    References
+    ----------
+    .. [1] Vale, A. and Ostriker, J.P. (2005), arXiv: astro-ph/0511816.
+    '''
+    if model == 'Vale':
+        subhalo_fraction0, alpha, beta, mcut = params
+        A = _subhalo_amplitude(halo_mass, params)
+    else:
+        A, alpha, beta = params
+
+    x = M / (beta * halo_mass)
+
+    return A * np.power(x, -alpha) * np.exp(-x) / (beta * halo_mass)
+
+
+def _subhalo_amplitude(M, params):
+    subhalo_fraction0, alpha, beta, mcut = params
+    x_cut = mcut / (beta * M)
+
+    return (subhalo_fraction0 / beta) / \
+        gamma(2.0 - alpha) * (1.0 - gammainc(2.0 - alpha, x_cut))
+
+
+def subhalo_mass_sampler(m_min, m_max, resolution,
+                         halo_mass, params, size=None, model=None):
+    r'''Subhalo mass sampler.
+    This function samples subhaloes from their mass function, given the mass
+    of the parent halo. Refer to equation 3 in [1]_.
+
+    Parameters
+    -----------
+    m_min, m_max : array_like
+        Lower and upper bounds for the random variable m.
+    resolution: int
+        Resolution of the inverse transform sampling spline.
+    M : (nm,) array_like
+        Array for the subhalo mass, in units of solar mass.
+    halo_mass : float
+        The mass of the halo parent, in units of solar mass.
+    params: tuple
+        List of parameters that determines the subhalo Schechter function.
+        If model is `None`, the parameters are `(A, alpha, beta)`.
+        If model is `'Vale'`, the parameters are
+        `(subhalo_fraction0, alpha, beta, mcut)`
+        and the amplitude is defined by equation 4 in [1].
+    size: int, optional
+        Output shape of samples. Default is None.
+    model: str
+        Model for the amplitude of the subhalo mass function. Default is None.
+
+    Returns
+    --------
+    sample: (size,) array_like
+        Samples drawn from the mass function, in units of solar masses.
+
+    Examples
+    ---------
+    >>> import numpy as np
+    >>> from skypy.halo import mass
+
+    This example samples from the subhalo mass function given a parent halo
+    of mass :math:`10^12 M_{Sun}`:
+
+    >>> params_model = (0.3, 1.9, 1.0)
+    >>> sh = mass.subhalo_mass_sampler(1e9, 1e10, 100, 1.0e12, params_model)
+
+    If we now choose the model given by equation 4 in [1]:
+
+    >>> params_vale = (0.5, 1.9, 1.0, 1.0e9)
+    >>> sh = mass.subhalo_mass_sampler(1e9, 1e10, 100, 1.0e12, params_vale,
+    ...      model='Vale')
+
+
+    References
+    ----------
+    .. [1] Vale, A. and Ostriker, J.P. (2005), arXiv: astro-ph/0511816.
+    '''
+
+    subhalo_fraction0, alpha, beta, mcut = params
+    # The mean number of subhalos above a mass threshold
+    n_subhalos = _subhalo_amplitude(halo_mass, params) * \
+        gamma(1.0 - alpha) * gammainc(2.0 - alpha, x_cut)
+
+    # Poisson
+    
+    m = np.logspace(np.log10(m_min), np.log10(m_max), n)
+
+    massf = subhalo_mass_function(m, halo_mass, params=params, model=model)
+
+    CDF = integrate.cumtrapz(massf, m, initial=0)
+    CDF = CDF / CDF[-1]
+    n_uniform = np.random.uniform(size=size)
+    return np.interp(n_uniform, CDF, m)
