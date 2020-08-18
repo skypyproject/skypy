@@ -12,7 +12,7 @@ Summary of SkyPy features
 -------------------------
 
 The full list of features can be found on the
-[SkyPy Documentation](https://skypy.readthedocs.io/en/latest/?badge=latest) main page
+`SkyPy Documentation <https://skypy.readthedocs.io/en/latest/?badge=latest>`_` main page
 
 * Clusters
 * Galaxies
@@ -27,10 +27,10 @@ The full list of features can be found on the
 Important links
 ---------------
 
-* [License](https://github.com/skypyproject/skypy/blob/master/LICENSE.rst)
-* [Code of Conduct](https://github.com/skypyproject/skypy/blob/master/CODE_OF_CONDUCT.md)
-* [Contributing guidelines](https://github.com/skypyproject/skypy/blob/master/CONTRIBUTING.md)
-* [Citation guidelines](https://github.com/skypyproject/skypy/blob/master/CITATION)
+* 'License <https://github.com/skypyproject/skypy/blob/master/LICENSE.rst)`_
+* `Code of Conduct <https://github.com/skypyproject/skypy/blob/master/CODE_OF_CONDUCT.md)`_
+* `Contributing guidelines <https://github.com/skypyproject/skypy/blob/master/CONTRIBUTING.md)`_
+* `Citation guidelines <https://github.com/skypyproject/skypy/blob/master/CITATION)`_
 
 
 How to install and run SkyPy
