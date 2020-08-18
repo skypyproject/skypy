@@ -203,7 +203,8 @@ def mag_ab(spec_lam, spec_flux, band_lam, band_tx, redshift=None):
 
     This function takes an *emission* spectrum and an observation bandpass and
     computes the AB magnitude for a source at 10pc (i.e. absolute magnitude).
-    The emission spectrum can optionally be redshifted.
+    The emission spectrum can optionally be redshifted. The definition of the
+    bandpass AB magnitude is taken from [1]_.
 
     Both the spectrum and the bandpass must be given as functions of wavelength
     in Angstrom. The spectrum must be given as flux in erg/s/cm2/A.
@@ -227,6 +228,10 @@ def mag_ab(spec_lam, spec_flux, band_lam, band_tx, redshift=None):
     mag_ab : array_like
         The absolute AB magnitude. If redshifts are given, the output has the
         same shape *and type* as the `redshift` argument.
+
+    References
+    ----------
+    .. [1] M. R. Blanton et al., 2003, AJ, 125, 2348
     '''
 
     assert np.ndim(spec_lam) == 1, 'spec_lam must be 1d array'
@@ -245,10 +250,10 @@ def mag_ab(spec_lam, spec_flux, band_lam, band_tx, redshift=None):
     # allocate output array
     mag_ab = np.empty_like(redshift)
 
-    # compute magnitude contribution from band normalisation
+    # compute magnitude contribution from band normalisation [denominator of (2)]
     m_band = -2.5*np.log10(np.trapz(band_tx/band_lam, band_lam))
 
-    # magnitude offset from band and AB definition
+    # magnitude offset from band and AB definition [constant in (2)]
     m_offs = -2.4079482426801846 - m_band
 
     # compute flux integrand at emitted wavelengths
@@ -263,10 +268,10 @@ def mag_ab(spec_lam, spec_flux, band_lam, band_tx, redshift=None):
         # interpolate band to get transmission at observed wavelengths
         obs_tx = np.interp(obs_lam, band_lam, band_tx, left=0, right=0)
 
-        # compute magnitude contribution from flux
+        # compute magnitude contribution from flux [numerator of (2)]
         m_flux = -2.5*np.log10(np.trapz(spec_intg*obs_tx, obs_lam))
 
-        # combine AB magnitude
+        # combine AB magnitude [all of (2)]
         mag_ab[i] = m_flux + m_offs
 
     # simplify scalar output
