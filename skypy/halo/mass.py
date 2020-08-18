@@ -24,6 +24,7 @@ from scipy import integrate
 from scipy.special import gamma, gammainc
 from functools import partial
 from astropy import units
+from skypy.utils.random import schechter
 
 __all__ = [
     'halo_mass_function',
@@ -389,7 +390,7 @@ def _subhalo_amplitude(M, params):
 
 
 def subhalo_mass_sampler(m_min, m_max, resolution,
-                         halo_mass, params, size=None, model=None):
+                         halo_mass, params, model=None):
     r'''Subhalo mass sampler.
     This function samples subhaloes from their mass function, given the mass
     of the parent halo. Refer to equation 3 in [1]_.
@@ -410,8 +411,6 @@ def subhalo_mass_sampler(m_min, m_max, resolution,
         If model is `'Vale'`, the parameters are
         `(subhalo_fraction0, alpha, beta, mcut)`
         and the amplitude is defined by equation 4 in [1].
-    size: int, optional
-        Output shape of samples. Default is None.
     model: str
         Model for the amplitude of the subhalo mass function. Default is None.
 
@@ -443,18 +442,37 @@ def subhalo_mass_sampler(m_min, m_max, resolution,
     .. [1] Vale, A. and Ostriker, J.P. (2005), arXiv: astro-ph/0511816.
     '''
 
-    subhalo_fraction0, alpha, beta, mcut = params
+    if model == 'Vale':
+        subhalo_fraction0, alpha, beta, mcut = params
+        A = _subhalo_amplitude(halo_mass, params)
+    else:
+        A, alpha, beta = params
+
+    ## subhalo_sample_list = np.zeros()
+    ## for halo in halo_mass:
+    # Characteristic M*
+    m_star = beta * halo_mass
+    x_low = m_min / m_star
+
     # The mean number of subhalos above a mass threshold
+    # can be obtained by integrating equation (3) in [1]
     n_subhalos = _subhalo_amplitude(halo_mass, params) * \
-        gamma(1.0 - alpha) * gammainc(2.0 - alpha, x_cut)
+        gammainc(1.0 - alpha, x_low)
 
-    # Poisson
-    
-    m = np.logspace(np.log10(m_min), np.log10(m_max), n)
+    # Random number of subhalos following a Poisson distribution
+    # with mean n_subhalos
+    n_sh_poisson = np.random.poisson(n_subhalos)
 
-    massf = subhalo_mass_function(m, halo_mass, params=params, model=model)
+    # Subhalo mass function
+    m = np.logspace(np.log10(m_min), np.log10(m_max), n_sh_poisson)
+    massf = subhalo_mass_function(m, halo_mass,
+                                  params=params, model=model)
 
-    CDF = integrate.cumtrapz(massf, m, initial=0)
-    CDF = CDF / CDF[-1]
-    n_uniform = np.random.uniform(size=size)
-    return np.interp(n_uniform, CDF, m)
+    # Sample from the Schechter function
+    x_min = m[0] / m_star
+    x_max = m[-1] / m_star
+
+    ## subhalo_sample_list[halo] = schechter(alpha, x_min, x_max, resolution,
+    ## size=n_sh_poisson, scale = m_star)
+    return schechter(alpha, x_min, x_max, resolution,
+                     size=n_sh_poisson, scale = m_star)
