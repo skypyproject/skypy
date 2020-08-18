@@ -37,7 +37,8 @@ How to install and run SkyPy
 ----------------------------
 
 * Requirements:
-  Make sure you have current version of astropy, networkx, numpy, scipy, pyyaml
+Make sure you have current version of ``astropy``, ``networkx``,
+``numpy``, ``scipy`` and ``pyyaml``.
 
 * Installation with pip
   ``pip install skypy``
