@@ -27,10 +27,10 @@ The full list of features can be found on the
 Important links
 ---------------
 
-* `License <https://github.com/skypyproject/skypy/blob/master/LICENSE.rst)>`_
-* `Code of Conduct <https://github.com/skypyproject/skypy/blob/master/CODE_OF_CONDUCT.md)>`_
-* `Contributing guidelines <https://github.com/skypyproject/skypy/blob/master/CONTRIBUTING.md)>`_
-* `Citation guidelines <https://github.com/skypyproject/skypy/blob/master/CITATION)>`_
+* `License <https://github.com/skypyproject/skypy/blob/master/LICENSE.rst>`_
+* `Code of Conduct <https://github.com/skypyproject/skypy/blob/master/CODE_OF_CONDUCT.md>`_
+* `Contributor Guidelines <https://github.com/skypyproject/skypy/blob/master/CONTRIBUTING.md>`_
+* `Citation Guidelines <https://github.com/skypyproject/skypy/blob/master/CITATION>`_
 
 
 How to install and run SkyPy
@@ -67,7 +67,7 @@ How to install and run SkyPy
   You could clone or download our repository or simply download the example directory.
 
   Move to the directory and type on your terminal
-  
+
   ``skypy –config examples/herbel_galaxies.yaml –format fits``
 
 
