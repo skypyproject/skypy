@@ -8,6 +8,32 @@ This package contains methods for modelling the Universe, galaxies and the Milky
 Way. Also included are methods for generating observed data.
 
 
+Summary of SkyPy features
+-------------------------
+
+* List
+
+
+Important links
+---------------
+
+* License
+* Code of conduct
+* Contributing guidelines
+* Citation guidelines
+
+
+How to install and run SkyPy
+----------------------------
+
+* Requirements
+* Installation with pip
+* Installation with conda (coming soon)
+* Running tests
+* Importing the package
+* Running examples
+
+
 License
 -------
 
