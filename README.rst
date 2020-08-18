@@ -63,8 +63,11 @@ How to install and run SkyPy
 * Running examples:
 
   Use skypy to run one of the example pipelines and write the outputs to fits files.
+
   You could clone or download our repository or simply download the example directory.
+
   Move to the directory and type on your terminal
+  
   ``skypy –config examples/herbel_galaxies.yaml –format fits``
 
 
