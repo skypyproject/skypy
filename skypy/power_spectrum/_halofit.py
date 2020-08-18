@@ -98,13 +98,14 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
     Examples
     --------
     >>> import numpy as np
-    >>> from astropy.cosmology import FlatLambdaCDM
-    >>> kvec = np.array([1.00000000e-04, 1.01000000e+01])
-    >>> zvalue = 0.0
-    >>> pvec = np.array([388.6725682632502, 0.21676249605280398])
-    >>> cosmo = FlatLambdaCDM(H0=67.04, Om0=0.21479, Ob0=0.04895)
-    >>> halofit(kvec, zvalue, pvec, cosmo, _takahashi_parameters)
-    array([388.67064424,   0.72797614])
+    >>> from astropy.cosmology import default_cosmology
+    >>> from skypy.power_spectrum import growth_function, eisenstein_hu, halofit_smith
+    >>> k = np.logspace(-4, 2, 100, base=10)
+    >>> z, A_s, n_s = 0, 2.2e-09, 0.97
+    >>> cosmology = default_cosmology.get()
+    >>> dz = growth_function(z, cosmology)
+    >>> linear_power = eisenstein_hu(k, A_s, n_s, cosmology) * np.square(dz)
+    >>> nonlinear_power = halofit_smith(k, z, linear_power, cosmology)
     '''
 
     # Manage shapes of input arrays
