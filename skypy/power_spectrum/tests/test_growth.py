@@ -68,6 +68,11 @@ def test_growth():
     assert allclose(Dz, 1. / (1. + redshift)),\
         "Growth function is not close to the scale factor"
 
+    # make sure that growth_function with scalar returns scalar
+    Dz2 = growth_function(redshift[2], cosmology_flat)
+    assert np.isscalar(Dz2), 'growth function with scalar did not produce scalar'
+    assert Dz2 == Dz[2], 'growth function with scalar produced inconsistent result'
+
     # Test growth function derivative
     assert redshift.shape == Dzprime.shape,\
         "Length of redshift array and growth function array do not match"
