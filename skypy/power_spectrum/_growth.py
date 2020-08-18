@@ -114,7 +114,7 @@ def growth_factor(redshift, cosmology, gamma=6.0/11.0):
     return growth_factor
 
 
-def growth_function(redshift, cosmology, gamma=6.0/11.0):
+def growth_function(redshift, cosmology, gamma=6.0/11.0, z_upper=1100):
     r'''Growth function.
 
     Function used to calculate :math:`D(z)`, growth function at different
@@ -127,9 +127,11 @@ def growth_function(redshift, cosmology, gamma=6.0/11.0):
     cosmology : astropy.cosmology.Cosmology
         Cosmology object providing methods for the evolution history of
         omega_matter and omega_lambda with redshift.
-    gamma : float
+    gamma : float, optional
         Growth index providing an efficient parametrization of the matter
-        perturbations.
+        perturbations. Default is the 6/11 LCDM value.
+    z_upper : float, optional
+        Redshift for the early-time integral cutoff. Default is 1100.
 
     Returns
     -------
@@ -153,27 +155,23 @@ def growth_function(redshift, cosmology, gamma=6.0/11.0):
     ----------
     .. [1] E. V. Linder, Phys. Rev. D 72, 043529 (2005)
     '''
-    z = redshift
 
     def integrand(x):
         integrand = (growth_factor(x, cosmology, gamma) - 1) / (1 + x)
         return integrand
 
-    if isinstance(z, int) or isinstance(z, float):
-        integral = integrate.quad(integrand, z, 1100)[0]
+    z_flat = np.ravel(redshift)
+    g_flat = np.empty(z_flat.size)
+
+    for i, z in enumerate(z_flat):
+        integral = integrate.quad(integrand, z, z_upper)[0]
         g = np.exp(integral)
-        growth_function = g / (1 + z)
+        g_flat[i] = g / (1 + z)
 
-    elif isinstance(z, np.ndarray):
-        growth_function = np.zeros(np.shape(z))
-
-        for i, aux in enumerate(z):
-            integral = integrate.quad(integrand, aux, 1100)[0]
-            g = np.exp(integral)
-            growth_function[i] = g / (1 + aux)
-
+    if np.isscalar(redshift):
+        growth_function = g_flat.item()
     else:
-        raise ValueError('Redshift must be integer, float or ndarray ')
+        growth_function = g_flat.reshape(np.shape(redshift))
 
     return growth_function
 
