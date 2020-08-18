@@ -36,32 +36,29 @@ Important links
 How to install and run SkyPy
 ----------------------------
 
-Requirements:
-^^^^^^^^^^^^^
-Make sure you have current version of astropy, networkx, numpy, scipy, pyyaml
+* Requirements:
+  Make sure you have current version of astropy, networkx, numpy, scipy, pyyaml
 
-Installation with pip
-^^^^^^^^^^^^^^^^^^^^^
-``pip install skypy``
+* Installation with pip
+  ``pip install skypy``
 
-Installation with conda
-^^^^^^^^^^^^^^^^^^^^^^^
-(coming soon)
+* Installation with conda
+  (coming soon)
 
-Running tests
-^^^^^^^^^^^^^
-``python setup.py test``
+* Running tests
+  ``python setup.py test``
 
-Importing the package
-^^^^^^^^^^^^^^^^^^^^^
-You can use your favorite `python` shell (python, ipython, jupyter notebook),
-and do
+* Importing the package
+  You can use your favorite `python` shell (python, ipython, jupyter notebook),
+  and do
 
-``import skypy``
+  ``import skypy``
 
-Running examples
-^^^^^^^^^^^^^^^^
-Here.
+* Running examples
+  Use skypy to run one of the example pipelines and write the outputs to fits files.
+  You could clone or download our repository or simply download the example directory.
+  Move to the directory and type on your terminal
+  ``skypy –config examples/herbel_galaxies.yaml –format fits``
 
 
 License
