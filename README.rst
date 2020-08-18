@@ -39,9 +39,10 @@ How to install and run SkyPy
 Requirements:
 ^^^^^^^^^^^^^
 Make sure you have current version of astropy, networkx, numpy, scipy, pyyaml
+
 Installation with pip
 ^^^^^^^^^^^^^^^^^^^^^
-`pip install skypy`
+``pip install skypy``
 
 Installation with conda
 ^^^^^^^^^^^^^^^^^^^^^^^
@@ -49,13 +50,14 @@ Installation with conda
 
 Running tests
 ^^^^^^^^^^^^^
-`python setup.py test`
+``python setup.py test``
 
 Importing the package
 ^^^^^^^^^^^^^^^^^^^^^
 You can use your favorite `python` shell (python, ipython, jupyter notebook),
 and do
-`import skypy`
+
+``import skypy``
 
 Running examples
 ^^^^^^^^^^^^^^^^
