@@ -17,10 +17,10 @@ Summary of SkyPy features
 Important links
 ---------------
 
-* License
-* Code of conduct
-* Contributing guidelines
-* Citation guidelines
+* [License](https://github.com/skypyproject/skypy/blob/master/LICENSE.rst)
+* [Code of Conduct](https://github.com/skypyproject/skypy/blob/master/CODE_OF_CONDUCT.md)
+* [Contributing guidelines](https://github.com/skypyproject/skypy/blob/master/CONTRIBUTING.md)
+* [Citation guidelines](https://github.com/skypyproject/skypy/blob/master/CITATION)
 
 
 How to install and run SkyPy
