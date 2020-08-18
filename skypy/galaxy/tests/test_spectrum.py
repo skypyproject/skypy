@@ -1,5 +1,4 @@
 import numpy as np
-import numpy.testing as npt
 import scipy.stats
 import pytest
 from astropy.io.fits import getdata
@@ -115,10 +114,10 @@ def test_mag_ab_redshift_dependence():
     flam = np.exp(-((lam - 100)/10)**2)
 
     # array of redshifts
-    z = np.arange(0., 1.01, 0.1)
+    z = np.linspace(0, 1, 11)
 
     # compute the AB magnitude at different redshifts
     m = mag_ab(lam, flam, th_lam, th_tx, z)
 
     # compare with expected redshift dependence
-    npt.assert_allclose(m, m[0] - 2.5*np.log10(1 + z))
+    np.testing.assert_allclose(m, m[0] - 2.5*np.log10(1 + z))
