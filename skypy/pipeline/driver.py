@@ -24,6 +24,16 @@ def _items(a):
     return enumerate(a)
 
 
+def _is_string_argument(s):
+    # string arguments are enclosed in either single or double quotation marks
+    return s[0] in '"\'' and s[0] == s[-1]
+
+
+def _parse_string_argument(s):
+    # strip nested quotes from literal string
+    return s[1:-1]
+
+
 class SkyPyDriver:
     r'''Class for running pipelines.
 
@@ -114,7 +124,7 @@ class SkyPyDriver:
             deps = settings.get('depends', [])
             args = settings.get('args', [])
             for k, v in _items(args):
-                if isinstance(v, str) and not (v[0] in '"\'' and v[0] == v[-1]):
+                if isinstance(v, str) and not _is_string_argument(v):
                     deps.append(v)
             return deps
         for job, settings in config.items():
@@ -166,7 +176,11 @@ class SkyPyDriver:
         args = config.get('args', [])
         for k, v in _items(args):
             if isinstance(v, str):
-                args[k] = self[v]
+                if _is_string_argument(v):
+                    args[k] = _parse_string_argument(v)
+                else:
+                    # get column
+                    args[k] = self[v]
 
         # Call function
         if isinstance(args, Mapping):
@@ -177,10 +191,6 @@ class SkyPyDriver:
         return result
 
     def __getitem__(self, label):
-        # do not parse literal strings
-        if label[0] in '"\'' and label[0] == label[-1]:
-            return label[1:-1]
-
         name, key = re.search(r'^(\w*)\.?(\w*)$', label).groups()
         item = getattr(self, name)
         return item[key] if key else item
