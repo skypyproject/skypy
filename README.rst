@@ -13,6 +13,7 @@ Summary of SkyPy features
 
 The full list of features can be found on the
 [SkyPy Documentation](https://skypy.readthedocs.io/en/latest/?badge=latest) main page
+
 * Clusters
 * Galaxies
 * Gravitational waves
