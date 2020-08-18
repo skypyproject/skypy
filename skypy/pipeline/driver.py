@@ -61,7 +61,7 @@ class SkyPyDriver:
         Note that 'args' either specifices keyword arguments by value, or the
         names of previous steps in the pipeline and uses their return values as
         keyword arguments. Literal strings (i.e. not field names) are escaped
-        by an initial `~` (tilde).
+        by nested quotes: '"this is a literal string"' and "'another one'".
 
         'configuration' should contain the name and configuration of each
         variable and/or an entry named 'tables'. 'tables' should contain a set
@@ -114,7 +114,7 @@ class SkyPyDriver:
             deps = settings.get('depends', [])
             args = settings.get('args', [])
             for k, v in _items(args):
-                if isinstance(v, str) and v[0] != '~':
+                if isinstance(v, str) and not (v[0] in '"\'' and v[0] == v[-1]):
                     deps.append(v)
             return deps
         for job, settings in config.items():
@@ -178,8 +178,8 @@ class SkyPyDriver:
 
     def __getitem__(self, label):
         # do not parse literal strings
-        if label[0] == '~':
-            return label[1:]
+        if label[0] in '"\'' and label[0] == label[-1]:
+            return label[1:-1]
 
         name, key = re.search(r'^(\w*)\.?(\w*)$', label).groups()
         item = getattr(self, name)

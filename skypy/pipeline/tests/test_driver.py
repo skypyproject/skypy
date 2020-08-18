@@ -21,7 +21,7 @@ def test_driver():
     # Generate a simple two column table with a dependency. Also write the
     # table to a fits file and check it's contents.
     size = 100
-    string = '~' + size*'a'
+    string = '"' + size*'a' + '"'
     config = {'tables': {
                 'test_table': {
                   'column1': {
@@ -51,7 +51,7 @@ def test_driver():
 
     # Check that the existing output files are modified if overwrite is True
     new_size = 2 * size
-    new_string = '~' + new_size*'a'
+    new_string = '"' + new_size*'a' + '"'
     config['tables']['test_table']['column1']['args']['size'] = new_size
     config['tables']['test_table']['column3']['args'][0] = new_string
     driver = SkyPyDriver()
@@ -104,7 +104,7 @@ def test_driver():
     config = {'test_func': {
                 'function': 'list',
                 'args': [
-                    '~hello world']},
+                    '"hello world"']},
               'test_func2': {
                 'function': 'len',
                 'args': [
