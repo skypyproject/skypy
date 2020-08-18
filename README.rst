@@ -11,7 +11,16 @@ Way. Also included are methods for generating observed data.
 Summary of SkyPy features
 -------------------------
 
-* List
+The full list of features can be found on the
+[SkyPy Documentation](https://skypy.readthedocs.io/en/latest/?badge=latest) main page
+* Clusters
+* Galaxies
+* Gravitational waves
+* Dark Matter Halos
+* Power Spectrum
+* Supernovae
+* Utiles
+* Pipeline
 
 
 Important links
