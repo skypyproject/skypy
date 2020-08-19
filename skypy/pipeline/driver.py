@@ -179,7 +179,7 @@ class SkyPyDriver:
                 if _is_string_argument(v):
                     args[k] = _parse_string_argument(v)
                 else:
-                    # get column
+                    # get variable or table column
                     args[k] = self[v]
 
         # Call function
