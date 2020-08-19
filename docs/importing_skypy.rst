@@ -24,4 +24,4 @@ For example, to access the galaxy-related functionality, you can import
 Note that for clarity, and to avoid any issues, we recommend **never**
 importing any SkyPy functionality using ``*``, for example::
 
-    >>> from skyp.galaxy import *  # NOT recommended
+    >>> from skypy.galaxy import *  # NOT recommended # doctest: +SKIP
