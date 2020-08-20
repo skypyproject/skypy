@@ -1,9 +1,3 @@
-"""HALOFIT module.
-
-This module facilitates the computation of the halofit matter power spectrum.
-"""
-
-
 from astropy.utils import isiterable
 from collections import namedtuple
 from functools import partial
