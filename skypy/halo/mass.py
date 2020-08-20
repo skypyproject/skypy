@@ -345,10 +345,8 @@ def subhalo_mass_sampler(m_min, m_max, resolution,
     halo_mass : (nm, ) array_like
         The mass of the halo parent, in units of solar mass.
     params: tuple
-        List of parameters that determines the subhalo Schechter function.
-        If model is `None`, the parameters are `(A, alpha, beta)`.
-        If model is `'Vale'`, the parameters are
-        `(subhalo_fraction0, alpha, beta, mcut)`
+        List of parameters that determines the subhalo Schechter function:
+        `(subhalo_fraction0, alpha, beta, mcut)` with
         and the amplitude is defined by equation 4 in [1].
 
     Returns
@@ -361,17 +359,11 @@ def subhalo_mass_sampler(m_min, m_max, resolution,
     >>> import numpy as np
     >>> from skypy.halo import mass
 
-    This example samples from the subhalo mass function given a parent halo
-    of mass :math:`10^12 M_{Sun}`:
-
-    >>> params_model = (0.3, 1.9, 1.0)
-    >>> sh = mass.subhalo_mass_sampler(1e9, 1e10, 100, 1.0e12, params_model)
-
-    If we now choose the model given by equation 4 in [1]:
+    This example samples from the subhalo mass function given given by equation 4 in [1]
+    with a parent halo of mass :math:`10^12 M_{Sun}`:
 
     >>> params_vale = (0.5, 1.9, 1.0, 1.0e9)
-    >>> sh = mass.subhalo_mass_sampler(1e9, 1e10, 100, 1.0e12, params_vale,
-    ...      model='Vale')
+    >>> sh = mass.subhalo_mass_sampler(1e9, 1e10, 100, 1.0e12, params_vale)
 
 
     References
@@ -406,7 +398,7 @@ def subhalo_mass_sampler(m_min, m_max, resolution,
         x_max = np.max(m) / m_star
 
         schechter_sampling = A * schechter(alpha, x_min, x_max, resolution,
-                                       size=n_sh_poisson, scale=m_star)
+                                           size=n_sh_poisson, scale=m_star)
         subhalo_sample_list = subhalo_sample_list.append(schechter_sampling)
 
     return subhalo_sample_list
