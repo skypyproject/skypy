@@ -51,7 +51,7 @@ def test_halofit():
 
     # Test for failure when wavenumber is a scalar
     k_scalar = k[0]
-    power_1d = linear_power[0, :]
+    power_1d = linear_power[:, 0]
     with pytest.raises(TypeError):
         halofit_smith(k_scalar, z, power_1d, Planck15)
 
