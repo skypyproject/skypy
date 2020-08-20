@@ -238,3 +238,10 @@ plot_rcparams = {
     'figure.subplot.wspace': 0.4,
     'text.usetex': False,
 }
+
+# Mock camb if it is not available e.g. on readthedocs
+autodoc_mock_imports = []
+try:
+    import_module('camb')
+except ImportError:
+    autodoc_mock_imports.append('camb')

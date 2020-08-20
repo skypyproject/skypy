@@ -44,10 +44,12 @@ def main(args=None):
     import yaml
 
     parser = argparse.ArgumentParser(description="SkyPy pipeline driver")
-    parser.add_argument('-c', '--config', required=True,
-                        type=argparse.FileType('r'), help='Config file name')
+    parser.add_argument('config', type=argparse.FileType('r'),
+                        help='Config file name')
     parser.add_argument('-f', '--format', required=False,
                         choices=['fits', 'hdf5'], help='Table file format')
+    parser.add_argument('-o', '--overwrite', action='store_true',
+                        help='Whether to overwrite existing files')
 
     # get system args if none passed
     if args is None:
@@ -57,5 +59,5 @@ def main(args=None):
     config = yaml.safe_load(args.config)
     config = {} if config is None else config
     driver = SkyPyDriver()
-    driver.execute(config, file_format=args.format)
+    driver.execute(config, file_format=args.format, overwrite=args.overwrite)
     return(0)

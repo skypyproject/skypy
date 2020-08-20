@@ -1,38 +1,30 @@
 import numpy as np
 from astropy.cosmology import Planck15
 from astropy.units import allclose
+from astropy.utils.data import get_pkg_data_filename
 import pytest
 from skypy.power_spectrum import halofit_smith
 from skypy.power_spectrum import halofit_takahashi
 from skypy.power_spectrum import halofit_bird
 
 
+# Power spectrum data for tests
+linear_power_filename = get_pkg_data_filename('data/linear_power.txt')
+truth_smith_filename = get_pkg_data_filename('data/truth_smith.txt')
+truth_takahashi_filename = get_pkg_data_filename('data/truth_takahashi.txt')
+truth_bird_filename = get_pkg_data_filename('data/truth_bird.txt')
+linear_power = np.loadtxt(linear_power_filename)
+truth_smith = np.loadtxt(truth_smith_filename)
+truth_takahashi = np.loadtxt(truth_takahashi_filename)
+truth_bird = np.loadtxt(truth_bird_filename)
+
+
 def test_halofit():
     """Test Smith, Takahashi and Bird Halofit models with Planck15 cosmology"""
 
-    # Data for tests
-    k = np.logspace(-4.0, 0.0, 5)
-    z = np.linspace(0.0, 1.0, 2)
-    p = [[705.54997046, 6474.60158058, 37161.00990355, 9657.02613688,
-          114.60445565],
-         [262.14967329, 2405.66190924, 13807.30920991, 3588.10339832,
-          42.58170486]]
-    ts = [[705.49027968, 6469.19607307, 36849.24061946, 9028.01112208,
-          596.91685425],
-          [262.13980368, 2404.75754883, 13757.68241714, 3628.67740715,
-          110.08074646]]
-    tt = [[705.48895748, 6469.02581579, 36827.71983838, 9143.97447325,
-          662.31133378],
-          [262.14055831, 2404.83678008, 13751.52554662, 3050.69467676,
-          60.66609697]]
-    tb = [[705.4903004, 6469.19940132, 36849.2113973, 9010.83583125,
-          601.45212141],
-          [262.13980169, 2404.75760398, 13757.8052238, 3630.48463588,
-          111.52139435]]
-    linear_power = np.array(p)
-    truth_smith = np.array(ts)
-    truth_takahashi = np.array(tt)
-    truth_bird = np.array(tb)
+    # Wavenumbers and redshifts for tests
+    k = np.logspace(-4, 2, 100, base=10)
+    z = np.linspace(0, 2, 5)
 
     # Non-linear power spectra from Smith, Takahashi and Bird models
     nl_power_smith = halofit_smith(k, z, linear_power, Planck15)
@@ -68,9 +60,9 @@ def test_halofit():
     with pytest.raises(ValueError):
         halofit_smith(k_wrong_size, z, linear_power, Planck15)
 
-    # Test for failure when redshift arry is the wrong size
+    # Test for failure when redshift array is the wrong size
     z_wrong_size = np.linspace(0.0, 2.0, 3)
-    with pytest.raises(TypeError):
+    with pytest.raises(ValueError):
         halofit_smith(k, z_wrong_size, linear_power, Planck15)
 
     # Test for failure when wavenumber is negative

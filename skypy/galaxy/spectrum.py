@@ -3,10 +3,13 @@ r"""Galaxy spectrum module.
 """
 
 import numpy as np
+from astropy.io.fits import getdata
 
 
 __all__ = [
     'dirichlet_coefficients',
+    'kcorrect_spectra',
+    'mag_ab',
 ]
 
 
@@ -96,3 +99,184 @@ def dirichlet_coefficients(redshift, alpha0, alpha1, z1=1.):
     sum_y = y.sum(axis=1)
     coefficients = np.divide(y.T, sum_y.T).T
     return coefficients.reshape(return_shape)
+
+
+def kcorrect_spectra(redshift, stellar_mass, coefficients):
+    r"""Flux densities of galaxies.
+
+    The flux density as a sum of the 5 kcorrect templates.
+
+    Parameters
+    ----------
+    redshift : (nz,) array-like
+        The redshift values of the galaxies.
+    stellar_mass : (nz, ) array-like
+        The stellar masses of the galaxies.
+    coefficients: (nz, 5) array-like
+        Coefficients to be multiplied with the kcorrect templates.
+
+
+    Returns
+    -------
+    wavelength_observe : (nl, ) array_like
+        Wavelengths corresponding to the flux density. Given in units of
+        Angstrom
+    sed: (nz, nl) array-like
+        Flux density of the galaxies in units of erg/s/cm^2/Angstrom as it
+        would be observed at a distance of 10 pc.
+
+    Notes
+    -----
+    The rest-frame flux-density can be calculated as a sum of the five kcorrect
+    templates [1]_
+
+    .. math::
+        f_e(\lambda) = \sum_i c_i t_i(\lambda) \;,
+
+    with kcorrect templates :math:`t_i(\lambda)` and coefficients :math:`c_i`.
+
+    The kcorrect templates are given in units of
+    erg/s/cm^2/Angstrom per solar mass and as it would be observed in a
+    distance of 10pc. To obtain the correct flux density if the object would be
+    at 10 pc distance we have to adjust the coefficients by the stellar mass
+    :math:`M` of the galaxy
+
+    .. math::
+         \tilde{c_i} = c_i \cdot M \;.
+
+    Thus, the flux density is given by
+
+    .. math::
+        f_e(\lambda) = \sum_i \tilde{c_i} t_i(\lambda) \;.
+
+    To get the flux density in observed frame we have to redshift it
+
+    .. math::
+        f_o(\lambda_o) = \frac{f_e(\lambda)}{1+z} \;
+
+    where
+
+    .. math::
+        \lambda_o = (1+z) \lambda \;.
+
+    References
+    ----------
+    .. [1] Blanton M., Roweis S., 2006, The Astronomical Journal, Issue 2,
+        Volume 133, Pages 734 - 754
+
+    Examples
+    --------
+    >>> from skypy.galaxy.spectrum import kcorrect_spectra
+    >>> from astropy.cosmology import FlatLambdaCDM
+    >>> from skypy.galaxy.spectrum import dirichlet_coefficients
+
+    Calculate the flux density for two galaxies.
+
+    >>> cosmology = FlatLambdaCDM(H0=70, Om0=0.3)
+    >>> alpha0 = np.array([2.079, 3.524, 1.917, 1.992, 2.536])
+    >>> alpha1 = np.array([2.265, 3.862, 1.921, 1.685, 2.480])
+    >>> redshift = np.array([0.5,1])
+    >>> coefficients = dirichlet_coefficients(redshift, alpha0, alpha1)
+    >>> stellar_mass = np.array([5*10**10, 7*10**9])
+    >>>
+    >>> wavelength_o, sed = kcorrect_spectra(redshift, stellar_mass,
+    ...                                       coefficients)
+
+    """
+
+    kcorrect_templates_url = "https://github.com/blanton144/kcorrect/raw/" \
+                             "master/data/templates/k_nmf_derived.default.fits"
+    templates = getdata(kcorrect_templates_url, 1)
+    wavelength = getdata(kcorrect_templates_url, 11)
+
+    rescaled_coeff = (coefficients.T * stellar_mass).T
+
+    sed = (np.matmul(rescaled_coeff, templates).T / (1 + redshift)).T
+    wavelength_observed = np.matmul((1 + redshift).reshape(len(redshift), 1),
+                                    wavelength.reshape(1, len(wavelength)))
+
+    return wavelength_observed, sed
+
+
+def mag_ab(spec_lam, spec_flux, band_lam, band_tx, redshift=None):
+    r'''Compute absolute AB magnitude from spectrum and bandpass.
+
+    This function takes an *emission* spectrum and an observation bandpass and
+    computes the AB magnitude for a source at 10pc (i.e. absolute magnitude).
+    The emission spectrum can optionally be redshifted. The definition of the
+    bandpass AB magnitude is taken from [1]_.
+
+    Both the spectrum and the bandpass must be given as functions of wavelength
+    in Angstrom. The spectrum must be given as flux in erg/s/cm2/A.
+
+    Parameters
+    ----------
+    spec_lam : (ns,) array_like
+        Vector of spectrum wavelengths in units of Angstrom.
+    spec_flux : (ns,) array_like
+        Vector of spectrum fluxes in units of erg/s/cm2/A.
+    band_lam : (nb,) array_like
+        Vector of bandpass wavelengths in units of Angstrom.
+    band_tx : (nb,) array_like
+        Vector of bandpass transmissions.
+    redshift : array_like, optional
+        Optional array of values for redshifting the source spectrum. Default
+        is a redshift of 0.0.
+
+    Returns
+    -------
+    mag_ab : array_like
+        The absolute AB magnitude. If redshifts are given, the output has the
+        same shape *and type* as the `redshift` argument.
+
+    References
+    ----------
+    .. [1] M. R. Blanton et al., 2003, AJ, 125, 2348
+    '''
+
+    assert np.ndim(spec_lam) == 1, 'spec_lam must be 1d array'
+    assert np.ndim(spec_flux) == 1, 'spec_flux must be 1d array'
+    assert len(spec_lam) == len(spec_flux), 'spec_lam and spec_flux must match'
+    assert np.all(np.less_equal(spec_lam[:-1], spec_lam[1:])), 'spec_lam must be ordered'
+    assert np.ndim(band_lam) == 1, 'band_lam must be 1d array'
+    assert np.ndim(band_tx) == 1, 'band_tx must be 1d array'
+    assert len(band_lam) == len(band_tx), 'band_lam and band_tx must match'
+    assert np.all(np.less_equal(band_lam[:-1], band_lam[1:])), 'band_lam must be ordered'
+
+    # redshift zero if not given
+    if redshift is None:
+        redshift = 0.
+
+    # allocate output array
+    mag_ab = np.empty_like(redshift)
+
+    # compute magnitude contribution from band normalisation [denominator of (2)]
+    m_band = -2.5*np.log10(np.trapz(band_tx/band_lam, band_lam))
+
+    # magnitude offset from band and AB definition [constant in (2)]
+    m_offs = -2.4079482426801846 - m_band
+
+    # compute flux integrand at emitted wavelengths
+    spec_intg = spec_lam*spec_flux
+
+    # go through redshifts ...
+    for i, z in np.ndenumerate(redshift):
+
+        # observed wavelength of spectrum
+        obs_lam = (1 + z)*spec_lam
+
+        # interpolate band to get transmission at observed wavelengths
+        obs_tx = np.interp(obs_lam, band_lam, band_tx, left=0, right=0)
+
+        # compute magnitude contribution from flux [numerator of (2)]
+        m_flux = -2.5*np.log10(np.trapz(spec_intg*obs_tx, obs_lam))
+
+        # combine AB magnitude [all of (2)]
+        mag_ab[i] = m_flux + m_offs
+
+    # simplify scalar output
+    if np.isscalar(redshift):
+        mag_ab = mag_ab.item()
+
+    # all done
+    return mag_ab

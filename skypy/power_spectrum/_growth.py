@@ -1,3 +1,9 @@
+"""Growth function.
+
+This computes the linear growth function in
+perturbation theory.
+"""
+
 from astropy.utils import isiterable
 import numpy as np
 from scipy import integrate
@@ -12,14 +18,15 @@ __all__ = [
 
 
 def growth_function_carroll(redshift, cosmology):
-    """Computation of the growth function.
+    '''Growth function.
 
-    Return the growth function as a function of redshift for a given cosmology
-    as approximated by Carroll, Press & Turner (1992) Equation 29.
+    This function returns the growth function as a function of redshift for a
+    given cosmology as approximated by Carroll, Press & Turner (1992),
+    equation 29 in [1]_.
 
     Parameters
     ----------
-    redshift : array_like
+    redshift : (nz,) array_like
         Array of redshifts at which to evaluate the growth function.
     cosmology : astropy.cosmology.Cosmology
         Cosmology object providing methods for the evolution history of
@@ -27,12 +34,16 @@ def growth_function_carroll(redshift, cosmology):
 
     Returns
     -------
-    growth : numpy.ndarray, or float if input scalar
+    growth : (nz,) array_like
         The growth function evaluated at the input redshifts for the given
         cosmology.
 
     Examples
     --------
+
+    This example returns the growth function for a given array of redshifts
+    and for the Astropy default cosmology:
+
     >>> import numpy as np
     >>> from astropy.cosmology import default_cosmology
     >>> redshift = np.array([0, 1, 2])
@@ -42,8 +53,10 @@ def growth_function_carroll(redshift, cosmology):
 
     References
     ----------
-    doi : 10.1146/annurev.aa.30.090192.002435
-    """
+    .. [1] Carroll, M. and Press, W. and Turner, E., (1992),
+        doi : 10.1146/annurev.aa.30.090192.002435
+    '''
+
     if isiterable(redshift):
         redshift = np.asarray(redshift)
     if np.any(redshift < 0):
@@ -56,14 +69,14 @@ def growth_function_carroll(redshift, cosmology):
 
 
 def growth_factor(redshift, cosmology, gamma=6.0/11.0):
-    """Computation of the growth factor.
+    r'''Growth factor.
 
-    Function used to calculate f(z), parametrised growth factor at different
-    redshifts, as described in [1]_ equation 17.
+    Function used to calculate :math:`f(z)`, parametrised growth factor as a
+    function of redshift, as described in [1]_ equation 17.
 
     Parameters
     ----------
-    redshift : array_like
+    redshift : (nz,) array_like
         Array of redshifts at which to evaluate the growth function.
     cosmology : astropy.cosmology.Cosmology
         Cosmology object providing methods for the evolution history of
@@ -74,11 +87,15 @@ def growth_factor(redshift, cosmology, gamma=6.0/11.0):
 
     Returns
     -------
-    growth_factor : ndarray, or float if input scalar
+    growth_factor : (nz,) array_like
       The redshift scaling of the growth factor.
 
     Examples
     --------
+
+    This example returns the growth factor for a given array of redshifts
+    and for a given cosmology:
+
     >>> import numpy as np
     >>> from astropy.cosmology import FlatLambdaCDM
     >>> cosmology = FlatLambdaCDM(H0=67.04, Om0=0.3183, Ob0=0.047745)
@@ -88,7 +105,7 @@ def growth_factor(redshift, cosmology, gamma=6.0/11.0):
     References
     ----------
     .. [1] E. V. Linder, Phys. Rev. D 72, 043529 (2005)
-    """
+    '''
     z = redshift
 
     omega_m_z = cosmology.Om(z)
@@ -97,30 +114,36 @@ def growth_factor(redshift, cosmology, gamma=6.0/11.0):
     return growth_factor
 
 
-def growth_function(redshift, cosmology, gamma=6.0/11.0):
-    """Computation of the growth function.
+def growth_function(redshift, cosmology, gamma=6.0/11.0, z_upper=1100):
+    r'''Growth function.
 
-    Function used to calculate D(z), growth function at different redshifts,
-    as described in [1]_ equation 16.
+    Function used to calculate :math:`D(z)`, growth function at different
+    redshifts, as described in [1]_ equation 16.
 
     Parameters
     ----------
-    redshift : array_like
+    redshift : (nz,) array_like
         Array of redshifts at which to evaluate the growth function.
     cosmology : astropy.cosmology.Cosmology
         Cosmology object providing methods for the evolution history of
         omega_matter and omega_lambda with redshift.
-    gamma : float
+    gamma : float, optional
         Growth index providing an efficient parametrization of the matter
-        perturbations.
+        perturbations. Default is the 6/11 LCDM value.
+    z_upper : float, optional
+        Redshift for the early-time integral cutoff. Default is 1100.
 
     Returns
     -------
-    growth_function : ndarray
+    growth_function : (nz,) array_like
       The redshift scaling of the growth function.
 
     Examples
     --------
+
+    This example returns the growth function for a given array of redshifts
+    and for a given cosmology:
+
     >>> import numpy as np
     >>> from scipy import integrate
     >>> from astropy.cosmology import FlatLambdaCDM
@@ -131,41 +154,37 @@ def growth_function(redshift, cosmology, gamma=6.0/11.0):
     References
     ----------
     .. [1] E. V. Linder, Phys. Rev. D 72, 043529 (2005)
-    """
-    z = redshift
+    '''
 
     def integrand(x):
         integrand = (growth_factor(x, cosmology, gamma) - 1) / (1 + x)
         return integrand
 
-    if isinstance(z, int) or isinstance(z, float):
-        integral = integrate.quad(integrand, z, 1100)[0]
+    z_flat = np.ravel(redshift)
+    g_flat = np.empty(z_flat.size)
+
+    for i, z in enumerate(z_flat):
+        integral = integrate.quad(integrand, z, z_upper)[0]
         g = np.exp(integral)
-        growth_function = g / (1 + z)
+        g_flat[i] = g / (1 + z)
 
-    elif isinstance(z, np.ndarray):
-        growth_function = np.zeros(np.shape(z))
-
-        for i, aux in enumerate(z):
-            integral = integrate.quad(integrand, aux, 1100)[0]
-            g = np.exp(integral)
-            growth_function[i] = g / (1 + aux)
-
+    if np.isscalar(redshift):
+        growth_function = g_flat.item()
     else:
-        raise ValueError('Redshift must be integer, float or ndarray ')
+        growth_function = g_flat.reshape(np.shape(redshift))
 
     return growth_function
 
 
 def growth_function_derivative(redshift, cosmology, gamma=6.0/11.0):
-    """Computation of the first derivative of the growth function.
+    r'''First derivative of the growth function.
 
     Function used to calculate D'(z), derivative of the growth function
-    with respect to redshift, described in [1]_ equation 16.
+    with respect to redshift as in [1]_ equation 16.
 
     Parameters
     ----------
-    redshift : array_like
+    redshift : (nz,) array_like
         Array of redshifts at which to evaluate the growth function.
     cosmology : astropy.cosmology.Cosmology
         Cosmology object providing methods for the evolution history of
@@ -176,11 +195,25 @@ def growth_function_derivative(redshift, cosmology, gamma=6.0/11.0):
 
     Returns
     -------
-    growth_function_derivative : ndarray, or float if input scalar
+    growth_function_derivative : (nz,) array_like
       The redshift scaling of the derivative of the growth function.
+
+    Notes
+    -----
+    The first derivative of the growth function, :math:`D(z)`,
+    with respect to redshift reads
+
+    .. math:: D'(z) = - \frac{D(z) f(z)}{1 + z} \;.
+
+    With :math:`f(z)` the growth factor.
+
 
     Examples
     --------
+
+    This example returns the first derivative of the growth function for a
+    given array of redshifts and cosmology:
+
     >>> import numpy as np
     >>> from scipy import integrate
     >>> from astropy.cosmology import FlatLambdaCDM
@@ -191,7 +224,7 @@ def growth_function_derivative(redshift, cosmology, gamma=6.0/11.0):
     References
     ----------
     .. [1] E. V. Linder, Phys. Rev. D 72, 043529 (2005)
-    """
+    '''
     z = redshift
 
     growth_function_derivative = - growth_function(z, cosmology, gamma) * \
