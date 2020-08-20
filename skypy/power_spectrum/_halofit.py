@@ -123,8 +123,7 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
     redshift = np.atleast_1d(redshift)
 
     if np.ndim(linear_power_spectrum) == 1:
-        length_pk = len(linear_power_spectrum)
-        linear_power_spectrum = linear_power_spectrum.reshape(1, length_pk)
+        linear_power_spectrum = linear_power_spectrum[np.newaxis, :]
 
     # Declaration of variables
     if isiterable(redshift):
