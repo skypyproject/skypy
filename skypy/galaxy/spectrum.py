@@ -8,7 +8,8 @@ from astropy.io.fits import getdata
 
 __all__ = [
     'dirichlet_coefficients',
-    'kcorrect_spectra'
+    'kcorrect_spectra',
+    'mag_ab',
 ]
 
 
@@ -103,7 +104,7 @@ def dirichlet_coefficients(redshift, alpha0, alpha1, z1=1.):
 def kcorrect_spectra(redshift, stellar_mass, coefficients):
     r"""Flux densities of galaxies.
 
-    The flux density as a sum of the 5 kcorrect templates [1]_.
+    The flux density as a sum of the 5 kcorrect templates.
 
     Parameters
     ----------
@@ -141,7 +142,7 @@ def kcorrect_spectra(redshift, stellar_mass, coefficients):
     :math:`M` of the galaxy
 
     .. math::
-         \tilde{c_i} = \tilde{c_i} \cdot M \;.
+         \tilde{c_i} = c_i \cdot M \;.
 
     Thus, the flux density is given by
 
@@ -151,9 +152,12 @@ def kcorrect_spectra(redshift, stellar_mass, coefficients):
     To get the flux density in observed frame we have to redshift it
 
     .. math::
-        f_o(\lambda_o) = \frac{f_e(\lambda)}{1+z} \;.
+        f_o(\lambda_o) = \frac{f_e(\lambda)}{1+z} \;
 
+    where
 
+    .. math::
+        \lambda_o = (1+z) \lambda \;.
 
     References
     ----------
@@ -192,3 +196,87 @@ def kcorrect_spectra(redshift, stellar_mass, coefficients):
                                     wavelength.reshape(1, len(wavelength)))
 
     return wavelength_observed, sed
+
+
+def mag_ab(spec_lam, spec_flux, band_lam, band_tx, redshift=None):
+    r'''Compute absolute AB magnitude from spectrum and bandpass.
+
+    This function takes an *emission* spectrum and an observation bandpass and
+    computes the AB magnitude for a source at 10pc (i.e. absolute magnitude).
+    The emission spectrum can optionally be redshifted. The definition of the
+    bandpass AB magnitude is taken from [1]_.
+
+    Both the spectrum and the bandpass must be given as functions of wavelength
+    in Angstrom. The spectrum must be given as flux in erg/s/cm2/A.
+
+    Parameters
+    ----------
+    spec_lam : (ns,) array_like
+        Vector of spectrum wavelengths in units of Angstrom.
+    spec_flux : (ns,) array_like
+        Vector of spectrum fluxes in units of erg/s/cm2/A.
+    band_lam : (nb,) array_like
+        Vector of bandpass wavelengths in units of Angstrom.
+    band_tx : (nb,) array_like
+        Vector of bandpass transmissions.
+    redshift : array_like, optional
+        Optional array of values for redshifting the source spectrum. Default
+        is a redshift of 0.0.
+
+    Returns
+    -------
+    mag_ab : array_like
+        The absolute AB magnitude. If redshifts are given, the output has the
+        same shape *and type* as the `redshift` argument.
+
+    References
+    ----------
+    .. [1] M. R. Blanton et al., 2003, AJ, 125, 2348
+    '''
+
+    assert np.ndim(spec_lam) == 1, 'spec_lam must be 1d array'
+    assert np.ndim(spec_flux) == 1, 'spec_flux must be 1d array'
+    assert len(spec_lam) == len(spec_flux), 'spec_lam and spec_flux must match'
+    assert np.all(np.less_equal(spec_lam[:-1], spec_lam[1:])), 'spec_lam must be ordered'
+    assert np.ndim(band_lam) == 1, 'band_lam must be 1d array'
+    assert np.ndim(band_tx) == 1, 'band_tx must be 1d array'
+    assert len(band_lam) == len(band_tx), 'band_lam and band_tx must match'
+    assert np.all(np.less_equal(band_lam[:-1], band_lam[1:])), 'band_lam must be ordered'
+
+    # redshift zero if not given
+    if redshift is None:
+        redshift = 0.
+
+    # allocate output array
+    mag_ab = np.empty_like(redshift)
+
+    # compute magnitude contribution from band normalisation [denominator of (2)]
+    m_band = -2.5*np.log10(np.trapz(band_tx/band_lam, band_lam))
+
+    # magnitude offset from band and AB definition [constant in (2)]
+    m_offs = -2.4079482426801846 - m_band
+
+    # compute flux integrand at emitted wavelengths
+    spec_intg = spec_lam*spec_flux
+
+    # go through redshifts ...
+    for i, z in np.ndenumerate(redshift):
+
+        # observed wavelength of spectrum
+        obs_lam = (1 + z)*spec_lam
+
+        # interpolate band to get transmission at observed wavelengths
+        obs_tx = np.interp(obs_lam, band_lam, band_tx, left=0, right=0)
+
+        # compute magnitude contribution from flux [numerator of (2)]
+        m_flux = -2.5*np.log10(np.trapz(spec_intg*obs_tx, obs_lam))
+
+        # combine AB magnitude [all of (2)]
+        mag_ab[i] = m_flux + m_offs
+
+    # simplify scalar output
+    if np.isscalar(redshift):
+        mag_ab = mag_ab.item()
+
+    # all done
+    return mag_ab

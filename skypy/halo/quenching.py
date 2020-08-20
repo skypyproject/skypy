@@ -2,6 +2,15 @@
 
 This module implements models for environment and mass
 quenching by dark matter halos.
+
+Models
+======
+.. autosummary::
+   :nosignatures:
+   :toctree: ../api/
+
+   environment_quenched
+   mass_quenched
 """
 
 import numpy as np

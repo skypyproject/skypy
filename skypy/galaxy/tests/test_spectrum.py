@@ -83,3 +83,41 @@ def test_kcorrect_spectra():
 
     assert np.allclose(lam_o, lam)
     assert np.allclose(sed, templates[0])
+
+
+def test_mag_ab_standard_source():
+
+    from skypy.galaxy.spectrum import mag_ab
+
+    # create a bandpass
+    bp_lam = np.logspace(0, 4, 1000)
+    bp_tx = np.exp(-((bp_lam - 1000)/(100))**2)
+
+    # test that the AB standard source has zero magnitude
+    lam = np.logspace(0, 4, 1000)
+    flam = 0.10884806248538730623/lam**2
+    m = mag_ab(lam, flam, bp_lam, bp_tx)
+
+    assert np.isclose(m, 0)
+
+
+def test_mag_ab_redshift_dependence():
+
+    from skypy.galaxy.spectrum import mag_ab
+
+    # make a wide tophat bandpass
+    th_lam = np.logspace(-10, 10, 3)
+    th_tx = np.ones(3)
+
+    # create a narrow gaussian source
+    lam = np.logspace(0, 3, 1000)
+    flam = np.exp(-((lam - 100)/10)**2)
+
+    # array of redshifts
+    z = np.linspace(0, 1, 11)
+
+    # compute the AB magnitude at different redshifts
+    m = mag_ab(lam, flam, th_lam, th_tx, z)
+
+    # compare with expected redshift dependence
+    np.testing.assert_allclose(m, m[0] - 2.5*np.log10(1 + z))

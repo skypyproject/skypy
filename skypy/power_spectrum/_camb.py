@@ -8,8 +8,9 @@ __all__ = [
 
 
 def camb(wavenumber, redshift, cosmology, A_s, n_s):
-    """ Return the CAMB computation of the linear matter power spectrum, on a
-    two dimensional grid of wavenumber and redshift
+    r'''CAMB linear matter power spectrum.
+    Compute the linear matter power spectrum on a two dimensional grid of
+    redshift and wavenumber using CAMB [1]_.
 
     Parameters
     ----------
@@ -31,11 +32,11 @@ def camb(wavenumber, redshift, cosmology, A_s, n_s):
 
     Returns
     -------
-    power_spectrum : (nk, nz) array_like
+    power_spectrum : (nz, nk) array_like
         Array of values for the linear matter power spectrum in  [Mpc^3]
         evaluated at the input wavenumbers for the given primordial power
         spectrum parameters, cosmology. For nz redshifts and nk wavenumbers
-        the returned array will have shape (nk, nz).
+        the returned array will have shape (nz, nk).
 
     Examples
     --------
@@ -46,23 +47,21 @@ def camb(wavenumber, redshift, cosmology, A_s, n_s):
     >>> wavenumber = np.array([1.e-2, 1.e-1, 1e0])
     >>> A_s = 2.e-9
     >>> n_s = 0.965
-    >>> camb(wavenumber, redshift, cosmology, A_s, n_s)  # doctest: +SKIP
-    array([[2.34758952e+04, 8.70837957e+03],
-           [3.03660813e+03, 1.12836115e+03],
-           [2.53124880e+01, 9.40802814e+00]])
+    >>> power_spectrum = camb(wavenumber, redshift, cosmology, A_s, n_s) # doctest: +SKIP
 
     References
     ----------
-    doi : 10.1086/309179
-    arXiv: astro-ph/9911177
+    .. [1] Lewis, A. and Challinor, A. and Lasenby, A. (2000),
+        doi : 10.1086/309179.
 
-    """
+    '''
 
     try:
         from camb import CAMBparams, get_results, model
     except ImportError:
-        raise Exception("camb is required to use skypy.linear.camb")
+        raise Exception("camb is required to use skypy.power_spectrum.camb")
 
+    return_shape = (*np.shape(redshift), *np.shape(wavenumber))
     redshift = np.atleast_1d(redshift)
 
     h2 = cosmology.h * cosmology.h
@@ -98,4 +97,4 @@ def camb(wavenumber, redshift, cosmology, A_s, n_s):
                                                    maxkh=np.max(k_h.value),
                                                    npoints=len(k_h.value))
 
-    return pzk[redshift_order[::-1]].T
+    return pzk[redshift_order[::-1]].reshape(return_shape)

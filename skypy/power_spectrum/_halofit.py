@@ -2,8 +2,6 @@ from astropy.utils import isiterable
 from collections import namedtuple
 from functools import partial
 import numpy as np
-from scipy import interpolate
-from scipy import integrate
 from scipy import optimize
 
 
@@ -74,7 +72,7 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
         Input wavenumbers in units of :math:`1/Mpc`.
     z : (nz,) array_like
         Input redshifts
-    P : (nk, nz) array_like
+    P : (nz, nk) array_like
         Linear power spectrum for given wavenumbers
         and redshifts :math:`Mpc^3`.
     cosmology : astropy.cosmology.Cosmology
@@ -85,7 +83,7 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
 
     Returns
     -------
-    pknl : (nk, nz) array_like
+    pknl : (nz, nk) array_like
            Non-linear halo power spectrum in units of :math:`Mpc^3`.
 
     References
@@ -100,20 +98,21 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
     Examples
     --------
     >>> import numpy as np
-    >>> from astropy.cosmology import FlatLambdaCDM
-    >>> kvec = np.array([1.00000000e-04, 1.01000000e+01])
-    >>> zvalue = 0.0
-    >>> pvec = np.array([388.6725682632502, 0.21676249605280398])
-    >>> cosmo = FlatLambdaCDM(H0=67.04, Om0=0.21479, Ob0=0.04895)
-    >>> halofit(kvec, zvalue, pvec, cosmo, _takahashi_parameters)
-    array([388.67064424,   0.72797614])
+    >>> from astropy.cosmology import default_cosmology
+    >>> from skypy.power_spectrum import growth_function, eisenstein_hu, halofit_smith
+    >>> k = np.logspace(-4, 2, 100, base=10)
+    >>> z, A_s, n_s = 0, 2.2e-09, 0.97
+    >>> cosmology = default_cosmology.get()
+    >>> dz = growth_function(z, cosmology)
+    >>> linear_power = eisenstein_hu(k, A_s, n_s, cosmology) * np.square(dz)
+    >>> nonlinear_power = halofit_smith(k, z, linear_power, cosmology)
     '''
 
     # Manage shapes of input arrays
     return_shape = np.shape(linear_power_spectrum)
     redshift = np.atleast_1d(redshift)
     if np.ndim(linear_power_spectrum) == 1:
-        linear_power_spectrum = linear_power_spectrum[:, np.newaxis]
+        linear_power_spectrum = linear_power_spectrum[np.newaxis, :]
 
     # Declaration of variables
     if isiterable(redshift):
@@ -139,42 +138,32 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
     ode_1pw_z = omega_de_z * wp1_z
 
     # Linear power spectrum interpolated at each redshift
+    lnk = np.log(wavenumber)
     k2 = np.square(wavenumber)
     k3 = np.power(wavenumber, 3)
-    dl2kz = (linear_power_spectrum.T * k3) / (2 * np.pi * np.pi)
-    dl2k = [interpolate.interp1d(np.log(wavenumber), np.log(d)) for d in dl2kz]
-    lnk_lo = np.log(wavenumber[0])
-    lnk_up = np.log(wavenumber[-1])
+    dl2kz = (linear_power_spectrum * k3) / (2 * np.pi * np.pi)
 
     # Integrals required to evaluate Smith et al. 2003 equations C5, C7 & C8
-    def integrand_kn(lnk, lnR, lnd, n):
-        R2 = np.exp(2*lnR)
-        k2 = np.exp(2*lnk)
-        dl2 = np.exp(lnd(lnk))
-        return dl2 * np.power(k2, n/2) * np.exp(-k2*R2)
-
-    def integral_kn(lnR, lnd, n, lnk_lo, lnk_up):
-        integrand = partial(integrand_kn, lnR=lnR, lnd=lnd, n=n)
-        return integrate.quad(integrand, lnk_lo, lnk_up)[0]
+    def integral_kn(lnR, n):
+        R2 = np.exp(2*lnR)[:, np.newaxis]
+        integrand = dl2kz * np.power(k2, n/2) * np.exp(-k2*R2)
+        return np.trapz(integrand, lnk, axis=1)
 
     # Find root at which sigma^2(R) == 1.0 for each redshift
     # Smith et al. 2003 equation C5 & C6
     def log_sigma_squared(lnR):
-        ik0 = [integral_kn(r, d, 0, lnk_lo, lnk_up) for r, d in zip(lnR, dl2k)]
+        ik0 = integral_kn(lnR, 0)
         return np.log(ik0)
-    guess = np.zeros(np.size(redshift))
+    guess = np.zeros_like(redshift)
     root = optimize.fsolve(log_sigma_squared, guess)
     R = np.exp(root)[:, np.newaxis]
     ksigma = 1.0 / R
     y = wavenumber / ksigma
 
     # Evaluate integrals at lnR = root for each redshift
-    ik0 = [integral_kn(r, d, 0, lnk_lo, lnk_up) for r, d in zip(root, dl2k)]
-    ik2 = [integral_kn(r, d, 2, lnk_lo, lnk_up) for r, d in zip(root, dl2k)]
-    ik4 = [integral_kn(r, d, 4, lnk_lo, lnk_up) for r, d in zip(root, dl2k)]
-    ik0 = np.asarray(ik0)[:, np.newaxis]
-    ik2 = np.asarray(ik2)[:, np.newaxis]
-    ik4 = np.asarray(ik4)[:, np.newaxis]
+    ik0 = integral_kn(root, 0)[:, np.newaxis]
+    ik2 = integral_kn(root, 2)[:, np.newaxis]
+    ik4 = integral_kn(root, 4)[:, np.newaxis]
 
     # Effective spectral index neff and curvature C
     # Smith et al. 2003 equations C7 & C8
@@ -220,7 +209,7 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
     # Halofit non-linear power spectrum, Smith et al. 2003 equation C1
     pknl = 2 * np.pi * np.pi * (dq2 + dh2) / k3
 
-    return pknl.T.reshape(return_shape)
+    return pknl.reshape(return_shape)
 
 
 halofit_smith = partial(halofit, parameters=_smith_parameters)

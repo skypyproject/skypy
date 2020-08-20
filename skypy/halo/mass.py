@@ -47,13 +47,13 @@ def halo_mass_function(M, wavenumber, power_spectrum, growth_function,
 
     Parameters
     -----------
-    M : (nm,)
-        Array for the halo mass, in units of solar masses.
+    M : (nm,) array_like
+        Array for the halo mass, in units of solar mass.
     wavenumber : (nk,) array_like
         Array of wavenumbers at which the power spectrum is evaluated,
-        in units of [Mpc^-1].
+        in units of :math:`1/Mpc`.
     power_spectrum: (nk,) array_like
-        Linear power spectrum at redshift 0 in [Mpc^3].
+        Linear power spectrum at redshift 0 in :math:`Mpc^3`.
     growth_function : float
         The growth function evaluated at a given redshift for the given
         cosmology.
@@ -212,7 +212,7 @@ def halo_mass_sampler(m_min, m_max, resolution, wavenumber, power_spectrum,
 
 
 def ellipsoidal_collapse_function(sigma, params):
-    r'''Spherical collapse function.
+    r'''Ellipsoidal collapse function.
     This function computes the mass function for ellipsoidal
     collapse, see equation 10 in [1]_ or [2]_.
 

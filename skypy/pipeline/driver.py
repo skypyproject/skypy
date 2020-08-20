@@ -6,6 +6,8 @@ and handle their results.
 
 from collections.abc import Mapping
 from copy import deepcopy
+from importlib import import_module
+import builtins
 import networkx
 import re
 
@@ -15,6 +17,23 @@ __all__ = [
 ]
 
 
+def _items(a):
+    '''return keys and values for dict or list'''
+    if hasattr(a, 'items'):
+        return a.items()
+    return enumerate(a)
+
+
+def _is_string_argument(s):
+    # string arguments are enclosed in either single or double quotation marks
+    return s[0] in '"\'' and s[0] == s[-1]
+
+
+def _parse_string_argument(s):
+    # strip nested quotes from literal string
+    return s[1:-1]
+
+
 class SkyPyDriver:
     r'''Class for running pipelines.
 
@@ -22,7 +41,7 @@ class SkyPyDriver:
     and using their results to generate variables and tables.
     '''
 
-    def execute(self, configuration, file_format=None):
+    def execute(self, configuration, file_format=None, overwrite=False):
         r'''Run a pipeline.
 
         This function runs a pipeline of functions to generate variables and
@@ -38,20 +57,21 @@ class SkyPyDriver:
             File format used to write tables. Files are written using the
             Astropy unified file read/write interface; see [2]_ for supported
             file formats. If None (default) tables are not written to file.
+        overwrite : bool
+            Whether to overwrite any existing files without warning.
 
         Notes
         -----
         Each step in the pipeline is configured by a dictionary specifying:
 
-        - 'function' : the name of the function
-        - 'module' : the name of the the module to import 'function' from
-        - 'args' : a list of positional arguments (by value)
-        - 'kwargs' : a dictionary of keyword arguments
-        - 'requires' : a dictionary of keyword arguments
+        - 'function' : the fully qualified name of the function
+        - 'args' : a list of positional arguments (by value), or a dictionary
+                   of keyword arguments
 
-        Note that 'kwargs' specifices keyword arguments by value, wheras
-        'requires' specifices the names of previous steps in the pipeline and
-        uses their return values as keyword arguments.
+        Note that 'args' either specifices keyword arguments by value, or the
+        names of previous steps in the pipeline and uses their return values as
+        keyword arguments. Literal strings (i.e. not field names) are escaped
+        by nested quotes: '"this is a literal string"' and "'another one'".
 
         'configuration' should contain the name and configuration of each
         variable and/or an entry named 'tables'. 'tables' should contain a set
@@ -74,7 +94,7 @@ class SkyPyDriver:
         # table_config contains settings for all table columns
         config = deepcopy(configuration)
         table_config = config.pop('tables', {})
-        default_table = {'module': 'astropy.table', 'function': 'Table'}
+        default_table = {'function': 'astropy.table.Table'}
         config.update({k: v.pop('init', default_table)
                       for k, v in table_config.items()})
 
@@ -83,7 +103,7 @@ class SkyPyDriver:
 
         # Variables initialised by value don't require function evaluations
         def isfunction(f):
-            return isinstance(f, Mapping) and 'module' in f and 'function' in f
+            return isinstance(f, Mapping) and 'function' in f
         variables = {k: v for k, v in config.items() if not isfunction(v)}
         for v in variables:
             dag.add_node(v)
@@ -100,10 +120,15 @@ class SkyPyDriver:
                 dag.add_node(job)
 
         # Add edges for all requirements and dependencies
+        def deps(settings):
+            deps = settings.get('depends', [])
+            args = settings.get('args', [])
+            for k, v in _items(args):
+                if isinstance(v, str) and not _is_string_argument(v):
+                    deps.append(v)
+            return deps
         for job, settings in config.items():
-            dependencies = settings.get('depends', [])
-            dependencies += settings.get('requires', {}).values()
-            dag.add_edges_from((d, job) for d in dependencies)
+            dag.add_edges_from((d, job) for d in deps(settings))
         for table, columns in table_config.items():
             table_complete = '.'.join((table, 'complete'))
             dag.add_edge(table, table_complete)
@@ -111,9 +136,7 @@ class SkyPyDriver:
                 job = '.'.join((table, column))
                 dag.add_edge(table, job)
                 dag.add_edge(job, table_complete)
-                dependencies = settings.get('depends', [])
-                dependencies += settings.get('requires', {}).values()
-                dag.add_edges_from((d, job) for d in dependencies)
+                dag.add_edges_from((d, job) for d in deps(settings))
 
         # Execute jobs in order that resolves dependencies
         for job in networkx.topological_sort(dag):
@@ -131,30 +154,41 @@ class SkyPyDriver:
         if file_format:
             for table in table_config.keys():
                 filename = '.'.join((table, file_format))
-                getattr(self, table).write(filename)
+                getattr(self, table).write(filename, overwrite=overwrite)
 
     def _call_from_config(self, config):
 
         # Import function
-        module_name = config.get('module')
-        object_name, function_name = re.search(r'^(\w*?)\.?(\w*)$',
-                                               config.get('function')).groups()
-        if object_name:
-            module = __import__(module_name, fromlist=object_name)
-            object = getattr(module, object_name)
-            function = getattr(object, function_name)
-        else:
-            module = __import__(module_name, fromlist=function_name)
-            function = getattr(module, function_name)
+        function_path = config.get('function').split('.')
+        module = builtins
+        for i, key in enumerate(function_path[:-1]):
+            if not hasattr(module, key):
+                module_name = '.'.join(function_path[:i+1])
+                try:
+                    module = import_module(module_name)
+                except ModuleNotFoundError:
+                    raise ModuleNotFoundError(module_name)
+            else:
+                module = getattr(module, key)
+        function = getattr(module, function_path[-1])
 
         # Parse arguments
         args = config.get('args', [])
-        kwargs = config.get('kwargs', {})
-        req = config.get('requires', {})
-        req = {k: self.__getitem__(v) for k, v in req.items()}
+        for k, v in _items(args):
+            if isinstance(v, str):
+                if _is_string_argument(v):
+                    args[k] = _parse_string_argument(v)
+                else:
+                    # get variable or table column
+                    args[k] = self[v]
 
         # Call function
-        return function(*args, **kwargs, **req)
+        if isinstance(args, Mapping):
+            result = function(**args)
+        else:
+            result = function(*args)
+
+        return result
 
     def __getitem__(self, label):
         name, key = re.search(r'^(\w*)\.?(\w*)$', label).groups()
