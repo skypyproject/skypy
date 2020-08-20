@@ -48,9 +48,7 @@ def camb(wavenumber, redshift, cosmology, A_s, n_s):
     >>> wavenumber = np.array([1.e-2, 1.e-1, 1e0])
     >>> A_s = 2.e-9
     >>> n_s = 0.965
-    >>> camb(wavenumber, redshift, cosmology, A_s, n_s)  # doctest: +SKIP
-    array([[2.36646871e+04, 3.02592011e+03, 2.49336836e+01],
-       [8.77864738e+03, 1.12441960e+03, 9.26749240e+00]])
+    >>> power_spectrum = camb(wavenumber, redshift, cosmology, A_s, n_s)
 
     References
     ----------
