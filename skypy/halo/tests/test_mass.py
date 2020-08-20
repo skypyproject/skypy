@@ -103,24 +103,13 @@ def test_ellipsoidal_collapse_function():
     assert allclose(fps, PS_fsigma)
 
 
-def test_subhalo_mass_function():
-    # Test the output and shape is correct given an array of masses
-    m_array = np.asarray(mass_array)
-
-    # Any particular ellipsoidal collapse model
-    params_subh = (0.3, 1.9, 1.0)
-    array_output_subh = mass.subhalo_mass_function(m_array, 1.0e12,
-                                                   params=params_subh)
-    assert array_output_subh.shape == m_array.shape
-
-
 def test_subhalo_mass_sampler():
     # Test the output shape is correct given the sample size
     n_samples = 1000
-    m_min, m_max, resolution = 10**9, 10**10, 100
+    m_min, m_max, halo_mass = 1.0e9, 1.0e10, 1.0e12
     # Any particular ellipsoidal collapse model
-    params_subh = (0.3, 1.9, 1.0)
-    array_output_subh = mass.subhalo_mass_sampler(m_min, m_max, resolution,
-                                                  1.0e12, params=params_subh,
-                                                  size=n_samples)
+    params_vale = (0.5, 1.9, 1.0, 1.0e10)
+    array_output_subh = mass.subhalo_mass_sampler(m_min, m_max, n_samples,
+                                                  halo_mass, params=params_vale)
+
     assert len(array_output_subh) == n_samples
