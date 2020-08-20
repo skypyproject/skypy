@@ -49,13 +49,13 @@ def halo_mass_function(M, wavenumber, power_spectrum, growth_function,
 
     Parameters
     -----------
-    M : (nm,) array_like
-        Array for the halo mass, in units of solar mass.
+    M : (nm,)
+        Array for the halo mass, in units of solar masses.
     wavenumber : (nk,) array_like
         Array of wavenumbers at which the power spectrum is evaluated,
-        in units of :math:`1/Mpc`.
+        in units of [Mpc^-1].
     power_spectrum: (nk,) array_like
-        Linear power spectrum at redshift 0 in :math:`Mpc^3`.
+        Linear power spectrum at redshift 0 in [Mpc^3].
     growth_function : float
         The growth function evaluated at a given redshift for the given
         cosmology.
