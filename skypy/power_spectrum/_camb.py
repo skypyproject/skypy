@@ -9,8 +9,8 @@ __all__ = [
 
 def camb(wavenumber, redshift, cosmology, A_s, n_s):
     r'''CAMB linear matter power spectrum.
-    Return the CAMB computation of the linear matter power spectrum, on a
-    two dimensional grid of wavenumber and , described in [1]_.
+    Compute the linear matter power spectrum on a two dimensional grid of
+    redshift and wavenumber using CAMB [1]_.
 
     Parameters
     ----------
