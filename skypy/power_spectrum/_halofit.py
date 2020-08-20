@@ -221,10 +221,7 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
     # Halofit non-linear power spectrum, Smith et al. 2003 equation C1
     pknl = 2 * np.pi * np.pi * (dq2 + dh2) / k3
 
-    if len(redshift) == 1:
-        pknl = pknl.reshape(return_shape)
-
-    return pknl
+    return pknl.reshape(return_shape)
 
 
 halofit_smith = partial(halofit, parameters=_smith_parameters)
