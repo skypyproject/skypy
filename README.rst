@@ -47,11 +47,11 @@ How to install and run SkyPy
 
 * Installation with conda:
 
-  (coming soon)
+  ``conda install -c conda-forge skypy``
 
 * Running tests:
 
-  ``python setup.py test``
+  ``pytest --pyargs skypy``
 
 * Importing the package:
 
