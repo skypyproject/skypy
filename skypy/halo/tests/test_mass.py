@@ -59,7 +59,7 @@ def test_halo_mass_function():
     assert allclose(array_output_PS, PS_massf)
 
 
-def test_halo_mass_sampler():
+def halo_mass_sampler():
     # Test the output shape is correct given the sample size
     n_samples = 1000
     m_min, m_max, resolution = 10**9, 10**12, 100
