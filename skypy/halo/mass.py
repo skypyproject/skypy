@@ -389,8 +389,6 @@ def subhalo_mass_sampler(m_min, m_max, resolution,
         # Random number of subhalos following a Poisson distribution
         # with mean n_subhalos
         n_sh_poisson = np.random.poisson(n_subhalos)
-
-        # Subhalo mass function
         m = np.logspace(np.log10(m_min), np.log10(m_max), n_sh_poisson)
 
         # Sample from the Schechter function
