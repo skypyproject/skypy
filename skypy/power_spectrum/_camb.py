@@ -100,4 +100,4 @@ def camb(wavenumber, redshift, cosmology, A_s, n_s):
                                                    maxkh=np.max(k_h.value),
                                                    npoints=len(k_h.value))
 
-    return np.reshape(pzk[redshift_order[::-1]], return_shape)
+    return pzk[redshift_order[::-1]].reshape(return_shape)
