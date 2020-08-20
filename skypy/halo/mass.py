@@ -329,7 +329,7 @@ def _subhalo_amplitude(M, params):
 
 
 def subhalo_mass_sampler(m_min, m_max, resolution,
-                         halo_mass, params, model=None):
+                         halo_mass, params):
     r'''Subhalo mass sampler.
     This function samples subhaloes from their mass function, given the mass
     of the parent halo. Refer to equation 3 in [1]_.
@@ -350,8 +350,6 @@ def subhalo_mass_sampler(m_min, m_max, resolution,
         If model is `'Vale'`, the parameters are
         `(subhalo_fraction0, alpha, beta, mcut)`
         and the amplitude is defined by equation 4 in [1].
-    model: str
-        Model for the amplitude of the subhalo mass function. Default is None.
 
     Returns
     --------
@@ -381,11 +379,8 @@ def subhalo_mass_sampler(m_min, m_max, resolution,
     .. [1] Vale, A. and Ostriker, J.P. (2005), arXiv: astro-ph/0511816.
     '''
 
-    if model == 'Vale':
-        subhalo_fraction0, alpha, beta, mcut = params
-        A = _subhalo_amplitude(halo_mass, params)
-    else:
-        A, alpha, beta = params
+    subhalo_fraction0, alpha, beta, mcut = params
+    A = _subhalo_amplitude(halo_mass, params)
 
     halo_mass = np.atleast_1d(halo_mass)
     subhalo_sample_list = []
