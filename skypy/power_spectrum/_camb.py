@@ -40,7 +40,6 @@ def camb(wavenumber, redshift, cosmology, A_s, n_s):
 
     Examples
     --------
-
     >>> import numpy as np
     >>> from astropy.cosmology import default_cosmology
     >>> cosmology = default_cosmology.get()

@@ -97,7 +97,6 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
 
     Examples
     --------
-
     >>> import numpy as np
     >>> from astropy.cosmology import default_cosmology
     >>> from skypy.power_spectrum import growth_function, eisenstein_hu, halofit_smith
@@ -112,7 +111,6 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
     # Manage shapes of input arrays
     return_shape = np.shape(linear_power_spectrum)
     redshift = np.atleast_1d(redshift)
-
     if np.ndim(linear_power_spectrum) == 1:
         linear_power_spectrum = linear_power_spectrum[np.newaxis, :]
 
