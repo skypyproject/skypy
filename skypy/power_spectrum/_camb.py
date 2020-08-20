@@ -1,9 +1,3 @@
-"""CAMB module.
-
-This module facilitates the CAMB computation of the linear
-matter power spectrum.
-"""
-
 import numpy as np
 from astropy import units as u
 
