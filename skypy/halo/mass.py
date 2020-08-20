@@ -21,7 +21,7 @@ Models
 
 import numpy as np
 from scipy import integrate
-from scipy.special import gamma, gammainc
+from scipy.special import gamma
 from skypy.utils.special import gammaincc
 from functools import partial
 from astropy import units
@@ -383,11 +383,11 @@ def subhalo_mass_function(M, halo_mass, params, model=None):
 
 
 def _subhalo_amplitude(M, params):
+    # astro-ph/0511816 Equation 4
     subhalo_fraction0, alpha, beta, mcut = params
     x_cut = mcut / (beta * M)
 
-    return (subhalo_fraction0 / beta) / \
-        gamma(2.0 - alpha) * (1.0 - gammainc(2.0 - alpha, x_cut))
+    return subhalo_fraction0 / (beta * gamma(2.0 - alpha) * (1.0 - gammaincc(2.0 - alpha, x_cut)))
 
 
 def subhalo_mass_sampler(m_min, m_max, resolution,
