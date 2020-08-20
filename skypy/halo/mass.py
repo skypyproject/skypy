@@ -400,14 +400,12 @@ def subhalo_mass_sampler(m_min, m_max, resolution,
 
         # Subhalo mass function
         m = np.logspace(np.log10(m_min), np.log10(m_max), n_sh_poisson)
-        x = m / m_star
-        massf = A * np.power(x, -alpha) * np.exp(-x) / m_star
 
         # Sample from the Schechter function
-        x_min = min(massf) / m_star
-        x_max = max(massf) / m_star
+        x_min = np.min(m) / m_star
+        x_max = np.max(m) / m_star
 
-        schechter_sampling = schechter(alpha, x_min, x_max, resolution,
+        schechter_sampling = A * schechter(alpha, x_min, x_max, resolution,
                                        size=n_sh_poisson, scale=m_star)
         subhalo_sample_list = subhalo_sample_list.append(schechter_sampling)
 
