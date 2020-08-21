@@ -20,7 +20,6 @@ be found in the `SkyPy Documentation <https://skypy.readthedocs.io/en/latest/>`_
 Important links
 ---------------
 
-* `License <https://github.com/skypyproject/skypy/blob/master/LICENSE.rst>`_
 * `Code of Conduct <https://github.com/skypyproject/skypy/blob/master/CODE_OF_CONDUCT.md>`_
 * `Contributor Guidelines <https://github.com/skypyproject/skypy/blob/master/CONTRIBUTING.md>`_
 * `Citation Guidelines <https://github.com/skypyproject/skypy/blob/master/CITATION>`_
@@ -62,16 +61,6 @@ How to install and run SkyPy
   Move to the directory and type on your terminal
 
   ``skypy –config examples/herbel_galaxies.yaml –format fits``
-
-
-License
--------
-
-This project is Copyright (c) SkyPy Team and licensed under
-the terms of the BSD 3-Clause license. This package is based upon
-the `Astropy package template <https://github.com/astropy/package-template>`_
-which is licensed under the BSD 3-clause licence. See the
-`LICENSE.rst <LICENSE.rst>`_ file for more information.
 
 
 Contributing
