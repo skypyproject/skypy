@@ -7,21 +7,14 @@ SkyPy: A package for modelling the Universe
 This package contains methods for modelling the Universe, galaxies and the Milky
 Way. Also included are methods for generating observed data.
 
+* `Galaxy <https://skypy.readthedocs.io/en/latest/galaxy.html>`_ morphology, luminosity and redshift distributions
+* `Halo <https://skypy.readthedocs.io/en/latest/halo/index.html>`_ and subhalo mass distributions
+* `Gravitational Wave <https://skypy.readthedocs.io/en/latest/gravitational_wave/index.html>`_ binary merger rates
+* `Power Spectra <https://skypy.readthedocs.io/en/latest/power_spectrum/index.html>`_ using CAMB and Halofit
 
-Summary of SkyPy features
--------------------------
-
-The full list of features can be found on the
-`SkyPy Documentation <https://skypy.readthedocs.io/en/latest/?badge=latest>`_ main page
-
-* Clusters
-* Galaxies
-* Gravitational waves
-* Dark Matter Halos
-* Power Spectrum
-* Supernovae
-* Utiles
-* Pipeline
+SkyPy can also implement `Pipelines <https://skypy.readthedocs.io/en/latest/pipeline/index.html>`_
+that generate populations of astronomical objects. The full list of features can
+be found in the `SkyPy Documentation <https://skypy.readthedocs.io/en/latest/>`_.
 
 
 Important links
