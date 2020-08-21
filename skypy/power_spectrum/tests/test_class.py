@@ -18,7 +18,7 @@ else:
 
 
 @pytest.mark.skipif(CLASS_NOT_FOUND, reason='CLASS not found')
-def test_camb():
+def test_classy():
     '''
     Test a default astropy cosmology
     '''
