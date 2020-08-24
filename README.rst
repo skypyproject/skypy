@@ -11,10 +11,9 @@ Way. Also included are methods for generating observed data.
 * `Halo <https://skypy.readthedocs.io/en/latest/halo/index.html>`_ and subhalo mass distributions
 * `Gravitational Wave <https://skypy.readthedocs.io/en/latest/gravitational_wave/index.html>`_ binary merger rates
 * `Power Spectra <https://skypy.readthedocs.io/en/latest/power_spectrum/index.html>`_ using CAMB and Halofit
+* `Pipelines <https://skypy.readthedocs.io/en/latest/pipeline/index.html>`_ to generate populations of astronomical objects
 
-SkyPy can also implement `Pipelines <https://skypy.readthedocs.io/en/latest/pipeline/index.html>`_
-that generate populations of astronomical objects. The full list of features can
-be found in the `SkyPy Documentation <https://skypy.readthedocs.io/en/latest/>`_.
+The full list of features can be found in the `SkyPy Documentation <https://skypy.readthedocs.io/en/latest/>`_.
 
 
 Important links
