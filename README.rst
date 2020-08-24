@@ -25,42 +25,46 @@ Important links
 * `Citation Guidelines <https://github.com/skypyproject/skypy/blob/master/CITATION>`_
 
 
-How to install and run SkyPy
-----------------------------
+Getting Started
+---------------
 
-* Requirements:
+SkyPy is distributed through `PyPI <https://pypi.org/project/skypy/>`_ and `conda-forge <https://anaconda.org/conda-forge/skypy>`_.
+To install SkyPy and its `dependencies <setup.cfg>`_ using `pip <https://pip.pypa.io/en/stable/>`_:
 
-  Make sure you have current version of ``astropy``, ``networkx``,
-  ``numpy``, ``scipy`` and ``pyyaml``.
+.. code:: bash
 
-* Installation with pip:
+    $ pip install skypy
 
-  ``pip install skypy``
+To install using `conda <https://docs.conda.io/en/latest/>`_:
 
-* Installation with conda:
+.. code:: bash
 
-  ``conda install -c conda-forge skypy``
+    $ conda install -c conda-forge skypy
 
-* Running tests:
+You can test your SkyPy intallation using `pytest <https://docs.pytest.org/en/stable/>`_:
 
-  ``pytest --pyargs skypy``
+.. code:: bash
 
-* Importing the package:
+    $ pytest --pyargs skypy
 
-  You can use your favorite `python` shell (python, ipython, jupyter notebook),
-  and import
+The SkyPy library can then be imported from python:
 
-  ``import skypy``
+.. code:: python
 
-* Running examples:
+    >>> import skypy
+    >>> help(skypy)
 
-  Use skypy to run one of the example pipelines and write the outputs to fits files.
+SkyPy also has a driver script that can run pipelines. The repository contains
+`examples <examples>`_ of config files in yaml format to download and run. For
+example:
 
-  You could clone or download our repository or simply download the example directory.
+.. code:: bash
 
-  Move to the directory and type on your terminal
+    skypy –config examples/herbel_galaxies.yaml –format fits
 
-  ``skypy –config examples/herbel_galaxies.yaml –format fits``
+will generate tables of red and blue galaxies following the model described in
+`Herbel et al. 2017 <https://ui.adsabs.harvard.edu/abs/2017JCAP...08..035H>`_
+and write them in fits format.
 
 
 Contributing
