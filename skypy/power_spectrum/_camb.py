@@ -93,12 +93,10 @@ def camb(wavenumber, redshift, cosmology,
 
     pars.NonLinear = model.NonLinear_none
 
-    results = get_results(pars)
-
     k = wavenumber * (1. / u.Mpc)
 
     pk_interp = get_matter_power_interpolator(pars,
-                                              nonlinear=False, 
+                                              nonlinear=False,
                                               hubble_units=False, k_hunit=False,
                                               kmax=np.max(k.value),
                                               zmax=redshift.max())
