@@ -57,7 +57,7 @@ def classy(wavenumber, redshift, cosmology, A_s, n_s):
 
     """
     try:
-        from classy import Class
+        from classyc import Class
     except ImportError:
         raise Exception("CLASS is required to use skypy.linear.classy")
 
@@ -89,8 +89,8 @@ def classy(wavenumber, redshift, cosmology, A_s, n_s):
 
     pzk = np.zeros([redshift.shape[0], wavenumber.shape[0]])
 
-    for i, ki in enumerate(wavenumber):
-        for j, zj in enumerate(redshift):
-            pzk[j, i] = classy_obj.pk(ki, zj)
+    for ik, k in enumerate(k_h.value):
+        for iz, z in enumerate(redshift):
+            pzk[iz, ik] = classy_obj.pk(k, z)
 
     return pzk.T
