@@ -7,35 +7,43 @@ SkyPy: A package for modelling the Universe
 This package contains methods for modelling the Universe, galaxies and the Milky
 Way. Also included are methods for generating observed data.
 
-* `Galaxy <https://skypy.readthedocs.io/en/latest/galaxy.html>`_ morphology, luminosity and redshift distributions
-* `Halo <https://skypy.readthedocs.io/en/latest/halo/index.html>`_ and subhalo mass distributions
-* `Gravitational Wave <https://skypy.readthedocs.io/en/latest/gravitational_wave/index.html>`_ binary merger rates
-* `Power Spectra <https://skypy.readthedocs.io/en/latest/power_spectrum/index.html>`_ using CAMB and Halofit
-* `Pipelines <https://skypy.readthedocs.io/en/latest/pipeline/index.html>`_ to generate populations of astronomical objects
+* Galaxy_ morphology, luminosity and redshift distributions
+* Halo_ and subhalo mass distributions
+* `Gravitational Wave`_ binary merger rates
+* `Power Spectra`_ using CAMB and Halofit
+* Pipelines_ to generate populations of astronomical objects
 
-The full list of features can be found in the `SkyPy Documentation <https://skypy.readthedocs.io/en/latest/>`_.
+The full list of features can be found in the `SkyPy Documentation`_.
 
 If you use SkyPy for work or research presented in a publication please follow
-our `Citation Guidelines <CITATION>`_.
+our `Citation Guidelines`_.
+
+.. _Galaxy: https://skypy.readthedocs.io/en/latest/galaxy.html
+.. _Halo: https://skypy.readthedocs.io/en/latest/halo/index.html
+.. _Gravitational Wave: https://skypy.readthedocs.io/en/latest/gravitational_wave/index.html
+.. _Power Spectra: https://skypy.readthedocs.io/en/latest/power_spectrum/index.html
+.. _Pipelines: https://skypy.readthedocs.io/en/latest/pipeline/index.html
+.. _SkyPy Documentation: https://skypy.readthedocs.io/en/latest/
+.. _Citation Guidelines: CITATION
 
 
 Getting Started
 ---------------
 
-SkyPy is distributed through `PyPI <https://pypi.org/project/skypy/>`_ and `conda-forge <https://anaconda.org/conda-forge/skypy>`_.
-To install SkyPy and its `dependencies <setup.cfg>`_ using `pip <https://pip.pypa.io/en/stable/>`_:
+SkyPy is distributed through PyPI_ and conda-forge_. To install SkyPy and its
+dependencies_ using pip_:
 
 .. code:: bash
 
     $ pip install skypy
 
-To install using `conda <https://docs.conda.io/en/latest/>`_:
+To install using conda_:
 
 .. code:: bash
 
     $ conda install -c conda-forge skypy
 
-You can test your SkyPy intallation using `pytest <https://docs.pytest.org/en/stable/>`_:
+You can test your SkyPy intallation using pytest_:
 
 .. code:: bash
 
@@ -49,16 +57,23 @@ The SkyPy library can then be imported from python:
     >>> help(skypy)
 
 SkyPy also has a driver script that can run pipelines. The repository contains
-`examples <examples>`_ of config files in yaml format to download and run. For
-example:
+examples_ of config files in yaml format to download and run. For example:
 
 .. code:: bash
 
     skypy –config examples/herbel_galaxies.yaml –format fits
 
 will generate tables of red and blue galaxies following the model described in
-`Herbel et al. 2017 <https://ui.adsabs.harvard.edu/abs/2017JCAP...08..035H>`_
-and write them in fits format.
+`Herbel et al. 2017`_ and write them in fits format.
+
+.. _PyPI: https://pypi.org/project/skypy/
+.. _conda-forge: https://anaconda.org/conda-forge/skypy
+.. _dependencies: setup.cfg
+.. _pip: https://pip.pypa.io/en/stable/
+.. _conda: https://docs.conda.io/en/latest/
+.. _pytest: https://docs.pytest.org/en/stable/
+.. _examples: examples
+.. _Herbel et al. 2017: https://ui.adsabs.harvard.edu/abs/2017JCAP...08..035H
 
 
 Contributing
@@ -66,9 +81,12 @@ Contributing
 
 We love contributions! SkyPy is open source,
 built on open source, and we'd love to have you hang out in our community.
-For information on how to contribute see our `Contributor Guidelines <CONTRIBUTING.md>`_.
+For information on how to contribute see our `Contributor Guidelines`_.
 All communication relating to The SkyPy Project must meet the standards set out
-in the `Code of Conduct <CODE_OF_CONDUCT.md>`_.
+in the `Code of Conduct`_.
+
+.. _Contributor Guidelines: CONTRIBUTING.md
+.. _Code of Conduct: CODE_OF_CONDUCT.md
 
 **Imposter syndrome disclaimer**: We want your help. No, really.
 
