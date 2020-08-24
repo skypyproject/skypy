@@ -18,12 +18,6 @@ The full list of features can be found in the `SkyPy Documentation <https://skyp
 If you use SkyPy for work or research presented in a publication please follow
 our `Citation Guidelines <CITATION>`_.
 
-Important links
----------------
-
-* `Code of Conduct <https://github.com/skypyproject/skypy/blob/master/CODE_OF_CONDUCT.md>`_
-* `Contributor Guidelines <https://github.com/skypyproject/skypy/blob/master/CONTRIBUTING.md>`_
-
 
 Getting Started
 ---------------
@@ -72,6 +66,9 @@ Contributing
 
 We love contributions! SkyPy is open source,
 built on open source, and we'd love to have you hang out in our community.
+For information on how to contribute see our `Contributor Guidelines <CONTRIBUTING.md>`_.
+All communication relating to The SkyPy Project must meet the standards set out
+in the `Code of Conduct <CODE_OF_CONDUCT.md>`_.
 
 **Imposter syndrome disclaimer**: We want your help. No, really.
 
