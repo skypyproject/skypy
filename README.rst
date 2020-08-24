@@ -15,13 +15,14 @@ Way. Also included are methods for generating observed data.
 
 The full list of features can be found in the `SkyPy Documentation <https://skypy.readthedocs.io/en/latest/>`_.
 
+If you use SkyPy for work or research presented in a publication please follow
+our `Citation Guidelines <CITATION>`_.
 
 Important links
 ---------------
 
 * `Code of Conduct <https://github.com/skypyproject/skypy/blob/master/CODE_OF_CONDUCT.md>`_
 * `Contributor Guidelines <https://github.com/skypyproject/skypy/blob/master/CONTRIBUTING.md>`_
-* `Citation Guidelines <https://github.com/skypyproject/skypy/blob/master/CITATION>`_
 
 
 Getting Started
