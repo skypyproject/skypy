@@ -7,10 +7,12 @@ __all__ = [
 ]
 
 
-def camb(wavenumber, redshift, cosmology, A_s, n_s):
+def camb(wavenumber, redshift, cosmology,
+         A_s, n_s, z_reion):
     r'''CAMB linear matter power spectrum.
     Compute the linear matter power spectrum on a two dimensional grid of
     redshift and wavenumber using CAMB [1]_.
+    Currently assumes massless neutrinos.
 
     Parameters
     ----------
@@ -29,6 +31,8 @@ def camb(wavenumber, redshift, cosmology, A_s, n_s):
     n_s : float
         Cosmology parameter, spectral index of scalar perturbation power
         spectrum
+    z_reion : float
+        Cosmology parameter, redshift of re-ionisation
 
     Returns
     -------
@@ -57,7 +61,7 @@ def camb(wavenumber, redshift, cosmology, A_s, n_s):
     '''
 
     try:
-        from camb import CAMBparams, get_results, model
+        from camb import CAMBparams, get_results, model, get_matter_power_interpolator
     except ImportError:
         raise Exception("camb is required to use skypy.power_spectrum.camb")
 
@@ -72,15 +76,17 @@ def camb(wavenumber, redshift, cosmology, A_s, n_s):
                        omch2=cosmology.Odm0 * h2,
                        omk=cosmology.Ok0,
                        TCMB=cosmology.Tcmb0.value,
-                       mnu=np.sum(cosmology.m_nu.value),
+                       mnu=0.,  # for now, need to solve agreement with CLASS
                        standard_neutrino_neff=cosmology.Neff
                        )
 
-    # camb requires redshifts to be in decreasing order
-    redshift_order = np.argsort(redshift)[::-1]
+    # camb interpolator requires redshifts to be in increasing order
+    redshift_order = np.argsort(redshift)
 
     pars.InitPower.ns = n_s
     pars.InitPower.As = A_s
+
+    pars.Reion.redshift = z_reion
 
     pars.set_matter_power(redshifts=list(redshift[redshift_order]),
                           kmax=np.max(wavenumber))
@@ -91,10 +97,12 @@ def camb(wavenumber, redshift, cosmology, A_s, n_s):
 
     k = wavenumber * (1. / u.Mpc)
 
-    k_h = k.to((u.littleh / u.Mpc), u.with_H0(cosmology.H0))
+    pk_interp = get_matter_power_interpolator(pars,
+                                              nonlinear=False, 
+                                              hubble_units=False, k_hunit=False,
+                                              kmax=np.max(k.value),
+                                              zmax=redshift.max())
 
-    kh, z, pzk = results.get_matter_power_spectrum(minkh=np.min(k_h.value),
-                                                   maxkh=np.max(k_h.value),
-                                                   npoints=len(k_h.value))
+    pzk = pk_interp.P(redshift[redshift_order], k.value)
 
-    return pzk[redshift_order[::-1]].reshape(return_shape)
+    return pzk[redshift_order].reshape(return_shape)

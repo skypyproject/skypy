@@ -27,12 +27,12 @@ def test_camb():
     # test shape and compare with the mocked power spectrum
     redshift = [0.0, 1.0]
     wavenumber = np.logspace(-4.0, np.log10(2.0), 200)
-    pkz = camb(wavenumber, redshift, Planck15, 2.e-9, 0.965)
+    pkz = camb(wavenumber, redshift, Planck15, 2.e-9, 0.965, 10.)
     assert pkz.shape == (len(redshift), len(wavenumber))
     assert allclose(pkz, test_pkz, rtol=1.e-4)
 
     # also check redshifts are ordered correctly
     redshift = [1.0, 0.0]
-    pkz = camb(wavenumber, redshift, Planck15, 2.e-9, 0.965)
+    pkz = camb(wavenumber, redshift, Planck15, 2.e-9, 0.965, 10.)
     assert pkz.shape == (len(redshift), len(wavenumber))
     assert allclose(pkz, test_pkz[np.argsort(redshift), :], rtol=1.e-4)
