@@ -61,7 +61,7 @@ def camb(wavenumber, redshift, cosmology,
     '''
 
     try:
-        from camb import CAMBparams, get_results, model, get_matter_power_interpolator
+        from camb import CAMBparams, model, get_matter_power_interpolator
     except ImportError:
         raise Exception("camb is required to use skypy.power_spectrum.camb")
 
