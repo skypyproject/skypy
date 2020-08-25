@@ -38,12 +38,12 @@ def test_classy():
 
     redshift = [0.0, 1.0]
     wavenumber = np.logspace(-4.0, np.log10(2.0), 200)
-    pkz = classy(wavenumber, redshift, Planck15, 2.e-9, 0.965)
+    pkz = classy(wavenumber, redshift, Planck15, 2.e-9, 0.965, 10.)
     assert pkz.shape == (len(wavenumber), len(redshift))
     assert allclose(pkz, test_pkz, rtol=1.e-4)
 
     # also check redshifts are ordered correctly
     redshift = [1.0, 0.0]
-    pkz = classy(wavenumber, redshift, Planck15, 2.e-9, 0.965)
+    pkz = classy(wavenumber, redshift, Planck15, 2.e-9, 0.965, 10.)
     assert pkz.shape == (len(wavenumber), len(redshift))
     assert allclose(pkz, test_pkz[:, np.argsort(redshift)], rtol=1.e-4)

@@ -1,13 +1,14 @@
 import numpy as np
 from astropy import units as u
-
+import pdb
 
 __all__ = [
     'classy',
 ]
 
 
-def classy(wavenumber, redshift, cosmology, A_s, n_s):
+def classy(wavenumber, redshift, cosmology,
+           A_s, n_s, z_reio):
     """ Return the CLASS computation of the linear matter power spectrum, on a
     two dimensional grid of wavenumber and redshift
 
@@ -46,7 +47,8 @@ def classy(wavenumber, redshift, cosmology, A_s, n_s):
     >>> wavenumber = np.array([1.e-2, 1.e-1, 1e0])
     >>> A_s = 2.e-9
     >>> n_s = 0.965
-    >>> classy(wavenumber, redshift, cosmology, A_s, n_s)  # doctest: +SKIP
+    >>> z_reio = 10.
+    >>> classy(wavenumber, redshift, cosmology, A_s, n_s, z_reio)  # doctest: +SKIP
     array([[2.34758952e+04, 8.70837957e+03],
            [3.03660813e+03, 1.12836115e+03],
            [2.53124880e+01, 9.40802814e+00]])
@@ -57,9 +59,9 @@ def classy(wavenumber, redshift, cosmology, A_s, n_s):
 
     """
     try:
-        from classyc import Class
+        from classylss.binding import ClassEngine, Spectra
     except ImportError:
-        raise Exception("CLASS is required to use skypy.linear.classy")
+        raise Exception("classylss is required to use skypy.linear.classy")
 
     redshift = np.atleast_1d(redshift)
 
@@ -70,27 +72,27 @@ def classy(wavenumber, redshift, cosmology, A_s, n_s):
 
     params = {
         'output': 'mPk',
-        'P_k_max_h/Mpc':  k_h.max().value,
+        'P_k_max_1/Mpc':  k.max().value,
         'z_pk': ', '.join(str(z) for z in redshift),
         'A_s':       A_s,
         'n_s':       n_s,
         'H0':        cosmology.H0.value,
         'omega_b':   cosmology.Ob0 * h2,
-        'omega_cdm': cosmology.Om0 * h2,
+        'omega_cdm': cosmology.Odm0 * h2,
         'T_cmb':     cosmology.Tcmb0.value,
         'N_eff':     cosmology.Neff,
+        'z_reio':    z_reio,
     }
 
-    classy_obj = Class()
+    classy_params = ClassEngine(params)
 
-    classy_obj.set(params)
-
-    classy_obj.compute()
+    classy_spectra = Spectra(classy_params)
 
     pzk = np.zeros([redshift.shape[0], wavenumber.shape[0]])
 
-    for ik, k in enumerate(k_h.value):
-        for iz, z in enumerate(redshift):
-            pzk[iz, ik] = classy_obj.pk(k, z)
+    for iz, z in enumerate(redshift):
+        pzk[iz] = classy_spectra.get_pklin(k_h.value, z)
+
+    pzk = pzk / cosmology.h**3
 
     return pzk.T
