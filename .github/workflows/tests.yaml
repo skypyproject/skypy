@@ -54,15 +54,19 @@ jobs:
           echo gfortran=$(which gfortran)
         fi
         # build dependencies from source
+        TESTDIR=$PWD
         pushd /tmp
         pip install numpy cython
         # classy
         git clone --depth 1 https://github.com/lesgourg/class_public.git class
         pushd class
-        make -j
+        make -j classy
         popd
-        # done
+        # done with build
         pip uninstall -y numpy cython
+        # make system packages accessible to this tox environment
+        echo "[testenv:${{ matrix.toxenv }}]" >> $TESTDIR/tox.ini
+        echo "sitepackages = true" >> $TESTDIR/tox.ini
         popd
     - name: Add pytest Matcher
       run: |
