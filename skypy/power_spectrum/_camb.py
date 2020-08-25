@@ -12,7 +12,6 @@ def camb(wavenumber, redshift, cosmology,
     r'''CAMB linear matter power spectrum.
     Compute the linear matter power spectrum on a two dimensional grid of
     redshift and wavenumber using CAMB [1]_.
-    Currently assumes massless neutrinos.
 
     Parameters
     ----------
@@ -89,19 +88,14 @@ def camb(wavenumber, redshift, cosmology,
 
     pars.Reion.redshift = z_reio
 
-    pars.set_matter_power(redshifts=list(redshift[redshift_order]),
-                          kmax=np.max(wavenumber))
-
     pars.NonLinear = model.NonLinear_none
-
-    k = wavenumber * (1. / u.Mpc)
 
     pk_interp = get_matter_power_interpolator(pars,
                                               nonlinear=False,
                                               hubble_units=False, k_hunit=False,
-                                              kmax=np.max(k.value),
-                                              zmax=redshift.max())
+                                              kmax=np.max(wavenumber),
+                                              zmax=np.max(redshift))
 
-    pzk = pk_interp.P(redshift[redshift_order], k.value)
+    pzk = pk_interp.P(redshift[redshift_order], wavenumber)
 
     return pzk[redshift_order].reshape(return_shape)
