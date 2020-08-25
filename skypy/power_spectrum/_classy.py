@@ -58,14 +58,13 @@ def classy(wavenumber, redshift, cosmology,
 
     """
     try:
-        from classylss.binding import ClassEngine, Spectra
+        from classy import Class
     except ImportError:
         raise Exception("classylss is required to use skypy.linear.classy")
 
     redshift = np.atleast_1d(redshift)
 
     k = wavenumber * (1. / u.Mpc)
-    k_h = k.to((u.littleh / u.Mpc), u.with_H0(cosmology.H0))
 
     h2 = cosmology.h * cosmology.h
 
@@ -83,15 +82,14 @@ def classy(wavenumber, redshift, cosmology,
         'z_reio':    z_reio,
     }
 
-    classy_params = ClassEngine(params)
-
-    classy_spectra = Spectra(classy_params)
+    classy_obj = Class()
+    classy_obj.set(params)
+    classy_obj.compute()
 
     pzk = np.zeros([redshift.shape[0], wavenumber.shape[0]])
 
-    for iz, z in enumerate(redshift):
-        pzk[iz] = classy_spectra.get_pklin(k_h.value, z)
-
-    pzk = pzk / cosmology.h**3
+    for ik, k in enumerate(k.value):
+        for iz, z in enumerate(redshift):
+            pzk[iz, ik] = classy_obj.pk_lin(k, z)
 
     return pzk.T
