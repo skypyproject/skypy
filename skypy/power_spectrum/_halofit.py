@@ -72,7 +72,7 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
         Input wavenumbers in units of :math:`1/Mpc`.
     z : (nz,) array_like
         Input redshifts
-    P : (nk, nz) array_like
+    P : (nz, nk) array_like
         Linear power spectrum for given wavenumbers
         and redshifts :math:`Mpc^3`.
     cosmology : astropy.cosmology.Cosmology
@@ -83,7 +83,7 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
 
     Returns
     -------
-    pknl : (nk, nz) array_like
+    pknl : (nz, nk) array_like
            Non-linear halo power spectrum in units of :math:`Mpc^3`.
 
     References
@@ -112,7 +112,7 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
     return_shape = np.shape(linear_power_spectrum)
     redshift = np.atleast_1d(redshift)
     if np.ndim(linear_power_spectrum) == 1:
-        linear_power_spectrum = linear_power_spectrum[:, np.newaxis]
+        linear_power_spectrum = linear_power_spectrum[np.newaxis, :]
 
     # Declaration of variables
     if isiterable(redshift):
@@ -141,7 +141,7 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
     lnk = np.log(wavenumber)
     k2 = np.square(wavenumber)
     k3 = np.power(wavenumber, 3)
-    dl2kz = (linear_power_spectrum.T * k3) / (2 * np.pi * np.pi)
+    dl2kz = (linear_power_spectrum * k3) / (2 * np.pi * np.pi)
 
     # Integrals required to evaluate Smith et al. 2003 equations C5, C7 & C8
     def integral_kn(lnR, n):
@@ -209,7 +209,7 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
     # Halofit non-linear power spectrum, Smith et al. 2003 equation C1
     pknl = 2 * np.pi * np.pi * (dq2 + dh2) / k3
 
-    return pknl.T.reshape(return_shape)
+    return pknl.reshape(return_shape)
 
 
 halofit_smith = partial(halofit, parameters=_smith_parameters)

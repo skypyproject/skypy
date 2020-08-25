@@ -1,50 +1,39 @@
 cosmology:
-  module: astropy.cosmology
-  function: default_cosmology.get
+  function: astropy.cosmology.default_cosmology.get
 tables:
   merger_rates:
     redshift:
-      module: skypy.galaxy.redshift
-      function: herbel_redshift
-      kwargs:
+      function: skypy.galaxy.redshift.herbel_redshift
+      args:
         alpha: -0.5
         a_phi: -2.232
         b_phi: 0.0141
         a_m: -0.610
         b_m: -20.416
         size: 1000
-      requires:
         cosmology: cosmology
     luminosity:
-      module: skypy.galaxy.luminosity
-      function: herbel_luminosities
-      kwargs:
+      function: skypy.galaxy.luminosity.herbel_luminosities
+      args:
         alpha: -0.5
         a_m: -0.610
         b_m: -20.416
-      requires:
         redshift: merger_rates.redshift
     ns_ns_rate:
-      module: skypy.gravitational_wave
-      function: b_band_merger_rate
-      kwargs:
-        population: NS-NS
-        optimism: low
-      requires:
+      function: skypy.gravitational_wave.b_band_merger_rate
+      args:
+        population: '''NS-NS'''
+        optimism: '''low'''
         luminosity: merger_rates.luminosity
     ns_bh_rate:
-      module: skypy.gravitational_wave
-      function: b_band_merger_rate
-      kwargs:
-        population: NS-BH
-        optimism: low
-      requires:
+      function: skypy.gravitational_wave.b_band_merger_rate
+      args:
+        population: '''NS-BH'''
+        optimism: '''low'''
         luminosity: merger_rates.luminosity
     bh_bh_rate:
-      module: skypy.gravitational_wave
-      function: b_band_merger_rate
-      kwargs:
-        population: BH-BH
-        optimism: low
-      requires:
+      function: skypy.gravitational_wave.b_band_merger_rate
+      args:
+        population: '''BH-BH'''
+        optimism: '''low'''
         luminosity: merger_rates.luminosity
