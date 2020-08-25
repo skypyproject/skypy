@@ -54,6 +54,7 @@ jobs:
           echo gfortran=$(which gfortran)
         fi
         # build dependencies from source
+        pip install cython
         pushd /tmp
         git clone --depth 1 https://github.com/lesgourg/class_public.git class
         pushd class
