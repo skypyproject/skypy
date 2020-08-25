@@ -46,11 +46,20 @@ jobs:
     - name: Install Dependencies
       run: |
         pip install tox
-    - if: contains(matrix.toxenv, '-all') && runner.os == 'Linux'
-      name: Install Additional Dependencies (Linux)
+    - if: contains(matrix.toxenv, '-all')
+      name: Install Additional Dependencies
       run: |
-        sudo install $(which gfortran-9) /usr/bin/gfortran
-        echo gfortran=$(which gfortran)
+        if [ '${{ runner.os }}' == 'Linux' ]; then
+          sudo install $(which gfortran-9) /usr/bin/gfortran
+          echo gfortran=$(which gfortran)
+        fi
+        # build dependencies from source
+        pushd /tmp
+        git clone --depth 1 https://github.com/lesgourg/class_public.git class
+        pushd class
+        make -j
+        popd
+        popd
     - name: Add pytest Matcher
       run: |
         echo ::add-matcher::.github/problem_matchers/pytest.json
