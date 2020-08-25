@@ -62,7 +62,7 @@ jobs:
         make -j
         popd
         # done
-        pip uninstall numpy cython classy
+        pip uninstall -y numpy cython classy
         popd
     - name: Add pytest Matcher
       run: |
