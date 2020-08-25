@@ -1,6 +1,7 @@
 import numpy as np
 from astropy.cosmology import Planck15
 from astropy.units import allclose
+from astropy import units as u
 from astropy.utils.data import get_pkg_data_filename
 import pytest
 
@@ -24,14 +25,16 @@ def test_classy():
     '''
     from skypy.power_spectrum import classy
 
+    Pl15massless = Planck15.clone(name='Planck 15 massless neutrino', m_nu=[0., 0., 0.]*u.eV)
+
     redshift = [0.0, 1.0]
     wavenumber = np.logspace(-4.0, np.log10(2.0), 200)
-    pkz = classy(wavenumber, redshift, Planck15, 2.e-9, 0.965, 10.)
+    pkz = classy(wavenumber, redshift, Pl15massless, 2.e-9, 0.965, 10.)
     assert pkz.shape == (len(wavenumber), len(redshift))
     assert allclose(pkz, test_pkz, rtol=1.e-4)
 
     # also check redshifts are ordered correctly
     redshift = [1.0, 0.0]
-    pkz = classy(wavenumber, redshift, Planck15, 2.e-9, 0.965, 10.)
+    pkz = classy(wavenumber, redshift, Pl15massless, 2.e-9, 0.965, 10.)
     assert pkz.shape == (len(wavenumber), len(redshift))
     assert allclose(pkz, test_pkz[:, np.argsort(redshift)], rtol=1.e-4)
