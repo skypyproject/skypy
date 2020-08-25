@@ -54,12 +54,15 @@ jobs:
           echo gfortran=$(which gfortran)
         fi
         # build dependencies from source
-        pip install numpy cython
         pushd /tmp
+        pip install numpy cython
+        # classy
         git clone --depth 1 https://github.com/lesgourg/class_public.git class
         pushd class
         make -j
         popd
+        # done
+        pip uninstall numpy cython classy
         popd
     - name: Add pytest Matcher
       run: |
