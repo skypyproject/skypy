@@ -1,6 +1,5 @@
 import numpy as np
 from astropy import units as u
-import pdb
 
 __all__ = [
     'classy',
