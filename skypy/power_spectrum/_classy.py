@@ -60,7 +60,7 @@ def classy(wavenumber, redshift, cosmology,
     try:
         from classy import Class
     except ImportError:
-        raise Exception("classylss is required to use skypy.linear.classy")
+        raise Exception("classy is required to use skypy.linear.classy")
 
     redshift = np.atleast_1d(redshift)
 
