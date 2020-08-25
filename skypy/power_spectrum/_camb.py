@@ -77,7 +77,7 @@ def camb(wavenumber, redshift, cosmology,
                        omch2=cosmology.Odm0 * h2,
                        omk=cosmology.Ok0,
                        TCMB=cosmology.Tcmb0.value,
-                       mnu=0.,  # for now, need to solve agreement with CLASS
+                       mnu=np.sum(cosmology.m_nu.to_value(u.eV)),
                        standard_neutrino_neff=cosmology.Neff
                        )
 
