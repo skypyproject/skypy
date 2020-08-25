@@ -11,14 +11,14 @@ test_pkz = np.loadtxt(class_result_filename, delimiter=',')
 
 # try to import the requirement, if it doesn't exist, skip test
 try:
-    __import__('classylss')
+    __import__('classy')
 except ImportError:
     CLASS_NOT_FOUND = True
 else:
     CLASS_NOT_FOUND = False
 
 
-@pytest.mark.skipif(CLASS_NOT_FOUND, reason='classylss not found')
+@pytest.mark.skipif(CLASS_NOT_FOUND, reason='classy not found')
 def test_classy():
     '''
     Test a default astropy cosmology
