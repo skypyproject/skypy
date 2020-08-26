@@ -35,6 +35,8 @@ values as keyword arguments.
 """
 
 import argparse
+from copy import deepcopy
+import numpy as np
 from skypy.pipeline.driver import SkyPyDriver
 import sys
 
@@ -50,6 +52,9 @@ def main(args=None):
                         choices=['fits', 'hdf5'], help='Table file format')
     parser.add_argument('-o', '--overwrite', action='store_true',
                         help='Whether to overwrite existing files')
+    parser.add_argument('-l', '--lightcone', nargs=3, type=int,
+                        metavar=('z_min', 'z_max', 'n_slice'),
+                        help='Lightcone simulation in redshift slices')
 
     # get system args if none passed
     if args is None:
@@ -58,6 +63,18 @@ def main(args=None):
     args = parser.parse_args(args or ['--help'])
     config = yaml.safe_load(args.config)
     config = {} if config is None else config
-    driver = SkyPyDriver()
-    driver.execute(config, file_format=args.format, overwrite=args.overwrite)
+
+    if args.lightcone:
+        args.lightcone[2] += 1
+        redshifts = np.linspace(*args.lightcone)
+        for z_min, z_max in zip(redshifts[:-1], redshifts[1:]):
+            config_z = deepcopy(config)
+            config_z['z_min'] = z_min
+            config_z['z_max'] = z_max
+            config_z['redshift'] = (z_min + z_max) / 2
+            driver = SkyPyDriver()
+            driver.execute(config_z)
+    else:
+        driver = SkyPyDriver()
+        driver.execute(config, file_format=args.format, overwrite=args.overwrite)
     return(0)
