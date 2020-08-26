@@ -1,6 +1,5 @@
 import numpy as np
 from astropy.cosmology import Planck15
-from astropy.units import allclose
 from astropy import units as u
 from astropy.utils.data import get_pkg_data_filename
 import pytest
