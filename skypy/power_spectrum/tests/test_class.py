@@ -1,5 +1,6 @@
 import numpy as np
 from astropy.cosmology import Planck15
+from astropy.units import allclose
 from astropy import units as u
 from astropy.utils.data import get_pkg_data_filename
 import pytest
@@ -38,4 +39,4 @@ def test_classy():
     pkz = classy(wavenumber, redshift, Pl15massless, 2.e-9, 0.965, 10.)
     assert pkz.shape == (len(wavenumber), len(redshift))
     #np.testing.assert_almost_equal(pkz, test_pkz[:, np.argsort(redshift)], decimal=4)
-    assert allclose(pkz, test_pkz[np.argsort(redshift), :], rtol=1.e-4)
+    assert allclose(pkz, test_pkz[:, np.argsort(redshift)], rtol=1.e-4)
