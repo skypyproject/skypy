@@ -10,8 +10,6 @@ class_result_filename = get_pkg_data_filename('data/class_result.txt')
 test_pkz = np.loadtxt(class_result_filename, delimiter=',')
 
 # try to import the requirement, if it doesn't exist, skip test
-import classy
-
 try:
     __import__('classy')
 except ImportError:
