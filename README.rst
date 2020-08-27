@@ -61,7 +61,7 @@ examples_ of config files in yaml format to download and run. For example:
 
 .. code:: bash
 
-    skypy –config examples/herbel_galaxies.yaml –format fits
+    skypy examples/herbel_galaxies.yaml –-format fits
 
 will generate tables of red and blue galaxies following the model described in
 `Herbel et al. 2017`_ and write them in FITS format.
