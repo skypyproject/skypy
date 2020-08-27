@@ -12,7 +12,7 @@ def test_driver():
 
     # Evaluate and store the default astropy cosmology.
     config = {'test_cosmology': {
-                'function': 'astropy.cosmology.default_cosmology.get'}}
+                'astropy.cosmology.default_cosmology.get': []}}
 
     driver = SkyPyDriver()
     driver.execute(config)
@@ -25,17 +25,13 @@ def test_driver():
     config = {'tables': {
                 'test_table': {
                   'column1': {
-                    'function': 'numpy.random.uniform',
-                    'args': {
+                    'numpy.random.uniform': {
                       'size': size}},
                   'column2': {
-                    'function': 'numpy.random.uniform',
-                    'args': {
+                    'numpy.random.uniform': {
                       'low': 'test_table.column1'}},
                   'column3': {
-                      'function': 'list',
-                      'args': [
-                        string]}}}}
+                      'list': [string]}}}}
 
     driver = SkyPyDriver()
     driver.execute(config, file_format='fits')
@@ -52,32 +48,32 @@ def test_driver():
     # Check that the existing output files are modified if overwrite is True
     new_size = 2 * size
     new_string = '"' + new_size*'a' + '"'
-    config['tables']['test_table']['column1']['args']['size'] = new_size
-    config['tables']['test_table']['column3']['args'][0] = new_string
+    config['tables']['test_table']['column1']['numpy.random.uniform']['size'] = new_size
+    config['tables']['test_table']['column3']['list'][0] = new_string
     driver = SkyPyDriver()
     driver.execute(config, file_format='fits', overwrite=True)
     with fits.open('test_table.fits') as hdu:
         assert len(hdu[1].data) == new_size
 
     # Check for failure if 'column1' calls a nonexistant module
-    config['tables']['test_table']['column1']['function'] = 'nomodule.function'
+    config['tables']['test_table']['column1'] = {'nomodule.function': []}
     with pytest.raises(ModuleNotFoundError):
         SkyPyDriver().execute(config)
 
     # Check for failure if 'column1' calls a nonexistant function
-    config['tables']['test_table']['column1']['function'] = 'builtins.nofunction'
+    config['tables']['test_table']['column1'] = {'builtins.nofunction': []}
     with pytest.raises(AttributeError):
         SkyPyDriver().execute(config)
 
     # Check for failure if 'column1' requires itself creating a cyclic
     # dependency graph
-    config['tables']['test_table']['column1']['args'] = {'low': 'test_table.column1'}
+    config['tables']['test_table']['column1'] = {'list': ['test_table.column1']}
     with pytest.raises(networkx.NetworkXUnfeasible):
         SkyPyDriver().execute(config)
 
     # Check for failure if 'column1' and 'column2' both require each other
     # creating a cyclic dependency graph
-    config['tables']['test_table']['column1']['args'] = {'low': 'test_table.column2'}
+    config['tables']['test_table']['column1'] = {'list': ['test_table.column2']}
     with pytest.raises(networkx.NetworkXUnfeasible):
         SkyPyDriver().execute(config)
 
@@ -102,13 +98,9 @@ def test_driver():
 
     # Check variables intialised by function
     config = {'test_func': {
-                'function': 'list',
-                'args': [
-                    '"hello world"']},
+                'list': ['"hello world"']},
               'test_func2': {
-                'function': 'len',
-                'args': [
-                    'test_func']}}
+                'len': ['test_func']}}
     driver = SkyPyDriver()
     driver.execute(config)
     assert driver.test_func == list('hello world')

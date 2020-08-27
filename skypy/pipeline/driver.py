@@ -94,7 +94,7 @@ class SkyPyDriver:
         # table_config contains settings for all table columns
         config = deepcopy(configuration)
         table_config = config.pop('tables', {})
-        default_table = {'function': 'astropy.table.Table'}
+        default_table = {'astropy.table.Table': []}
         config.update({k: v.pop('init', default_table)
                       for k, v in table_config.items()})
 
@@ -103,7 +103,7 @@ class SkyPyDriver:
 
         # Variables initialised by value don't require function evaluations
         def isfunction(f):
-            return isinstance(f, Mapping) and 'function' in f
+            return isinstance(f, Mapping)
         variables = {k: v for k, v in config.items() if not isfunction(v)}
         for v in variables:
             dag.add_node(v)
@@ -121,11 +121,11 @@ class SkyPyDriver:
 
         # Add edges for all requirements and dependencies
         def deps(settings):
-            deps = settings.get('depends', [])
-            args = settings.get('args', [])
-            for k, v in _items(args):
-                if isinstance(v, str) and not _is_string_argument(v):
-                    deps.append(v)
+            deps = settings.pop('depends', [])
+            for function, args in settings.items():
+                for k, v in _items(args):
+                    if isinstance(v, str) and not _is_string_argument(v):
+                        deps.append(v)
             return deps
         for job, settings in config.items():
             dag.add_edges_from((d, job) for d in deps(settings))
@@ -157,38 +157,38 @@ class SkyPyDriver:
                 getattr(self, table).write(filename, overwrite=overwrite)
 
     def _call_from_config(self, config):
+        for function, args in config.items():
 
-        # Import function
-        function_path = config.get('function').split('.')
-        module = builtins
-        for i, key in enumerate(function_path[:-1]):
-            if not hasattr(module, key):
-                module_name = '.'.join(function_path[:i+1])
-                try:
-                    module = import_module(module_name)
-                except ModuleNotFoundError:
-                    raise ModuleNotFoundError(module_name)
-            else:
-                module = getattr(module, key)
-        function = getattr(module, function_path[-1])
-
-        # Parse arguments
-        args = config.get('args', [])
-        for k, v in _items(args):
-            if isinstance(v, str):
-                if _is_string_argument(v):
-                    args[k] = _parse_string_argument(v)
+            # Import function
+            function_path = function.split('.')
+            module = builtins
+            for i, key in enumerate(function_path[:-1]):
+                if not hasattr(module, key):
+                    module_name = '.'.join(function_path[:i+1])
+                    try:
+                        module = import_module(module_name)
+                    except ModuleNotFoundError:
+                        raise ModuleNotFoundError(module_name)
                 else:
-                    # get variable or table column
-                    args[k] = self[v]
+                    module = getattr(module, key)
+            function = getattr(module, function_path[-1])
 
-        # Call function
-        if isinstance(args, Mapping):
-            result = function(**args)
-        else:
-            result = function(*args)
+            # Parse arguments
+            for k, v in _items(args):
+                if isinstance(v, str):
+                    if _is_string_argument(v):
+                        args[k] = _parse_string_argument(v)
+                    else:
+                        # get variable or table column
+                        args[k] = self[v]
 
-        return result
+            # Call function
+            if isinstance(args, Mapping):
+                result = function(**args)
+            else:
+                result = function(*args)
+
+            return result
 
     def __getitem__(self, label):
         name, key = re.search(r'^(\w*)\.?(\w*)$', label).groups()
