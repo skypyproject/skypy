@@ -78,6 +78,10 @@ def main(args=None):
             driver.execute(config_z)
             for k, v in tables.items():
                 tables[k] = vstack((v, driver[k]))
+        if args.format:
+            for name, table in tables.items():
+                filename = '.'.join((name, args.format))
+                table.write(filename, overwrite=args.overwrite)
     else:
         driver = SkyPyDriver()
         driver.execute(config, file_format=args.format, overwrite=args.overwrite)
