@@ -35,6 +35,7 @@ values as keyword arguments.
 """
 
 import argparse
+from astropy.table import Table, vstack
 from copy import deepcopy
 import numpy as np
 from skypy.pipeline.driver import SkyPyDriver
@@ -67,6 +68,7 @@ def main(args=None):
     if args.lightcone:
         args.lightcone[2] += 1
         redshifts = np.linspace(*args.lightcone)
+        tables = {k: Table() for k in config.get('tables', {}).keys()}
         for z_min, z_max in zip(redshifts[:-1], redshifts[1:]):
             config_z = deepcopy(config)
             config_z['z_min'] = z_min
@@ -74,6 +76,8 @@ def main(args=None):
             config_z['redshift'] = (z_min + z_max) / 2
             driver = SkyPyDriver()
             driver.execute(config_z)
+            for k, v in tables.items():
+                tables[k] = vstack((v, driver[k]))
     else:
         driver = SkyPyDriver()
         driver.execute(config, file_format=args.format, overwrite=args.overwrite)
