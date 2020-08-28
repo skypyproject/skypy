@@ -41,24 +41,18 @@ class SkyPyDriver:
     and using their results to generate variables and tables.
     '''
 
-    def execute(self, configuration, file_format=None, overwrite=False):
+    def execute(self, configuration):
         r'''Run a pipeline.
 
         This function runs a pipeline of functions to generate variables and
         the columns of a set of tables. It uses a Directed Acyclic Graph to
         determine a non-blocking order of execution that resolves any
-        dependencies, see [1]_. Tables can optionally be written to file.
+        dependencies, see [1]_.
 
         Parameters
         ----------
         configuration : dict-like
             Configuration for the pipeline.
-        file_format : str
-            File format used to write tables. Files are written using the
-            Astropy unified file read/write interface; see [2]_ for supported
-            file formats. If None (default) tables are not written to file.
-        overwrite : bool
-            Whether to overwrite any existing files without warning.
 
         Notes
         -----
@@ -81,13 +75,12 @@ class SkyPyDriver:
         not specificed the table will be initialised as an empty astropy Table
         by default.
 
-        See [3]_ for examples of pipeline configurations in YAML format.
+        See [2]_ for examples of pipeline configurations in YAML format.
 
         References
         ----------
         .. [1] https://networkx.github.io/documentation/stable/
-        .. [2] https://docs.astropy.org/en/stable/io/unified.html
-        .. [3] https://github.com/skypyproject/skypy/tree/master/examples
+        .. [2] https://github.com/skypyproject/skypy/tree/master/examples
         '''
 
         # config contains settings for all variables and table initialisation
@@ -149,12 +142,6 @@ class SkyPyDriver:
                 table, column = job.split('.')
                 settings = table_config[table][column]
                 getattr(self, table)[column] = self._call_from_config(settings)
-
-        # Write tables to file
-        if file_format:
-            for table in table_config.keys():
-                filename = '.'.join((table, file_format))
-                getattr(self, table).write(filename, overwrite=overwrite)
 
     def _call_from_config(self, config):
 
