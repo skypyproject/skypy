@@ -80,13 +80,15 @@ def main(args=None):
         z = [z_at_value(cosmology.comoving_distance, c, z_min, z_max) for c in chi[1:-1]]
         z_mid = [z_at_value(cosmology.comoving_distance, c, z_min, z_max) for c in chi_mid]
         redshift_slices = zip([z_min] + z, z + [z_max], z_mid)
+        config['lightcone_z_min'] = z_min
+        config['lightcone_z_max'] = z_max
 
         tables = {k: Table() for k in config.get('tables', {}).keys()}
         for z_min, z_max, z in redshift_slices:
             config_z = deepcopy(config)
-            config_z['z_min'] = z_min
-            config_z['z_max'] = z_max
-            config_z['redshift'] = z
+            config_z['slice_z_min'] = z_min
+            config_z['slice_z_max'] = z_max
+            config_z['slice_z_mid'] = z
             driver = SkyPyDriver()
             driver.execute(config_z)
             for k, v in tables.items():
