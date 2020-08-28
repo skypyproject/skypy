@@ -175,7 +175,7 @@ class SkyPyDriver:
 
         # handle lists by recursion
         if isinstance(field, Sequence):
-            return sum([self._call_from_config(item) for item in field], [])
+            return [self._call_from_config(item) for item in field]
 
         # handle functions == dicts
         if isinstance(field, Mapping):

@@ -87,7 +87,7 @@ def test_driver():
     config = {'test_int': 1,
               'test_float': 1.0,
               'test_string': LiteralValue('hello world'),
-              'test_list': [0, 'one', 2.],
+              'test_list': [0, LiteralValue('one'), 2.],
               'test_dict': LiteralValue({'a': 'b'})}
     driver = SkyPyDriver()
     driver.execute(config)
