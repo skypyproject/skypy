@@ -76,15 +76,17 @@ def main(args=None):
         chi_min = cosmology.comoving_distance(z_min)
         chi_max = cosmology.comoving_distance(z_max)
         chi = np.linspace(chi_min, chi_max, n_slice + 1)
+        chi_mid = (chi[:-1] + chi[1:]) / 2
         z = [z_at_value(cosmology.comoving_distance, c, z_min, z_max) for c in chi[1:-1]]
-        redshifts = [z_min] + z + [z_max]
+        z_mid = [z_at_value(cosmology.comoving_distance, c, z_min, z_max) for c in chi_mid]
+        redshift_slices = zip([z_min] + z, z + [z_max], z_mid)
 
         tables = {k: Table() for k in config.get('tables', {}).keys()}
-        for z_min, z_max in zip(redshifts[:-1], redshifts[1:]):
+        for z_min, z_max, z in redshift_slices:
             config_z = deepcopy(config)
             config_z['z_min'] = z_min
             config_z['z_max'] = z_max
-            config_z['redshift'] = (z_min + z_max) / 2
+            config_z['redshift'] = z
             driver = SkyPyDriver()
             driver.execute(config_z)
             for k, v in tables.items():
