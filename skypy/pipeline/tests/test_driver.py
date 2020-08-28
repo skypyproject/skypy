@@ -106,6 +106,17 @@ def test_driver():
     assert driver.test_func == list('hello world')
     assert driver.test_func2 == 9
 
+    # Check references with default values
+    config = {'test_func_1': ('numpy.size', ('test_nonexistant', [1, 2, 3])),
+              'test_func_2': ('numpy.size', [('test_nonexistant', [1, 2, 3])]),
+              'test_func_3': ('numpy.size', {
+                'a': ('test_nonexistant', [1, 2, 3])})}
+    driver = SkyPyDriver()
+    driver.execute(config)
+    assert driver.test_func_1 == 3
+    assert driver.test_func_2 == 3
+    assert driver.test_func_3 == 3
+
 
 def teardown_module(module):
 

@@ -15,16 +15,6 @@ __all__ = [
 ]
 
 
-def _items(a):
-    '''return keys and values for dict or list'''
-    if isinstance(a, dict):
-        return a.items()
-    elif isinstance(a, list):
-        return enumerate(a)
-    else:
-        return ()
-
-
 class SkyPyDriver:
     r'''Class for running pipelines.
 
@@ -185,25 +175,35 @@ class SkyPyDriver:
                 module = getattr(module, key)
         function = getattr(module, function_path[-1])
 
-        # Parse arguments
-        for k, v in _items(args):
-            if isinstance(v, tuple):
-                # tuple is a reference (label, [default value])
-                try:
-                    value = self[v[0]]
-                except KeyError:
-                    if len(v) > 1:
-                        value = v[1]
-                    else:
-                        raise KeyError(v[0])
-                args[k] = value
-
-        # Call function
+        # parse arguments and call function
+        # can be kwargs, args, or value
         if isinstance(args, dict):
+            # kwargs
+            for k, v in args.items():
+                if isinstance(v, tuple):
+                    try:
+                        value = self[v[0]]
+                    except:
+                        value = v[1]
+                    args[k] = value
             result = function(**args)
         elif isinstance(args, list):
+            # args
+            for k, v in enumerate(args):
+                if isinstance(v, tuple):
+                    try:
+                        value = self[v[0]]
+                    except:
+                        value = v[1]
+                    args[k] = value
             result = function(*args)
         else:
+            # value
+            if isinstance(args, tuple):
+                try:
+                    args = self[args[0]]
+                except:
+                    args = args[1]
             result = function(args)
 
         return result
