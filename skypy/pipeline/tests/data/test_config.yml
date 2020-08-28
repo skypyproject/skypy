@@ -1,24 +1,19 @@
 test_int: 1
 test_float: 1.0
-test_str: !str hello world
-test_cosmology:
-  astropy.cosmology.FlatLambdaCDM:
-    H0: 67.74
-    Om0: 0.3075
+test_str: hello world
+test_cosmology: !astropy.cosmology.FlatLambdaCDM
+  H0: 67.74
+  Om0: 0.3075
 tables:
   test_table_1:
-    test_column_1:
-      numpy.random.uniform:
-        size: 10
-    test_column_2:
-      numpy.random.uniform:
-        low: test_table_1.test_column_1
-    test_column_3:
-      numpy.random.uniform:
-        low: test_table_1.test_column_1
-        high: test_table_1.test_column_2
+    test_column_1: !numpy.random.uniform
+      size: 10
+    test_column_2: !numpy.random.uniform
+      low: !test_table_1.test_column_1
+    test_column_3: !numpy.random.uniform
+      low: !test_table_1.test_column_1
+      high: !test_table_1.test_column_2
   test_table_2:
-    init:
-      depends: [test_table_1.complete]
-      astropy.table.QTable:
-        names: ['column_1', 'column_2']
+    .init: !astropy.table.QTable
+      .depends: test_table_1.complete
+      names: ['column_1', 'column_2']

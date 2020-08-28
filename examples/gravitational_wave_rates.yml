@@ -1,34 +1,28 @@
-cosmology:
-  astropy.cosmology.default_cosmology.get: []
+cosmology: !astropy.cosmology.default_cosmology.get
 tables:
   merger_rates:
-    redshift:
-      skypy.galaxy.redshift.herbel_redshift:
-        alpha: -0.5
-        a_phi: -2.232
-        b_phi: 0.0141
-        a_m: -0.610
-        b_m: -20.416
-        size: 1000
-        cosmology: cosmology
-    luminosity:
-      skypy.galaxy.luminosity.herbel_luminosities:
-        alpha: -0.5
-        a_m: -0.610
-        b_m: -20.416
-        redshift: merger_rates.redshift
-    ns_ns_rate:
-      skypy.gravitational_wave.b_band_merger_rate:
-        population: !str NS-NS
-        optimism: !str low
-        luminosity: merger_rates.luminosity
-    ns_bh_rate:
-      skypy.gravitational_wave.b_band_merger_rate:
-        population: !str NS-BH
-        optimism: !str low
-        luminosity: merger_rates.luminosity
-    bh_bh_rate:
-      skypy.gravitational_wave.b_band_merger_rate:
-        population: !str BH-BH
-        optimism: !str low
-        luminosity: merger_rates.luminosity
+    redshift: !skypy.galaxy.redshift.herbel_redshift
+      alpha: -0.5
+      a_phi: -2.232
+      b_phi: 0.0141
+      a_m: -0.610
+      b_m: -20.416
+      size: 1000
+      cosmology: !cosmology
+    luminosity: !skypy.galaxy.luminosity.herbel_luminosities
+      alpha: -0.5
+      a_m: -0.610
+      b_m: -20.416
+      redshift: !merger_rates.redshift
+    ns_ns_rate: !skypy.gravitational_wave.b_band_merger_rate
+      population: NS-NS
+      optimism: low
+      luminosity: !merger_rates.luminosity
+    ns_bh_rate: !skypy.gravitational_wave.b_band_merger_rate
+      population: NS-BH
+      optimism: low
+      luminosity: !merger_rates.luminosity
+    bh_bh_rate: !skypy.gravitational_wave.b_band_merger_rate
+      population: BH-BH
+      optimism: low
+      luminosity: !merger_rates.luminosity
