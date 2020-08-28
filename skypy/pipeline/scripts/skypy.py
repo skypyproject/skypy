@@ -35,6 +35,7 @@ values as keyword arguments.
 """
 
 import argparse
+from astropy.cosmology import z_at_value
 from astropy.table import Table, vstack
 from copy import deepcopy
 import numpy as np
@@ -53,7 +54,7 @@ def main(args=None):
                         choices=['fits', 'hdf5'], help='Table file format')
     parser.add_argument('-o', '--overwrite', action='store_true',
                         help='Whether to overwrite existing files')
-    parser.add_argument('-l', '--lightcone', nargs=3, type=int,
+    parser.add_argument('-l', '--lightcone', nargs=3,
                         metavar=('z_min', 'z_max', 'n_slice'),
                         help='Lightcone simulation in redshift slices')
 
@@ -66,8 +67,18 @@ def main(args=None):
     config = {} if config is None else config
 
     if args.lightcone:
-        args.lightcone[2] += 1
-        redshifts = np.linspace(*args.lightcone)
+
+        # Equally spaced comoving distance slices and corresponding redshifts
+        cosmology = SkyPyDriver()._call_from_config(config.get('cosmology'))
+        z_min = float(args.lightcone[0])
+        z_max = float(args.lightcone[1])
+        n_slice = int(args.lightcone[2])
+        chi_min = cosmology.comoving_distance(z_min)
+        chi_max = cosmology.comoving_distance(z_max)
+        chi = np.linspace(chi_min, chi_max, n_slice + 1)
+        z = [z_at_value(cosmology.comoving_distance, c, z_min, z_max) for c in chi[1:-1]]
+        redshifts = [z_min] + z + [z_max]
+
         tables = {k: Table() for k in config.get('tables', {}).keys()}
         for z_min, z_max in zip(redshifts[:-1], redshifts[1:]):
             config_z = deepcopy(config)
