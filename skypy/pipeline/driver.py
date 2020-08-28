@@ -9,7 +9,6 @@ from copy import deepcopy
 from importlib import import_module
 import builtins
 import networkx
-import re
 
 
 __all__ = [
