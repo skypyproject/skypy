@@ -1,6 +1,6 @@
 test_int: 1
 test_float: 1.0
-test_str: hello world
+test_str: !str hello world
 test_cosmology:
   astropy.cosmology.FlatLambdaCDM:
     H0: 67.74

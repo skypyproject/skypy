@@ -4,7 +4,7 @@ This module provides methods to run pipelines of functions with dependencies
 and handle their results.
 """
 
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from copy import deepcopy
 from importlib import import_module
 import builtins
@@ -14,6 +14,7 @@ import re
 
 __all__ = [
     'SkyPyDriver',
+    'LiteralValue',
 ]
 
 
@@ -24,14 +25,11 @@ def _items(a):
     return enumerate(a)
 
 
-def _is_string_argument(s):
-    # string arguments are enclosed in either single or double quotation marks
-    return s[0] in '"\'' and s[0] == s[-1]
+class LiteralValue:
+    '''Tag that marks fields as literal variables.'''
 
-
-def _parse_string_argument(s):
-    # strip nested quotes from literal string
-    return s[1:-1]
+    def __init__(self, value):
+        self.value = value
 
 
 class SkyPyDriver:
@@ -101,14 +99,6 @@ class SkyPyDriver:
         # Create a Directed Acyclic Graph of all jobs and dependencies
         dag = networkx.DiGraph()
 
-        # Variables initialised by value don't require function evaluations
-        def isfunction(f):
-            return isinstance(f, Mapping)
-        variables = {k: v for k, v in config.items() if not isfunction(v)}
-        for v in variables:
-            dag.add_node(v)
-            setattr(self, v, config.pop(v))
-
         # Add nodes for each variable, table and column
         for job in config:
             dag.add_node(job)
@@ -119,16 +109,32 @@ class SkyPyDriver:
                 job = '.'.join((table, column))
                 dag.add_node(job)
 
+        # this function returns the dependencies given a field
+        def deps(field):
+            # strings specify dependencies
+            if isinstance(field, str):
+                return [field]
+            # dicts specify function calls
+            if isinstance(field, Mapping):
+                d = field.pop('depends', [])
+                for args in field.values():
+                    for k, v in _items(args):
+                        # string arguments are dependencies
+                        if isinstance(v, str):
+                            d.append(v)
+                return d
+            # recurse over lists
+            if isinstance(field, Sequence):
+                return sum([deps(item) for item in field], [])
+            # everything else has no dependencies
+            return []
+
         # Add edges for all requirements and dependencies
-        def deps(settings):
-            deps = settings.pop('depends', [])
-            for function, args in settings.items():
-                for k, v in _items(args):
-                    if isinstance(v, str) and not _is_string_argument(v):
-                        deps.append(v)
-            return deps
         for job, settings in config.items():
-            dag.add_edges_from((d, job) for d in deps(settings))
+            for d in deps(settings):
+                if not dag.has_node(d):
+                    raise KeyError(d)
+                dag.add_edge(d, job)
         for table, columns in table_config.items():
             table_complete = '.'.join((table, 'complete'))
             dag.add_edge(table, table_complete)
@@ -136,11 +142,14 @@ class SkyPyDriver:
                 job = '.'.join((table, column))
                 dag.add_edge(table, job)
                 dag.add_edge(job, table_complete)
-                dag.add_edges_from((d, job) for d in deps(settings))
+                for d in deps(settings):
+                    if not dag.has_node(d):
+                        raise KeyError(d)
+                    dag.add_edge(d, job)
 
         # Execute jobs in order that resolves dependencies
         for job in networkx.topological_sort(dag):
-            if job in variables or job.endswith('.complete'):
+            if job.endswith('.complete'):
                 continue
             elif job in config:
                 settings = config.get(job)
@@ -156,41 +165,60 @@ class SkyPyDriver:
                 filename = '.'.join((table, file_format))
                 getattr(self, table).write(filename, overwrite=overwrite)
 
-    def _call_from_config(self, config):
-        for function, args in config.items():
+    def _call_from_config(self, field):
+        # handle explicit variables
+        if isinstance(field, LiteralValue):
+            return field.value
 
-            # Import function
-            function_path = function.split('.')
-            module = builtins
-            for i, key in enumerate(function_path[:-1]):
-                if not hasattr(module, key):
-                    module_name = '.'.join(function_path[:i+1])
-                    try:
-                        module = import_module(module_name)
-                    except ModuleNotFoundError:
-                        raise ModuleNotFoundError(module_name)
-                else:
-                    module = getattr(module, key)
-            function = getattr(module, function_path[-1])
+        # handle references == strings
+        if isinstance(field, str):
+            return self[field]
 
-            # Parse arguments
-            for k, v in _items(args):
-                if isinstance(v, str):
-                    if _is_string_argument(v):
-                        args[k] = _parse_string_argument(v)
+        # handle lists by recursion
+        if isinstance(field, Sequence):
+            return sum([self._call_from_config(item) for item in field], [])
+
+        # handle functions == dicts
+        if isinstance(field, Mapping):
+
+            # calls only the first function in dict really
+            for function, args in field.items():
+
+                # import function
+                function_path = function.split('.')
+                module = builtins
+                for i, key in enumerate(function_path[:-1]):
+                    if not hasattr(module, key):
+                        module_name = '.'.join(function_path[:i+1])
+                        try:
+                            module = import_module(module_name)
+                        except ModuleNotFoundError:
+                            raise ModuleNotFoundError(module_name)
                     else:
-                        # get variable or table column
+                        module = getattr(module, key)
+                function = getattr(module, function_path[-1])
+
+                # Parse arguments
+                for k, v in _items(args):
+                    if isinstance(v, str):
+                        # strings are references
                         args[k] = self[v]
+                    elif isinstance(v, LiteralValue):
+                        # literal variable
+                        args[k] = v.value
 
-            # Call function
-            if isinstance(args, Mapping):
-                result = function(**args)
-            else:
-                result = function(*args)
+                # Call function
+                if isinstance(args, Mapping):
+                    result = function(**args)
+                else:
+                    result = function(*args)
 
-            return result
+                return result
+
+        # handle everything else by returning it
+        return field
 
     def __getitem__(self, label):
-        name, key = re.search(r'^(\w*)\.?(\w*)$', label).groups()
+        name, _, key = label.partition('.')
         item = getattr(self, name)
         return item[key] if key else item

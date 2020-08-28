@@ -19,16 +19,16 @@ tables:
         redshift: merger_rates.redshift
     ns_ns_rate:
       skypy.gravitational_wave.b_band_merger_rate:
-        population: '''NS-NS'''
-        optimism: '''low'''
+        population: !str NS-NS
+        optimism: !str low
         luminosity: merger_rates.luminosity
     ns_bh_rate:
       skypy.gravitational_wave.b_band_merger_rate:
-        population: '''NS-BH'''
-        optimism: '''low'''
+        population: !str NS-BH
+        optimism: !str low
         luminosity: merger_rates.luminosity
     bh_bh_rate:
       skypy.gravitational_wave.b_band_merger_rate:
-        population: '''BH-BH'''
-        optimism: '''low'''
+        population: !str BH-BH
+        optimism: !str low
         luminosity: merger_rates.luminosity

@@ -35,8 +35,16 @@ values as keyword arguments.
 """
 
 import argparse
-from skypy.pipeline.driver import SkyPyDriver
+from skypy.pipeline.driver import SkyPyDriver, LiteralValue
 import sys
+
+
+def literal_str(loader, node):
+    return LiteralValue(str(node.value))
+
+
+def literal_dict(loader, node):
+    return LiteralValue(dict(node.value))
 
 
 def main(args=None):
@@ -54,6 +62,10 @@ def main(args=None):
     # get system args if none passed
     if args is None:
         args = sys.argv[1:]
+
+    # register custom tags
+    yaml.SafeLoader.add_constructor('!str', literal_str)
+    yaml.SafeLoader.add_constructor('!dict', literal_dict)
 
     args = parser.parse_args(args or ['--help'])
     config = yaml.safe_load(args.config)
