@@ -88,7 +88,8 @@ def test_driver():
               'test_float': 1.0,
               'test_string': LiteralValue('hello world'),
               'test_list': [0, LiteralValue('one'), 2.],
-              'test_dict': LiteralValue({'a': 'b'})}
+              'test_dict': LiteralValue({'a': 'b'}),
+              'test_ref': 'test_int'}
     driver = SkyPyDriver()
     driver.execute(config)
     assert isinstance(driver.test_int, int)
@@ -96,11 +97,13 @@ def test_driver():
     assert isinstance(driver.test_string, str)
     assert isinstance(driver.test_list, list)
     assert isinstance(driver.test_dict, dict)
+    assert isinstance(driver.test_ref, int)
     assert driver.test_int == 1
     assert driver.test_float == 1.0
     assert driver.test_string == 'hello world'
     assert driver.test_list == [0, 'one', 2.]
     assert driver.test_dict == {'a': 'b'}
+    assert driver.test_ref == 1
 
     # Check variables intialised by function
     config = {'test_func': {
