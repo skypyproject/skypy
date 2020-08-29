@@ -176,39 +176,24 @@ class SkyPyDriver:
         function = getattr(module, function_path[-1])
 
         # parse arguments and call function
-        # can be kwargs, args, or value
-        if isinstance(args, dict):
-            # kwargs
-            for k, v in args.items():
+        if isinstance(args, (dict, list)):
+            # kwargs or args
+            for k, v in args.items() if isinstance(args, dict) else enumerate(args):
                 if isinstance(v, tuple):
-                    try:
-                        value = self[v[0]]
-                    except:
-                        value = v[1]
-                    args[k] = value
-            result = function(**args)
-        elif isinstance(args, list):
-            # args
-            for k, v in enumerate(args):
-                if isinstance(v, tuple):
-                    try:
-                        value = self[v[0]]
-                    except:
-                        value = v[1]
-                    args[k] = value
-            result = function(*args)
+                    args[k] = self.get(*v)
+            result = function(**args) if isinstance(args, dict) else function(*args)
         else:
             # value
             if isinstance(args, tuple):
-                try:
-                    args = self[args[0]]
-                except:
-                    args = args[1]
+                args = self.get(*args)
             result = function(args)
 
         return result
 
-    def __getitem__(self, label):
+    def get(self, label, default=None):
         name, _, key = label.partition('.')
-        item = getattr(self, name)
-        return item[key] if key else item
+        try:
+            item = getattr(self, name)
+            return item[key] if key else item
+        except (KeyError, AttributeError):
+            return default
