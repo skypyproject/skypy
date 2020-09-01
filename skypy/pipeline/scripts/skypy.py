@@ -44,6 +44,9 @@ def yaml_tag(loader, tag, node):
 
     tags are stored as a tuple `(tag, value)`
     '''
+
+    import yaml
+
     if isinstance(node, yaml.ScalarNode):
         value = loader.construct_scalar(node)
     elif isinstance(node, yaml.SequenceNode):
@@ -52,9 +55,11 @@ def yaml_tag(loader, tag, node):
         value = loader.construct_mapping(node)
     else:
         value = None
+
     # tags without arguments have empty string value
     if value == '':
         return tag,
+
     return tag, value
 
 
