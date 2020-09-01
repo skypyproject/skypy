@@ -60,12 +60,3 @@ jobs:
     - if: contains(matrix.toxenv, '-cov')
       name: Report Coverage
       uses: codecov/codecov-action@v1
-    - if: contains(matrix.toxenv, '-cov')
-      name: Report Coverage
-      uses: paambaati/codeclimate-action@v2.6.0
-      env:
-        CC_TEST_REPORTER_ID: 31b8f5884f7bcfb65aa7db49a58daf6ff31b6eb3fea005dd5419e344e3e69ab4
-      with:
-        coverageCommand: touch coverage.xml
-        coverageLocations: coverage.xml:coverage.py
-        prefix: /${{ github.workspace }}/.tox/${{ matrix.toxenv }}/lib/python${{ matrix.python }}/site-packages/
