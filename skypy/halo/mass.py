@@ -328,6 +328,28 @@ def _subhalo_amplitude(M, params):
     return subhalo_fraction0 / (beta * gamma(2.0 - alpha) * (1.0 - gammaincc(2.0 - alpha, x_cut)))
 
 
+def _number_subhalos(mass_parents, m_min, params):
+    # len(mass_parents) = len(nsubhalos)
+    # output_array[i] = number of subhalos for parent halo number i
+    subhalo_fraction0, alpha, beta, mcut = params
+    nsubhalos = np.zeros(len(mass_parents))
+    mass_parents = np.atleast_1d(mass_parents)
+    i = 0
+    for M in mass_parents:
+        m_star = beta * M
+        x_low = m_min / m_star
+        # The mean number of subhalos above a mass threshold
+        # can be obtained by integrating equation (3) in [1]
+        n_subhalos = _subhalo_amplitude(M, params) * \
+        gammaincc(1.0 - alpha, x_low) * gamma(1.0 - alpha)
+
+        # Random number of subhalos following a Poisson distribution
+        # with mean n_subhalos
+        nsubhalos[i] = np.random.poisson(n_subhalos)
+        i += 1
+    return nsubhalos
+
+
 def subhalo_mass_sampler(m_min, m_max, resolution,
                          halo_mass, params):
     r'''Subhalo mass sampler.
@@ -351,7 +373,7 @@ def subhalo_mass_sampler(m_min, m_max, resolution,
 
     Returns
     --------
-    sample: List
+    sample: array_like
         Samples drawn from the mass function, in units of solar masses.
 
     Examples
@@ -372,11 +394,12 @@ def subhalo_mass_sampler(m_min, m_max, resolution,
     '''
 
     subhalo_fraction0, alpha, beta, mcut = params
-    A = _subhalo_amplitude(halo_mass, params)
 
     halo_mass = np.atleast_1d(halo_mass)
     subhalo_sample_list = []
     for M in halo_mass:
+        # Amplitude
+        A = _subhalo_amplitude(M, params)
         # Characteristic M*
         m_star = beta * M
         x_low = m_min / m_star
@@ -397,6 +420,6 @@ def subhalo_mass_sampler(m_min, m_max, resolution,
 
         schechter_sampling = A * schechter(alpha, x_min, x_max, resolution,
                                            size=n_sh_poisson, scale=m_star)
-        subhalo_sample_list = subhalo_sample_list.append(schechter_sampling)
+        subhalo_sample_list = np.append(subhalo_sample_list, schechter_sampling)
 
     return subhalo_sample_list
