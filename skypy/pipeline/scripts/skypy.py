@@ -53,8 +53,6 @@ def yaml_tag(loader, tag, node):
         value = loader.construct_sequence(node)
     elif isinstance(node, yaml.MappingNode):
         value = loader.construct_mapping(node)
-    else:
-        value = None
 
     # tags without arguments have empty string value
     if value == '':
