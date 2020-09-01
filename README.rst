@@ -2,20 +2,78 @@
 SkyPy: A package for modelling the Universe
 ===========================================
 
-|Zenodo Badge| |Astropy Badge| |Test Status| |Coverage Status| |PyPI Status| |Documentation Status|
+|Zenodo Badge| |Astropy Badge| |Test Status| |Coverage Status| |PyPI Status| |Anaconda Status| |Documentation Status|
 
 This package contains methods for modelling the Universe, galaxies and the Milky
 Way. Also included are methods for generating observed data.
 
+* Galaxy_ morphology, luminosity and redshift distributions
+* Halo_ and subhalo mass distributions
+* `Gravitational Wave`_ binary merger rates
+* `Power Spectra`_ using CAMB and Halofit
+* Pipelines_ to generate populations of astronomical objects
 
-License
--------
+The full list of features can be found in the `SkyPy Documentation`_.
 
-This project is Copyright (c) SkyPy Team and licensed under
-the terms of the BSD 3-Clause license. This package is based upon
-the `Astropy package template <https://github.com/astropy/package-template>`_
-which is licensed under the BSD 3-clause licence. See the
-`LICENSE.rst <LICENSE.rst>`_ file for more information.
+If you use SkyPy for work or research presented in a publication please follow
+our `Citation Guidelines`_.
+
+.. _Galaxy: https://skypy.readthedocs.io/en/latest/galaxy.html
+.. _Halo: https://skypy.readthedocs.io/en/latest/halo/index.html
+.. _Gravitational Wave: https://skypy.readthedocs.io/en/latest/gravitational_wave/index.html
+.. _Power Spectra: https://skypy.readthedocs.io/en/latest/power_spectrum/index.html
+.. _Pipelines: https://skypy.readthedocs.io/en/latest/pipeline/index.html
+.. _SkyPy Documentation: https://skypy.readthedocs.io/en/latest/
+.. _Citation Guidelines: CITATION
+
+
+Getting Started
+---------------
+
+SkyPy is distributed through PyPI_ and conda-forge_. To install SkyPy and its
+dependencies_ using pip_:
+
+.. code:: bash
+
+    $ pip install skypy
+
+To install using conda_:
+
+.. code:: bash
+
+    $ conda install -c conda-forge skypy
+
+You can test your SkyPy intallation using pytest_:
+
+.. code:: bash
+
+    $ pytest --pyargs skypy
+
+The SkyPy library can then be imported from python:
+
+.. code:: python
+
+    >>> import skypy
+    >>> help(skypy)
+
+SkyPy also has a driver script that can run pipelines. The repository contains
+examples_ of config files in yaml format to download and run. For example:
+
+.. code:: bash
+
+    skypy examples/herbel_galaxies.yaml –-format fits
+
+will generate tables of red and blue galaxies following the model described in
+`Herbel et al. 2017`_ and write them in FITS format.
+
+.. _PyPI: https://pypi.org/project/skypy/
+.. _conda-forge: https://anaconda.org/conda-forge/skypy
+.. _dependencies: setup.cfg
+.. _pip: https://pip.pypa.io/en/stable/
+.. _conda: https://docs.conda.io/en/latest/
+.. _pytest: https://docs.pytest.org/en/stable/
+.. _examples: examples
+.. _Herbel et al. 2017: https://ui.adsabs.harvard.edu/abs/2017JCAP...08..035H
 
 
 Contributing
@@ -23,6 +81,12 @@ Contributing
 
 We love contributions! SkyPy is open source,
 built on open source, and we'd love to have you hang out in our community.
+For information on how to contribute see our `Contributor Guidelines`_.
+All communication relating to The SkyPy Project must meet the standards set out
+in the `Code of Conduct`_.
+
+.. _Contributor Guidelines: CONTRIBUTING.md
+.. _Code of Conduct: CODE_OF_CONDUCT.md
 
 **Imposter syndrome disclaimer**: We want your help. No, really.
 
@@ -69,6 +133,10 @@ SkyPy based on its use in the README file for the
 .. |PyPI Status| image:: https://img.shields.io/pypi/v/skypy.svg
     :target: https://pypi.python.org/pypi/skypy
     :alt: SkyPy's PyPI Status
+
+.. |Anaconda Status| image:: https://anaconda.org/conda-forge/skypy/badges/version.svg
+    :target: https://anaconda.org/conda-forge/skypy
+    :alt: SkyPy's Anaconda Status
 
 .. |Documentation Status| image:: https://readthedocs.org/projects/githubapps/badge/?version=latest
     :target: https://skypy.readthedocs.io/en/latest/?badge=latest
