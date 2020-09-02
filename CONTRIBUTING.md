@@ -72,11 +72,10 @@ When you feel that work on your new feature is complete, you should create a *Pu
 
 A series of automated checks will be run on your pull request, some of which will be required to pass before it can be merged into the main codebase:
 
-  - `Code Style` (Required) runs [flake8](https://flake8.pycqa.org/en/latest/) to check that your code conforms to the [PEP 8](https://www.python.org/dev/peps/pep-0008/) style guidelines. Errors can be viewed inline in the "Files changed" tab.
   - `Documentation` (Required) checks that the documentation builds successfully. Click "Details" to view the output including any errors.
   - `Tests` (Required) runs the [unit tests](#unit-tests) in four predefined environments; `latest supported versions`, `oldest supported versions`, `macOS latest supported` and `Windows latest supported`. Click "Details" to view the output including any failures.
   - `build_docs` builds the html documentation so that you can view it using `giles` (see below).
-  - `codeclimate` runs [pycodestyle](https://pycodestyle.pycqa.org/en/latest/) to check that your code conforms to the [PEP 8](https://www.python.org/dev/peps/pep-0008/) style guidelines. Click "Details" to view any errors.
+  - `codeclimate` (Required) runs [pycodestyle](https://pycodestyle.pycqa.org/en/latest/) to check that your code conforms to the [PEP 8](https://www.python.org/dev/peps/pep-0008/) style guidelines. Click "Details" to view any errors.
   - `codecov` reports the test coverage for your pull request; you should aim for `codecov/patch — 100.00%`. Click "Details" to view coverage data.
   - `giles` lets you view the html documentation built by `circleci: build_docs`. Click "Details" to view the documentation.
 
