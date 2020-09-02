@@ -51,10 +51,9 @@ class SkyPyDriver:
         fully qualified function name, and the second value specifies the
         function arguments.
 
-        If a function argument is a tuple `(variable_name, default_value)`, it
-        refers to the values of previous step in the pipeline. The first item
-        is the name of the reference variable, and the optional second argument
-        is a default value in case the variable cannot be found.
+        If a function argument is a tuple `(variable_name,)`, it refers to the
+        values of previous step in the pipeline. The tuple item must be the
+        name of the reference variable.
 
         'configuration' should contain the name and configuration of each
         variable and/or an entry named 'tables'. 'tables' should contain a set
@@ -139,11 +138,11 @@ class SkyPyDriver:
                 continue
             elif job in config:
                 settings = config.get(job)
-                setattr(self, job, self._call_from_config(settings))
+                setattr(self, job, self.get_value(settings))
             else:
                 table, column = job.split('.')
                 settings = table_config[table][column]
-                getattr(self, table)[column] = self._call_from_config(settings)
+                getattr(self, table)[column] = self.get_value(settings)
 
         # Write tables to file
         if file_format:
@@ -151,15 +150,20 @@ class SkyPyDriver:
                 filename = '.'.join((table, file_format))
                 getattr(self, table).write(filename, overwrite=overwrite)
 
-    def _call_from_config(self, config):
 
-        # check for variable
-        if not isinstance(config, tuple):
-            return config
+    def get_value(self, value):
+        '''return the value of a field
 
-        # config is tuple (function name, [function args])
-        name = config[0]
-        args = config[1] if len(config) > 1 else []
+        tuples specify function calls `(function name, function args)`
+        '''
+
+        # check for plain value
+        if not isinstance(value, tuple):
+            return value
+
+        # value is tuple (function name, [function args])
+        name = value[0]
+        args = value[1] if len(value) > 1 else []
 
         # Import function
         function_path = name.split('.')
@@ -175,25 +179,41 @@ class SkyPyDriver:
                 module = getattr(module, key)
         function = getattr(module, function_path[-1])
 
-        # parse arguments and call function
-        if isinstance(args, (dict, list)):
-            # kwargs or args
-            for k, v in args.items() if isinstance(args, dict) else enumerate(args):
-                if isinstance(v, tuple):
-                    args[k] = self.get(*v)
-            result = function(**args) if isinstance(args, dict) else function(*args)
+        # Parse arguments
+        parsed_args = self.get_args(args)
+
+        # Call function
+        if isinstance(args, dict):
+            result = function(**parsed_args)
+        elif isinstance(args, list):
+            result = function(*parsed_args)
         else:
-            # value
-            if isinstance(args, tuple):
-                args = self.get(*args)
-            result = function(args)
+            result = function(parsed_args)
 
         return result
 
-    def get(self, label, default=None):
+
+    def get_args(self, args):
+        '''parse function arguments
+
+        tuples specify references to container: `(field name,)`
+        '''
+
+        if isinstance(args, tuple):
+            # get reference
+            return self[args[0]]
+        elif isinstance(args, dict):
+            # recurse kwargs
+            return {k: self.get_args(v) for k, v in args.items()}
+        elif isinstance(args, list):
+            # recurse args
+            return [self.get_args(a) for a in args]
+        else:
+            # return value
+            return args
+
+
+    def __getitem__(self, label):
         name, _, key = label.partition('.')
-        try:
-            item = getattr(self, name)
-            return item[key] if key else item
-        except (KeyError, AttributeError):
-            return default
+        item = getattr(self, name)
+        return item[key] if key else item
