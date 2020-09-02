@@ -4,34 +4,15 @@ This module provides methods to run pipelines of functions with dependencies
 and handle their results.
 """
 
-from collections.abc import Mapping
 from copy import deepcopy
 from importlib import import_module
 import builtins
 import networkx
-import re
 
 
 __all__ = [
     'SkyPyDriver',
 ]
-
-
-def _items(a):
-    '''return keys and values for dict or list'''
-    if hasattr(a, 'items'):
-        return a.items()
-    return enumerate(a)
-
-
-def _is_string_argument(s):
-    # string arguments are enclosed in either single or double quotation marks
-    return s[0] in '"\'' and s[0] == s[-1]
-
-
-def _parse_string_argument(s):
-    # strip nested quotes from literal string
-    return s[1:-1]
 
 
 class SkyPyDriver:
@@ -62,16 +43,17 @@ class SkyPyDriver:
 
         Notes
         -----
-        Each step in the pipeline is configured by a dictionary specifying:
+        Each step in the pipeline is configured by a dictionary specifying
+        a variable name and the associated value.
 
-        - 'function' : the fully qualified name of the function
-        - 'args' : a list of positional arguments (by value), or a dictionary
-                   of keyword arguments
+        A value that is a tuple `(function_name, function_args)` specifies that
+        the value will be the result of a function call. The first item is the
+        fully qualified function name, and the second value specifies the
+        function arguments.
 
-        Note that 'args' either specifices keyword arguments by value, or the
-        names of previous steps in the pipeline and uses their return values as
-        keyword arguments. Literal strings (i.e. not field names) are escaped
-        by nested quotes: '"this is a literal string"' and "'another one'".
+        If a function argument is a tuple `(variable_name,)`, it refers to the
+        values of previous step in the pipeline. The tuple item must be the
+        name of the reference variable.
 
         'configuration' should contain the name and configuration of each
         variable and/or an entry named 'tables'. 'tables' should contain a set
@@ -94,61 +76,58 @@ class SkyPyDriver:
         # table_config contains settings for all table columns
         config = deepcopy(configuration)
         table_config = config.pop('tables', {})
-        default_table = {'function': 'astropy.table.Table'}
-        config.update({k: v.pop('init', default_table)
+        default_table = ('astropy.table.Table',)
+        config.update({k: v.pop('.init', default_table)
                       for k, v in table_config.items()})
 
         # Create a Directed Acyclic Graph of all jobs and dependencies
         dag = networkx.DiGraph()
 
-        # Variables initialised by value don't require function evaluations
-        def isfunction(f):
-            return isinstance(f, Mapping) and 'function' in f
-        variables = {k: v for k, v in config.items() if not isfunction(v)}
-        for v in variables:
-            dag.add_node(v)
-            setattr(self, v, config.pop(v))
-
-        # Add nodes for each variable, table and column
-        for job in config:
+        # - add nodes for each variable, table and column
+        # - add edges for the table dependencies
+        # - keep track where functions need to be called
+        #   functions are tuples (function name, [function args])
+        functions = {}
+        for job, settings in config.items():
             dag.add_node(job)
+            if isinstance(settings, tuple):
+                functions[job] = settings
         for table, columns in table_config.items():
             table_complete = '.'.join((table, 'complete'))
             dag.add_node(table_complete)
-            for column in columns.keys():
-                job = '.'.join((table, column))
-                dag.add_node(job)
-
-        # Add edges for all requirements and dependencies
-        def deps(settings):
-            deps = settings.get('depends', [])
-            args = settings.get('args', [])
-            for k, v in _items(args):
-                if isinstance(v, str) and not _is_string_argument(v):
-                    deps.append(v)
-            return deps
-        for job, settings in config.items():
-            dag.add_edges_from((d, job) for d in deps(settings))
-        for table, columns in table_config.items():
-            table_complete = '.'.join((table, 'complete'))
             dag.add_edge(table, table_complete)
             for column, settings in columns.items():
                 job = '.'.join((table, column))
+                dag.add_node(job)
                 dag.add_edge(table, job)
                 dag.add_edge(job, table_complete)
-                dag.add_edges_from((d, job) for d in deps(settings))
+                if isinstance(settings, tuple):
+                    functions[job] = settings
+
+        # go through functions and add edges for all references
+        for job, settings in functions.items():
+            # settings are tuple (function, [args])
+            args = settings[1] if len(settings) > 1 else None
+            # get dependencies from arguments
+            deps = self.get_deps(args)
+            # add edges for dependencies
+            for d in deps:
+                if dag.has_node(d):
+                    dag.add_edge(d, job)
+                else:
+                    raise KeyError(d)
 
         # Execute jobs in order that resolves dependencies
         for job in networkx.topological_sort(dag):
-            if job in variables or job.endswith('.complete'):
+            if job.endswith('.complete'):
                 continue
             elif job in config:
                 settings = config.get(job)
-                setattr(self, job, self._call_from_config(settings))
+                setattr(self, job, self.get_value(settings))
             else:
                 table, column = job.split('.')
                 settings = table_config[table][column]
-                getattr(self, table)[column] = self._call_from_config(settings)
+                getattr(self, table)[column] = self.get_value(settings)
 
         # Write tables to file
         if file_format:
@@ -156,10 +135,22 @@ class SkyPyDriver:
                 filename = '.'.join((table, file_format))
                 getattr(self, table).write(filename, overwrite=overwrite)
 
-    def _call_from_config(self, config):
+    def get_value(self, value):
+        '''return the value of a field
+
+        tuples specify function calls `(function name, function args)`
+        '''
+
+        # check for plain value
+        if not isinstance(value, tuple):
+            return value
+
+        # value is tuple (function name, [function args])
+        name = value[0]
+        args = value[1] if len(value) > 1 else []
 
         # Import function
-        function_path = config.get('function').split('.')
+        function_path = name.split('.')
         module = builtins
         for i, key in enumerate(function_path[:-1]):
             if not hasattr(module, key):
@@ -173,24 +164,62 @@ class SkyPyDriver:
         function = getattr(module, function_path[-1])
 
         # Parse arguments
-        args = config.get('args', [])
-        for k, v in _items(args):
-            if isinstance(v, str):
-                if _is_string_argument(v):
-                    args[k] = _parse_string_argument(v)
-                else:
-                    # get variable or table column
-                    args[k] = self[v]
+        parsed_args = self.get_args(args)
 
         # Call function
-        if isinstance(args, Mapping):
-            result = function(**args)
+        if isinstance(args, dict):
+            result = function(**parsed_args)
+        elif isinstance(args, list):
+            result = function(*parsed_args)
         else:
-            result = function(*args)
+            result = function(parsed_args)
 
         return result
 
+    def get_args(self, args):
+        '''parse function arguments
+
+        tuples specify references to container: `(field name,)`
+        '''
+
+        if isinstance(args, tuple):
+            # get reference
+            return self[args[0]]
+        elif isinstance(args, dict):
+            # recurse kwargs
+            return {k: self.get_args(v) for k, v in args.items()}
+        elif isinstance(args, list):
+            # recurse args
+            return [self.get_args(a) for a in args]
+        else:
+            # return value
+            return args
+
+    def get_deps(self, args):
+        '''get dependencies from function args
+
+        returns a list of all dependencies found
+        '''
+
+        if isinstance(args, tuple):
+            # reference
+            return [args[0]]
+        elif isinstance(args, dict):
+            # get explicit dependencies
+            deps = args.pop('.depends', [])
+            # turn a single value into a list
+            if isinstance(deps, str) or not isinstance(deps, list):
+                deps = [deps]
+            # recurse remaining kwargs
+            return deps + sum([self.get_deps(a) for a in args.values()], [])
+        elif isinstance(args, list):
+            # recurse args
+            return sum([self.get_deps(a) for a in args], [])
+        else:
+            # no reference
+            return []
+
     def __getitem__(self, label):
-        name, key = re.search(r'^(\w*)\.?(\w*)$', label).groups()
+        name, _, key = label.partition('.')
         item = getattr(self, name)
         return item[key] if key else item

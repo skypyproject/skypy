@@ -39,6 +39,28 @@ from skypy.pipeline.driver import SkyPyDriver
 import sys
 
 
+def yaml_tag(loader, tag, node):
+    '''handler for generic YAML tags
+
+    tags are stored as a tuple `(tag, value)`
+    '''
+
+    import yaml
+
+    if isinstance(node, yaml.ScalarNode):
+        value = loader.construct_scalar(node)
+    elif isinstance(node, yaml.SequenceNode):
+        value = loader.construct_sequence(node)
+    elif isinstance(node, yaml.MappingNode):
+        value = loader.construct_mapping(node)
+
+    # tags without arguments have empty string value
+    if value == '':
+        return tag,
+
+    return tag, value
+
+
 def main(args=None):
 
     import yaml
@@ -54,6 +76,9 @@ def main(args=None):
     # get system args if none passed
     if args is None:
         args = sys.argv[1:]
+
+    # register custom tags
+    yaml.SafeLoader.add_multi_constructor('!', yaml_tag)
 
     args = parser.parse_args(args or ['--help'])
     config = yaml.safe_load(args.config)
