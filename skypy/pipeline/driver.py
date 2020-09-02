@@ -110,7 +110,6 @@ class SkyPyDriver:
             args = settings[1] if len(settings) > 1 else None
             # get dependencies from arguments
             deps = self.get_deps(args)
-            print(deps)
             # add edges for dependencies
             for d in deps:
                 if dag.has_node(d):
