@@ -108,29 +108,15 @@ class SkyPyDriver:
         for job, settings in functions.items():
             # settings are tuple (function, [args])
             args = settings[1] if len(settings) > 1 else None
-            # three kinds of arguments: kwargs, args, values
-            if isinstance(args, dict):
-                deps = args.pop('.depends', [])
-                # turn a single values into a list
-                if isinstance(deps, str) or not isinstance(deps, list):
-                    deps = [deps]
-                # make all explicit deps into tuples
-                deps = [(d,) for d in deps]
-                # get dependencies from mapping
-                deps += [a for a in args.values() if isinstance(a, tuple)]
-            elif isinstance(args, list):
-                # get dependencies from sequence
-                deps = [a for a in args if isinstance(a, tuple)]
-            else:
-                # get single dependency
-                deps = [args] if isinstance(args, tuple) else []
+            # get dependencies from arguments
+            deps = self.get_deps(args)
+            print(deps)
             # add edges for dependencies
             for d in deps:
-                if dag.has_node(d[0]):
-                    dag.add_edge(d[0], job)
-                elif len(d) < 2:
-                    # no default argument
-                    raise KeyError(d[0])
+                if dag.has_node(d):
+                    dag.add_edge(d, job)
+                else:
+                    raise KeyError(d)
 
         # Execute jobs in order that resolves dependencies
         for job in networkx.topological_sort(dag):
@@ -211,6 +197,31 @@ class SkyPyDriver:
         else:
             # return value
             return args
+
+    
+    def get_deps(self, args):
+        '''get dependencies from function args
+
+        returns a list of all dependencies found
+        '''
+
+        if isinstance(args, tuple):
+            # reference
+            return [args[0]]
+        elif isinstance(args, dict):
+            # get explicit dependencies
+            deps = args.pop('.depends', [])
+            # turn a single value into a list
+            if isinstance(deps, str) or not isinstance(deps, list):
+                deps = [deps]
+            # recurse remaining kwargs
+            return deps + sum([self.get_deps(a) for a in args.values()], [])
+        elif isinstance(args, list):
+            # recurse args
+            return sum([self.get_deps(a) for a in args], [])
+        else:
+            # no reference
+            return []
 
 
     def __getitem__(self, label):
