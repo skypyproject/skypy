@@ -135,7 +135,6 @@ class SkyPyDriver:
                 filename = '.'.join((table, file_format))
                 getattr(self, table).write(filename, overwrite=overwrite)
 
-
     def get_value(self, value):
         '''return the value of a field
 
@@ -177,7 +176,6 @@ class SkyPyDriver:
 
         return result
 
-
     def get_args(self, args):
         '''parse function arguments
 
@@ -197,7 +195,6 @@ class SkyPyDriver:
             # return value
             return args
 
-    
     def get_deps(self, args):
         '''get dependencies from function args
 
@@ -221,7 +218,6 @@ class SkyPyDriver:
         else:
             # no reference
             return []
-
 
     def __getitem__(self, label):
         name, _, key = label.partition('.')
