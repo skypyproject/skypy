@@ -326,7 +326,46 @@ def _subhalo_amplitude(M, alpha, beta, gamma_M, m_cut):
     return gamma_M / (beta * gamma(2.0 - alpha) * (1.0 - gammaincc(2.0 - alpha, x_cut)))
 
 
-def _number_subhalos(mass_parents, m_min, params):
+def number_subhalos(halo_mass, alpha, beta, gamma_M, m_min):
+    r'''Number of subhalos.
+    This function calculates the number of subhalos for a parent halo of given mass
+    according to the model of Vale & Ostriker  2006 [1]_. The mean number of subhalos
+    above a mass threshold can be obtained by integrating equation (3) in [1]. The
+    number of subhalos returned is randomly drawn from a Poisson distribution with
+    that mean.
+    Parameters
+    -----------
+    halo_mass : (nm, ) array_like
+        The mass of the halo parent, in units of solar mass.
+    alpha, beta : float
+        Parameters that determines the subhalo Schechter function. Its the amplitude
+        is defined by equation 4 in [1].
+    gamma_M : float
+        Present day mass fraction in subhalos.
+    m_min : array_like
+        Mass of the least massive subhalo.
+
+    Returns
+    --------
+    number: array_like
+        Array of the number of subhalos assigned to parent halos with mass halo_mass.
+
+    Examples
+    ---------
+    >>> import numpy as np
+    >>> from skypy.halo import mass
+
+    This gives the number of subhalos in a parent halo of mass math:`1*10^12 M_\odot`:
+    
+    >>> nsh = mass.number_subhalos(1e12, 1e10, 1.9, 1.0, 0.3, 1.0e6)
+
+
+    References
+    ----------
+    .. [1] Vale, A. and Ostriker, J.P. (2005), arXiv: astro-ph/0511816.
+
+
+    '''
     # len(mass_parents) = len(nsubhalos)
     # output_array[i] = number of subhalos for parent halo number i
     subhalo_fraction0, alpha, beta, mcut = params
