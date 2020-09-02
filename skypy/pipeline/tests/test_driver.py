@@ -100,11 +100,14 @@ def test_driver():
 
     # Check variables intialised by function
     config = {'test_func': ('list', 'hello world'),
-              'len_of_test_func': ('len', ('test_func',))}
+              'len_of_test_func': ('len', ('test_func',)),
+              'nested_references': ('sum', [
+                [('test_func',), [' '], ('test_func',)], []])}
     driver = SkyPyDriver()
     driver.execute(config)
     assert driver.test_func == list('hello world')
-    assert driver.len_of_test_func == 11
+    assert driver.len_of_test_func == len('hello world')
+    assert driver.nested_references == list('hello world hello world')
 
 
 def teardown_module(module):
