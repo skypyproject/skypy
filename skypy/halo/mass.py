@@ -320,12 +320,10 @@ def _dlns_dlnM(sigma, M):
     return np.absolute((M / sigma) * ds)
 
 
-def _subhalo_amplitude(M, params):
+def _subhalo_amplitude(M, alpha, beta, gamma_M, m_cut):
     # astro-ph/0511816 Equation 4
-    subhalo_fraction0, alpha, beta, mcut = params
-    x_cut = mcut / (beta * M)
-
-    return subhalo_fraction0 / (beta * gamma(2.0 - alpha) * (1.0 - gammaincc(2.0 - alpha, x_cut)))
+    x_cut = m_cut / (beta * M)
+    return gamma_M / (beta * gamma(2.0 - alpha) * (1.0 - gammaincc(2.0 - alpha, x_cut)))
 
 
 def _number_subhalos(mass_parents, m_min, params):
@@ -341,7 +339,7 @@ def _number_subhalos(mass_parents, m_min, params):
         # The mean number of subhalos above a mass threshold
         # can be obtained by integrating equation (3) in [1]
         n_subhalos = _subhalo_amplitude(M, params) * \
-        gammaincc(1.0 - alpha, x_low) * gamma(1.0 - alpha)
+            gammaincc(1.0 - alpha, x_low) * gamma(1.0 - alpha)
 
         # Random number of subhalos following a Poisson distribution
         # with mean n_subhalos
@@ -393,10 +391,10 @@ def subhalo_mass_sampler(m_min, m_max, resolution,
     .. [1] Vale, A. and Ostriker, J.P. (2005), arXiv: astro-ph/0511816.
     '''
 
-        subhalo_fraction0, alpha, beta, mcut = params
+    subhalo_fraction0, alpha, beta, mcut = params
 
     halo_mass = np.atleast_1d(halo_mass)
-    nsh = number_subhalos(halo_mass, m_min, params)
+    nsh = _number_subhalos(halo_mass, m_min, params)
     subhalo_list = []
     i = 0
     for M in halo_mass:
@@ -405,8 +403,8 @@ def subhalo_mass_sampler(m_min, m_max, resolution,
         m_star = beta * M
 
         # Sample from the Schechter function
-        x_min = np.min(m) / m_star
-        x_max = np.max(m) / m_star
+        x_min = m_min / m_star
+        x_max = m_max / m_star
 
         schechter_sampling = A * schechter(alpha, x_min, x_max, resolution,
                                            size=int(nsh[i]), scale=m_star)
