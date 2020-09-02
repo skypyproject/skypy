@@ -349,7 +349,7 @@ def number_subhalos(halo_mass, alpha, beta, gamma_M, m_min):
 
     Returns
     --------
-    number: array_like
+    nsubhalos: array_like
         Array of the number of subhalos assigned to parent halos with mass halo_mass.
 
     Examples
@@ -359,7 +359,7 @@ def number_subhalos(halo_mass, alpha, beta, gamma_M, m_min):
 
     This gives the number of subhalos in a parent halo of mass math:`1*10^12 M_\odot`:
 
-    >>> nsh = mass.number_subhalos(1e12, 1e10, 1.9, 1.0, 0.3, 1.0e6)
+    >>> nsh = mass.number_subhalos(1e12, 1.9, 1.0, 0.3, 1.0e6)
 
 
     References
@@ -368,25 +368,18 @@ def number_subhalos(halo_mass, alpha, beta, gamma_M, m_min):
 
 
     '''
-    # len(mass_parents) = len(nsubhalos)
-    # output_array[i] = number of subhalos for parent halo number i
-    subhalo_fraction0, alpha, beta, mcut = params
-    nsubhalos = np.zeros(len(mass_parents))
-    mass_parents = np.atleast_1d(mass_parents)
-    i = 0
-    for M in mass_parents:
-        m_star = beta * M
-        x_low = m_min / m_star
-        # The mean number of subhalos above a mass threshold
-        # can be obtained by integrating equation (3) in [1]
-        n_subhalos = _subhalo_amplitude(M, params) * \
-            gammaincc(1.0 - alpha, x_low) * gamma(1.0 - alpha)
+    m_star = beta * halo_mass
+    x_low = m_min / m_star
+    # The mean number of subhalos above a mass threshold
+    # can be obtained by integrating equation (3) in [1]
+    A = _subhalo_amplitude(halo_mass, alpha, beta, gamma_M, m_min)
 
-        # Random number of subhalos following a Poisson distribution
-        # with mean n_subhalos
-        nsubhalos[i] = np.random.poisson(n_subhalos)
-        i += 1
-    return nsubhalos
+    n_subhalos =  A * gammaincc(1.0 - alpha, x_low) * gamma(1.0 - alpha)
+
+    # Random number of subhalos following a Poisson distribution
+    # with mean n_subhalos
+
+    return np.random.poisson(n_subhalos)
 
 
 def subhalo_mass_sampler(m_min, m_max, resolution,
