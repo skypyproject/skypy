@@ -10,6 +10,7 @@ Models
    press_schechter
    halo_mass_function
    halo_mass_sampler
+   number_subhalos
    subhalo_mass_sampler
    ellipsoidal_collapse_function
    press_schechter_collapse_function
@@ -29,6 +30,7 @@ from skypy.utils.random import schechter
 __all__ = [
     'halo_mass_function',
     'halo_mass_sampler',
+    'number_subhalos',
     'subhalo_mass_sampler',
     'sheth_tormen_collapse_function',
     'press_schechter_collapse_function',
@@ -356,7 +358,7 @@ def number_subhalos(halo_mass, alpha, beta, gamma_M, m_min):
     >>> from skypy.halo import mass
 
     This gives the number of subhalos in a parent halo of mass math:`1*10^12 M_\odot`:
-    
+
     >>> nsh = mass.number_subhalos(1e12, 1e10, 1.9, 1.0, 0.3, 1.0e6)
 
 
