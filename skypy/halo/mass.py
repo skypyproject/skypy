@@ -369,6 +369,7 @@ def number_subhalos(halo_mass, alpha, beta, gamma_M, m_min):
 
     '''
     m_star = beta * halo_mass
+    # m_cut is the mass of the most massive subhalo before becoming a parent halo
     m_cut = 0.5 * halo_mass
     x_low = m_min / m_star
     # The mean number of subhalos above a mass threshold
