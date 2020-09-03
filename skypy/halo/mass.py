@@ -7,16 +7,17 @@ Models
    :nosignatures:
    :toctree: ../api/
 
-   press_schechter
+   ellipsoidal_collapse_function
    halo_mass_function
    halo_mass_sampler
    number_subhalos
-   subhalo_mass_sampler
-   ellipsoidal_collapse_function
-   press_schechter_collapse_function
-   sheth_tormen_collapse_function
    press_schechter
+   press_schechter_collapse_function
+   press_schechter_mass_function
    sheth_tormen
+   sheth_tormen_collapse_function
+   sheth_tormen_mass_function
+   subhalo_mass_sampler
 '''
 
 import numpy as np
@@ -28,16 +29,17 @@ from astropy import units
 from skypy.utils.random import schechter
 
 __all__ = [
+    'ellipsoidal_collapse_function',
     'halo_mass_function',
     'halo_mass_sampler',
     'number_subhalos',
-    'subhalo_mass_sampler',
-    'sheth_tormen_collapse_function',
+    'press_schechter',
     'press_schechter_collapse_function',
-    'sheth_tormen_mass_function',
     'press_schechter_mass_function',
     'sheth_tormen',
-    'press_schechter',
+    'sheth_tormen_collapse_function',
+    'sheth_tormen_mass_function',
+    'subhalo_mass_sampler',
  ]
 
 
