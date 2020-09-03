@@ -39,3 +39,19 @@ def test_vale_ostriker():
     # Test failure for exact join when nh != ng
     with pytest.raises(TableMergeError):
         vale_ostriker(h, g, join_type='exact')
+
+    # Test failure if halos or subhalos are missing mass column
+    s = Table(data=np.random.uniform(size=(5, 1)), names=['not mass'])
+    with pytest.raises(ValueError):
+        vale_ostriker(h, g, subhalos=s)
+    with pytest.raises(ValueError):
+        vale_ostriker(s, g, subhalos=h)
+
+    # Test joining halos and subhalos.
+    nh, ng, ns = 10, 15, 20
+    h = Table(data=np.random.uniform(1, 2, size=(nh, 1)), names=['mass'])
+    g = Table(data=np.random.uniform(size=(ng, 1)), names=['luminosity'])
+    s = Table(data=np.random.uniform(size=(ns, 1)), names=['mass'])
+    matched_subhalos = vale_ostriker(h, g, subhalos=s)
+    assert sorted(matched_subhalos['mass'])[:-nh] == sorted(s['mass'])[nh-ng:]
+    assert sorted(matched_subhalos['mass'])[-nh:] == sorted(h['mass'])
