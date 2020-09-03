@@ -107,11 +107,10 @@ def test_ellipsoidal_collapse_function():
 
 def test_subhalo_mass_sampler():
     # Test the output shape is correct given the sample size
-    n_samples = 1000
-    m_min, m_max, halo_mass = 1.0e9, 1.0e10, 1.0e12
-    # Any particular ellipsoidal collapse model
-    params_vale = (0.5, 1.9, 1.0, 1.0e10)
-    array_output_subh = mass.subhalo_mass_sampler(m_min, m_max, n_samples,
-                                                  halo_mass, params=params_vale)
+    halo, min_sh = 1.0e12, 1.0e6
+    alpha, beta, gamma_M = 1.9, 1.0, 0.3
+    nsh = mass.number_subhalos(halo, alpha, beta, gamma_M, min_sh)
 
-    assert len(array_output_subh) == n_samples
+    array_output = mass.subhalo_mass_sampler(halo, nsh, alpha, beta, gamma_M, min_sh, 100)
+
+    assert len(array_output) == np.sum(nsh)
