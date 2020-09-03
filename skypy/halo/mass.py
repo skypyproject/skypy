@@ -369,10 +369,11 @@ def number_subhalos(halo_mass, alpha, beta, gamma_M, m_min):
 
     '''
     m_star = beta * halo_mass
+    m_cut = 0.5 * halo_mass
     x_low = m_min / m_star
     # The mean number of subhalos above a mass threshold
     # can be obtained by integrating equation (3) in [1]
-    A = _subhalo_amplitude(halo_mass, alpha, beta, gamma_M, m_min)
+    A = _subhalo_amplitude(halo_mass, alpha, beta, gamma_M, m_cut)
 
     n_subhalos =  A * gammaincc(1.0 - alpha, x_low) * gamma(1.0 - alpha)
 
