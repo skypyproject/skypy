@@ -335,6 +335,7 @@ def number_subhalos(halo_mass, alpha, beta, gamma_M, m_min):
     above a mass threshold can be obtained by integrating equation (3) in [1]. The
     number of subhalos returned is randomly drawn from a Poisson distribution with
     that mean.
+    
     Parameters
     -----------
     halo_mass : (nm, ) array_like
@@ -361,15 +362,14 @@ def number_subhalos(halo_mass, alpha, beta, gamma_M, m_min):
 
     >>> halo, min_sh = 1.0e12, 1.0e6
     >>> alpha, beta, gamma_M = 1.9, 1.0, 0.3
-    >>> nsh = mass.number_subhalos(halo, alpha, beta, gamma_M, min_sh)
-
+    >>> mass.number_subhalos(halo, alpha, beta, gamma_M, min_sh)
+    9358
 
     References
     ----------
     .. [1] Vale, A. and Ostriker, J.P. (2005), arXiv: astro-ph/0511816.
-
-
     '''
+
     m_star = beta * halo_mass
     # m_cut is the mass of the most massive subhalo before becoming a parent halo
     m_cut = 0.5 * halo_mass
@@ -382,11 +382,10 @@ def number_subhalos(halo_mass, alpha, beta, gamma_M, m_min):
 
     # Random number of subhalos following a Poisson distribution
     # with mean n_subhalos
-
     return np.random.poisson(n_subhalos)
 
 
-def subhalo_mass_sampler(halo_max, nsubhalos, alpha, beta, gamma_M,
+def subhalo_mass_sampler(halo_mass, nsubhalos, alpha, beta, gamma_M,
                          m_min, resolution):
     r'''Subhalo mass sampler.
     This function samples subhaloes from their mass function, given the mass
@@ -437,12 +436,8 @@ def subhalo_mass_sampler(halo_max, nsubhalos, alpha, beta, gamma_M,
     .. [1] Vale, A. and Ostriker, J.P. (2005), arXiv: astro-ph/0511816.
     '''
 
-    subhalo_fraction0, alpha, beta, mcut = params
-
     halo_mass = np.atleast_1d(halo_mass)
-    nsh = _number_subhalos(halo_mass, m_min, params)
     subhalo_list = []
-    i = 0
     for M in halo_mass:
         A = _subhalo_amplitude(M, params)
         # Characteristic M*
