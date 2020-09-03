@@ -358,7 +358,7 @@ def number_subhalos(halo_mass, alpha, beta, gamma_M, m_min):
     >>> import numpy as np
     >>> from skypy.halo import mass
 
-    This gives the number of subhalos in a parent halo of mass math:`1*10^12 M_\odot`:
+    This gives the number of subhalos in a parent halo of mass :math:`1*10^{12} M_\odot`
 
     >>> halo, min_sh = 1.0e12, 1.0e6
     >>> alpha, beta, gamma_M = 1.9, 1.0, 0.3
@@ -420,7 +420,7 @@ def subhalo_mass_sampler(halo_mass, nsubhalos, alpha, beta, gamma_M,
     >>> from skypy.halo import mass
 
     This example samples from the subhalo mass function given given by equation 4 in [1]
-    with a parent halo of mass :math:`10^12 M_{Sun}`. The number of subhalos can be obtained
+    with a parent halo of mass :math:`10^{12} M_\odot`. The number of subhalos can be obtained
 
     >>> halo, min_sh = 1.0e12, 1.0e6
     >>> alpha, beta, gamma_M = 1.9, 1.0, 0.3
