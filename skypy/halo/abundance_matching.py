@@ -14,13 +14,13 @@ Models
 
 """
 
-from astropy.table import hstack
+from astropy.table import hstack, vstack
 
 
-def vale_ostriker(halos, galaxies, mass='mass', luminosity='luminosity',
-                  join_type='inner'):
+def vale_ostriker(halos, galaxies, subhalos=None,
+                  mass='mass', luminosity='luminosity', join_type='inner'):
     """Vale & Ostriker abundance matching.
-    Takes catalogs of halos and galaxies and performs abundance matching
+    Takes catalogs of (sub)halos and galaxies and performs abundance matching
     following the method outlined in Vale & Ostriker (2004) assuming
     monotonicity between halo mass and galaxy luminosity to return an
     abundance-matched table of halo-galaxy pairs.
@@ -29,6 +29,8 @@ def vale_ostriker(halos, galaxies, mass='mass', luminosity='luminosity',
     ----------
     halos, galaxies : Astropy Table
         Tables of halos and galaxies to be matched.
+    subhalos : Astropy Table
+        Optional table of subhalos to be matched..
     mass, luminosity : str
         Halo mass and galaxy luminosity column names.
     join_type : str
@@ -43,6 +45,13 @@ def vale_ostriker(halos, galaxies, mass='mass', luminosity='luminosity',
     ----------
     .. [1] Vale A., Ostriker J. P., 2004, MNRAS, 353, 189
     """
+
+    if subhalos:
+        if mass not in halos.columns:
+            raise ValueError("{} is not a column in halos".format(mass))
+        if mass not in subhalos.columns:
+            raise ValueError("{} is not a column in subhalos".format(mass))
+        halos = vstack((halos, subhalos))
 
     halos.sort(mass, reverse=True)
     galaxies.sort(luminosity, reverse=True)
