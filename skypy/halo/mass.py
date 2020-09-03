@@ -335,7 +335,7 @@ def number_subhalos(halo_mass, alpha, beta, gamma_M, m_min):
     above a mass threshold can be obtained by integrating equation (3) in [1]. The
     number of subhalos returned is randomly drawn from a Poisson distribution with
     that mean.
-    
+
     Parameters
     -----------
     halo_mass : (nm, ) array_like
@@ -430,26 +430,19 @@ def subhalo_mass_sampler(halo_mass, nsubhalos, alpha, beta, gamma_M,
 
     >>> sh = mass.subhalo_mass_sampler(halo, nsh, alpha, beta, gamma_M, min_sh, 100)
 
-
     References
     ----------
     .. [1] Vale, A. and Ostriker, J.P. (2005), arXiv: astro-ph/0511816.
     '''
 
     halo_mass = np.atleast_1d(halo_mass)
+    nsubhalos = np.atleast_1d(nsubhalos)
     subhalo_list = []
-    for M in halo_mass:
-        A = _subhalo_amplitude(M, params)
-        # Characteristic M*
+    for M, n in zip(halo_mass, nsubhalos):
         m_star = beta * M
-
-        # Sample from the Schechter function
         x_min = m_min / m_star
-        x_max = m_max / m_star
+        x_max = 0.5 * halo_mass / m_star
+        subhalo_mass = schechter(alpha, x_min, x_max, resolution, size=n, scale=m_star)
+        subhalo_list.append(subhalo_mass)
 
-        schechter_sampling = A * schechter(alpha, x_min, x_max, resolution,
-                                           size=int(nsh[i]), scale=m_star)
-
-        subhalo_list.append(schechter_sampling)
-        i += 1
     return np.concatenate(subhalo_list)
