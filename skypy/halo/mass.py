@@ -345,7 +345,7 @@ def number_subhalos(halo_mass, alpha, beta, gamma_M, m_min):
     gamma_M : float
         Present day mass fraction in subhalos.
     m_min : array_like
-        Mass of the least massive subhalo.
+        Mass of the least massive subhalo, in units of solar mass.
 
     Returns
     --------
@@ -359,7 +359,9 @@ def number_subhalos(halo_mass, alpha, beta, gamma_M, m_min):
 
     This gives the number of subhalos in a parent halo of mass math:`1*10^12 M_\odot`:
 
-    >>> nsh = mass.number_subhalos(1e12, 1.9, 1.0, 0.3, 1.0e6)
+    >>> halo, min_sh = 1.0e12, 1.0e6
+    >>> alpha, beta, gamma_M = 1.9, 1.0, 0.3
+    >>> nsh = mass.number_subhalos(halo, alpha, beta, gamma_M, min_sh)
 
 
     References
@@ -384,31 +386,34 @@ def number_subhalos(halo_mass, alpha, beta, gamma_M, m_min):
     return np.random.poisson(n_subhalos)
 
 
-def subhalo_mass_sampler(m_min, m_max, resolution,
-                         halo_mass, params):
+def subhalo_mass_sampler(halo_max, nsubhalos, alpha, beta, gamma_M,
+                         m_min, resolution):
     r'''Subhalo mass sampler.
     This function samples subhaloes from their mass function, given the mass
     of the parent halo. Refer to equation 3 in [1]_.
 
     Parameters
     -----------
-    m_min, m_max : array_like
-        Lower and upper bounds for the random variable m.
-    resolution: int
-        Resolution of the inverse transform sampling spline.
-    M : (nm,) array_like
-        Array for the subhalo mass, in units of solar mass.
     halo_mass : (nm, ) array_like
         The mass of the halo parent, in units of solar mass.
-    params: tuple
-        List of parameters that determines the subhalo Schechter function:
-        `(subhalo_fraction0, alpha, beta, mcut)` with
-        and the amplitude is defined by equation 4 in [1].
+    nsubhalos: (nm, ) array_like
+        Array of the number of subhalos assigned to parent halos with mass `halo_mass`.
+    alpha, beta : float
+        Parameters that determines the subhalo Schechter function. Its the amplitude
+        is defined by equation 4 in [1].
+    gamma_M : float
+        Present day mass fraction in subhalos.
+    m_min : array_like
+        Mass of the least massive subhalo, in units of solar mass.
+    resolution: int
+        Resolution of the inverse transform sampling spline.
 
     Returns
     --------
-    sample: array_like
-        Samples drawn from the mass function, in units of solar masses.
+    sample: (nh, ) array_like
+        List of samples drawn from the mass function, in units of solar mass.
+        The length corresponds to the addition of all subhalos of all parent halos,
+        i.e. `np.sum(nsubhalos)`
 
     Examples
     ---------
@@ -416,10 +421,15 @@ def subhalo_mass_sampler(m_min, m_max, resolution,
     >>> from skypy.halo import mass
 
     This example samples from the subhalo mass function given given by equation 4 in [1]
-    with a parent halo of mass :math:`10^12 M_{Sun}`:
+    with a parent halo of mass :math:`10^12 M_{Sun}`. The number of subhalos can be obtained
 
-    >>> params_vale = (0.5, 1.9, 1.0, 1.0e9)
-    >>> sh = mass.subhalo_mass_sampler(1e9, 1e10, 100, 1.0e12, params_vale)
+    >>> halo, min_sh = 1.0e12, 1.0e6
+    >>> alpha, beta, gamma_M = 1.9, 1.0, 0.3
+    >>> nsh = mass.number_subhalos(halo, alpha, beta, gamma_M, min_sh)
+
+    The list of subhalo masses:
+
+    >>> sh = mass.subhalo_mass_sampler(halo, nsh, alpha, beta, gamma_M, min_sh, 100)
 
 
     References
