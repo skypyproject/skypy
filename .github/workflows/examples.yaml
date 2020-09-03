@@ -1,0 +1,66 @@
+name: Mirror Examples
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 4 * * *'
+jobs:
+  examples:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+      with:
+        repository: skypyproject/examples
+        fetch-depth: 0
+    - name: Configure git
+      run: |
+        git config user.name github-actions
+        git config user.email github-actions@github.com
+        git config advice.detachedHead false
+    - name: Clone SkyPy
+      run: |
+        git clone https://github.com/skypyproject/skypy.git
+
+        cd skypy
+        branches=$(git branch --format='%(refname:short)')
+        tags=$(git tag)
+        cd ..
+
+        echo "branches: $(echo ${branches})"
+        echo "::set-env name=branches::$(echo ${branches})"
+
+        echo "tags: $(echo ${tags})"
+        echo "::set-env name=tags::$(echo ${tags})"
+    - name: Mirror Branches
+      run: |
+        for b in ${branches}; do
+          (git checkout -qf ${b} 2> /dev/null && echo "checkout ${b}") || (git checkout -qf --orphan ${b} && git rm -qrf . && echo "branch ${b}")
+          cd skypy && git checkout -qf ${b} && cd ..
+          for file in LICENSE.rst examples; do
+            rm -rf ${file}
+            if [ -e skypy/${file} ]; then
+              cp -a skypy/${file} .
+              git add ${file}
+            fi
+          done
+          git checkout master -- README.md
+          git diff --cached --quiet || git commit -qm "branch ${b}"
+        done
+        git push -f --all origin
+    - name: Mirror Tags
+      run: |
+        for t in ${tags}; do
+          (git checkout -qf ${t} 2> /dev/null && echo "checkout ${t}") || (git checkout -qf --orphan ${t} && git rm -qrf . && echo "tag ${t}")
+          cd skypy && git checkout -qf ${t} && cd ..
+          for file in LICENSE.rst examples; do
+            rm -rf ${file}
+            if [ -e skypy/${file} ]; then
+              cp -a skypy/${file} .
+              git add ${file}
+            fi
+          done
+          git checkout master -- README.md
+          git diff --cached --quiet || git commit -qm "tag ${t}"
+          git tag -f ${t}
+        done
+        git push -f --tags origin
