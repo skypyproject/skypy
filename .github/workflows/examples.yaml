@@ -1,5 +1,7 @@
 name: Mirror Examples
 on:
+  push:
+  release:
   workflow_dispatch:
   schedule:
     - cron: '0 4 * * *'
