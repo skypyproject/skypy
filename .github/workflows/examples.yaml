@@ -25,20 +25,22 @@ jobs:
         git config --global user.name skypybot
         git config --global user.email skypybot@users.noreply.github.com
         git config --global advice.detachedHead false
-    - name: Mirror Branches
+    - name: Mirror Branches and Tags
       run: |
         cd skypy
         branches=$(git branch -r --format='%(refname:short)' | cut -d/ -f2 | grep -E '^master$|^v')
+        tags=$(git tag | grep -E '^v')
+        refs="${branches} ${tags}"
         cd ..
 
-        for b in ${branches}; do
+        for ref in ${refs}; do
           cd examples
-          (git checkout -qf ${b} 2> /dev/null && echo "checkout ${b}") || (git checkout -qf --orphan ${b} && echo "branch ${b}")
+          (git checkout -qf ${ref} 2> /dev/null && echo "update ${ref}") || (git checkout -qf --orphan ${ref} && echo "create ${ref}")
           git rm -qrf .
           cd ..
 
           cd skypy
-          git checkout -qf ${b}
+          git checkout -qf ${ref}
           cd ..
 
           cp -a $(find skypy -maxdepth 2 -name LICENSE.rst) examples/
@@ -47,40 +49,16 @@ jobs:
           cd examples
           git add -Af
           git checkout master -- README.md
-          git diff --cached --quiet || git commit -qm "branch ${b}"
+          git diff --cached --quiet || git commit -qm "${ref}"
+          if [ -n "$(echo "${tags}" | grep "${ref}")" ]; then
+            git tag -f ${ref}
+            git symbolic-ref -q HEAD > /dev/null && git checkout -qf --detach && git branch -qD ${ref}
+          fi
           cd ..
         done
-
+    - name: Push Changes
+      run: |
         cd examples
         git push -f --all origin
-        cd ..
-    - name: Mirror Tags
-      run: |
-        cd skypy
-        tags=$(git tag | grep -E '^v')
-        cd ..
-
-        for t in ${tags}; do
-          cd examples
-          (git checkout -qf ${t} 2> /dev/null && echo "checkout ${t}") || (git checkout -qf --orphan ${t} && echo "tag ${t}")
-          git rm -qrf .
-          cd ..
-
-          cd skypy
-          git checkout -qf ${t}
-          cd ..
-
-          cp -a $(find skypy -maxdepth 2 -name LICENSE.rst) examples/
-          cp -a skypy/examples/* examples/
-
-          cd examples
-          git add -Af
-          git checkout master -- README.md
-          git diff --cached --quiet || git commit -qm "tag ${t}"
-          git tag -f ${t}
-          cd ..
-        done
-
-        cd examples
         git push -f --tags origin
         cd ..
