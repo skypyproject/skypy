@@ -1,5 +1,6 @@
 name: Mirror Examples
 on:
+  push:
   workflow_dispatch:
   schedule:
     - cron: '0 4 * * *'
@@ -7,57 +8,80 @@ jobs:
   examples:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout Repository
+    - name: Checkout SkyPy
+      uses: actions/checkout@v2
+      with:
+        repository: skypyproject/skypy
+        path: skypy
+        fetch-depth: 0
+    - name: Checkout Examples
       uses: actions/checkout@v2
       with:
         repository: skypyproject/examples
-        token: ${{ secrets.EXAMPLES_TOKEN }}
+        token: ${{ secrets.SKYPYBOT_TOKEN }}
+        path: examples
         fetch-depth: 0
     - name: Configure git
       run: |
-        git config user.name github-actions
-        git config user.email github-actions@github.com
-        git config advice.detachedHead false
-    - name: Clone SkyPy
-      run: |
-        pushd ..
-
-        git clone https://github.com/skypyproject/skypy.git
-        cd skypy
-        branches=$(git branch --format='%(refname:short)')
-        tags=$(git tag)
-
-        popd
-
-        echo "branches: $(echo ${branches})"
-        echo "::set-env name=branches::$(echo ${branches})"
-
-        echo "tags: $(echo ${tags})"
-        echo "::set-env name=tags::$(echo ${tags})"
+        git config --global user.name skypybot
+        git config --global user.email skypybot@users.noreply.github.com
+        git config --global advice.detachedHead false
     - name: Mirror Branches
       run: |
+        cd skypy
+        branches=$(git branch -r --format='%(refname:short)' | cut -d/ -f2 | grep -E '^master$|^v')
+        cd ..
+
         for b in ${branches}; do
+          cd examples
           (git checkout -qf ${b} 2> /dev/null && echo "checkout ${b}") || (git checkout -qf --orphan ${b} && echo "branch ${b}")
           git rm -qrf .
-          cd ../skypy && git checkout -qf ${b} && cd -
-          cp -a $(find ../skypy -maxdepth 2 -name LICENSE.rst) .
-          cp -a ../skypy/examples/* .
+          cd ..
+
+          cd skypy
+          git checkout -qf ${b}
+          cd ..
+
+          cp -a $(find skypy -maxdepth 2 -name LICENSE.rst) examples/
+          cp -a skypy/examples/* examples/
+
+          cd examples
           git add -Af
           git checkout master -- README.md
           git diff --cached --quiet || git commit -qm "branch ${b}"
+          cd ..
         done
+
+        cd examples
         git push -f --all origin
+        cd ..
     - name: Mirror Tags
       run: |
+        cd skypy
+        tags=$(git tag | grep -E '^v')
+        cd ..
+
         for t in ${tags}; do
+          cd examples
           (git checkout -qf ${t} 2> /dev/null && echo "checkout ${t}") || (git checkout -qf --orphan ${t} && echo "tag ${t}")
           git rm -qrf .
-          cd ../skypy && git checkout -qf ${t} && cd -
-          cp -a $(find ../skypy -maxdepth 2 -name LICENSE.rst) .
-          cp -a ../skypy/examples/* .
+          cd ..
+
+          cd skypy
+          git checkout -qf ${t}
+          cd ..
+
+          cp -a $(find skypy -maxdepth 2 -name LICENSE.rst) examples/
+          cp -a skypy/examples/* examples/
+
+          cd examples
           git add -Af
           git checkout master -- README.md
           git diff --cached --quiet || git commit -qm "tag ${t}"
           git tag -f ${t}
+          cd ..
         done
+
+        cd examples
         git push -f --tags origin
+        cd ..
