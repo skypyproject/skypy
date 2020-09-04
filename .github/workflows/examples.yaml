@@ -1,7 +1,5 @@
 name: Mirror Examples
 on:
-  push:
-  release:
   workflow_dispatch:
   schedule:
     - cron: '0 4 * * *'
@@ -22,12 +20,14 @@ jobs:
         git config advice.detachedHead false
     - name: Clone SkyPy
       run: |
-        git clone https://github.com/skypyproject/skypy.git
+        pushd ..
 
+        git clone https://github.com/skypyproject/skypy.git
         cd skypy
         branches=$(git branch --format='%(refname:short)')
         tags=$(git tag)
-        cd ..
+
+        popd
 
         echo "branches: $(echo ${branches})"
         echo "::set-env name=branches::$(echo ${branches})"
@@ -37,15 +37,12 @@ jobs:
     - name: Mirror Branches
       run: |
         for b in ${branches}; do
-          (git checkout -qf ${b} 2> /dev/null && echo "checkout ${b}") || (git checkout -qf --orphan ${b} && git rm -qrf . && echo "branch ${b}")
-          cd skypy && git checkout -qf ${b} && cd ..
-          for file in LICENSE.rst examples; do
-            rm -rf ${file}
-            if [ -e skypy/${file} ]; then
-              cp -a skypy/${file} .
-              git add ${file}
-            fi
-          done
+          (git checkout -qf ${b} 2> /dev/null && echo "checkout ${b}") || (git checkout -qf --orphan ${b} && echo "branch ${b}")
+          git rm -qrf .
+          cd ../skypy && git checkout -qf ${b} && cd -
+          cp -a $(find ../skypy -maxdepth 2 -name LICENSE.rst) .
+          cp -a ../skypy/examples/* .
+          git add -Af
           git checkout master -- README.md
           git diff --cached --quiet || git commit -qm "branch ${b}"
         done
@@ -53,15 +50,12 @@ jobs:
     - name: Mirror Tags
       run: |
         for t in ${tags}; do
-          (git checkout -qf ${t} 2> /dev/null && echo "checkout ${t}") || (git checkout -qf --orphan ${t} && git rm -qrf . && echo "tag ${t}")
-          cd skypy && git checkout -qf ${t} && cd ..
-          for file in LICENSE.rst examples; do
-            rm -rf ${file}
-            if [ -e skypy/${file} ]; then
-              cp -a skypy/${file} .
-              git add ${file}
-            fi
-          done
+          (git checkout -qf ${t} 2> /dev/null && echo "checkout ${t}") || (git checkout -qf --orphan ${t} && echo "tag ${t}")
+          git rm -qrf .
+          cd ../skypy && git checkout -qf ${t} && cd -
+          cp -a $(find ../skypy -maxdepth 2 -name LICENSE.rst) .
+          cp -a ../skypy/examples/* .
+          git add -Af
           git checkout master -- README.md
           git diff --cached --quiet || git commit -qm "tag ${t}"
           git tag -f ${t}
