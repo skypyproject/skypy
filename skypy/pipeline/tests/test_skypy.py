@@ -1,5 +1,8 @@
 from astropy.utils.data import get_pkg_data_filename
+from contextlib import redirect_stdout
+from io import StringIO
 import pytest
+from skypy import __version__ as skypy_version
 from skypy.pipeline.scripts import skypy
 
 
@@ -13,6 +16,14 @@ def test_skypy():
     # Argparse help
     with pytest.raises(SystemExit) as e:
         skypy.main(['--help'])
+    assert e.value.code == 0
+
+    # Argparse version
+    version = StringIO()
+    with pytest.raises(SystemExit) as e:
+        with redirect_stdout(version):
+            skypy.main(['--version'])
+    assert version.getvalue().strip() == skypy_version
     assert e.value.code == 0
 
     # Missing positional argument 'config'
