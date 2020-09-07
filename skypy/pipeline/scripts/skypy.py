@@ -35,6 +35,7 @@ values as keyword arguments.
 """
 
 import argparse
+from skypy import __version__ as skypy_version
 from skypy.pipeline.driver import SkyPyDriver
 import sys
 
@@ -66,6 +67,7 @@ def main(args=None):
     import yaml
 
     parser = argparse.ArgumentParser(description="SkyPy pipeline driver")
+    parser.add_argument('--version', action='version', version=skypy_version)
     parser.add_argument('config', type=argparse.FileType('r'),
                         help='Config file name')
     parser.add_argument('-f', '--format', required=False,
