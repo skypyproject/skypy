@@ -1,8 +1,15 @@
 name: Mirror Examples
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '0 4 * * *'
+  push:
+    branches:
+      - master
+      - 'v[0-9]+.*'
+    tags:
+      - 'v[0-9]+.*'
+    paths:
+      - 'examples/**'
+      - LICENSE.rst
 jobs:
   examples:
     runs-on: ubuntu-latest
