@@ -8,7 +8,7 @@ a config file to generate tables of objects and write them to file.
 Using ``skypy`` to run one of the example pipelines and write the outputs to
 fits files:
 
-    $ skypy --config examples/herbel_galaxies.yaml --format fits
+    $ skypy examples/mccl_galaxies.yml --format fits
 
 Config Files
 ------------
