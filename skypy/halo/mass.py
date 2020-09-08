@@ -343,7 +343,7 @@ def number_subhalos(halo_mass, alpha, beta, gamma_M, x, m_min):
         The mass of the halo parent, in units of solar mass.
     alpha, beta : float
         Parameters that determines the subhalo Schechter function. Its the amplitude
-        is defined by equation 4 in [1].
+        is defined by equation 2 in [1].
     gamma_M : float
         Present day mass fraction in subhalos.
     x : float
@@ -388,10 +388,10 @@ def number_subhalos(halo_mass, alpha, beta, gamma_M, x, m_min):
 
 
 def subhalo_mass_sampler(halo_mass, nsubhalos, alpha, beta, gamma_M,
-                         m_min, resolution):
+                         x, m_min, resolution):
     r'''Subhalo mass sampler.
     This function samples subhaloes from their mass function, given the mass
-    of the parent halo. Refer to equation 3 in [1]_.
+    of the parent halo. Refer to equation 1 in [1]_.
 
     Parameters
     -----------
@@ -401,11 +401,15 @@ def subhalo_mass_sampler(halo_mass, nsubhalos, alpha, beta, gamma_M,
         Array of the number of subhalos assigned to parent halos with mass `halo_mass`.
     alpha, beta : float
         Parameters that determines the subhalo Schechter function. Its the amplitude
-        is defined by equation 4 in [1].
+        is defined by equation 2 in [1].
     gamma_M : float
         Present day mass fraction in subhalos.
+    x : float
+        Parameter that accounts for the added mass of the original, unstripped
+        subhalos.
     m_min : array_like
         Mass of the least massive subhalo, in units of solar mass.
+        Current stripped mass is given by :math:`$x m_{min}$`.
     resolution: int
         Resolution of the inverse transform sampling spline.
 
@@ -426,25 +430,24 @@ def subhalo_mass_sampler(halo_mass, nsubhalos, alpha, beta, gamma_M,
 
     >>> halo, min_sh = 1.0e12, 1.0e6
     >>> alpha, beta, gamma_M = 1.9, 1.0, 0.3
-    >>> nsh = mass.number_subhalos(halo, alpha, beta, gamma_M, min_sh)
+    >>> x = 3
+    >>> nsh = mass.number_subhalos(halo, alpha, beta, gamma_M, x, min_sh)
 
     The list of subhalo masses:
 
-    >>> sh = mass.subhalo_mass_sampler(halo, nsh, alpha, beta, gamma_M, min_sh, 100)
+    >>> sh = mass.subhalo_mass_sampler(halo, nsh, alpha, beta, gamma_M, x, min_sh, 100)
 
     References
     ----------
-    .. [1] Vale, A. and Ostriker, J.P. (2005), arXiv: astro-ph/0511816.
+    .. [1] Vale, A. and Ostriker, J.P. (2004), arXiv: astro-ph/0402500.
     '''
-
     halo_mass = np.atleast_1d(halo_mass)
     nsubhalos = np.atleast_1d(nsubhalos)
     subhalo_list = []
     for M, n in zip(halo_mass, nsubhalos):
         m_star = beta * M
-        x_min = m_min / m_star
+        x_min = m_min / (x * m_star)
         x_max = 0.5 * halo_mass / m_star
         subhalo_mass = schechter(alpha, x_min, x_max, resolution, size=n, scale=m_star)
         subhalo_list.append(subhalo_mass)
-
     return np.concatenate(subhalo_list)

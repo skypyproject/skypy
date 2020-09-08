@@ -109,8 +109,9 @@ def test_subhalo_mass_sampler():
     # Test the output shape is correct given the sample size
     halo, min_sh = 1.0e12, 1.0e6
     alpha, beta, gamma_M = 1.9, 1.0, 0.3
-    nsh = mass.number_subhalos(halo, alpha, beta, gamma_M, min_sh)
+    x = 3
+    nsh = mass.number_subhalos(halo, alpha, beta, gamma_M, x, min_sh)
 
-    array_output = mass.subhalo_mass_sampler(halo, nsh, alpha, beta, gamma_M, min_sh, 100)
+    array_output = mass.subhalo_mass_sampler(halo, nsh, alpha, beta, gamma_M, x, min_sh, 100)
 
     assert len(array_output) == np.sum(nsh)
