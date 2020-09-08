@@ -24,11 +24,13 @@ tables:
       alpha0: [2.461, 2.358, 2.568, 2.268, 2.402]
       alpha1: [2.410, 2.340, 2.200, 2.540, 2.464]
       redshift: !red_galaxies.redshift
-    physical_size: !skypy.galaxy.size.linear_lognormal
-      a_mu: -0.243
-      b_mu: 0.954
-      sigma: 0.568
+    physical_size: !skypy.galaxy.size.early_type_lognormal
       magnitude: !red_galaxies.magnitude
+      a: 0.60
+      b: -4.63
+      M0: -20.52
+      sigma1: 0.48
+      sigma2: 0.25
     angular_size: !skypy.galaxy.size.angular_size
       physical_size: !red_galaxies.physical_size
       redshift: !red_galaxies.redshift
@@ -57,11 +59,14 @@ tables:
       alpha0: [2.079, 3.524, 1.917, 1.992, 2.536]
       alpha1: [2.265, 3.862, 1.921, 1.685, 2.480]
       redshift: !blue_galaxies.redshift
-    physical_size: !skypy.galaxy.size.linear_lognormal
-      a_mu: -0.243
-      b_mu: 0.954
-      sigma: 0.568
+    physical_size: !skypy.galaxy.size.late_type_lognormal
       magnitude: !blue_galaxies.magnitude
+      alpha: 0.21
+      beta: 0.53
+      gamma: -1.31
+      M0: -20.52
+      sigma1: 0.48
+      sigma2: 0.25
     angular_size: !skypy.galaxy.size.angular_size
       physical_size: !blue_galaxies.physical_size
       redshift: !blue_galaxies.redshift
