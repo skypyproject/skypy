@@ -56,15 +56,14 @@ The SkyPy library can then be imported from python:
     >>> import skypy
     >>> help(skypy)
 
-SkyPy also has a driver script that can run pipelines. The repository contains
-examples_ of config files in yaml format to download and run. For example:
+SkyPy also has a driver script that can run simulation pipelines from the
+command line. The `skypyproject/examples`_ repository contains sample
+configuration files that you can clone and run:
 
 .. code:: bash
 
+    git clone --depth 1 -b v$(skypy --version) https://github.com/skypyproject/examples.git
     skypy examples/mccl_galaxies.yml –-format fits
-
-will generate tables of red and blue galaxies following the model described in
-`Herbel et al. 2017`_ and write them in FITS format.
 
 .. _PyPI: https://pypi.org/project/skypy/
 .. _conda-forge: https://anaconda.org/conda-forge/skypy
@@ -72,8 +71,7 @@ will generate tables of red and blue galaxies following the model described in
 .. _pip: https://pip.pypa.io/en/stable/
 .. _conda: https://docs.conda.io/en/latest/
 .. _pytest: https://docs.pytest.org/en/stable/
-.. _examples: examples
-.. _Herbel et al. 2017: https://ui.adsabs.harvard.edu/abs/2017JCAP...08..035H
+.. _skypyproject/examples: https://github.com/skypyproject/examples
 
 
 Contributing
