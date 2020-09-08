@@ -329,11 +329,11 @@ def _subhalo_amplitude(M, alpha, beta, gamma_M):
     return gamma_M / (beta * gamma(2.0 - alpha))
 
 
-def number_subhalos(halo_mass, alpha, beta, gamma_M, m_min):
+def number_subhalos(halo_mass, alpha, beta, gamma_M, x, m_min):
     r'''Number of subhalos.
     This function calculates the number of subhalos for a parent halo of given mass
-    according to the model of Vale & Ostriker  2006 [1]_. The mean number of subhalos
-    above a mass threshold can be obtained by integrating equation (3) in [1]. The
+    according to the model of Vale & Ostriker  2004 [1]_. The mean number of subhalos
+    above a mass threshold can be obtained by integrating equation (1) in [1]. The
     number of subhalos returned is randomly drawn from a Poisson distribution with
     that mean.
 
@@ -346,8 +346,12 @@ def number_subhalos(halo_mass, alpha, beta, gamma_M, m_min):
         is defined by equation 4 in [1].
     gamma_M : float
         Present day mass fraction in subhalos.
+    x : float
+        Parameter that accounts for the added mass of the original, unstripped
+        subhalos.
     m_min : array_like
-        Mass of the least massive subhalo, in units of solar mass.
+        Original mass of the least massive subhalo, in units of solar mass.
+        Current stripped mass is given by :math:`$x m_{min}$`.
 
     Returns
     --------
@@ -363,21 +367,19 @@ def number_subhalos(halo_mass, alpha, beta, gamma_M, m_min):
 
     >>> halo, min_sh = 1.0e12, 1.0e6
     >>> alpha, beta, gamma_M = 1.9, 1.0, 0.3
-    >>> nsh = mass.number_subhalos(halo, alpha, beta, gamma_M, min_sh)
+    >>> x = 3
+    >>> nsh = mass.number_subhalos(halo, alpha, beta, gamma_M, x, min_sh)
 
     References
     ----------
-    .. [1] Vale, A. and Ostriker, J.P. (2005), arXiv: astro-ph/0511816.
+    .. [1] Vale, A. and Ostriker, J.P. (2005), arXiv: astro-ph/0402500.
     '''
-
     m_star = beta * halo_mass
-    # m_cut is the mass of the most massive subhalo before becoming a parent halo
-    m_cut = 0.5 * halo_mass
-    x_low = m_min / m_star
+    # m_min is the current minimum subhalo mass, the original mass is x * m_min
+    x_low = m_min / (x * m_star)
+    A = _subhalo_amplitude(halo_mass, alpha, beta, gamma_M)
     # The mean number of subhalos above a mass threshold
-    # can be obtained by integrating equation (3) in [1]
-    A = _subhalo_amplitude(halo_mass, alpha, beta, gamma_M, m_cut)
-
+    # can be obtained by integrating equation (1) in [1]
     n_subhalos = A * gammaincc(1.0 - alpha, x_low) * gamma(1.0 - alpha)
 
     # Random number of subhalos following a Poisson distribution
