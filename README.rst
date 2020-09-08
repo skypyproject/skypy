@@ -63,7 +63,7 @@ configuration files that you can clone and run:
 .. code:: bash
 
     git clone --depth 1 -b v$(skypy --version) https://github.com/skypyproject/examples.git
-    skypy examples/herbel_galaxies.yaml –-format fits
+    skypy examples/mccl_galaxies.yml –-format fits
 
 .. _PyPI: https://pypi.org/project/skypy/
 .. _conda-forge: https://anaconda.org/conda-forge/skypy
