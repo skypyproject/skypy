@@ -11,10 +11,10 @@ tables:
     test_column_1: !numpy.random.uniform
       size: 10
     test_column_2: !numpy.random.uniform
-      low: !test_table_1.test_column_1
+      low: $test_table_1.test_column_1
     test_column_3: !numpy.random.uniform
-      - !test_table_1.test_column_1  # <- low
-      - !test_table_1.test_column_2  # <- high
+      - $test_table_1.test_column_1  # <- low
+      - $test_table_1.test_column_2  # <- high
   test_table_2:
     .init: !astropy.table.QTable
       .depends: test_table_1.complete

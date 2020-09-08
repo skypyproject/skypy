@@ -141,9 +141,14 @@ class SkyPyDriver:
         tuples specify function calls `(function name, function args)`
         '''
 
-        # check for plain value
+        # check if not function
         if not isinstance(value, tuple):
-            return value
+            # check for reference
+            if isinstance(value, str) and value[0] == '$':
+                return self[value[1:]]
+            else:
+                # plain value
+                return value
 
         # value is tuple (function name, [function args])
         name = value[0]
@@ -179,13 +184,10 @@ class SkyPyDriver:
     def get_args(self, args):
         '''parse function arguments
 
-        tuples specify references to container: `(field name,)`
+        strings beginning with `$` are references to other fields
         '''
 
-        if isinstance(args, tuple):
-            # get reference
-            return self[args[0]]
-        elif isinstance(args, dict):
+        if isinstance(args, dict):
             # recurse kwargs
             return {k: self.get_args(v) for k, v in args.items()}
         elif isinstance(args, list):
@@ -193,17 +195,20 @@ class SkyPyDriver:
             return [self.get_args(a) for a in args]
         else:
             # return value
-            return args
+            return self.get_value(args)
 
     def get_deps(self, args):
         '''get dependencies from function args
 
-        returns a list of all dependencies found
+        returns a list of all references found
         '''
 
-        if isinstance(args, tuple):
+        if isinstance(args, str) and args[0] == '$':
             # reference
-            return [args[0]]
+            return [args[1:]]
+        elif isinstance(args, tuple):
+            # recurse on function arguments
+            return self.get_deps(args[1]) if len(args) > 1 else []
         elif isinstance(args, dict):
             # get explicit dependencies
             deps = args.pop('.depends', [])

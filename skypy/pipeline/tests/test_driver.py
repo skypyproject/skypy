@@ -26,7 +26,7 @@ def test_driver():
                   'column1': ('numpy.random.uniform', {
                       'size': size}),
                   'column2': ('numpy.random.uniform', {
-                      'low': ('test_table.column1',)}),
+                      'low': '$test_table.column1'}),
                   'column3': ('list', [string])}}}
 
     driver = SkyPyDriver()
@@ -63,13 +63,13 @@ def test_driver():
 
     # Check for failure if 'column1' requires itself creating a cyclic
     # dependency graph
-    config['tables']['test_table']['column1'] = ('list', ('test_table.column1',))
+    config['tables']['test_table']['column1'] = ('list', '$test_table.column1')
     with pytest.raises(networkx.NetworkXUnfeasible):
         SkyPyDriver().execute(config)
 
     # Check for failure if 'column1' and 'column2' both require each other
     # creating a cyclic dependency graph
-    config['tables']['test_table']['column1'] = ('list', ('test_table.column2',))
+    config['tables']['test_table']['column1'] = ('list', '$test_table.column2')
     with pytest.raises(networkx.NetworkXUnfeasible):
         SkyPyDriver().execute(config)
 
@@ -100,14 +100,16 @@ def test_driver():
 
     # Check variables intialised by function
     config = {'test_func': ('list', 'hello world'),
-              'len_of_test_func': ('len', ('test_func',)),
+              'len_of_test_func': ('len', '$test_func'),
               'nested_references': ('sum', [
-                [('test_func',), [' '], ('test_func',)], []])}
+                ['$test_func', [' '], '$test_func'], []]),
+              'nested_functions': ('list', ('range', ('len', '$test_func')))}
     driver = SkyPyDriver()
     driver.execute(config)
     assert driver.test_func == list('hello world')
     assert driver.len_of_test_func == len('hello world')
     assert driver.nested_references == list('hello world hello world')
+    assert driver.nested_functions == list(range(len('hello world')))
 
 
 def teardown_module(module):
