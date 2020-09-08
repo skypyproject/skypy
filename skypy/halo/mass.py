@@ -324,10 +324,9 @@ def _dlns_dlnM(sigma, M):
     return np.absolute((M / sigma) * ds)
 
 
-def _subhalo_amplitude(M, alpha, beta, gamma_M, m_cut):
-    # astro-ph/0511816 Equation 4
-    x_cut = m_cut / (beta * M)
-    return gamma_M / (beta * gamma(2.0 - alpha) * (1.0 - gammaincc(2.0 - alpha, x_cut)))
+def _subhalo_amplitude(M, alpha, beta, gamma_M):
+    # astro-ph/0402500 Equation 2
+    return gamma_M / (beta * gamma(2.0 - alpha))
 
 
 def number_subhalos(halo_mass, alpha, beta, gamma_M, m_min):
