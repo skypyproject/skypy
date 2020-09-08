@@ -3,9 +3,9 @@ This module contains methods that model the intrinsic properties of galaxy
 populations.
 """
 
-from .ellipticity import *  # noqa F401,F403
-from .luminosity import *  # noqa F401,F403
-from .redshift import *  # noqa F401,F403
-from .size import *  # noqa F401,F403
-from .spectrum import *  # noqa F401,F403
-from .stellar_mass import *  # noqa F401,F403
+from . import ellipticity  # noqa F401,F403
+from . import luminosity  # noqa F401,F403
+from . import redshift  # noqa F401,F403
+from . import size  # noqa F401,F403
+from . import spectrum  # noqa F401,F403
+from . import stellar_mass  # noqa F401,F403
