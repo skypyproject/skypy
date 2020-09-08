@@ -351,7 +351,7 @@ def number_subhalos(halo_mass, alpha, beta, gamma_M, x, m_min):
         subhalos.
     m_min : array_like
         Original mass of the least massive subhalo, in units of solar mass.
-        Current stripped mass is given by :math:`$x m_{min}$`.
+        Current stripped mass is given by :math:`x m_{min}`.
 
     Returns
     --------
@@ -409,7 +409,7 @@ def subhalo_mass_sampler(halo_mass, nsubhalos, alpha, beta, gamma_M,
         subhalos.
     m_min : array_like
         Mass of the least massive subhalo, in units of solar mass.
-        Current stripped mass is given by :math:`$x m_{min}$`.
+        Current stripped mass is given by :math:`x m_{min}`.
     resolution: int
         Resolution of the inverse transform sampling spline.
 
