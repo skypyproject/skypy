@@ -90,7 +90,7 @@ example to plot a parametric surface:
 
     # x and y over a [-5, 5]x[-5, 5] grid
     x, y = np.mgrid[-5.0:5.0:0.1, -5.0:5.0:0.1]
-    
+
     # compute surface
     z = f(x, y)
 
@@ -128,7 +128,7 @@ dependent argument:
 
     # x and y over a [-5, 5]x[-5, 5] grid
     x, y = np.mgrid[-5.0:5.0:0.1, -5.0:5.0:0.1]
-    
+
     # plot surface
     plot(x, y, f)
 
