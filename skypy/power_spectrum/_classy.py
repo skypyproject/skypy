@@ -63,7 +63,6 @@ def classy(wavenumber, redshift, cosmology,
     except ImportError:
         raise Exception("classy is required to use skypy.linear.classy")
 
-    redshift = np.atleast_1d(redshift)
 
     h2 = cosmology.h * cosmology.h
 
