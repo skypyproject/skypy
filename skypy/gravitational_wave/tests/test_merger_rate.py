@@ -1,6 +1,5 @@
 import numpy as np
 from astropy import constants, units
-from skypy.galaxy.luminosity import herbel_luminosities
 from skypy.gravitational_wave import b_band_merger_rate
 from skypy.gravitational_wave.merger_rate import abadie_table_III
 
@@ -8,8 +7,7 @@ from skypy.gravitational_wave.merger_rate import abadie_table_III
 def test_abadie_rates():
 
     # Check the number of merger rates returned
-    z, alpha, a_m, b_m = 1.0, -1.3, -0.9408582, -20.40492365
-    luminosity = herbel_luminosities(z, alpha, a_m, b_m, size=1000)
+    luminosity = 10.**(-0.4*(-20.5 + np.random.randn(1000)))
     rates = b_band_merger_rate(luminosity, population='NS-NS', optimism='low')
     assert len(rates) == len(luminosity)
 
