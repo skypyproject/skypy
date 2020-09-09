@@ -69,7 +69,7 @@ def classy(wavenumber, redshift, cosmology,
 
     params = {
         'output': 'mPk',
-        'P_k_max_1/Mpc':  k.max().value,
+        'P_k_max_1/Mpc':  np.max(wavenumber),
         'z_pk': ', '.join(str(z) for z in redshift),
         'A_s':       A_s,
         'n_s':       n_s,
