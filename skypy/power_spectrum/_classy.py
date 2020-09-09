@@ -65,8 +65,6 @@ def classy(wavenumber, redshift, cosmology,
 
     redshift = np.atleast_1d(redshift)
 
-    k = wavenumber * (1. / u.Mpc)
-
     h2 = cosmology.h * cosmology.h
 
     params = {
