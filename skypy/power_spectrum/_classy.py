@@ -85,10 +85,15 @@ def classy(wavenumber, redshift, cosmology,
     classy_obj.set(params)
     classy_obj.compute()
 
-    pzk = np.zeros([redshift.shape[0], wavenumber.shape[0]])
+    z = np.expand_dims(redshift, (-1,)*np.ndim(wavenumber))
+    k = np.expand_dims(wavenumber, (0,)*np.ndim(redshift))
+    z, k = np.broadcast_arrays(z, k)
+    pzk = np.empty(z.shape)
 
-    for ik, k in enumerate(k.value):
-        for iz, z in enumerate(redshift):
-            pzk[iz, ik] = classy_obj.pk_lin(k, z)
+    for i in np.ndindex(*pzk.shape):
+        pzk[i] = classy_obj.pk_lin(k[i], z[i])
 
-    return pzk.T
+    if pzk.ndim == 0:
+        pzk = pzk.item()
+
+    return pzk
