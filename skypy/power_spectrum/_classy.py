@@ -1,5 +1,4 @@
 import numpy as np
-from astropy import units as u
 
 __all__ = [
     'classy',
@@ -63,7 +62,6 @@ def classy(wavenumber, redshift, cosmology,
     except ImportError:
         raise Exception("classy is required to use skypy.linear.classy")
 
-
     h2 = cosmology.h * cosmology.h
 
     params = {
@@ -95,4 +93,4 @@ def classy(wavenumber, redshift, cosmology,
     if pzk.ndim == 0:
         pzk = pzk.item()
 
-    return pzk
+    return pzk.T
