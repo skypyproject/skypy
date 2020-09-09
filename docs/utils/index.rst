@@ -8,11 +8,17 @@ Utils (`skypy.utils`)
 Decorators
 ==========
 
-SkyPy provides a number of convenient decorators to perform common tasks.
+SkyPy provides a number of convenient decorators to perform common tasks:
+
+- :ref:`uses_default_cosmology`
+- :ref:`broadcast_arguments`
+- :ref:`dependent_argument`
 
 
-Use a default cosmology
------------------------
+.. _uses_default_cosmology:
+
+Use the default cosmology
+-------------------------
 
 The `uses_default_cosmology` decorator will check if a `cosmology` argument is
 provided, and if not, use the `astropy.cosmology.default_cosmology` instead.
@@ -34,6 +40,8 @@ argument as a non-optional argument. Because the `uses_default_cosmology`
 decorator provides a required argument, it should always be placed above
 decorators which handle arguments.
 
+
+.. _broadcast_arguments:
 
 Broadcast arguments to same shape
 ---------------------------------
@@ -63,6 +71,8 @@ passed to the function.
 Since `broadcast_arguments` requires the final shapes of its arguments, it
 should be placed below decorators which modify arguments.
 
+
+.. _dependent_argument:
 
 Evaluate dependent arguments
 ----------------------------
