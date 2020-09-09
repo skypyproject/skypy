@@ -30,11 +30,11 @@ def classy(wavenumber, redshift, cosmology,
 
     Returns
     -------
-    power_spectrum : (nk, nz) array_like
+    power_spectrum : (nz, nk) array_like
         Array of values for the linear matter power spectrum in  [Mpc^3]
         evaluated at the input wavenumbers for the given primordial power
         spectrum parameters, cosmology. For nz redshifts and nk wavenumbers
-        the returned array will have shape (nk, nz).
+        the returned array will have shape (nz, nk).
 
     Examples
     --------
@@ -93,4 +93,4 @@ def classy(wavenumber, redshift, cosmology,
     if pzk.ndim == 0:
         pzk = pzk.item()
 
-    return pzk.T
+    return pzk
