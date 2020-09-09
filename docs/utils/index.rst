@@ -60,6 +60,9 @@ passed to the function.
     #          [1 2 3 5 5 5]
     #          [1 2 3 6 6 6]]
 
+Since `broadcast_arguments` requires the final shapes of its arguments, it
+should be placed below decorators which modify arguments.
+
 
 Evaluate dependent arguments
 ----------------------------
@@ -128,6 +131,10 @@ dependent argument:
     
     # plot surface
     plot(x, y, f)
+
+Since `dependent_argument` requires the values of all independent arguments, it
+should be placed below decorators which modify any of the independent
+arguments.
 
 
 Astronomy (`skypy.utils.astronomy`)
