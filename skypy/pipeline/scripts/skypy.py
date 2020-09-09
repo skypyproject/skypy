@@ -8,7 +8,7 @@ a config file to generate tables of objects and write them to file.
 Using ``skypy`` to run one of the example pipelines and write the outputs to
 fits files:
 
-    $ skypy --config examples/herbel_galaxies.yaml --format fits
+    $ skypy examples/mccl_galaxies.yml --format fits
 
 Config Files
 ------------
@@ -35,8 +35,31 @@ values as keyword arguments.
 """
 
 import argparse
+from skypy import __version__ as skypy_version
 from skypy.pipeline.driver import SkyPyDriver
 import sys
+
+
+def yaml_tag(loader, tag, node):
+    '''handler for generic YAML tags
+
+    tags are stored as a tuple `(tag, value)`
+    '''
+
+    import yaml
+
+    if isinstance(node, yaml.ScalarNode):
+        value = loader.construct_scalar(node)
+    elif isinstance(node, yaml.SequenceNode):
+        value = loader.construct_sequence(node)
+    elif isinstance(node, yaml.MappingNode):
+        value = loader.construct_mapping(node)
+
+    # tags without arguments have empty string value
+    if value == '':
+        return tag,
+
+    return tag, value
 
 
 def main(args=None):
@@ -44,6 +67,7 @@ def main(args=None):
     import yaml
 
     parser = argparse.ArgumentParser(description="SkyPy pipeline driver")
+    parser.add_argument('--version', action='version', version=skypy_version)
     parser.add_argument('config', type=argparse.FileType('r'),
                         help='Config file name')
     parser.add_argument('-f', '--format', required=False,
@@ -54,6 +78,9 @@ def main(args=None):
     # get system args if none passed
     if args is None:
         args = sys.argv[1:]
+
+    # register custom tags
+    yaml.SafeLoader.add_multi_constructor('!', yaml_tag)
 
     args = parser.parse_args(args or ['--help'])
     config = yaml.safe_load(args.config)

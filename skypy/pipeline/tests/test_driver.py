@@ -11,8 +11,7 @@ from skypy.pipeline.driver import SkyPyDriver
 def test_driver():
 
     # Evaluate and store the default astropy cosmology.
-    config = {'test_cosmology': {
-                'function': 'astropy.cosmology.default_cosmology.get'}}
+    config = {'test_cosmology': ('astropy.cosmology.default_cosmology.get',)}
 
     driver = SkyPyDriver()
     driver.execute(config)
@@ -21,21 +20,14 @@ def test_driver():
     # Generate a simple two column table with a dependency. Also write the
     # table to a fits file and check it's contents.
     size = 100
-    string = '"' + size*'a' + '"'
+    string = size*'a'
     config = {'tables': {
                 'test_table': {
-                  'column1': {
-                    'function': 'numpy.random.uniform',
-                    'args': {
-                      'size': size}},
-                  'column2': {
-                    'function': 'numpy.random.uniform',
-                    'args': {
-                      'low': 'test_table.column1'}},
-                  'column3': {
-                      'function': 'list',
-                      'args': [
-                        string]}}}}
+                  'column1': ('numpy.random.uniform', {
+                      'size': size}),
+                  'column2': ('numpy.random.uniform', {
+                      'low': '$test_table.column1'}),
+                  'column3': ('list', [string])}}}
 
     driver = SkyPyDriver()
     driver.execute(config, file_format='fits')
@@ -51,33 +43,33 @@ def test_driver():
 
     # Check that the existing output files are modified if overwrite is True
     new_size = 2 * size
-    new_string = '"' + new_size*'a' + '"'
-    config['tables']['test_table']['column1']['args']['size'] = new_size
-    config['tables']['test_table']['column3']['args'][0] = new_string
+    new_string = new_size*'a'
+    config['tables']['test_table']['column1'][1]['size'] = new_size
+    config['tables']['test_table']['column3'][1][0] = new_string
     driver = SkyPyDriver()
     driver.execute(config, file_format='fits', overwrite=True)
     with fits.open('test_table.fits') as hdu:
         assert len(hdu[1].data) == new_size
 
     # Check for failure if 'column1' calls a nonexistant module
-    config['tables']['test_table']['column1']['function'] = 'nomodule.function'
+    config['tables']['test_table']['column1'] = ('nomodule.function',)
     with pytest.raises(ModuleNotFoundError):
         SkyPyDriver().execute(config)
 
     # Check for failure if 'column1' calls a nonexistant function
-    config['tables']['test_table']['column1']['function'] = 'builtins.nofunction'
+    config['tables']['test_table']['column1'] = ('builtins.nofunction',)
     with pytest.raises(AttributeError):
         SkyPyDriver().execute(config)
 
     # Check for failure if 'column1' requires itself creating a cyclic
     # dependency graph
-    config['tables']['test_table']['column1']['args'] = {'low': 'test_table.column1'}
+    config['tables']['test_table']['column1'] = ('list', '$test_table.column1')
     with pytest.raises(networkx.NetworkXUnfeasible):
         SkyPyDriver().execute(config)
 
     # Check for failure if 'column1' and 'column2' both require each other
     # creating a cyclic dependency graph
-    config['tables']['test_table']['column1']['args'] = {'low': 'test_table.column2'}
+    config['tables']['test_table']['column1'] = ('list', '$test_table.column2')
     with pytest.raises(networkx.NetworkXUnfeasible):
         SkyPyDriver().execute(config)
 
@@ -90,29 +82,34 @@ def test_driver():
     # Check variables intialised by value
     config = {'test_int': 1,
               'test_float': 1.0,
-              'test_string': 'hello world'}
+              'test_string': 'hello world',
+              'test_list': [0, 'one', 2.],
+              'test_dict': {'a': 'b'}}
     driver = SkyPyDriver()
     driver.execute(config)
     assert isinstance(driver.test_int, int)
     assert isinstance(driver.test_float, float)
     assert isinstance(driver.test_string, str)
+    assert isinstance(driver.test_list, list)
+    assert isinstance(driver.test_dict, dict)
     assert driver.test_int == 1
     assert driver.test_float == 1.0
     assert driver.test_string == 'hello world'
+    assert driver.test_list == [0, 'one', 2.]
+    assert driver.test_dict == {'a': 'b'}
 
     # Check variables intialised by function
-    config = {'test_func': {
-                'function': 'list',
-                'args': [
-                    '"hello world"']},
-              'test_func2': {
-                'function': 'len',
-                'args': [
-                    'test_func']}}
+    config = {'test_func': ('list', 'hello world'),
+              'len_of_test_func': ('len', '$test_func'),
+              'nested_references': ('sum', [
+                ['$test_func', [' '], '$test_func'], []]),
+              'nested_functions': ('list', ('range', ('len', '$test_func')))}
     driver = SkyPyDriver()
     driver.execute(config)
     assert driver.test_func == list('hello world')
-    assert driver.test_func2 == 11
+    assert driver.len_of_test_func == len('hello world')
+    assert driver.nested_references == list('hello world hello world')
+    assert driver.nested_functions == list(range(len('hello world')))
 
 
 def teardown_module(module):
