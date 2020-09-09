@@ -91,6 +91,6 @@ def classy(wavenumber, redshift, cosmology,
         pzk[i] = classy_obj.pk_lin(k[i], z[i])
 
     if pzk.ndim == 0:
-        pzk = pzk.item()
+        pzk = pzk.item()  # pragma: no cover
 
     return pzk
