@@ -3,14 +3,14 @@ A_s: 2.1982e-09
 n_s: 0.969453
 redshift: 1
 growth_function: !skypy.power_spectrum.growth_function
-  redshift: !redshift
-  cosmology: !cosmology
+  redshift: $redshift
+  cosmology: $cosmology
 wavenumber: !numpy.logspace [-4, 2, 100]
 power_spectrum: !skypy.power_spectrum.eisenstein_hu
-  wavenumber: !wavenumber
-  A_s: !A_s
-  n_s: !n_s
-  cosmology: !cosmology
+  wavenumber: $wavenumber
+  A_s: $A_s
+  n_s: $n_s
+  cosmology: $cosmology
 tables:
   halos:
     mass: !skypy.halo.mass.press_schechter
@@ -18,19 +18,19 @@ tables:
       m_max: 1.0E+12
       resolution: 1000
       size: 1000
-      wavenumber: !wavenumber
-      power_spectrum: !power_spectrum
-      growth_function: !growth_function
-      cosmology: !cosmology
+      wavenumber: $wavenumber
+      power_spectrum: $power_spectrum
+      growth_function: $growth_function
+      cosmology: $cosmology
   galaxies:
     luminosity: !skypy.galaxy.luminosity.herbel_luminosities
       alpha: -0.5
       a_m: -0.610
       b_m: -20.416
       size: 100
-      redshift: !redshift
+      redshift: $redshift
   abundance_matching:
     .init: !skypy.halo.abundance_matching.vale_ostriker
       .depends: [halos.complete, galaxies.complete]
-      halos: !halos
-      galaxies: !galaxies
+      halos: $halos
+      galaxies: $galaxies

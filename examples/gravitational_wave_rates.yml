@@ -8,21 +8,21 @@ tables:
       a_m: -0.610
       b_m: -20.416
       size: 1000
-      cosmology: !cosmology
+      cosmology: $cosmology
     luminosity: !skypy.galaxy.luminosity.herbel_luminosities
       alpha: -0.5
       a_m: -0.610
       b_m: -20.416
-      redshift: !merger_rates.redshift
+      redshift: $merger_rates.redshift
     ns_ns_rate: !skypy.gravitational_wave.b_band_merger_rate
       population: NS-NS
       optimism: low
-      luminosity: !merger_rates.luminosity
+      luminosity: $merger_rates.luminosity
     ns_bh_rate: !skypy.gravitational_wave.b_band_merger_rate
       population: NS-BH
       optimism: low
-      luminosity: !merger_rates.luminosity
+      luminosity: $merger_rates.luminosity
     bh_bh_rate: !skypy.gravitational_wave.b_band_merger_rate
       population: BH-BH
       optimism: low
-      luminosity: !merger_rates.luminosity
+      luminosity: $merger_rates.luminosity
