@@ -87,37 +87,48 @@ def test_kcorrect_spectra():
 
 def test_mag_ab_standard_source():
 
+    import astropy.units as u
+    import specutils
+
     from skypy.galaxy.spectrum import mag_ab
 
     # create a bandpass
-    bp_lam = np.logspace(0, 4, 1000)
-    bp_tx = np.exp(-((bp_lam - 1000)/(100))**2)
+    bp_lam = np.logspace(0, 4, 1000)*u.AA
+    bp_tx = np.exp(-((bp_lam - 1000*u.AA)/(100*u.AA))**2)*u.adu
+    bp = specutils.Spectrum1D(spectral_axis=bp_lam, flux=bp_tx)
 
     # test that the AB standard source has zero magnitude
-    lam = np.logspace(0, 4, 1000)
-    flam = 0.10884806248538730623/lam**2
-    m = mag_ab(lam, flam, bp_lam, bp_tx)
+    lam = np.logspace(0, 4, 1000)*u.AA
+    flam = 0.10884806248538730623*u.Unit('erg s-1 cm-2 AA')/lam**2
+    spec = specutils.Spectrum1D(spectral_axis=lam, flux=flam)
+
+    m = mag_ab(spec, bp)
 
     assert np.isclose(m, 0)
 
 
 def test_mag_ab_redshift_dependence():
 
+    import astropy.units as u
+    import specutils
+
     from skypy.galaxy.spectrum import mag_ab
 
     # make a wide tophat bandpass
-    th_lam = np.logspace(-10, 10, 3)
-    th_tx = np.ones(3)
+    bp_lam = np.logspace(-10, 10, 3)*u.AA
+    bp_tx = np.ones(3)*u.adu
+    bp = specutils.Spectrum1D(spectral_axis=bp_lam, flux=bp_tx)
 
     # create a narrow gaussian source
-    lam = np.logspace(0, 3, 1000)
-    flam = np.exp(-((lam - 100)/10)**2)
+    lam = np.logspace(0, 3, 1000)*u.AA
+    flam = np.exp(-((lam - 100*u.AA)/(10*u.AA))**2)*u.Unit('erg s-1 cm-2 AA-1')
+    spec = specutils.Spectrum1D(spectral_axis=lam, flux=flam)
 
     # array of redshifts
     z = np.linspace(0, 1, 11)
 
     # compute the AB magnitude at different redshifts
-    m = mag_ab(lam, flam, th_lam, th_tx, z)
+    m = mag_ab(spec, bp, z)
 
     # compare with expected redshift dependence
     np.testing.assert_allclose(m, m[0] - 2.5*np.log10(1 + z))

@@ -3,6 +3,7 @@ r"""Galaxy spectrum module.
 """
 
 import numpy as np
+import astropy.units as u
 from astropy.io.fits import getdata
 
 
@@ -198,7 +199,7 @@ def kcorrect_spectra(redshift, stellar_mass, coefficients):
     return wavelength_observed, sed
 
 
-def mag_ab(spec_lam, spec_flux, band_lam, band_tx, redshift=None):
+def mag_ab(spectrum, bandpass, redshift=None):
     r'''Compute absolute AB magnitude from spectrum and bandpass.
 
     This function takes an *emission* spectrum and an observation bandpass and
@@ -211,44 +212,37 @@ def mag_ab(spec_lam, spec_flux, band_lam, band_tx, redshift=None):
 
     Parameters
     ----------
-    spec_lam : (ns,) array_like
-        Vector of spectrum wavelengths in units of Angstrom.
-    spec_flux : (ns,) array_like
-        Vector of spectrum fluxes in units of erg/s/cm2/A.
-    band_lam : (nb,) array_like
-        Vector of bandpass wavelengths in units of Angstrom.
-    band_tx : (nb,) array_like
-        Vector of bandpass transmissions.
+    spectrum : specutils.Spectrum1D
+        Emission spectrum of the source.
+    bandpass : specutils.Spectrum1D
+        Bandpass filter.
     redshift : array_like, optional
-        Optional array of values for redshifting the source spectrum. Default
-        is a redshift of 0.0.
+        Optional array of values for redshifting the source spectrum.
 
     Returns
     -------
     mag_ab : array_like
         The absolute AB magnitude. If redshifts are given, the output has the
-        same shape *and type* as the `redshift` argument.
+        same shape as the `redshift` argument.
 
     References
     ----------
     .. [1] M. R. Blanton et al., 2003, AJ, 125, 2348
     '''
 
-    assert np.ndim(spec_lam) == 1, 'spec_lam must be 1d array'
-    assert np.ndim(spec_flux) == 1, 'spec_flux must be 1d array'
-    assert len(spec_lam) == len(spec_flux), 'spec_lam and spec_flux must match'
-    assert np.all(np.less_equal(spec_lam[:-1], spec_lam[1:])), 'spec_lam must be ordered'
-    assert np.ndim(band_lam) == 1, 'band_lam must be 1d array'
-    assert np.ndim(band_tx) == 1, 'band_tx must be 1d array'
-    assert len(band_lam) == len(band_tx), 'band_lam and band_tx must match'
-    assert np.all(np.less_equal(band_lam[:-1], band_lam[1:])), 'band_lam must be ordered'
+    # get the spectrum and bandpass
+    spec_lam = spectrum.wavelength.to_value('AA', equivalencies=u.spectral())
+    spec_flux = spectrum.flux.to_value('erg s-1 cm-2 AA-1',
+                                       equivalencies=u.spectral_density(spec_lam))
+    band_lam = bandpass.wavelength.to_value('AA', equivalencies=u.spectral())
+    band_tx = bandpass.flux.to_value('adu')
 
     # redshift zero if not given
     if redshift is None:
         redshift = 0.
 
     # allocate output array
-    mag_ab = np.empty_like(redshift)
+    mag_ab = np.empty_like(redshift, dtype=float)
 
     # compute magnitude contribution from band normalisation [denominator of (2)]
     m_band = -2.5*np.log10(np.trapz(band_tx/band_lam, band_lam))
