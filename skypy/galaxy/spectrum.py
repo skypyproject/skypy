@@ -280,3 +280,59 @@ def mag_ab(spec_lam, spec_flux, band_lam, band_tx, redshift=None):
 
     # all done
     return mag_ab
+
+
+def absolute_magnitude_from_templates(coefficients, band_lam, band_tx,
+                                      redshift=0, resolution=1000):
+    r'''Compute absolute AB magnitudes from galaxy template coefficients.
+
+    This function calculates absolute AB magnitudes for galaxies whose spectra
+    are modelled as a linear combination of the kcorrect template spectra
+    presented in [1]_.
+
+    Parameters
+    ----------
+    coefficients : (5, ng) array_like
+        Array of spectrum coefficients.
+    band_lam : (nb,) array_like
+        Vector of bandpass wavelengths in units of Angstrom.
+    band_tx : (nb,) array_like
+        Vector of bandpass transmissions.
+    redshift : (ng) array_like, optional
+        Optional array of values for redshifting the source spectrum. Default
+        is a redshift of 0.0.
+    resolution : integer, optional
+        Redshift resolution for intepolating magnitudes. Default is 1000. If
+        the number of galaxies is less than resolution their magnitudes are
+        calculated directly without interpolation.
+
+    Returns
+    -------
+    mag_ab : array_like
+        The absolute AB magnitude of each galaxy
+
+    References
+    ----------
+    .. [1] M. R. Blanton and S. Roweis, 2007, AJ, 125, 2348
+    '''
+
+    kcorrect_templates_url = "https://github.com/blanton144/kcorrect/raw/" \
+                             "master/data/templates/k_nmf_derived.default.fits"
+    templates = getdata(kcorrect_templates_url, 1)
+    spec_lam = getdata(kcorrect_templates_url, 11)
+
+    nt = np.shape(templates)[0]
+    nz = np.size(redshift)
+    mag = np.empty((nt, nz))
+    interpolate = nz > resolution
+
+    for i, spec_flux in enumerate(templates):
+        if interpolate:
+            z = np.linspace(np.min(redshift), np.max(redshift), resolution)
+            mag_z = mag_ab(spec_lam, spec_flux, band_lam, band_tx, z)
+            mag[i] = np.interp(redshift, z, mag_z)
+        else:
+            mag[i] = mag_ab(spec_lam, spec_flux, band_lam, band_tx, redshift)
+
+    flux = np.sum(coefficients * np.power(10, -0.4*mag), axis=0)
+    return -2.5 * np.log10(flux)
