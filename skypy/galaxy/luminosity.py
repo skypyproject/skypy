@@ -9,8 +9,72 @@ from ..utils import uses_default_cosmology, dependent_argument
 
 
 __all__ = [
+    'absolute_to_apparent_magnitude',
+    'apparent_to_absolute_magnitude',
+    'distance_modulus',
     'schechter_lf_magnitude',
 ]
+
+
+def absolute_to_apparent_magnitude(M, DM):
+    '''Convert absolute to apparent magnitude.
+
+    Parameters
+    ==========
+    M : array_like
+        Absolute magnitude.
+    DM : array_like
+        Distance modulus.
+
+    Returns
+    =======
+    m : array_like
+        Apparent magnitude M + DM.
+
+    '''
+
+    return np.add(M, DM)
+
+
+def apparent_to_absolute_magnitude(m, DM):
+    '''Convert apparent to absolute magnitude.
+
+    Parameters
+    ==========
+    m : array_like
+        Apparent magnitude.
+    DM : array_like
+        Distance modulus.
+
+    Returns
+    =======
+    M : array_like
+        Absolute magnitude m - DM.
+
+    '''
+
+    return np.subtract(m, DM)
+
+
+@uses_default_cosmology
+def distance_modulus(redshift, cosmology):
+    '''Compute the distance modulus.
+
+    Parameters
+    ==========
+    redshift : array_like
+        Redshift of objects.
+    cosmology : Cosmology, optional
+        The cosmology from which the luminosity distance is taken. If not
+        given, the default cosmology is used.
+
+    Returns
+    =======
+    distmod : array_like
+        The distance modulus m - M for each input redshift.
+    '''
+
+    return cosmology.distmod(redshift).value
 
 
 @uses_default_cosmology

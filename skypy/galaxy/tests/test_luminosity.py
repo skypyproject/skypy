@@ -2,6 +2,39 @@ import numpy as np
 from scipy.stats import kstest
 
 
+def test_magnitude_functions():
+    from astropy.cosmology import default_cosmology
+
+    from skypy.galaxy.luminosity import (absolute_to_apparent_magnitude,
+            apparent_to_absolute_magnitude, distance_modulus)
+
+    cosmo = default_cosmology.get()
+
+    # sample some redshifts
+    z = np.random.uniform(0, 10, size=1000)
+
+    # sample some absolute magnitudes
+    M = np.random.uniform(15, 25, size=1000)
+
+    # sample distance moduli
+    DM = cosmo.distmod(z).value
+
+    # compare with function
+    np.testing.assert_allclose(distance_modulus(z), DM)
+
+    # compute apparent magnitudes
+    m = absolute_to_apparent_magnitude(M, DM)
+
+    # compare with values
+    np.testing.assert_allclose(m, M+DM)
+
+    # go back to absolute magnitudes
+    M_ = apparent_to_absolute_magnitude(m, DM)
+
+    # compare with original values
+    np.testing.assert_allclose(M_, M)
+
+
 def test_schechter_lf_magnitude():
     from skypy.galaxy.luminosity import schechter_lf_magnitude
     from astropy.cosmology import default_cosmology
