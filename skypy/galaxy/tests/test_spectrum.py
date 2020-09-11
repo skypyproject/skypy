@@ -39,6 +39,12 @@ def test_sampling_coefficients():
         assert p >= 0.01, \
             'Not all marginal distributions follow a beta distribution.'
 
+    # test sampling with weights
+    weight = [3.47e+09, 3.31e+06, 2.13e+09, 1.64e+10, 1.01e+09]
+    coefficients = dirichlet_coefficients(redshift, alpha0, alpha1, z1, weight)
+    assert coefficients.shape == (len(redshift), len(alpha0)), \
+        'Shape of coefficients array is not (len(redshift), len(alpha0)) '
+
     # Test output shape if redshift is a scalar
     redshift = 2.0
     coefficients = dirichlet_coefficients(redshift, alpha0, alpha1)
@@ -55,12 +61,14 @@ def test_sampling_coefficients():
 
     # Test that ValueError is risen if alpha0 or alpha1 is a scalar.
     scalar_alpha = 1.
-    with pytest.raises(ValueError,
-                       match="alpha0 and alpha1 must be array_like."):
+    with pytest.raises(ValueError):
         dirichlet_coefficients(redshift, scalar_alpha, alpha1)
-    with pytest.raises(ValueError,
-                       match="alpha0 and alpha1 must be array_like."):
+    with pytest.raises(ValueError):
         dirichlet_coefficients(redshift, alpha0, scalar_alpha)
+
+    # bad weight parameter
+    with pytest.raises(ValueError):
+        dirichlet_coefficients(redshift, [2.5, 2.5], [2.5, 2.5], weight=[1, 2, 3])
 
 
 def test_kcorrect_spectra():

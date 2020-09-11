@@ -14,7 +14,7 @@ __all__ = [
 ]
 
 
-def dirichlet_coefficients(redshift, alpha0, alpha1, z1=1.):
+def dirichlet_coefficients(redshift, alpha0, alpha1, z1=1., weight=None):
     r"""Dirichlet-distributed SED coefficients.
 
     Spectral coefficients to calculate the rest-frame spectral energy
@@ -30,6 +30,8 @@ def dirichlet_coefficients(redshift, alpha0, alpha1, z1=1.):
         (3.9) in [1]_.
     z1 : float or scalar, optional
        Reference redshift at which alpha = alpha1. The default value is 1.0.
+    weight : (nc,) array_like, optional
+        Different weights for each component.
 
     Returns
     -------
@@ -84,22 +86,25 @@ def dirichlet_coefficients(redshift, alpha0, alpha1, z1=1.):
     >>> coefficients = dirichlet_coefficients(redshift, alpha0, alpha1)
 
     """
-    if np.isscalar(alpha0) or np.isscalar(alpha1):
-        raise ValueError("alpha0 and alpha1 must be array_like.")
-    return_shape = (*np.shape(redshift), *np.shape(alpha0))
-    redshift = np.atleast_1d(redshift)[:, np.newaxis]
 
-    alpha = np.power(alpha0, 1. - redshift / z1) * \
-        np.power(alpha1, redshift / z1)
+    if np.ndim(alpha0) != 1 or np.ndim(alpha1) != 1:
+        raise ValueError('alpha0, alpha1 must be 1D arrays')
+    if len(alpha0) != len(alpha1):
+        raise ValueError('alpha0 and alpha1 must have the same length')
+    if weight is not None and (np.ndim(weight) != 1 or len(weight) != len(alpha0)):
+        raise ValueError('weight must be 1D and match alpha0, alpha1')
 
-    # To sample Dirichlet distributed variables of order k we first sample k
-    # Gamma distributed variables y_i with the parameters alpha_i.
-    # Normalising all y_i by the sum of all k y_i gives us the k Dirichlet
-    # distributed variables.
-    y = np.random.gamma(alpha)
-    sum_y = y.sum(axis=1)
-    coefficients = np.divide(y.T, sum_y.T).T
-    return coefficients.reshape(return_shape)
+    redshift = np.expand_dims(redshift, -1)
+
+    alpha = np.power(alpha0, 1-redshift/z1)*np.power(alpha1, redshift/z1)
+
+    # sample Dirichlet by normalising independent gamma draws
+    coeff = np.random.gamma(alpha)
+    if weight is not None:
+        coeff *= weight
+    coeff /= coeff.sum(axis=-1)[..., np.newaxis]
+
+    return coeff
 
 
 def kcorrect_spectra(redshift, stellar_mass, coefficients):
