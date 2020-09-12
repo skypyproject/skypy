@@ -6,7 +6,9 @@ def test_magnitude_functions():
     from astropy.cosmology import default_cosmology
 
     from skypy.galaxy.luminosity import (absolute_to_apparent_magnitude,
-            apparent_to_absolute_magnitude, distance_modulus)
+            apparent_to_absolute_magnitude, distance_modulus,
+            luminosity_in_band, luminosity_from_absolute_magnitude,
+            absolute_magnitude_from_luminosity)
 
     cosmo = default_cosmology.get()
 
@@ -33,6 +35,15 @@ def test_magnitude_functions():
 
     # compare with original values
     np.testing.assert_allclose(M_, M)
+
+    # convert between absolute luminosity and magnitude
+    assert np.isclose(luminosity_from_absolute_magnitude(-22), 630957344.5)
+    assert np.isclose(absolute_magnitude_from_luminosity(630957344.5), -22)
+
+    # convert with standard luminosities
+    for ref, mag in luminosity_in_band.items():
+        assert np.isclose(luminosity_from_absolute_magnitude(mag, ref), 1.0)
+        assert np.isclose(absolute_magnitude_from_luminosity(1.0, ref), mag)
 
 
 def test_schechter_lf_magnitude():

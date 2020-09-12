@@ -98,6 +98,7 @@ Reference/API
 
 .. automodapi:: skypy.galaxy
 .. automodapi:: skypy.galaxy.luminosity
+   :include-all-objects:
 .. automodapi:: skypy.galaxy.ellipticity
    :include-all-objects:
 .. automodapi:: skypy.galaxy.redshift
