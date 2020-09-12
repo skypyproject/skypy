@@ -3,6 +3,9 @@ from scipy.stats import kstest
 
 
 def test_magnitude_functions():
+
+    from pytest import raises
+
     from astropy.cosmology import default_cosmology
 
     from skypy.galaxy.luminosity import (absolute_to_apparent_magnitude,
@@ -44,6 +47,12 @@ def test_magnitude_functions():
     for ref, mag in luminosity_in_band.items():
         assert np.isclose(luminosity_from_absolute_magnitude(mag, ref), 1.0)
         assert np.isclose(absolute_magnitude_from_luminosity(1.0, ref), mag)
+
+    # error when unknown reference is used
+    with raises(KeyError):
+        luminosity_from_absolute_magnitude(0., 'unknown')
+    with raises(KeyError):
+        absolute_magnitude_from_luminosity(1., 'unknown')
 
 
 def test_schechter_lf_magnitude():
