@@ -4,6 +4,14 @@ import pytest
 from astropy.io.fits import getdata
 
 
+try:
+    import specutils
+except ImportError:
+    SPECUTILS_FOUND = False
+else:
+    SPECUTILS_FOUND = True
+
+
 from skypy.galaxy.spectrum import dirichlet_coefficients, kcorrect_spectra
 
 
@@ -85,10 +93,10 @@ def test_kcorrect_spectra():
     assert np.allclose(sed, templates[0])
 
 
+@pytest.mark.skipif(not SPECUTILS_FOUND, reason='test requires specutils')
 def test_mag_ab_standard_source():
 
     import astropy.units as u
-    import specutils
 
     from skypy.galaxy.spectrum import mag_ab
 
@@ -107,10 +115,10 @@ def test_mag_ab_standard_source():
     assert np.isclose(m, 0)
 
 
+@pytest.mark.skipif(not SPECUTILS_FOUND, reason='test requires specutils')
 def test_mag_ab_redshift_dependence():
 
     import astropy.units as u
-    import specutils
 
     from skypy.galaxy.spectrum import mag_ab
 
