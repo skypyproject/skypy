@@ -102,7 +102,7 @@ def test_mag_ab_standard_source():
 
     # create a bandpass
     bp_lam = np.logspace(0, 4, 1000)*u.AA
-    bp_tx = np.exp(-((bp_lam - 1000*u.AA)/(100*u.AA))**2)*u.adu
+    bp_tx = np.exp(-((bp_lam - 1000*u.AA)/(100*u.AA))**2)*u.dimensionless_unscaled
     bp = specutils.Spectrum1D(spectral_axis=bp_lam, flux=bp_tx)
 
     # test that the AB standard source has zero magnitude
@@ -124,7 +124,7 @@ def test_mag_ab_redshift_dependence():
 
     # make a wide tophat bandpass
     bp_lam = np.logspace(-10, 10, 3)*u.AA
-    bp_tx = np.ones(3)*u.adu
+    bp_tx = np.ones(3)*u.dimensionless_unscaled
     bp = specutils.Spectrum1D(spectral_axis=bp_lam, flux=bp_tx)
 
     # create a narrow gaussian source
