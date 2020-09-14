@@ -276,7 +276,7 @@ def mag_ab(spectrum, bandpass, redshift=None):
     return mag_ab
 
 
-def absolute_magnitude_from_templates(coefficients, templates, bandpass,
+def absolute_magnitude_from_templates(coefficients, templates, bandpasses,
                                       redshift=None, resolution=1000):
     r'''Compute absolute AB magnitudes from galaxy template coefficients.
 
@@ -290,8 +290,8 @@ def absolute_magnitude_from_templates(coefficients, templates, bandpass,
         Array of spectrum coefficients.
     templates : (nt,) specutils.SpectrumList
         Template spectra
-    bandpass : specutils.Spectrum1D
-        Bandpass filter.
+    bandpasses : (nb,) specutils.SpectrumList
+        Bandpass filters.
     redshift : (ng,) array_like, optional
         Optional array of values for redshifting the source spectrum.
     resolution : integer, optional
@@ -301,7 +301,7 @@ def absolute_magnitude_from_templates(coefficients, templates, bandpass,
 
     Returns
     -------
-    mag_ab : array_like
+    mag_ab : (nb, ng) array_like
         The absolute AB magnitude of each galaxy
 
     References
@@ -309,18 +309,20 @@ def absolute_magnitude_from_templates(coefficients, templates, bandpass,
     .. [1] M. R. Blanton and S. Roweis, 2007, AJ, 125, 2348
     '''
 
+    nb = len(bandpasses)
     nt = len(templates)
     nz = np.size(redshift)
-    mag = np.empty((nt, nz))
+    mag = np.empty((nb, nt, nz))
     interpolate = nz > resolution
 
-    for i, spectrum in enumerate(templates):
-        if interpolate:
-            z = np.linspace(np.min(redshift), np.max(redshift), resolution)
-            mag_z = mag_ab(spectrum, bandpass, z)
-            mag[i] = np.interp(redshift, z, mag_z)
-        else:
-            mag[i] = mag_ab(spectrum, bandpass, redshift)
+    for i, bandpass in enumerate(bandpasses):
+        for j, spectrum in enumerate(templates):
+            if interpolate:
+                z = np.linspace(np.min(redshift), np.max(redshift), resolution)
+                mag_z = mag_ab(spectrum, bandpass, z)
+                mag[i, j, :] = np.interp(redshift, z, mag_z)
+            else:
+                mag[i, j, :] = mag_ab(spectrum, bandpass, redshift)
 
-    flux = np.sum(coefficients * np.power(10, -0.4*mag), axis=0)
+    flux = np.sum(coefficients * np.power(10, -0.4*mag), axis=1)
     return -2.5 * np.log10(flux)
