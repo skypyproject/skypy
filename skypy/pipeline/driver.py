@@ -119,11 +119,11 @@ class SkyPyDriver:
         # - add edges for the table dependencies
         # - keep track where functions need to be called
         #   functions are tuples (function name, [function args])
-        self.functions = {}
+        functions = {}
         for job, settings in self.config.items():
             self.dag.add_node(job)
             if isinstance(settings, tuple):
-                self.functions[job] = settings
+                functions[job] = settings
         for table, columns in self.table_config.items():
             table_complete = '.'.join((table, 'complete'))
             self.dag.add_node(table_complete)
@@ -134,10 +134,10 @@ class SkyPyDriver:
                 self.dag.add_edge(table, job)
                 self.dag.add_edge(job, table_complete)
                 if isinstance(settings, tuple):
-                    self.functions[job] = settings
+                    functions[job] = settings
 
         # go through functions and add edges for all references
-        for job, settings in self.functions.items():
+        for job, settings in functions.items():
             # settings are tuple (function, [args])
             args = settings[1] if len(settings) > 1 else None
             # get dependencies from arguments
