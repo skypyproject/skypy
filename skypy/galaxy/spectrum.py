@@ -287,7 +287,7 @@ def magnitudes_from_templates(coefficients, templates, bandpasses,
 
     Parameters
     ----------
-    coefficients : (nt, ng) array_like
+    coefficients : (ng, nt) array_like
         Array of spectrum coefficients.
     templates : (nt,) specutils.SpectrumList
         Template spectra.
@@ -302,7 +302,7 @@ def magnitudes_from_templates(coefficients, templates, bandpasses,
 
     Returns
     -------
-    mag_ab : (nb, ng) array_like
+    mag_ab : (ng, nb) array_like
         The absolute AB magnitude of each object.
 
     References
@@ -314,17 +314,17 @@ def magnitudes_from_templates(coefficients, templates, bandpasses,
     nb = len(bandpasses)
     nt = len(templates)
     nz = np.size(redshift)
-    mag = np.empty((nb, nt, nz))
+    mag = np.empty((nz, nt, nb))
     interpolate = nz > resolution
 
-    for i, bandpass in enumerate(bandpasses):
-        for j, spectrum in enumerate(templates):
+    for b, bandpass in enumerate(bandpasses):
+        for t, template in enumerate(templates):
             if interpolate:
                 z = np.linspace(np.min(redshift), np.max(redshift), resolution)
-                mag_z = mag_ab(spectrum, bandpass, z)
-                mag[i, j, :] = np.interp(redshift, z, mag_z)
+                mag_z = mag_ab(template, bandpass, z)
+                mag[:, t, b] = np.interp(redshift, z, mag_z)
             else:
-                mag[i, j, :] = mag_ab(spectrum, bandpass, redshift)
+                mag[:, t, b] = mag_ab(template, bandpass, redshift)
 
-    flux = np.sum(coefficients * np.power(10, -0.4*mag), axis=1)
+    flux = np.sum(coefficients[:, :, np.newaxis] * np.power(10, -0.4*mag), axis=1)
     return -2.5 * np.log10(flux)
