@@ -276,8 +276,8 @@ def mag_ab(spectrum, bandpass, redshift=None):
     return mag_ab
 
 
-def absolute_magnitude_from_templates(coefficients, band_lam, band_tx,
-                                      redshift=0, resolution=1000):
+def absolute_magnitude_from_templates(coefficients, templates, bandpass,
+                                      redshift=None, resolution=1000):
     r'''Compute absolute AB magnitudes from galaxy template coefficients.
 
     This function calculates absolute AB magnitudes for galaxies whose spectra
@@ -286,15 +286,14 @@ def absolute_magnitude_from_templates(coefficients, band_lam, band_tx,
 
     Parameters
     ----------
-    coefficients : (5, ng) array_like
+    coefficients : (nt, ng) array_like
         Array of spectrum coefficients.
-    band_lam : (nb,) array_like
-        Vector of bandpass wavelengths in units of Angstrom.
-    band_tx : (nb,) array_like
-        Vector of bandpass transmissions.
-    redshift : (ng) array_like, optional
-        Optional array of values for redshifting the source spectrum. Default
-        is a redshift of 0.0.
+    templates : (nt,) specutils.SpectrumList
+        Template spectra
+    bandpass : specutils.Spectrum1D
+        Bandpass filter.
+    redshift : (ng,) array_like, optional
+        Optional array of values for redshifting the source spectrum.
     resolution : integer, optional
         Redshift resolution for intepolating magnitudes. Default is 1000. If
         the number of galaxies is less than resolution their magnitudes are
@@ -310,23 +309,18 @@ def absolute_magnitude_from_templates(coefficients, band_lam, band_tx,
     .. [1] M. R. Blanton and S. Roweis, 2007, AJ, 125, 2348
     '''
 
-    kcorrect_templates_url = "https://github.com/blanton144/kcorrect/raw/" \
-                             "master/data/templates/k_nmf_derived.default.fits"
-    templates = getdata(kcorrect_templates_url, 1)
-    spec_lam = getdata(kcorrect_templates_url, 11)
-
-    nt = np.shape(templates)[0]
+    nt = len(templates)
     nz = np.size(redshift)
     mag = np.empty((nt, nz))
     interpolate = nz > resolution
 
-    for i, spec_flux in enumerate(templates):
+    for i, spectrum in enumerate(templates):
         if interpolate:
             z = np.linspace(np.min(redshift), np.max(redshift), resolution)
-            mag_z = mag_ab(spec_lam, spec_flux, band_lam, band_tx, z)
+            mag_z = mag_ab(spectrum, bandpass, z)
             mag[i] = np.interp(redshift, z, mag_z)
         else:
-            mag[i] = mag_ab(spec_lam, spec_flux, band_lam, band_tx, redshift)
+            mag[i] = mag_ab(spectrum, bandpass, redshift)
 
     flux = np.sum(coefficients * np.power(10, -0.4*mag), axis=0)
     return -2.5 * np.log10(flux)
