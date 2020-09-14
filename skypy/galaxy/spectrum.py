@@ -276,37 +276,38 @@ def mag_ab(spectrum, bandpass, redshift=None):
     return mag_ab
 
 
-def absolute_magnitude_from_templates(coefficients, templates, bandpasses,
-                                      redshift=None, resolution=1000):
-    r'''Compute absolute AB magnitudes from galaxy template coefficients.
+def magnitudes_from_templates(coefficients, templates, bandpasses,
+                              redshift=None, resolution=1000):
+    r'''Compute AB magnitudes from template spectra.
 
-    This function calculates absolute AB magnitudes for galaxies whose spectra
-    are modelled as a linear combination of the kcorrect template spectra
-    presented in [1]_.
+    This function calculates photometric AB magnitudes for objects whose
+    spectra are modelled as a linear combination of template spectra following
+    [1]_ and [2]_.
 
     Parameters
     ----------
     coefficients : (nt, ng) array_like
         Array of spectrum coefficients.
     templates : (nt,) specutils.SpectrumList
-        Template spectra
+        Template spectra.
     bandpasses : (nb,) specutils.SpectrumList
         Bandpass filters.
     redshift : (ng,) array_like, optional
         Optional array of values for redshifting the source spectrum.
     resolution : integer, optional
         Redshift resolution for intepolating magnitudes. Default is 1000. If
-        the number of galaxies is less than resolution their magnitudes are
+        the number of objects is less than resolution their magnitudes are
         calculated directly without interpolation.
 
     Returns
     -------
     mag_ab : (nb, ng) array_like
-        The absolute AB magnitude of each galaxy
+        The absolute AB magnitude of each object.
 
     References
     ----------
-    .. [1] M. R. Blanton and S. Roweis, 2007, AJ, 125, 2348
+    .. [1] M. R. Blanton et al., 2003, AJ, 125, 2348
+    .. [2] M. R. Blanton and S. Roweis, 2007, AJ, 125, 2348
     '''
 
     nb = len(bandpasses)
