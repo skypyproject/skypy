@@ -11,6 +11,7 @@ __all__ = [
     'dirichlet_coefficients',
     'kcorrect_spectra',
     'mag_ab',
+    'magnitudes_from_templates',
 ]
 
 
