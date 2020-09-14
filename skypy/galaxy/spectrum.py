@@ -3,7 +3,7 @@ r"""Galaxy spectrum module.
 """
 
 import numpy as np
-import astropy.units as u
+from astropy import units
 from astropy.io.fits import getdata
 
 
@@ -231,11 +231,11 @@ def mag_ab(spectrum, bandpass, redshift=None):
     '''
 
     # get the spectrum and bandpass
-    spec_lam = spectrum.wavelength.to_value(u.AA, equivalencies=u.spectral())
+    spec_lam = spectrum.wavelength.to_value(units.AA, equivalencies=units.spectral())
     spec_flux = spectrum.flux.to_value('erg s-1 cm-2 AA-1',
-                                       equivalencies=u.spectral_density(spec_lam))
-    band_lam = bandpass.wavelength.to_value(u.AA, equivalencies=u.spectral())
-    band_tx = bandpass.flux.to_value(u.dimensionless_unscaled)
+                                       equivalencies=units.spectral_density(spec_lam))
+    band_lam = bandpass.wavelength.to_value(units.AA, equivalencies=units.spectral())
+    band_tx = bandpass.flux.to_value(units.dimensionless_unscaled)
 
     # redshift zero if not given
     if redshift is None:

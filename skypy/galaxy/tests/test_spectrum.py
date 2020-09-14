@@ -7,9 +7,9 @@ from astropy.io.fits import getdata
 try:
     import specutils
 except ImportError:
-    SPECUTILS_FOUND = False
+    HAS_SPECUTILS = False
 else:
-    SPECUTILS_FOUND = True
+    HAS_SPECUTILS = True
 
 
 from skypy.galaxy.spectrum import dirichlet_coefficients, kcorrect_spectra
@@ -93,21 +93,21 @@ def test_kcorrect_spectra():
     assert np.allclose(sed, templates[0])
 
 
-@pytest.mark.skipif(not SPECUTILS_FOUND, reason='test requires specutils')
+@pytest.mark.skipif(not HAS_SPECUTILS, reason='test requires specutils')
 def test_mag_ab_standard_source():
 
-    import astropy.units as u
+    from astropy import units
 
     from skypy.galaxy.spectrum import mag_ab
 
     # create a bandpass
-    bp_lam = np.logspace(0, 4, 1000)*u.AA
-    bp_tx = np.exp(-((bp_lam - 1000*u.AA)/(100*u.AA))**2)*u.dimensionless_unscaled
+    bp_lam = np.logspace(0, 4, 1000)*units.AA
+    bp_tx = np.exp(-((bp_lam - 1000*units.AA)/(100*units.AA))**2)*units.dimensionless_unscaled
     bp = specutils.Spectrum1D(spectral_axis=bp_lam, flux=bp_tx)
 
     # test that the AB standard source has zero magnitude
-    lam = np.logspace(0, 4, 1000)*u.AA
-    flam = 0.10884806248538730623*u.Unit('erg s-1 cm-2 AA')/lam**2
+    lam = np.logspace(0, 4, 1000)*units.AA
+    flam = 0.10884806248538730623*units.Unit('erg s-1 cm-2 AA')/lam**2
     spec = specutils.Spectrum1D(spectral_axis=lam, flux=flam)
 
     m = mag_ab(spec, bp)
@@ -115,21 +115,21 @@ def test_mag_ab_standard_source():
     assert np.isclose(m, 0)
 
 
-@pytest.mark.skipif(not SPECUTILS_FOUND, reason='test requires specutils')
+@pytest.mark.skipif(not HAS_SPECUTILS, reason='test requires specutils')
 def test_mag_ab_redshift_dependence():
 
-    import astropy.units as u
+    from astropy import units
 
     from skypy.galaxy.spectrum import mag_ab
 
     # make a wide tophat bandpass
-    bp_lam = np.logspace(-10, 10, 3)*u.AA
-    bp_tx = np.ones(3)*u.dimensionless_unscaled
+    bp_lam = np.logspace(-10, 10, 3)*units.AA
+    bp_tx = np.ones(3)*units.dimensionless_unscaled
     bp = specutils.Spectrum1D(spectral_axis=bp_lam, flux=bp_tx)
 
     # create a narrow gaussian source
-    lam = np.logspace(0, 3, 1000)*u.AA
-    flam = np.exp(-((lam - 100*u.AA)/(10*u.AA))**2)*u.Unit('erg s-1 cm-2 AA-1')
+    lam = np.logspace(0, 3, 1000)*units.AA
+    flam = np.exp(-((lam - 100*units.AA)/(10*units.AA))**2)*units.Unit('erg s-1 cm-2 AA-1')
     spec = specutils.Spectrum1D(spectral_axis=lam, flux=flam)
 
     # array of redshifts
