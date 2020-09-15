@@ -16,6 +16,7 @@ __all__ = [
 
 
 def broadcast_arguments(*broadcast_args):
+    '''Decorator that broadcasts arguments.'''
     def decorator(function):
         sig = signature(function)
         for arg in broadcast_args:
@@ -36,6 +37,7 @@ def broadcast_arguments(*broadcast_args):
 
 
 def dependent_argument(dependent_arg, *independent_args):
+    '''Decorator to evaluate dependent arguments automatically.'''
     def decorator(function):
         sig = signature(function)
         for arg in [dependent_arg, *independent_args]:
@@ -58,6 +60,7 @@ def dependent_argument(dependent_arg, *independent_args):
 
 
 def uses_default_cosmology(function):
+    '''Decorator to provide the default cosmology if none is given.'''
     sig = signature(function)
 
     @wraps(function)
