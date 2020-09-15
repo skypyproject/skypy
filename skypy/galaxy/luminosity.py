@@ -19,44 +19,44 @@ __all__ = [
 ]
 
 
-def absolute_to_apparent_magnitude(M, DM):
+def absolute_to_apparent_magnitude(absolute_magnitude, distance_modulus):
     '''Convert absolute to apparent magnitude.
 
     Parameters
     ----------
-    M : array_like
-        Absolute magnitude.
-    DM : array_like
-        Distance modulus.
+    absolute_magnitude : array_like
+        Absolute magnitude M.
+    distance_modulus : array_like
+        Distance modulus DM.
 
     Returns
     -------
-    m : array_like
+    apparent_magnitude : array_like
         Apparent magnitude M + DM.
 
     '''
 
-    return np.add(M, DM)
+    return np.add(absolute_magnitude, distance_modulus)
 
 
-def apparent_to_absolute_magnitude(m, DM):
+def apparent_to_absolute_magnitude(apparent_magnitude, distance_modulus):
     '''Convert apparent to absolute magnitude.
 
     Parameters
     ----------
-    m : array_like
-        Apparent magnitude.
-    DM : array_like
-        Distance modulus.
+    apparent_magnitude : array_like
+        Apparent magnitude m.
+    distance_modulus : array_like
+        Distance modulus DM.
 
     Returns
     -------
-    M : array_like
+    absolute_magnitude : array_like
         Absolute magnitude m - DM.
 
     '''
 
-    return np.subtract(m, DM)
+    return np.subtract(apparent_magnitude, distance_modulus)
 
 
 @uses_default_cosmology
