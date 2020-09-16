@@ -289,9 +289,9 @@ def magnitudes_from_templates(coefficients, templates, bandpasses,
     ----------
     coefficients : (ng, nt) array_like
         Array of spectrum coefficients.
-    templates : (nt,) specutils.SpectrumList
+    templates : specutils.Spectrum1D
         Template spectra.
-    bandpasses : (nb,) specutils.SpectrumList
+    bandpasses : specutils.Spectrum1D
         Bandpass filters.
     redshift : (ng,) array_like, optional
         Optional array of values for redshifting the source spectrum.
@@ -311,20 +311,29 @@ def magnitudes_from_templates(coefficients, templates, bandpasses,
     .. [2] M. R. Blanton and S. Roweis, 2007, AJ, 125, 2348
     '''
 
-    nb = len(bandpasses)
-    nt = len(templates)
+    # Array shapes
     nz = np.size(redshift)
-    mag = np.empty((nz, nt, nb))
+    nb_loop = np.atleast_2d(bandpasses.flux).shape[:-1]
+    nt_loop = np.atleast_2d(templates.flux).shape[:-1]
+    nb_return = bandpasses.flux.shape[:-1]
+    nt_return = templates.flux.shape[:-1]
+    loop_shape = (*nz, *nb_loop, *nt_loop)
+    return_shape = (*nz, *nb_return, *nt_return)
+
+    # Interpolation flag
     interpolate = nz > resolution
 
-    for b, bandpass in enumerate(bandpasses):
-        for t, template in enumerate(templates):
-            if interpolate:
-                z = np.linspace(np.min(redshift), np.max(redshift), resolution)
-                mag_z = mag_ab(template, bandpass, z)
-                mag[:, t, b] = np.interp(redshift, z, mag_z)
-            else:
-                mag[:, t, b] = mag_ab(template, bandpass, redshift)
+    if interpolate:
+        z = np.linspace(np.min(redshift), np.max(redshift), resolution)
+        M_z = mag_ab(templates, bandpasses, z).reshape(loop_shape)
+        M = np.empty(loop_shape, dtype=float)
+        for b in range(nb_loop):
+            for t in range(nt_loop):
+                M[:, b, t] = np.interp(redshift, z, M_z[:, b, t])
+    else:
+        M = mag_ab(templates, bandpasses, redshift)
 
-    flux = np.sum(coefficients[:, :, np.newaxis] * np.power(10, -0.4*mag), axis=1)
-    return -2.5 * np.log10(flux)
+    flux = np.sum(coefficients[:, np.newaxis, :] * np.power(10, -0.4*M))
+    magnitudes = -2.5 * np.log10(flux)
+
+    return magnitudes.item() if not return_shape else magnitudes.reshape(return_shape)
