@@ -43,8 +43,8 @@ def test_schechter_gamma():
 
     from skypy.utils.random import schechter
 
-    # when alpha > -1, x_min ≈ 0, x_max ≈ ∞, distribution is gamma
-    alpha = np.random.uniform(-1, 2)
+    # when alpha > 0, x_min ≈ 0, x_max ≈ ∞, distribution is gamma
+    alpha = np.random.uniform(0, 2)
     x_min = 1e-20
     x_max = 1e+20
     scale = 2.5
