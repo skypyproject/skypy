@@ -246,8 +246,17 @@ def mag_ab(spectrum, bandpass, redshift=None):
     if redshift is None:
         redshift = 0.
 
-    # allocate output array
-    mag_ab = np.empty_like(redshift, dtype=float)
+    # Array shapes
+    nz = np.shape(redshift)
+    ns_loop = np.atleast_2d(spec_flux).shape[:-1]
+    nb_loop = np.atleast_2d(band_tx).shape[:-1]
+    ns_return = spec_flux.shape[:-1]
+    nb_return = band_tx.shape[:-1]
+    loop_shape = (*nz, *nb_loop, *ns_loop)
+    return_shape = (*nz, *nb_return, *ns_return)
+
+    # allocate magnitude array
+    mag_ab = np.empty(loop_shape, dtype=float)
 
     # compute magnitude contribution from band normalisation [denominator of (2)]
     m_band = -2.5*np.log10(np.trapz(band_tx/band_lam, band_lam))
@@ -264,18 +273,15 @@ def mag_ab(spectrum, bandpass, redshift=None):
         # observed wavelength of spectrum
         obs_lam = (1 + z)*spec_lam
 
-        # interpolate band to get transmission at observed wavelengths
-        obs_tx = np.interp(obs_lam, band_lam, band_tx, left=0, right=0)
+        for j, b in np.atleast2d(band_tx):
 
-        # compute magnitude contribution from flux [numerator of (2)]
-        m_flux = -2.5*np.log10(np.trapz(spec_intg*obs_tx, obs_lam))
+            # interpolate band to get transmission at observed wavelengths
+            obs_tx = np.interp(obs_lam, band_lam, b, left=0, right=0)
 
-        # combine AB magnitude [all of (2)]
-        mag_ab[i] = m_flux + m_offs
+            # compute magnitude contribution from flux [numerator of (2)]
+            mag_ab[i, j, :] = -2.5*np.log10(np.trapz(spec_intg*obs_tx, obs_lam))
 
-    # simplify scalar output
-    if np.isscalar(redshift):
-        mag_ab = mag_ab.item()
+    # combine AB magnitude [all of (2)]
+    mag_ab += m_offs
 
-    # all done
-    return mag_ab
+    return mag_ab.item() if not return_shape else mag_ab.reshape(return_shape)
