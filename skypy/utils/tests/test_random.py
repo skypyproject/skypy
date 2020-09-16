@@ -44,6 +44,7 @@ def test_schechter_gamma():
     from skypy.utils.random import schechter
 
     # when alpha > 0, x_min ≈ 0, x_max ≈ ∞, distribution is gamma
+    # n.b. if alpha < 0 the distribution becomes too steep to resolve accurately
     alpha = np.random.uniform(0, 2)
     x_min = 1e-20
     x_max = 1e+20
