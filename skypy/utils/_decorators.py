@@ -16,7 +16,14 @@ __all__ = [
 
 
 def broadcast_arguments(*broadcast_args):
-    '''Decorator that broadcasts arguments.'''
+    '''Decorator that broadcasts arguments.
+
+    Parameters
+    ----------
+    broadcast_args : tuple
+        The names of the decorated function arguments to be broadcast together
+        using numpy.broadcast_arrays.
+    '''
     def decorator(function):
         sig = signature(function)
         for arg in broadcast_args:
@@ -37,7 +44,17 @@ def broadcast_arguments(*broadcast_args):
 
 
 def dependent_argument(dependent_arg, *independent_args):
-    '''Decorator to evaluate dependent arguments automatically.'''
+    '''Decorator to evaluate a dependent argument.
+
+    Parameters
+    ----------
+    dependent_arg : str
+        The name of the decorated function's dependent argument that can
+        optionally be passed as a callable object to be evaluated.
+    independent_args : tuple
+        The names of the decorated function's independent arguments to be
+        passed as function arguments when evaluating the dependent argument.
+    '''
     def decorator(function):
         sig = signature(function)
         for arg in [dependent_arg, *independent_args]:
@@ -60,7 +77,7 @@ def dependent_argument(dependent_arg, *independent_args):
 
 
 def uses_default_cosmology(function):
-    '''Decorator to provide the default cosmology if none is given.'''
+    '''Decorator to use the Astropy default cosmology if none is given.'''
     sig = signature(function)
 
     @wraps(function)
