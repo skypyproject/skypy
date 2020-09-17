@@ -247,13 +247,14 @@ def mag_ab(spectrum, bandpass, redshift=None):
         redshift = 0.
 
     # Array shapes
-    nz = np.shape(redshift)
+    nz_loop = np.atleast_1d(redshift).shape
     ns_loop = np.atleast_2d(spec_flux).shape[:-1]
     nb_loop = np.atleast_2d(band_tx).shape[:-1]
+    nz_return = np.shape(redshift)
     ns_return = spec_flux.shape[:-1]
     nb_return = band_tx.shape[:-1]
-    loop_shape = (*nz, *nb_loop, *ns_loop)
-    return_shape = (*nz, *nb_return, *ns_return)
+    loop_shape = (*nz_loop, *nb_loop, *ns_loop)
+    return_shape = (*nz_return, *nb_return, *ns_return)
 
     # allocate magnitude array
     mag_ab = np.empty(loop_shape, dtype=float)
@@ -268,12 +269,12 @@ def mag_ab(spectrum, bandpass, redshift=None):
     spec_intg = spec_lam*spec_flux
 
     # go through redshifts ...
-    for i, z in np.ndenumerate(redshift):
+    for i, z in enumerate(np.atleast_1d(redshift)):
 
         # observed wavelength of spectrum
         obs_lam = (1 + z)*spec_lam
 
-        for j, b in np.atleast2d(band_tx):
+        for j, b in enumerate(np.atleast_2d(band_tx)):
 
             # interpolate band to get transmission at observed wavelengths
             obs_tx = np.interp(obs_lam, band_lam, b, left=0, right=0)
