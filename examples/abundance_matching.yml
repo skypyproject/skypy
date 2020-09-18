@@ -2,6 +2,7 @@ cosmology: !astropy.cosmology.default_cosmology.get
 A_s: 2.1982e-09
 n_s: 0.969453
 redshift: 1
+M_star: !astropy.modeling.models.Linear1D [-0.70798041, -20.37196157]
 growth_function: !skypy.power_spectrum.growth_function
   redshift: $redshift
   cosmology: $cosmology
@@ -23,12 +24,14 @@ tables:
       growth_function: $growth_function
       cosmology: $cosmology
   galaxies:
-    luminosity: !skypy.galaxy.luminosity.herbel_luminosities
-      alpha: -0.5
-      a_m: -0.610
-      b_m: -20.416
-      size: 100
+    magnitude: !skypy.galaxy.luminosity.schechter_lf_magnitude
       redshift: $redshift
+      M_star: $M_star
+      alpha: -0.5
+      m_lim: 35
+      size: 100
+    luminosity: !skypy.utils.astronomy.luminosity_from_absolute_magnitude
+      absolute_magnitude: $galaxies.magnitude
   abundance_matching:
     .init: !skypy.halo.abundance_matching.vale_ostriker
       .depends: [halos.complete, galaxies.complete]
