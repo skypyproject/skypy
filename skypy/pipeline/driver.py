@@ -15,6 +15,28 @@ __all__ = [
 ]
 
 
+def _yaml_tag(loader, tag, node):
+    '''handler for generic YAML tags
+
+    tags are stored as a tuple `(tag, value)`
+    '''
+
+    import yaml
+
+    if isinstance(node, yaml.ScalarNode):
+        value = loader.construct_scalar(node)
+    elif isinstance(node, yaml.SequenceNode):
+        value = loader.construct_sequence(node)
+    elif isinstance(node, yaml.MappingNode):
+        value = loader.construct_mapping(node)
+
+    # tags without arguments have empty string value
+    if value == '':
+        return tag,
+
+    return tag, value
+
+
 class SkyPyDriver:
     r'''Class for running pipelines.
 
@@ -22,24 +44,35 @@ class SkyPyDriver:
     and using their results to generate variables and tables.
     '''
 
-    def execute(self, configuration, file_format=None, overwrite=False):
-        r'''Run a pipeline.
+    @classmethod
+    def read(cls, filename):
+        '''Read a pipeline from a configuration file.
 
-        This function runs a pipeline of functions to generate variables and
-        the columns of a set of tables. It uses a Directed Acyclic Graph to
-        determine a non-blocking order of execution that resolves any
-        dependencies, see [1]_. Tables can optionally be written to file.
+        Parameters
+        ----------
+        filename : str
+            The name of the configuration file.
+
+        '''
+        import yaml
+
+        # register custom tags
+        yaml.SafeLoader.add_multi_constructor('!', _yaml_tag)
+
+        # read the file
+        with open(filename, 'r') as stream:
+            config = yaml.safe_load(stream) or {}
+
+        # construct the pipeline
+        return cls(config)
+
+    def __init__(self, configuration):
+        '''Construct the pipeline.
 
         Parameters
         ----------
         configuration : dict-like
             Configuration for the pipeline.
-        file_format : str
-            File format used to write tables. Files are written using the
-            Astropy unified file read/write interface; see [2]_ for supported
-            file formats. If None (default) tables are not written to file.
-        overwrite : bool
-            Whether to overwrite any existing files without warning.
 
         Notes
         -----
@@ -63,44 +96,43 @@ class SkyPyDriver:
         not specificed the table will be initialised as an empty astropy Table
         by default.
 
-        See [3]_ for examples of pipeline configurations in YAML format.
+        See [1]_ for examples of pipeline configurations in YAML format.
 
         References
         ----------
-        .. [1] https://networkx.github.io/documentation/stable/
-        .. [2] https://docs.astropy.org/en/stable/io/unified.html
-        .. [3] https://github.com/skypyproject/skypy/tree/master/examples
+        .. [1] https://github.com/skypyproject/skypy/tree/master/examples
+
         '''
 
         # config contains settings for all variables and table initialisation
         # table_config contains settings for all table columns
-        config = deepcopy(configuration)
-        table_config = config.pop('tables', {})
+        self.config = deepcopy(configuration)
+        self.table_config = self.config.pop('tables', {})
         default_table = ('astropy.table.Table',)
-        config.update({k: v.pop('.init', default_table)
-                      for k, v in table_config.items()})
+        self.config.update({k: v.pop('.init', default_table)
+                            for k, v in self.table_config.items()})
 
         # Create a Directed Acyclic Graph of all jobs and dependencies
-        dag = networkx.DiGraph()
+        self.dag = networkx.DiGraph()
 
         # - add nodes for each variable, table and column
         # - add edges for the table dependencies
         # - keep track where functions need to be called
         #   functions are tuples (function name, [function args])
         functions = {}
-        for job, settings in config.items():
-            dag.add_node(job)
+        for job, settings in self.config.items():
+            self.dag.add_node(job)
             if isinstance(settings, tuple):
                 functions[job] = settings
-        for table, columns in table_config.items():
+        for table, columns in self.table_config.items():
             table_complete = '.'.join((table, 'complete'))
-            dag.add_node(table_complete)
-            dag.add_edge(table, table_complete)
+            self.dag.add_node(table_complete)
+            self.dag.add_edge(table, table_complete)
             for column, settings in columns.items():
                 job = '.'.join((table, column))
-                dag.add_node(job)
-                dag.add_edge(table, job)
-                dag.add_edge(job, table_complete)
+                self.dag.add_node(job)
+                self.dag.add_edge(table, job)
+                self.dag.add_edge(job, table_complete)
                 if isinstance(settings, tuple):
                     functions[job] = settings
 
@@ -112,26 +144,54 @@ class SkyPyDriver:
             deps = self.get_deps(args)
             # add edges for dependencies
             for d in deps:
-                if dag.has_node(d):
-                    dag.add_edge(d, job)
+                if self.dag.has_node(d):
+                    self.dag.add_edge(d, job)
                 else:
                     raise KeyError(d)
 
-        # Execute jobs in order that resolves dependencies
-        for job in networkx.topological_sort(dag):
+    def execute(self):
+        r'''Run a pipeline.
+
+        This function runs a pipeline of functions to generate variables and
+        the columns of a set of tables. It uses a Directed Acyclic Graph to
+        determine a non-blocking order of execution that resolves any
+        dependencies, see [1]_.
+
+        References
+        ----------
+        .. [1] https://networkx.github.io/documentation/stable/
+
+        '''
+        for job in networkx.topological_sort(self.dag):
             if job.endswith('.complete'):
                 continue
-            elif job in config:
-                settings = config.get(job)
+            elif job in self.config:
+                settings = self.config.get(job)
                 setattr(self, job, self.get_value(settings))
             else:
                 table, column = job.split('.')
-                settings = table_config[table][column]
+                settings = self.table_config[table][column]
                 getattr(self, table)[column] = self.get_value(settings)
 
-        # Write tables to file
+    def write(self, file_format=None, overwrite=False):
+        r'''Write pipeline results to disk.
+
+        Parameters
+        ----------
+        file_format : str
+            File format used to write tables. Files are written using the
+            Astropy unified file read/write interface; see [1]_ for supported
+            file formats. If None (default) tables are not written to file.
+        overwrite : bool
+            Whether to overwrite any existing files without warning.
+
+        References
+        ----------
+        .. [1] https://docs.astropy.org/en/stable/io/unified.html
+
+        '''
         if file_format:
-            for table in table_config.keys():
+            for table in self.table_config.keys():
                 filename = '.'.join((table, file_format))
                 getattr(self, table).write(filename, overwrite=overwrite)
 

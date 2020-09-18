@@ -13,8 +13,8 @@ def test_driver():
     # Evaluate and store the default astropy cosmology.
     config = {'test_cosmology': ('astropy.cosmology.default_cosmology.get',)}
 
-    driver = SkyPyDriver()
-    driver.execute(config)
+    driver = SkyPyDriver(config)
+    driver.execute()
     assert driver.test_cosmology == default_cosmology.get()
 
     # Generate a simple two column table with a dependency. Also write the
@@ -29,55 +29,58 @@ def test_driver():
                       'low': '$test_table.column1'}),
                   'column3': ('list', [string])}}}
 
-    driver = SkyPyDriver()
-    driver.execute(config, file_format='fits')
+    driver = SkyPyDriver(config)
+    driver.execute()
+    driver.write(file_format='fits')
     assert len(driver.test_table) == size
     assert np.all(driver.test_table['column1'] < driver.test_table['column2'])
     with fits.open('test_table.fits') as hdu:
         assert np.all(Table(hdu[1].data) == driver.test_table)
 
     # Check for failure if output files already exist and overwrite is False
-    driver = SkyPyDriver()
+    driver = SkyPyDriver(config)
+    driver.execute()
     with pytest.raises(OSError):
-        driver.execute(config, file_format='fits', overwrite=False)
+        driver.write(file_format='fits', overwrite=False)
 
     # Check that the existing output files are modified if overwrite is True
     new_size = 2 * size
     new_string = new_size*'a'
     config['tables']['test_table']['column1'][1]['size'] = new_size
     config['tables']['test_table']['column3'][1][0] = new_string
-    driver = SkyPyDriver()
-    driver.execute(config, file_format='fits', overwrite=True)
+    driver = SkyPyDriver(config)
+    driver.execute()
+    driver.write(file_format='fits', overwrite=True)
     with fits.open('test_table.fits') as hdu:
         assert len(hdu[1].data) == new_size
 
     # Check for failure if 'column1' calls a nonexistant module
     config['tables']['test_table']['column1'] = ('nomodule.function',)
     with pytest.raises(ModuleNotFoundError):
-        SkyPyDriver().execute(config)
+        SkyPyDriver(config).execute()
 
     # Check for failure if 'column1' calls a nonexistant function
     config['tables']['test_table']['column1'] = ('builtins.nofunction',)
     with pytest.raises(AttributeError):
-        SkyPyDriver().execute(config)
+        SkyPyDriver(config).execute()
 
     # Check for failure if 'column1' requires itself creating a cyclic
     # dependency graph
     config['tables']['test_table']['column1'] = ('list', '$test_table.column1')
     with pytest.raises(networkx.NetworkXUnfeasible):
-        SkyPyDriver().execute(config)
+        SkyPyDriver(config).execute()
 
     # Check for failure if 'column1' and 'column2' both require each other
     # creating a cyclic dependency graph
     config['tables']['test_table']['column1'] = ('list', '$test_table.column2')
     with pytest.raises(networkx.NetworkXUnfeasible):
-        SkyPyDriver().execute(config)
+        SkyPyDriver(config).execute()
 
     # Check for failure if 'column1' is removed from the config so that the
     # requirements for 'column2' are not satisfied.
     del config['tables']['test_table']['column1']
     with pytest.raises(KeyError):
-        SkyPyDriver().execute(config)
+        SkyPyDriver(config).execute()
 
     # Check variables intialised by value
     config = {'test_int': 1,
@@ -85,8 +88,8 @@ def test_driver():
               'test_string': 'hello world',
               'test_list': [0, 'one', 2.],
               'test_dict': {'a': 'b'}}
-    driver = SkyPyDriver()
-    driver.execute(config)
+    driver = SkyPyDriver(config)
+    driver.execute()
     assert isinstance(driver.test_int, int)
     assert isinstance(driver.test_float, float)
     assert isinstance(driver.test_string, str)
@@ -104,8 +107,8 @@ def test_driver():
               'nested_references': ('sum', [
                 ['$test_func', [' '], '$test_func'], []]),
               'nested_functions': ('list', ('range', ('len', '$test_func')))}
-    driver = SkyPyDriver()
-    driver.execute(config)
+    driver = SkyPyDriver(config)
+    driver.execute()
     assert driver.test_func == list('hello world')
     assert driver.len_of_test_func == len('hello world')
     assert driver.nested_references == list('hello world hello world')
