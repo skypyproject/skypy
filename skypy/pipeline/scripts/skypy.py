@@ -36,7 +36,7 @@ values as keyword arguments.
 
 import argparse
 from skypy import __version__ as skypy_version
-from skypy.pipeline.driver import SkyPyDriver
+from skypy.pipeline import Pipeline
 import sys
 
 
@@ -56,7 +56,7 @@ def main(args=None):
 
     args = parser.parse_args(args or ['--help'])
 
-    driver = SkyPyDriver.read(args.config)
+    driver = Pipeline.read(args.config)
     driver.execute()
     driver.write(file_format=args.format, overwrite=args.overwrite)
     return(0)

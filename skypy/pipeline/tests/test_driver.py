@@ -5,7 +5,7 @@ import networkx
 import numpy as np
 import os
 import pytest
-from skypy.pipeline.driver import SkyPyDriver
+from skypy.pipeline import Pipeline
 
 
 def test_driver():
@@ -13,7 +13,7 @@ def test_driver():
     # Evaluate and store the default astropy cosmology.
     config = {'test_cosmology': ('astropy.cosmology.default_cosmology.get',)}
 
-    driver = SkyPyDriver(config)
+    driver = Pipeline(config)
     driver.execute()
     assert driver.test_cosmology == default_cosmology.get()
 
@@ -29,7 +29,7 @@ def test_driver():
                       'low': '$test_table.column1'}),
                   'column3': ('list', [string])}}}
 
-    driver = SkyPyDriver(config)
+    driver = Pipeline(config)
     driver.execute()
     driver.write(file_format='fits')
     assert len(driver.test_table) == size
@@ -38,7 +38,7 @@ def test_driver():
         assert np.all(Table(hdu[1].data) == driver.test_table)
 
     # Check for failure if output files already exist and overwrite is False
-    driver = SkyPyDriver(config)
+    driver = Pipeline(config)
     driver.execute()
     with pytest.raises(OSError):
         driver.write(file_format='fits', overwrite=False)
@@ -48,7 +48,7 @@ def test_driver():
     new_string = new_size*'a'
     config['tables']['test_table']['column1'][1]['size'] = new_size
     config['tables']['test_table']['column3'][1][0] = new_string
-    driver = SkyPyDriver(config)
+    driver = Pipeline(config)
     driver.execute()
     driver.write(file_format='fits', overwrite=True)
     with fits.open('test_table.fits') as hdu:
@@ -57,30 +57,30 @@ def test_driver():
     # Check for failure if 'column1' calls a nonexistant module
     config['tables']['test_table']['column1'] = ('nomodule.function',)
     with pytest.raises(ModuleNotFoundError):
-        SkyPyDriver(config).execute()
+        Pipeline(config).execute()
 
     # Check for failure if 'column1' calls a nonexistant function
     config['tables']['test_table']['column1'] = ('builtins.nofunction',)
     with pytest.raises(AttributeError):
-        SkyPyDriver(config).execute()
+        Pipeline(config).execute()
 
     # Check for failure if 'column1' requires itself creating a cyclic
     # dependency graph
     config['tables']['test_table']['column1'] = ('list', '$test_table.column1')
     with pytest.raises(networkx.NetworkXUnfeasible):
-        SkyPyDriver(config).execute()
+        Pipeline(config).execute()
 
     # Check for failure if 'column1' and 'column2' both require each other
     # creating a cyclic dependency graph
     config['tables']['test_table']['column1'] = ('list', '$test_table.column2')
     with pytest.raises(networkx.NetworkXUnfeasible):
-        SkyPyDriver(config).execute()
+        Pipeline(config).execute()
 
     # Check for failure if 'column1' is removed from the config so that the
     # requirements for 'column2' are not satisfied.
     del config['tables']['test_table']['column1']
     with pytest.raises(KeyError):
-        SkyPyDriver(config).execute()
+        Pipeline(config).execute()
 
     # Check variables intialised by value
     config = {'test_int': 1,
@@ -88,7 +88,7 @@ def test_driver():
               'test_string': 'hello world',
               'test_list': [0, 'one', 2.],
               'test_dict': {'a': 'b'}}
-    driver = SkyPyDriver(config)
+    driver = Pipeline(config)
     driver.execute()
     assert isinstance(driver.test_int, int)
     assert isinstance(driver.test_float, float)
@@ -107,7 +107,7 @@ def test_driver():
               'nested_references': ('sum', [
                 ['$test_func', [' '], '$test_func'], []]),
               'nested_functions': ('list', ('range', ('len', '$test_func')))}
-    driver = SkyPyDriver(config)
+    driver = Pipeline(config)
     driver.execute()
     assert driver.test_func == list('hello world')
     assert driver.len_of_test_func == len('hello world')

@@ -11,7 +11,7 @@ import networkx
 
 
 __all__ = [
-    'SkyPyDriver',
+    'Pipeline',
 ]
 
 
@@ -37,7 +37,7 @@ def _yaml_tag(loader, tag, node):
     return tag, value
 
 
-class SkyPyDriver:
+class Pipeline:
     r'''Class for running pipelines.
 
     This is the main class for running pipelines of functions with dependencies
