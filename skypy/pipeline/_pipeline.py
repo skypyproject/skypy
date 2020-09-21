@@ -4,6 +4,7 @@ This module provides methods to run pipelines of functions with dependencies
 and handle their results.
 """
 
+from astropy.table import Table
 from copy import deepcopy
 from importlib import import_module
 import builtins
@@ -171,7 +172,14 @@ class Pipeline:
             else:
                 table, column = job.split('.')
                 settings = self.table_config[table][column]
-                getattr(self, table)[column] = self.get_value(settings)
+                names = column.split('/')
+                if len(names) > 1:
+                    # Multi-column assignment
+                    t = Table(self.get_value(settings), names=names)
+                    getattr(self, table).add_columns(t.columns.values())
+                else:
+                    # Single column assignment
+                    getattr(self, table)[column] = self.get_value(settings)
 
     def write(self, file_format=None, overwrite=False):
         r'''Write pipeline results to disk.
