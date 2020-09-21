@@ -23,13 +23,13 @@ from other code.
     from skypy.pipeline import Pipeline
 
     # read the MCCL example pipeline
-    driver = Pipeline.read('examples/mccl_galaxies.yml')
+    pipeline = Pipeline.read('examples/mccl_galaxies.yml')
 
     # run the pipeline
-    driver.execute()
+    pipeline.execute()
 
     # access the results
-    print(driver['blue_galaxies'])
+    print(pipeline['blue_galaxies'])
 
 
 Reference/API

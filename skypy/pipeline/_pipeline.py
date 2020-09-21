@@ -1,4 +1,4 @@
-"""Driver module.
+"""Pipeline implementation.
 
 This module provides methods to run pipelines of functions with dependencies
 and handle their results.

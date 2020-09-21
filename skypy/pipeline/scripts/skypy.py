@@ -56,7 +56,7 @@ def main(args=None):
 
     args = parser.parse_args(args or ['--help'])
 
-    driver = Pipeline.read(args.config)
-    driver.execute()
-    driver.write(file_format=args.format, overwrite=args.overwrite)
+    pipeline = Pipeline.read(args.config)
+    pipeline.execute()
+    pipeline.write(file_format=args.format, overwrite=args.overwrite)
     return(0)

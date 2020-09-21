@@ -8,14 +8,14 @@ import pytest
 from skypy.pipeline import Pipeline
 
 
-def test_driver():
+def test_pipeline():
 
     # Evaluate and store the default astropy cosmology.
     config = {'test_cosmology': ('astropy.cosmology.default_cosmology.get',)}
 
-    driver = Pipeline(config)
-    driver.execute()
-    assert driver.test_cosmology == default_cosmology.get()
+    pipeline = Pipeline(config)
+    pipeline.execute()
+    assert pipeline.test_cosmology == default_cosmology.get()
 
     # Generate a simple two column table with a dependency. Also write the
     # table to a fits file and check it's contents.
@@ -29,28 +29,28 @@ def test_driver():
                       'low': '$test_table.column1'}),
                   'column3': ('list', [string])}}}
 
-    driver = Pipeline(config)
-    driver.execute()
-    driver.write(file_format='fits')
-    assert len(driver.test_table) == size
-    assert np.all(driver.test_table['column1'] < driver.test_table['column2'])
+    pipeline = Pipeline(config)
+    pipeline.execute()
+    pipeline.write(file_format='fits')
+    assert len(pipeline.test_table) == size
+    assert np.all(pipeline.test_table['column1'] < pipeline.test_table['column2'])
     with fits.open('test_table.fits') as hdu:
-        assert np.all(Table(hdu[1].data) == driver.test_table)
+        assert np.all(Table(hdu[1].data) == pipeline.test_table)
 
     # Check for failure if output files already exist and overwrite is False
-    driver = Pipeline(config)
-    driver.execute()
+    pipeline = Pipeline(config)
+    pipeline.execute()
     with pytest.raises(OSError):
-        driver.write(file_format='fits', overwrite=False)
+        pipeline.write(file_format='fits', overwrite=False)
 
     # Check that the existing output files are modified if overwrite is True
     new_size = 2 * size
     new_string = new_size*'a'
     config['tables']['test_table']['column1'][1]['size'] = new_size
     config['tables']['test_table']['column3'][1][0] = new_string
-    driver = Pipeline(config)
-    driver.execute()
-    driver.write(file_format='fits', overwrite=True)
+    pipeline = Pipeline(config)
+    pipeline.execute()
+    pipeline.write(file_format='fits', overwrite=True)
     with fits.open('test_table.fits') as hdu:
         assert len(hdu[1].data) == new_size
 
@@ -88,18 +88,18 @@ def test_driver():
               'test_string': 'hello world',
               'test_list': [0, 'one', 2.],
               'test_dict': {'a': 'b'}}
-    driver = Pipeline(config)
-    driver.execute()
-    assert isinstance(driver.test_int, int)
-    assert isinstance(driver.test_float, float)
-    assert isinstance(driver.test_string, str)
-    assert isinstance(driver.test_list, list)
-    assert isinstance(driver.test_dict, dict)
-    assert driver.test_int == 1
-    assert driver.test_float == 1.0
-    assert driver.test_string == 'hello world'
-    assert driver.test_list == [0, 'one', 2.]
-    assert driver.test_dict == {'a': 'b'}
+    pipeline = Pipeline(config)
+    pipeline.execute()
+    assert isinstance(pipeline.test_int, int)
+    assert isinstance(pipeline.test_float, float)
+    assert isinstance(pipeline.test_string, str)
+    assert isinstance(pipeline.test_list, list)
+    assert isinstance(pipeline.test_dict, dict)
+    assert pipeline.test_int == 1
+    assert pipeline.test_float == 1.0
+    assert pipeline.test_string == 'hello world'
+    assert pipeline.test_list == [0, 'one', 2.]
+    assert pipeline.test_dict == {'a': 'b'}
 
     # Check variables intialised by function
     config = {'test_func': ('list', 'hello world'),
@@ -107,15 +107,15 @@ def test_driver():
               'nested_references': ('sum', [
                 ['$test_func', [' '], '$test_func'], []]),
               'nested_functions': ('list', ('range', ('len', '$test_func')))}
-    driver = Pipeline(config)
-    driver.execute()
-    assert driver.test_func == list('hello world')
-    assert driver.len_of_test_func == len('hello world')
-    assert driver.nested_references == list('hello world hello world')
-    assert driver.nested_functions == list(range(len('hello world')))
+    pipeline = Pipeline(config)
+    pipeline.execute()
+    assert pipeline.test_func == list('hello world')
+    assert pipeline.len_of_test_func == len('hello world')
+    assert pipeline.nested_references == list('hello world hello world')
+    assert pipeline.nested_functions == list(range(len('hello world')))
 
 
 def teardown_module(module):
 
-    # Remove fits file generated in test_driver
+    # Remove fits file generated in test_pipeline
     os.remove('test_table.fits')
