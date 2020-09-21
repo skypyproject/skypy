@@ -205,37 +205,37 @@ def kcorrect_spectra(redshift, stellar_mass, coefficients):
 
 
 def mag_ab(spectrum, bandpass, redshift=None):
-    r'''Compute absolute AB magnitude from spectrum and bandpass.
+    r'''Compute absolute AB magnitudes from spectra and bandpasses.
 
-    This function takes an *emission* spectrum and an observation bandpass and
-    computes the AB magnitude for a source at 10pc (i.e. absolute magnitude).
-    The emission spectrum can optionally be redshifted. The definition of the
+    This function takes *emission* spectra and observation bandpasses and
+    computes the AB magnitudes for sources at 10pc (i.e. absolute magnitudes).
+    The emission spectra can optionally be redshifted. The definition of the
     bandpass AB magnitude is taken from [1]_.
 
-    Both the spectrum and the bandpass must be given as functions of wavelength
-    in Angstrom. The spectrum must be given as flux in erg/s/cm2/A.
+    Both the spectra and the bandpasses must be given as functions of
+    wavelength. The spectra must be given as fluxes with units equivalent to
+    erg/s/cm2/A while the bandpasses should be dimensionless.
 
     Parameters
     ----------
     spectrum : specutils.Spectrum1D
-        Emission spectrum of the source.
+        Emission spectra of the sources.
     bandpass : specutils.Spectrum1D
-        Bandpass filter.
-    redshift : array_like, optional
-        Optional array of values for redshifting the source spectrum.
+        Bandpass filters.
+    redshift : (nz,) array_like, optional
+        Optional array of values for redshifting the source spectra.
 
     Returns
     -------
-    mag_ab : array_like
-        The absolute AB magnitude. If redshifts are given, the output has the
-        same shape as the `redshift` argument.
+    mag_ab : (nz, nb, ns) array_like
+        Absolute AB magnitudes.
 
     References
     ----------
     .. [1] M. R. Blanton et al., 2003, AJ, 125, 2348
     '''
 
-    # get the spectrum and bandpass
+    # get the spectra and bandpasses
     spec_lam = spectrum.wavelength.to_value(units.AA, equivalencies=units.spectral())
     spec_flux = spectrum.flux.to_value('erg s-1 cm-2 AA-1',
                                        equivalencies=units.spectral_density(spec_lam))
@@ -271,7 +271,7 @@ def mag_ab(spectrum, bandpass, redshift=None):
     # go through redshifts ...
     for i, z in enumerate(np.atleast_1d(redshift)):
 
-        # observed wavelength of spectrum
+        # observed wavelength of spectra
         obs_lam = (1 + z)*spec_lam
 
         for j, b in enumerate(np.atleast_2d(band_tx)):
