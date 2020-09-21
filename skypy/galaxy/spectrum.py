@@ -283,6 +283,6 @@ def mag_ab(spectrum, bandpass, redshift=None):
             mag_ab[i, j, :] = -2.5*np.log10(np.trapz(spec_intg*obs_tx, obs_lam))
 
     # combine AB magnitude [all of (2)]
-    mag_ab += m_offs
+    mag_ab += np.atleast_1d(m_offs)[:, np.newaxis]
 
     return mag_ab.item() if not return_shape else mag_ab.reshape(return_shape)
