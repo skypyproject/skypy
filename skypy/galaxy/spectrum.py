@@ -285,8 +285,8 @@ def mag_ab(spectrum, bandpass, redshift=None):
     return mag_ab.item() if not return_shape else mag_ab.reshape(return_shape)
 
 
-def magnitudes_from_templates(coefficients, templates, bandpasses,
-                              redshift=None, resolution=1000):
+def magnitudes_from_templates(coefficients, templates, bandpasses, redshift=None,
+                              resolution=1000, stellar_mass=None, distance_modulus=None):
     r'''Compute AB magnitudes from template spectra.
 
     This function calculates photometric AB magnitudes for objects whose
@@ -307,6 +307,10 @@ def magnitudes_from_templates(coefficients, templates, bandpasses,
         Redshift resolution for intepolating magnitudes. Default is 1000. If
         the number of objects is less than resolution their magnitudes are
         calculated directly without interpolation.
+    stellar_mass : (ng,) array_like, optional
+        Optional array of stellar masses for each galaxy in units of Msun.
+    distance_modulus : (ng,) array_like, optional
+        Optional array of distance moduli for each galaxy.
 
     Returns
     -------
@@ -341,7 +345,11 @@ def magnitudes_from_templates(coefficients, templates, bandpasses,
     else:
         M = mag_ab(templates, bandpasses, redshift)
 
+    stellar_mass = stellar_mass.to_value(units.Msun) if stellar_mass else 1
+    distance_modulus = distance_modulus if distance_modulus else 0
+
     flux = np.sum(coefficients[:, np.newaxis, :] * np.power(10, -0.4*M))
-    magnitudes = -2.5 * np.log10(flux)
+    flux *= stellar_mass[:, np.newaxis, np.newaxis]
+    magnitudes = -2.5 * np.log10(flux) + distance_modulus
 
     return magnitudes.item() if not return_shape else magnitudes.reshape(return_shape)
