@@ -36,7 +36,7 @@ The following models are found in the `skypy.galaxy.luminosity` package.
 .. autosummary::
    :nosignatures:
 
-   herbel_luminosities
+   schechter_lf_magnitude
 
 
 Redshift
@@ -48,7 +48,8 @@ The following models are found in the `skypy.galaxy.redshift` package.
 .. autosummary::
    :nosignatures:
 
-   herbel_redshift
+   redshifts_from_comoving_density
+   schechter_lf_redshift
    smail
 
 

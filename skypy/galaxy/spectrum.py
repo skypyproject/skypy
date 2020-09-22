@@ -15,7 +15,7 @@ __all__ = [
 ]
 
 
-def dirichlet_coefficients(redshift, alpha0, alpha1, z1=1.):
+def dirichlet_coefficients(redshift, alpha0, alpha1, z1=1., weight=None):
     r"""Dirichlet-distributed SED coefficients.
 
     Spectral coefficients to calculate the rest-frame spectral energy
@@ -31,6 +31,8 @@ def dirichlet_coefficients(redshift, alpha0, alpha1, z1=1.):
         (3.9) in [1]_.
     z1 : float or scalar, optional
        Reference redshift at which alpha = alpha1. The default value is 1.0.
+    weight : (nc,) array_like, optional
+        Different weights for each component.
 
     Returns
     -------
@@ -85,22 +87,25 @@ def dirichlet_coefficients(redshift, alpha0, alpha1, z1=1.):
     >>> coefficients = dirichlet_coefficients(redshift, alpha0, alpha1)
 
     """
-    if np.isscalar(alpha0) or np.isscalar(alpha1):
-        raise ValueError("alpha0 and alpha1 must be array_like.")
-    return_shape = (*np.shape(redshift), *np.shape(alpha0))
-    redshift = np.atleast_1d(redshift)[:, np.newaxis]
 
-    alpha = np.power(alpha0, 1. - redshift / z1) * \
-        np.power(alpha1, redshift / z1)
+    if np.ndim(alpha0) != 1 or np.ndim(alpha1) != 1:
+        raise ValueError('alpha0, alpha1 must be 1D arrays')
+    if len(alpha0) != len(alpha1):
+        raise ValueError('alpha0 and alpha1 must have the same length')
+    if weight is not None and (np.ndim(weight) != 1 or len(weight) != len(alpha0)):
+        raise ValueError('weight must be 1D and match alpha0, alpha1')
 
-    # To sample Dirichlet distributed variables of order k we first sample k
-    # Gamma distributed variables y_i with the parameters alpha_i.
-    # Normalising all y_i by the sum of all k y_i gives us the k Dirichlet
-    # distributed variables.
-    y = np.random.gamma(alpha)
-    sum_y = y.sum(axis=1)
-    coefficients = np.divide(y.T, sum_y.T).T
-    return coefficients.reshape(return_shape)
+    redshift = np.expand_dims(redshift, -1)
+
+    alpha = np.power(alpha0, 1-redshift/z1)*np.power(alpha1, redshift/z1)
+
+    # sample Dirichlet by normalising independent gamma draws
+    coeff = np.random.gamma(alpha)
+    if weight is not None:
+        coeff *= weight
+    coeff /= coeff.sum(axis=-1)[..., np.newaxis]
+
+    return coeff
 
 
 def kcorrect_spectra(redshift, stellar_mass, coefficients):
@@ -201,37 +206,33 @@ def kcorrect_spectra(redshift, stellar_mass, coefficients):
 
 
 def mag_ab(spectrum, bandpass, redshift=None):
-    r'''Compute absolute AB magnitude from spectrum and bandpass.
+    r'''Compute absolute AB magnitudes from spectra and bandpasses.
 
-    This function takes an *emission* spectrum and an observation bandpass and
-    computes the AB magnitude for a source at 10pc (i.e. absolute magnitude).
-    The emission spectrum can optionally be redshifted. The definition of the
-    bandpass AB magnitude is taken from [1]_.
-
-    Both the spectrum and the bandpass must be given as functions of wavelength
-    in Angstrom. The spectrum must be given as flux in erg/s/cm2/A.
+    This function takes *emission* spectra and observation bandpasses and
+    computes the AB magnitudes. The definition of the bandpass AB magnitude is
+    taken from [1]_. The emission spectra can optionally be redshifted and the
+    bandpasses should have dimensionless `flux` units.
 
     Parameters
     ----------
     spectrum : specutils.Spectrum1D
-        Emission spectrum of the source.
+        Emission spectra of the sources.
     bandpass : specutils.Spectrum1D
-        Bandpass filter.
-    redshift : array_like, optional
-        Optional array of values for redshifting the source spectrum.
+        Bandpass filters.
+    redshift : (nz,) array_like, optional
+        Optional array of values for redshifting the source spectra.
 
     Returns
     -------
-    mag_ab : array_like
-        The absolute AB magnitude. If redshifts are given, the output has the
-        same shape as the `redshift` argument.
+    mag_ab : (nz, nb, ns) array_like
+        Absolute AB magnitudes.
 
     References
     ----------
     .. [1] M. R. Blanton et al., 2003, AJ, 125, 2348
     '''
 
-    # get the spectrum and bandpass
+    # get the spectra and bandpasses
     spec_lam = spectrum.wavelength.to_value(units.AA, equivalencies=units.spectral())
     spec_flux = spectrum.flux.to_value('erg s-1 cm-2 AA-1',
                                        equivalencies=units.spectral_density(spec_lam))
@@ -242,8 +243,18 @@ def mag_ab(spectrum, bandpass, redshift=None):
     if redshift is None:
         redshift = 0.
 
-    # allocate output array
-    mag_ab = np.empty_like(redshift, dtype=float)
+    # Array shapes
+    nz_loop = np.atleast_1d(redshift).shape
+    ns_loop = np.atleast_2d(spec_flux).shape[:-1]
+    nb_loop = np.atleast_2d(band_tx).shape[:-1]
+    nz_return = np.shape(redshift)
+    ns_return = spec_flux.shape[:-1]
+    nb_return = band_tx.shape[:-1]
+    loop_shape = (*nz_loop, *nb_loop, *ns_loop)
+    return_shape = (*nz_return, *nb_return, *ns_return)
+
+    # allocate magnitude array
+    mag_ab = np.empty(loop_shape, dtype=float)
 
     # compute magnitude contribution from band normalisation [denominator of (2)]
     m_band = -2.5*np.log10(np.trapz(band_tx/band_lam, band_lam))
@@ -255,26 +266,23 @@ def mag_ab(spectrum, bandpass, redshift=None):
     spec_intg = spec_lam*spec_flux
 
     # go through redshifts ...
-    for i, z in np.ndenumerate(redshift):
+    for i, z in enumerate(np.atleast_1d(redshift)):
 
-        # observed wavelength of spectrum
+        # observed wavelength of spectra
         obs_lam = (1 + z)*spec_lam
 
-        # interpolate band to get transmission at observed wavelengths
-        obs_tx = np.interp(obs_lam, band_lam, band_tx, left=0, right=0)
+        for j, b in enumerate(np.atleast_2d(band_tx)):
 
-        # compute magnitude contribution from flux [numerator of (2)]
-        m_flux = -2.5*np.log10(np.trapz(spec_intg*obs_tx, obs_lam))
+            # interpolate band to get transmission at observed wavelengths
+            obs_tx = np.interp(obs_lam, band_lam, b, left=0, right=0)
 
-        # combine AB magnitude [all of (2)]
-        mag_ab[i] = m_flux + m_offs
+            # compute magnitude contribution from flux [numerator of (2)]
+            mag_ab[i, j, :] = -2.5*np.log10(np.trapz(spec_intg*obs_tx, obs_lam))
 
-    # simplify scalar output
-    if np.isscalar(redshift):
-        mag_ab = mag_ab.item()
+    # combine AB magnitude [all of (2)]
+    mag_ab += np.atleast_1d(m_offs)[:, np.newaxis]
 
-    # all done
-    return mag_ab
+    return mag_ab.item() if not return_shape else mag_ab.reshape(return_shape)
 
 
 def magnitudes_from_templates(coefficients, templates, bandpasses,
