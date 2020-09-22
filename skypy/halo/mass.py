@@ -1,4 +1,4 @@
-r'''Halo mass sampler. 
+r'''Halo mass sampler.
 This code samples halos from their mass function.
 
 Models
