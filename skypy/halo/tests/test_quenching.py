@@ -13,7 +13,7 @@ def test_environment_quenched():
 
     p_value = stats.binom_test(number_quenched, n=n, p=p,
                                alternative='two-sided')
-    assert p_value > 0.05
+    assert p_value > 0.01
 
 
 def test_mass_quenched():
@@ -27,4 +27,4 @@ def test_mass_quenched():
 
     p_value = stats.binom_test(number_quenched, n=n, p=0.5,
                                alternative='two-sided')
-    assert p_value > 0.05
+    assert p_value > 0.01
