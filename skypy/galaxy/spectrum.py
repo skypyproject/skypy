@@ -208,11 +208,9 @@ def mag_ab(spectrum, bandpass, redshift=None):
     r'''Compute absolute AB magnitudes from spectra and bandpasses.
 
     This function takes *emission* spectra and observation bandpasses and
-    computes the AB magnitudes.
-    The emission spectra can optionally be redshifted. The definition of the
-    bandpass AB magnitude is taken from [1]_.
-
-    The bandpasses should have dimensionless `flux` units.
+    computes the AB magnitudes. The definition of the bandpass AB magnitude is
+    taken from [1]_. The emission spectra can optionally be redshifted and the
+    bandpasses should have dimensionless `flux` units.
 
     Parameters
     ----------
