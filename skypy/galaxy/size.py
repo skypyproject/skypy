@@ -90,13 +90,11 @@ def late_type_lognormal(magnitude, alpha, beta, gamma, M0, sigma1, sigma2,
     --------
     >>> import numpy as np
     >>> from skypy.galaxy import size
-    >>> np.random.seed(12345)
     >>> magnitude = -16.0
     >>> alpha, beta, gamma, M0 = 0.21, 0.53, -1.31, -20.52
     >>> sigma1, sigma2 = 0.48, 0.25
-    >>> size.late_type_lognormal(magnitude, alpha, beta, gamma, M0,\
-                                 sigma1, sigma2)
-    <Quantity 0.9850926 kpc>
+    >>> s = size.late_type_lognormal(magnitude, alpha, beta, gamma, M0,\
+                                     sigma1, sigma2)
 
 
     References
@@ -152,12 +150,10 @@ def early_type_lognormal(magnitude, a, b, M0, sigma1, sigma2, size=None):
     --------
     >>> import numpy as np
     >>> from skypy.galaxy import size
-    >>> np.random.seed(12345)
     >>> magnitude = -20.0
     >>> a, b, M0 = 0.6, -4.63, -20.52
     >>> sigma1, sigma2 = 0.48, 0.25
-    >>> size.early_type_lognormal(magnitude, a, b, M0, sigma1, sigma2)
-    <Quantity 1.35830285 kpc>
+    >>> s = size.early_type_lognormal(magnitude, a, b, M0, sigma1, sigma2)
 
 
     References
@@ -205,11 +201,9 @@ def linear_lognormal(magnitude, a_mu, b_mu, sigma, size=None):
     --------
     >>> import numpy as np
     >>> from skypy.galaxy import size
-    >>> np.random.seed(12345)
     >>> magnitude = -20.0
     >>> a_mu, b_mu, sigma =-0.24, -4.63, 0.4
-    >>> size.linear_lognormal(magnitude, a_mu, b_mu, sigma)
-    <Quantity 1.36282044 kpc>
+    >>> s = size.linear_lognormal(magnitude, a_mu, b_mu, sigma)
 
     References
     ----------

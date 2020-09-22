@@ -55,9 +55,9 @@ def halo_mass_function(M, wavenumber, power_spectrum, growth_function,
         Array for the halo mass, in units of solar mass.
     wavenumber : (nk,) array_like
         Array of wavenumbers at which the power spectrum is evaluated,
-        in units of :math:`1/Mpc`.
+        in units of Mpc-1.
     power_spectrum: (nk,) array_like
-        Linear power spectrum at redshift 0 in :math:`Mpc^3`.
+        Linear power spectrum at redshift 0 in Mpc3.
     growth_function : float
         The growth function evaluated at a given redshift for the given
         cosmology.
@@ -75,7 +75,7 @@ def halo_mass_function(M, wavenumber, power_spectrum, growth_function,
     --------
     mass_function: (nm,) array_like
         Halo mass function for a given mass array, cosmology and redshift, in
-        units of :math:`Mpc^{-3} M_{Sun}^{-1}`.
+        units of Mpc-3 Msun-1.
 
     Examples
     ---------
@@ -143,9 +143,9 @@ def halo_mass_sampler(m_min, m_max, resolution, wavenumber, power_spectrum,
         Resolution of the inverse transform sampling spline.
     wavenumber : (nk,) array_like
         Array of wavenumbers at which the power spectrum is evaluated,
-        in units of :math:`1/Mpc`.
+        in units of Mpc-1.
     power_spectrum: (nk,) array_like
-        Linear power spectrum at redshift 0 in :math:`Mpc^3`.
+        Linear power spectrum at redshift 0 in Mpc3.
     growth_function : float
         The growth function evaluated at a given redshift for the given
         cosmology.
