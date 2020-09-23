@@ -30,6 +30,7 @@ Packages
    galaxy
    gravitational_wave/index
    halo/index
+   positions
    power_spectrum/index
    supernova/index
    utils/index
