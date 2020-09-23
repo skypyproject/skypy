@@ -12,7 +12,7 @@ The simplest distribution of positions on the sky is the uniform distribution
 over a circular region with given centre and area. To sample this distribution,
 use the `~skypy.position.uniform_around` function:
 
-.. literalinclude:: uniform_around.yml
+.. literalinclude:: examples/uniform_around.yml
    :language: yaml
 
 .. plot::
@@ -20,7 +20,7 @@ use the `~skypy.position.uniform_around` function:
 
     from skypy.pipeline import Pipeline
 
-    pipeline = Pipeline.read('uniform_around.yml')
+    pipeline = Pipeline.read('examples/uniform_around.yml')
     pipeline.execute()
 
     coords = pipeline['positions']
