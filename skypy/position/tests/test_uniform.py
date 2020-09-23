@@ -22,12 +22,15 @@ def test_uniform_around():
     # sample 1000 random positions
     coords = uniform_around(centre, area, 1000)
 
-    # compute separations from centre
-    theta = coords.separation(centre).radian
-
     # make sure sample respects size
-    assert len(theta) == 1000
+    assert len(coords) == 1000
+
+    # compute separations and position angles from centre
+    theta = centre.separation(coords).radian
+    phi = centre.position_angle(coords).radian
 
     # test for uniform distribution
     D, p = kstest(theta, lambda t: (1 - np.cos(t))/(1 - np.cos(theta_max)))
+    assert p > 0.01, 'D = {}, p = {}'.format(D, p)
+    D, p = kstest(phi, 'uniform', args=(0., 2*np.pi))
     assert p > 0.01, 'D = {}, p = {}'.format(D, p)
