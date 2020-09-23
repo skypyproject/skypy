@@ -35,28 +35,8 @@ def uniform_around(centre, area, size):
 
     Examples
     --------
-    Import the Astropy and SkyPy modules.
+    See :ref:`User Documentation <skypy.position.uniform_around>`.
 
-    >>> from astropy.units import Quantity
-    >>> from astropy.coordinates import SkyCoord
-    >>> from skypy.position import uniform_around
-
-    Sample 500 points from a 1000deg2 region
-
-    >>> centre = SkyCoord('3h50m59.75s', '+54d39m22.15s')
-    >>> coords = uniform_around(centre, Quantity('1000 deg2'), 500)
-
-    Plot the distribution of points.
-
-    >>> # convert to RA and Dec, with RA in the +/-180deg range
-    >>> ra, dec = coords.ra.wrap_at('180d').radian, coords.dec.radian
-    >>> # plot in Aitoff projection
-    >>> import matplotlib.pyplot as plt  # doctest: +SKIP
-    >>> plt.figure(figsize=(8,4.2))  # doctest: +SKIP
-    >>> plt.subplot(111, projection="aitoff")  # doctest: +SKIP
-    >>> plt.plot(ra, dec, '.', alpha=0.2)  # doctest: +SKIP
-    >>> plt.grid()  # doctest: +SKIP
-    >>> plt.show()  # doctest: +SKIP
     '''
 
     # get cosine of the opening angle from the area
