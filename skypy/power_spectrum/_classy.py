@@ -20,12 +20,6 @@ def classy(wavenumber, redshift, cosmology, **kwargs):
     cosmology : astropy.cosmology.Cosmology
         Cosmology object providing omega_matter, omega_baryon, Hubble
         parameter and CMB temperature in the present day
-    A_s : float
-        Cosmology parameter, amplitude normalisation of curvature perturbation
-        power spectrum
-    n_s : float
-        Cosmology parameter, spectral index of scalar perturbation power
-        spectrum
 
     Returns
     -------
