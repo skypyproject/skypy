@@ -62,7 +62,7 @@ def classy(wavenumber, redshift, cosmology, **kwargs):
         raise Exception("classy is required to use skypy.linear.classy")
 
     h2 = cosmology.h * cosmology.h
-    
+
     params = {
         'output': 'mPk',
         'P_k_max_1/Mpc':  np.max(wavenumber),
