@@ -72,11 +72,10 @@ When you feel that work on your new feature is complete, you should create a *Pu
 
 A series of automated checks will be run on your pull request, some of which will be required to pass before it can be merged into the main codebase:
 
-  - `Code Style` (Required) runs [flake8](https://flake8.pycqa.org/en/latest/) to check that your code conforms to the [PEP 8](https://www.python.org/dev/peps/pep-0008/) style guidelines. Errors can be viewed inline in the "Files changed" tab.
   - `Documentation` (Required) checks that the documentation builds successfully. Click "Details" to view the output including any errors.
   - `Tests` (Required) runs the [unit tests](#unit-tests) in four predefined environments; `latest supported versions`, `oldest supported versions`, `macOS latest supported` and `Windows latest supported`. Click "Details" to view the output including any failures.
   - `build_docs` builds the html documentation so that you can view it using `giles` (see below).
-  - `codeclimate` runs [pycodestyle](https://pycodestyle.pycqa.org/en/latest/) to check that your code conforms to the [PEP 8](https://www.python.org/dev/peps/pep-0008/) style guidelines. Click "Details" to view any errors.
+  - `codeclimate` (Required) runs [pycodestyle](https://pycodestyle.pycqa.org/en/latest/) to check that your code conforms to the [PEP 8](https://www.python.org/dev/peps/pep-0008/) style guidelines. Click "Details" to view any errors.
   - `codecov` reports the test coverage for your pull request; you should aim for `codecov/patch — 100.00%`. Click "Details" to view coverage data.
   - `giles` lets you view the html documentation built by `circleci: build_docs`. Click "Details" to view the documentation.
 
@@ -118,16 +117,16 @@ Before your pull request can be merged into the codebase, it will be reviewed by
 - SkyPy is compatible with Python>=3.5 (see [setup.cfg](setup.cfg)). SkyPy *does not* support backwards compatibility with Python 2.x; `six`, `__future__` and `2to3` should not be used.
 - All contributions should follow the [PEP8 Style Guide for Python Code](https://www.python.org/dev/peps/pep-0008/). We recommend using [flake8](https://flake8.pycqa.org/) to check your code for PEP8 compliance.
 - Importing SkyPy should only depend on having [NumPy](https://www.numpy.org), [SciPy](https://www.scipy.org/) and [Astropy](https://www.astropy.org/) installed.
-- Code is grouped into submodules based on broad science areas e.g. [linear](skypy/linear), [nonlinear](skypy/nonlinear) and [galaxy](skypy/galaxy). There is also a [utils](skypy/utils) submodule for general utility functions.
+- Code is grouped into submodules based on broad science areas e.g. [galaxies](skypy/galaxy), [halos](skypy/halo) and [gravitational waves](skypy/gravitational_wave). There is also a [utils](skypy/utils) submodule for general utility functions.
 - For more information see the [Astropy Coding Guidelines](http://docs.astropy.org/en/latest/development/codeguide.html)
 
 ### Unit Tests
 
-Pull requests will require existing unit tests to pass before they can be merged. Additionally, new unit tests should be written for all new public methods and functions. Unit tests for each submodule are contained in subdirectories called `tests` and you can run them locally using `python setup.py test`. For more information see the [Astropy Testing Guidelines](https://docs.astropy.org/en/stable/development/testguide.html).
+Pull requests will require existing unit tests to pass before they can be merged. Additionally, new unit tests should be written for all new public methods and functions. Unit tests for each submodule are contained in subdirectories called `tests` and you can run them locally using `pytest`. For more information see the [Astropy Testing Guidelines](https://docs.astropy.org/en/stable/development/testguide.html).
 
 ### Docstrings
 
-All public classes, methods and functions require docstrings. You can build documentation locally by installing [sphinx-astropy](https://github.com/astropy/sphinx-astropy) and calling `python setup.py build_docs`. Docstrings should include the following sections:
+All public classes, methods and functions require docstrings. You can build documentation locally by installing [sphinx-astropy](https://github.com/astropy/sphinx-astropy) and calling `make html` in the `docs` subdirectory. Docstrings should include the following sections:
 
   - Description
   - Parameters

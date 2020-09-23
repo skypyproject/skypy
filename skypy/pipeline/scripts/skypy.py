@@ -8,7 +8,7 @@ a config file to generate tables of objects and write them to file.
 Using ``skypy`` to run one of the example pipelines and write the outputs to
 fits files:
 
-    $ skypy --config examples/herbel_galaxies.yaml --format fits
+    $ skypy examples/mccl_galaxies.yml --format fits
 
 Config Files
 ------------
@@ -35,17 +35,16 @@ values as keyword arguments.
 """
 
 import argparse
-from skypy.pipeline.driver import SkyPyDriver
+from skypy import __version__ as skypy_version
+from skypy.pipeline import Pipeline
 import sys
 
 
 def main(args=None):
 
-    import yaml
-
     parser = argparse.ArgumentParser(description="SkyPy pipeline driver")
-    parser.add_argument('config', type=argparse.FileType('r'),
-                        help='Config file name')
+    parser.add_argument('--version', action='version', version=skypy_version)
+    parser.add_argument('config', help='Config file name')
     parser.add_argument('-f', '--format', required=False,
                         choices=['fits', 'hdf5'], help='Table file format')
     parser.add_argument('-o', '--overwrite', action='store_true',
@@ -56,8 +55,8 @@ def main(args=None):
         args = sys.argv[1:]
 
     args = parser.parse_args(args or ['--help'])
-    config = yaml.safe_load(args.config)
-    config = {} if config is None else config
-    driver = SkyPyDriver()
-    driver.execute(config, file_format=args.format, overwrite=args.overwrite)
+
+    pipeline = Pipeline.read(args.config)
+    pipeline.execute()
+    pipeline.write(file_format=args.format, overwrite=args.overwrite)
     return(0)
