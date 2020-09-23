@@ -3,7 +3,7 @@ import pytest
 from scipy import stats
 
 
-@pytest.mark.flaky(reruns=3)
+@pytest.mark.flaky
 def test_beta_ellipticity():
 
     from skypy.galaxy.ellipticity import beta_ellipticity

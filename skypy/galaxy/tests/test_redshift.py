@@ -3,7 +3,7 @@ import pytest
 from scipy.stats import kstest
 
 
-@pytest.mark.flaky(reruns=3)
+@pytest.mark.flaky
 def test_schechter_lf_redshift():
 
     from skypy.galaxy.redshift import schechter_lf_redshift, redshifts_from_comoving_density
@@ -53,7 +53,7 @@ def test_schechter_lf_redshift():
     assert p > 0.01, 'D = {}, p = {}'.format(D, p)
 
 
-@pytest.mark.flaky(reruns=3)
+@pytest.mark.flaky
 def test_redshifts_from_comoving_density():
 
     from skypy.galaxy.redshift import redshifts_from_comoving_density
@@ -83,7 +83,7 @@ def test_redshifts_from_comoving_density():
     assert p > 0.01, 'D = {}, p = {}'.format(D, p)
 
 
-@pytest.mark.flaky(reruns=3)
+@pytest.mark.flaky
 def test_smail():
     from skypy.galaxy.redshift import smail
 

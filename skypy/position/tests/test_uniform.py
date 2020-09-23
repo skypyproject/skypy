@@ -3,7 +3,7 @@ import pytest
 from scipy.stats import kstest
 
 
-@pytest.mark.flaky(reruns=3)
+@pytest.mark.flaky
 def test_uniform_around():
     from skypy.position import uniform_around
     from astropy.coordinates import SkyCoord
