@@ -62,17 +62,18 @@ def classy(wavenumber, redshift, cosmology, **kwargs):
         raise Exception("classy is required to use skypy.linear.classy")
 
     h2 = cosmology.h * cosmology.h
-
-    params = {
-        'P_k_max_1/Mpc': np.max(wavenumber),
-        'z_pk': ', '.join(str(z) for z in redshift),
-        'H0': cosmology.H0.value,
-        'omega_b': cosmology.Ob0 * h2,
-        'omega_cdm': cosmology.Odm0 * h2,
-        'T_cmb': cosmology.Tcmb0.value,
-        'N_eff': cosmology.Neff,
-    }
     
+    params = {
+        'output': 'mPk',
+        'P_k_max_1/Mpc':  np.max(wavenumber),
+        'z_pk': ', '.join(str(z) for z in redshift),
+        'H0':        cosmology.H0.value,
+        'omega_b':   cosmology.Ob0 * h2,
+        'omega_cdm': cosmology.Odm0 * h2,
+        'T_cmb':     cosmology.Tcmb0.value,
+        'N_eff':     cosmology.Neff,
+    }
+
     params.update(kwargs)
 
     classy_obj = Class()
