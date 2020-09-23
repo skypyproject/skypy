@@ -16,7 +16,7 @@ def camb(wavenumber, redshift, cosmology,
     Parameters
     ----------
     wavenumber : (nk,) array_like
-        Array of wavenumbers in units of Mpc-1 at which to
+        Array of wavenumbers in units of [Mpc^-1] at which to
         evaluate the linear matter power spectrum.
     redshift : (nz,) array_like
         Array of redshifts at which to evaluate the linear matter power
