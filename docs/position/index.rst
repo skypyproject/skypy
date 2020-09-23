@@ -8,9 +8,9 @@ Uniform distributions
 
 .. _skypy.position.uniform_around:
 
-The simplest distribution of points on the sky is the uniform distribution over
-a spherical region with a given centre. To sample `n` points from this
-distribution, use the `~skypy.position.uniform_around` function:
+The simplest distribution of positions on the sky is the uniform distribution
+over a circular region with given centre and area. To sample this distribution,
+use the `~skypy.position.uniform_around` function:
 
 .. literalinclude:: uniform_around.yml
    :language: yaml
