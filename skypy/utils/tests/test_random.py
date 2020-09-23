@@ -1,8 +1,9 @@
 import numpy as np
-
+import pytest
 from scipy.stats import kstest
 
 
+@pytest.mark.flaky
 def test_schechter():
 
     from skypy.utils.random import schechter
@@ -39,6 +40,7 @@ def test_schechter():
     assert np.shape(samples) == np.shape(scale)
 
 
+@pytest.mark.flaky
 def test_schechter_gamma():
 
     from skypy.utils.random import schechter

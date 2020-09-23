@@ -8,6 +8,7 @@ from skypy.galaxy import stellar_mass
 from skypy.utils import special
 
 
+@pytest.mark.flaky
 def test_exponential_distribution():
     # When alpha=0, M*=1 and x_min~0 we get a truncated exponential
     q_max = 1e2
@@ -18,6 +19,7 @@ def test_exponential_distribution():
     assert p_value >= 0.01
 
 
+@pytest.mark.flaky
 def test_stellar_masses():
     # Test that error is returned if m_star input is an array but size !=
     # None and size != m_star,size
