@@ -38,3 +38,9 @@ def test_classy():
     pzk = classy(wavenumber, redshift, Pl15massless)
     assert pzk.shape == (len(redshift), len(wavenumber))
     assert allclose(pzk, test_pzk[np.argsort(redshift)], rtol=1.e-4)
+
+    # also check scalar arguments are treated correctly
+    redshift = 1.0
+    wavenumber = 1.e-1
+    pzk = classy(wavenumber, redshift, Pl15massless)
+    assert np.isscalar(pzk)

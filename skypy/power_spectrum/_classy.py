@@ -8,8 +8,8 @@ __all__ = [
 def classy(wavenumber, redshift, cosmology, **kwargs):
     """ Return the CLASS computation of the linear matter power spectrum, on a
     two dimensional grid of wavenumber and redshift.
-    
-    Additional CLASS parameters can be passed via keyword arguments. 
+
+    Additional CLASS parameters can be passed via keyword arguments.
 
     Parameters
     ----------
@@ -62,7 +62,7 @@ def classy(wavenumber, redshift, cosmology, **kwargs):
     params = {
         'output': 'mPk',
         'P_k_max_1/Mpc':  np.max(wavenumber),
-        'z_pk': ', '.join(str(z) for z in redshift),
+        'z_pk': ', '.join(str(z) for z in np.atleast_1d(redshift)),
         'H0':        cosmology.H0.value,
         'omega_b':   cosmology.Ob0 * h2,
         'omega_cdm': cosmology.Odm0 * h2,
@@ -85,6 +85,6 @@ def classy(wavenumber, redshift, cosmology, **kwargs):
         pzk[i] = classy_obj.pk_lin(k[i], z[i])
 
     if pzk.ndim == 0:
-        pzk = pzk.item()  # pragma: no cover
+        pzk = pzk.item()
 
     return pzk
