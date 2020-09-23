@@ -324,32 +324,33 @@ def magnitudes_from_templates(coefficients, templates, bandpasses, redshift=None
     '''
 
     # Array shapes
-    nz = np.size(redshift)
+    nz_loop = np.atleast_1d(redshift).shape
     nb_loop = np.atleast_2d(bandpasses.flux).shape[:-1]
     nt_loop = np.atleast_2d(templates.flux).shape[:-1]
+    ng_return = coefficients.shape[:-1]
     nb_return = bandpasses.flux.shape[:-1]
-    nt_return = templates.flux.shape[:-1]
-    loop_shape = (*nz, *nb_loop, *nt_loop)
-    return_shape = (*nz, *nb_return, *nt_return)
+    M_z_shape = (resolution, *nb_loop, *nt_loop)
+    M_shape = (*nz_loop, *nb_loop, *nt_loop)
+    return_shape = (*ng_return, *nb_return)
 
     # Interpolation flag
-    interpolate = nz > resolution
+    interpolate = np.size(redshift) > resolution
 
     if interpolate:
         z = np.linspace(np.min(redshift), np.max(redshift), resolution)
-        M_z = mag_ab(templates, bandpasses, z).reshape(loop_shape)
-        M = np.empty(loop_shape, dtype=float)
+        M_z = mag_ab(templates, bandpasses, z).reshape(M_z_shape)
+        M = np.empty(M_shape, dtype=float)
         for b in range(nb_loop):
             for t in range(nt_loop):
                 M[:, b, t] = np.interp(redshift, z, M_z[:, b, t])
     else:
-        M = mag_ab(templates, bandpasses, redshift)
+        M = mag_ab(templates, bandpasses, redshift).reshape(M_shape)
 
     stellar_mass = stellar_mass.to_value(units.Msun) if stellar_mass else 1
     distance_modulus = distance_modulus if distance_modulus else 0
 
-    flux = np.sum(coefficients[:, np.newaxis, :] * np.power(10, -0.4*M))
-    flux *= stellar_mass[:, np.newaxis, np.newaxis]
+    flux = np.sum(coefficients[:, np.newaxis, :] * np.power(10, -0.4*M), axis=2)
+    flux *= np.atleast_1d(stellar_mass)[:, np.newaxis]
     magnitudes = -2.5 * np.log10(flux) + distance_modulus
 
     return magnitudes.item() if not return_shape else magnitudes.reshape(return_shape)
