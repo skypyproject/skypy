@@ -5,8 +5,7 @@ __all__ = [
 ]
 
 
-def classy(wavenumber, redshift, cosmology,
-           A_s, n_s, z_reio):
+def classy(wavenumber, redshift, cosmology, **kwargs):
     """ Return the CLASS computation of the linear matter power spectrum, on a
     two dimensional grid of wavenumber and redshift
 
