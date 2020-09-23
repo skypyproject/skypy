@@ -15,6 +15,7 @@ else:
 from skypy.galaxy.spectrum import dirichlet_coefficients, kcorrect_spectra
 
 
+@pytest.mark.flaky(reruns=3)
 def test_sampling_coefficients():
     alpha0 = np.array([2.079, 3.524, 1.917, 1.992, 2.536])
     alpha1 = np.array([2.265, 3.862, 1.921, 1.685, 2.480])
