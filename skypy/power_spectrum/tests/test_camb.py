@@ -1,6 +1,6 @@
 import numpy as np
 from astropy.cosmology import Planck15
-from astropy import units as u
+from astropy import units
 from astropy.units import allclose
 from astropy.utils.data import get_pkg_data_filename
 import pytest
@@ -25,7 +25,7 @@ def test_camb():
     '''
     from skypy.power_spectrum import camb
 
-    Pl15massless = Planck15.clone(name='Planck 15 massless neutrino', m_nu=[0., 0., 0.]*u.eV)
+    Pl15massless = Planck15.clone(name='Planck 15 massless neutrino', m_nu=[0., 0., 0.]*units.eV)
 
     # test shape and compare with the mocked power spectrum
     redshift = [0.0, 1.0]

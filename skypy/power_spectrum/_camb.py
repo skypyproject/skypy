@@ -1,5 +1,5 @@
 import numpy as np
-from astropy import units as u
+from astropy import units
 
 
 __all__ = [
@@ -76,12 +76,13 @@ def camb(wavenumber, redshift, cosmology,
                        omch2=cosmology.Odm0 * h2,
                        omk=cosmology.Ok0,
                        TCMB=cosmology.Tcmb0.value,
-                       mnu=np.sum(cosmology.m_nu.to_value(u.eV)),
+                       mnu=np.sum(cosmology.m_nu.to_value(units.eV)),
                        standard_neutrino_neff=cosmology.Neff
                        )
 
     # camb interpolator requires redshifts to be in increasing order
     redshift_order = np.argsort(redshift)
+    wavenumber_order = np.argsort(wavenumber)
 
     pars.InitPower.ns = n_s
     pars.InitPower.As = A_s
@@ -96,6 +97,6 @@ def camb(wavenumber, redshift, cosmology,
                                               kmax=np.max(wavenumber),
                                               zmax=np.max(redshift))
 
-    pzk = pk_interp.P(redshift[redshift_order], wavenumber)
+    pzk = pk_interp.P(redshift[redshift_order], wavenumber[wavenumber_order])
 
     return pzk[redshift_order].reshape(return_shape)
