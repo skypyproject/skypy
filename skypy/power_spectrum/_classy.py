@@ -7,7 +7,9 @@ __all__ = [
 
 def classy(wavenumber, redshift, cosmology, **kwargs):
     """ Return the CLASS computation of the linear matter power spectrum, on a
-    two dimensional grid of wavenumber and redshift
+    two dimensional grid of wavenumber and redshift.
+    
+    Additional CLASS parameters can be passed via keyword arguments. 
 
     Parameters
     ----------
