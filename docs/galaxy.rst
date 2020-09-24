@@ -78,7 +78,7 @@ The following models are found in the `skypy.galaxy.spectrum` package.
    :nosignatures:
 
    dirichlet_coefficients
-   kcorrect_spectra
+   load_spectral_data
    mag_ab
    magnitudes_from_templates
 

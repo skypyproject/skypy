@@ -1,7 +1,9 @@
 import numpy as np
+import pytest
 from scipy.stats import kstest
 
 
+@pytest.mark.flaky
 def test_schechter_lf_magnitude():
     from skypy.galaxy.luminosity import schechter_lf_magnitude
     from astropy.cosmology import default_cosmology
