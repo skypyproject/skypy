@@ -149,6 +149,44 @@ def test_mag_ab_multi():
 
 
 @pytest.mark.skipif(not HAS_SPECUTILS, reason='test requires specutils')
+def test_stellar_mass_from_reference_band():
+
+    from astropy import units
+    from skypy.galaxy.spectrum import mag_ab, stellar_mass_from_reference_band
+
+    # Gaussian bandpass
+    bp_lam = np.logspace(0, 4, 1000) * units.AA
+    bp_mean = 1000 * units.AA
+    bp_width = 100 * units.AA
+    bp_tx = np.exp(-((bp_lam-bp_mean)/bp_width)**2)*units.dimensionless_unscaled
+    band = specutils.Spectrum1D(spectral_axis=bp_lam, flux=bp_tx)
+
+    # 3 Flat template spectra
+    lam = np.logspace(0, 4, 1000)*units.AA
+    A = np.array([[2], [3], [4]])
+    flam = A * 0.10884806248538730623*units.Unit('erg s-1 cm-2 AA')/lam**2
+    templates = specutils.Spectrum1D(spectral_axis=lam, flux=flam)
+
+    # Absolute magnitudes for each template
+    Mt = mag_ab(templates, band)
+
+    # Using the identity matrix for the coefficients yields trivial test cases
+    coeff = np.diag(np.ones(3))
+
+    # Using the absolute magnitudes of the templates as reference magnitudes
+    # should return one solar mass for each template.
+    stellar_mass = stellar_mass_from_reference_band(coeff, templates, Mt, band)
+    truth = 1 * units.Msun
+    np.testing.assert_allclose(stellar_mass, truth)
+
+    # Solution for given magnitudes without template mixing
+    Mb = np.array([10, 20, 30])
+    stellar_mass = stellar_mass_from_reference_band(coeff, templates, Mb, band)
+    truth = np.power(10, -0.4*(Mb-Mt)) * units.Msun
+    np.testing.assert_allclose(stellar_mass, truth)
+
+
+@pytest.mark.skipif(not HAS_SPECUTILS, reason='test requires specutils')
 def test_load_spectral_data():
 
     from skypy.galaxy.spectrum import load_spectral_data
