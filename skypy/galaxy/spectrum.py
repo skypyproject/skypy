@@ -259,12 +259,12 @@ def magnitudes_from_templates(coefficients, templates, bandpasses, redshift=None
     else:
         M = mag_ab(templates, bandpasses, redshift).reshape(M_shape)
 
-    stellar_mass = stellar_mass.to_value(units.Msun) if stellar_mass else 1
-    distance_modulus = distance_modulus if distance_modulus else 0
+    stellar_mass = 1 if stellar_mass is None else stellar_mass.to_value(units.Msun)
+    distance_modulus = 0 if distance_modulus is None else distance_modulus
 
     flux = np.sum(coefficients[:, np.newaxis, :] * np.power(10, -0.4*M), axis=2)
     flux *= np.atleast_1d(stellar_mass)[:, np.newaxis]
-    magnitudes = -2.5 * np.log10(flux) + distance_modulus
+    magnitudes = -2.5 * np.log10(flux) + np.atleast_1d(distance_modulus)[:, np.newaxis]
 
     return magnitudes.item() if not return_shape else magnitudes.reshape(return_shape)
 
