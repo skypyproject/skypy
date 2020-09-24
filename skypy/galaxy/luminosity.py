@@ -91,7 +91,7 @@ luminosity_in_band = {
 
 These values can be used for conversion in `absolute_magnitude_from_luminosity`
 and `luminosity_from_absolute_magnitude`. The `Lsun_{UBVRI}` values contain the
-absolute magnitude of the sun in Johnson/Cousins bands from [1]_.
+absolute AB magnitude of the sun in Johnson/Cousins bands from [1]_.
 
 References
 ----------
