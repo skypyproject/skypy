@@ -237,13 +237,13 @@ def magnitudes_from_templates(coefficients, templates, bandpasses, redshift=None
     '''
 
     # Array shapes
-    nz_loop = np.atleast_1d(redshift).shape
-    nb_loop = np.atleast_2d(bandpasses.flux).shape[:-1]
-    nt_loop = np.atleast_2d(templates.flux).shape[:-1]
+    nz_loop = np.atleast_1d(redshift).shape[0]
+    nb_loop = np.atleast_2d(bandpasses.flux).shape[0]
+    nt_loop = np.atleast_2d(templates.flux).shape[0]
     ng_return = coefficients.shape[:-1]
     nb_return = bandpasses.flux.shape[:-1]
-    M_z_shape = (resolution, *nb_loop, *nt_loop)
-    M_shape = (*nz_loop, *nb_loop, *nt_loop)
+    M_z_shape = (resolution, nb_loop, nt_loop)
+    M_shape = (nz_loop, nb_loop, nt_loop)
     return_shape = (*ng_return, *nb_return)
 
     # Interpolation flag
