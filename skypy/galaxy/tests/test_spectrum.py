@@ -1,8 +1,6 @@
 import numpy as np
 import scipy.stats
 import pytest
-from astropy.io.fits import getdata
-
 
 try:
     import specutils
@@ -12,11 +10,11 @@ else:
     HAS_SPECUTILS = True
 
 
-from skypy.galaxy.spectrum import dirichlet_coefficients, kcorrect_spectra
-
-
 @pytest.mark.flaky
 def test_sampling_coefficients():
+
+    from skypy.galaxy.spectrum import dirichlet_coefficients
+
     alpha0 = np.array([2.079, 3.524, 1.917, 1.992, 2.536])
     alpha1 = np.array([2.265, 3.862, 1.921, 1.685, 2.480])
 
@@ -70,36 +68,6 @@ def test_sampling_coefficients():
     # bad weight parameter
     with pytest.raises(ValueError):
         dirichlet_coefficients(redshift, [2.5, 2.5], [2.5, 2.5], weight=[1, 2, 3])
-
-
-def test_kcorrect_spectra():
-    # Download template data
-    kcorrect_templates_url = "https://github.com/blanton144/kcorrect/raw/" \
-                             "master/data/templates/k_nmf_derived.default.fits"
-    lam = getdata(kcorrect_templates_url, 11)
-    templates = getdata(kcorrect_templates_url, 1)
-
-    # Test that the shape of the returned flux density corresponds to (nz, nl)
-    coefficients = np.array([[0.2, 0.2, 0.2, 0.2, 0.2],
-                            [0, 0.1, 0.2, 0.3, 0.4]])
-    z = np.array([0.5, 1])
-    mass = np.array([5 * 10 ** 10, 7 * 10 ** 9])
-    lam_o, sed = kcorrect_spectra(z, mass, coefficients)
-
-    assert sed.shape == (len(z), len(lam))
-
-    # Test that for redshift=0, mass=1 and coefficients=[1,0,0,0,0]
-    # the returned wavelengths and spectra match the template data
-
-    coefficients = np.array([1, 0, 0, 0, 0])
-
-    z = np.array([0])
-    mass = np.array([1])
-
-    lam_o, sed = kcorrect_spectra(z, mass, coefficients)
-
-    assert np.allclose(lam_o, lam)
-    assert np.allclose(sed, templates[0])
 
 
 @pytest.mark.skipif(not HAS_SPECUTILS, reason='test requires specutils')
@@ -178,3 +146,67 @@ def test_mag_ab_multi():
     truth = -2.5 * np.log10(A * (1+z)).T[:, np.newaxis, :]
     assert magnitudes.shape == (5, 2, 3)
     np.testing.assert_allclose(*np.broadcast_arrays(magnitudes, truth))
+
+
+@pytest.mark.skipif(not HAS_SPECUTILS, reason='test requires specutils')
+def test_load_spectral_data():
+
+    from skypy.galaxy.spectrum import load_spectral_data
+    from astropy.utils.data import get_pkg_data_filename
+
+    # load a local file
+    filename = get_pkg_data_filename('data/spectrum.ecsv')
+    load_spectral_data(filename)
+
+    # load skypy data bandpasses
+    load_spectral_data('Johnson_UBV')
+    load_spectral_data('Cousins_RI')
+
+    # load skypy data spectrum templates
+    load_spectral_data('kcorrect_spec')
+
+    # load DECam bandpasses
+    load_spectral_data('DECam_grizY')
+
+    # load multiple sources
+    load_spectral_data(['Johnson_B', 'Cousins_R'])
+
+    # try to load non-string name
+    with pytest.raises(TypeError):
+        load_spectral_data(1.0)
+
+    # try to load unknown data
+    with pytest.raises(FileNotFoundError):
+        load_spectral_data('!!UNKNOWN!!')
+
+
+@pytest.mark.skipif(not HAS_SPECUTILS, reason='test requires specutils')
+def test_combine_spectra():
+
+    from skypy.galaxy._spectrum_loaders import combine_spectra
+    from astropy import units
+
+    a = specutils.Spectrum1D(spectral_axis=[1., 2., 3.]*units.AA,
+                             flux=[1., 2., 3.]*units.Jy)
+    b = specutils.Spectrum1D(spectral_axis=[1e-10, 2e-10, 3e-10]*units.m,
+                             flux=[4e-23, 5e-23, 6e-23]*units.Unit('erg s-1 cm-2 Hz-1'))
+
+    assert np.allclose(a.spectral_axis, b.spectral_axis, atol=0, rtol=1e-10)
+
+    assert a == combine_spectra(a, None)
+    assert a == combine_spectra(None, a)
+
+    ab = combine_spectra(a, b)
+    assert isinstance(ab, specutils.Spectrum1D)
+    assert ab.shape == (2, 3)
+    assert ab.flux.unit == units.Jy
+    assert np.allclose([[1, 2, 3], [4, 5, 6]], ab.flux.value)
+
+    c = specutils.Spectrum1D(spectral_axis=[1., 2., 3., 4.]*units.AA,
+                             flux=[1., 2., 3., 4.]*units.Jy)
+
+    ac = combine_spectra(a, c)
+    assert isinstance(ac, specutils.SpectrumList)
+
+    aca = combine_spectra(ac, a)
+    assert isinstance(aca, specutils.SpectrumList)
