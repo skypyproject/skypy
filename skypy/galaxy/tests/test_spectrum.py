@@ -178,6 +178,11 @@ def test_template_spectra():
     mt = magnitudes_from_templates(coefficients, spec, bp, distance_modulus=dm)
     np.testing.assert_allclose(mt, m + dm)
 
+    # Test stellar mass
+    sm = np.array([1, 2, 3]) * units.Msun
+    mt = magnitudes_from_templates(coefficients, spec, bp, stellar_mass=sm)
+    np.testing.assert_allclose(mt, m - 2.5*np.log10(sm.to_value('Msun')))
+
 
 @pytest.mark.skipif(not HAS_SPECUTILS, reason='test requires specutils')
 def test_load_spectral_data():
