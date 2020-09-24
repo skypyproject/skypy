@@ -183,6 +183,14 @@ def test_template_spectra():
     mt = magnitudes_from_templates(coefficients, spec, bp, stellar_mass=sm)
     np.testing.assert_allclose(mt, m - 2.5*np.log10(sm.to_value('Msun')))
 
+    # Redshift interpolation test; linear interpolation sufficient over a small
+    # redshift range at low relative tolerance
+    z = np.linspace(0, 0.1, 3)
+    m_true = magnitudes_from_templates(coefficients, spec, bp, redshift=z, resolution=4)
+    m_interp = magnitudes_from_templates(coefficients, spec, bp, redshift=z, resolution=2)
+    np.testing.assert_allclose(m_true, m_interp, rtol=1e-2)
+    with pytest.raises(AssertionError):
+        np.testing.assert_allclose(m_true, m_interp, rtol=1e-5)
 
 @pytest.mark.skipif(not HAS_SPECUTILS, reason='test requires specutils')
 def test_load_spectral_data():
