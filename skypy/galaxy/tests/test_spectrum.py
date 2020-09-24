@@ -153,6 +153,7 @@ def test_template_spectra():
 
     from astropy import units
     from skypy.galaxy.spectrum import mag_ab, magnitudes_from_templates
+    from astropy.cosmology import Planck15
 
     # 3 Flat Templates
     lam = np.logspace(0, 4, 1000)*units.AA
@@ -170,6 +171,12 @@ def test_template_spectra():
     mt = magnitudes_from_templates(coefficients, spec, bp)
     m = mag_ab(spec, bp)
     np.testing.assert_allclose(mt, m)
+
+    # Test distance modulus
+    redshift = np.array([0, 1, 2])
+    dm = Planck15.distmod(redshift).value
+    mt = magnitudes_from_templates(coefficients, spec, bp, distance_modulus=dm)
+    np.testing.assert_allclose(mt, m + dm)
 
 
 @pytest.mark.skipif(not HAS_SPECUTILS, reason='test requires specutils')
