@@ -1,4 +1,5 @@
 import numpy as np
+import pytest
 
 
 def test_uses_default_cosmology():
@@ -78,4 +79,24 @@ def test_dependent_argument():
     with raises(ValueError):
         @dependent_argument('x', 'y', 'z')
         def argument_z_does_not_exist(x, y):
+            pass
+
+
+def test_spectral_data_input():
+
+    from astropy import units
+    from skypy.utils import spectral_data_input
+
+    @spectral_data_input(bandpass=units.dimensionless_unscaled)
+    def my_bandpass_function(bandpass):
+        pass
+
+    my_bandpass_function('Johnson_B')
+
+    with pytest.raises(units.UnitConversionError):
+        my_bandpass_function('kcorrect_spec')
+
+    with pytest.raises(ValueError):
+        @spectral_data_input(invalid=units.Jy)
+        def my_spectrum_function(spectrum):
             pass
