@@ -8,7 +8,7 @@ a config file to generate tables of objects and write them to file.
 Using ``skypy`` to run one of the example pipelines and write the outputs to
 fits files:
 
-    $ skypy --config examples/herbel_galaxies.yaml --format fits
+    $ skypy examples/mccl_galaxies.yml --format fits
 
 Config Files
 ------------
@@ -39,17 +39,16 @@ from astropy.cosmology import z_at_value
 from astropy.table import Table, vstack
 from copy import deepcopy
 import numpy as np
-from skypy.pipeline.driver import SkyPyDriver
+from skypy import __version__ as skypy_version
+from skypy.pipeline import Pipeline
 import sys
 
 
 def main(args=None):
 
-    import yaml
-
     parser = argparse.ArgumentParser(description="SkyPy pipeline driver")
-    parser.add_argument('config', type=argparse.FileType('r'),
-                        help='Config file name')
+    parser.add_argument('--version', action='version', version=skypy_version)
+    parser.add_argument('config', help='Config file name')
     parser.add_argument('-f', '--format', required=False,
                         choices=['fits', 'hdf5'], help='Table file format')
     parser.add_argument('-o', '--overwrite', action='store_true',
@@ -63,15 +62,14 @@ def main(args=None):
         args = sys.argv[1:]
 
     args = parser.parse_args(args or ['--help'])
-    config = yaml.safe_load(args.config)
-    config = {} if config is None else config
 
     if args.lightcone:
 
         # Equally spaced comoving distance slices and corresponding redshifts
-        cosmology = SkyPyDriver()._call_from_config(config.get('cosmology'))
-        z_min = float(args.lightcone[0])
-        z_max = float(args.lightcone[1])
+        pipeline = Pipeline.read(args.config)
+        cosmology = pipeline.get_value('cosmology')
+        lightcone_z_min = float(args.lightcone[0])
+        lightcone_z_max = float(args.lightcone[1])
         n_slice = int(args.lightcone[2])
         chi_min = cosmology.comoving_distance(z_min)
         chi_max = cosmology.comoving_distance(z_max)
@@ -80,28 +78,29 @@ def main(args=None):
         z = [z_at_value(cosmology.comoving_distance, c, z_min, z_max) for c in chi[1:-1]]
         z_mid = [z_at_value(cosmology.comoving_distance, c, z_min, z_max) for c in chi_mid]
         redshift_slices = zip([z_min] + z, z + [z_max], z_mid)
-        config['lightcone_z_min'] = z_min
-        config['lightcone_z_max'] = z_max
 
-        tables = {k: Table() for k in config.get('tables', {}).keys()}
-        for z_min, z_max, z in redshift_slices:
-            config_z = deepcopy(config)
-            config_z['slice_z_min'] = z_min
-            config_z['slice_z_max'] = z_max
-            config_z['slice_z_mid'] = z
-            driver = SkyPyDriver()
-            driver.execute(config_z)
+        tables = {k: Table() for k in pipeline.config.get('tables', {}).keys()}
+        for slice_z_min, slice_z_max, slice_z in redshift_slices:
+            pipeline = Pipeline.read(args.config)
+            pipeline.config['lightcone_z_min'] = lightcone_z_min
+            pipeline.config['lightcone_z_max'] = lightcone_z_max
+            pipeline.config['slice_z_min'] = slice_z_min
+            pipeline.config['slice_z_max'] = slice_z_max
+            pipeline.config['slice_z'] = slice_z
+            pipeline.execute()
             for k, v in tables.items():
-                tables[k] = vstack((v, driver[k]))
-    else:
-        driver = SkyPyDriver()
-        driver.execute(config)
-        tables = {k: driver[k] for k in config.get('tables', {}).keys()}
+                tables[k] = vstack((v, pipeline[k]))
 
-    # Write tables to file
-    if args.format:
-        for name, table in tables.items():
-            filename = '.'.join((name, args.format))
-            table.write(filename, overwrite=args.overwrite)
+        # Write tables to file
+        if args.format:
+            for name, table in tables.items():
+                filename = '.'.join((name, args.format))
+                table.write(filename, overwrite=args.overwrite)
+
+    else:
+
+        pipeline = Pipeline.read(args.config)
+        pipeline.execute()
+        pipeline.write(file_format=args.format, overwrite=args.overwrite)
 
     return(0)

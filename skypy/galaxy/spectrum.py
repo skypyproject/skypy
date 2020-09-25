@@ -3,17 +3,18 @@ r"""Galaxy spectrum module.
 """
 
 import numpy as np
-from astropy.io.fits import getdata
+from astropy import units
+from ..utils import spectral_data_input
 
 
 __all__ = [
     'dirichlet_coefficients',
-    'kcorrect_spectra',
+    'load_spectral_data',
     'mag_ab',
 ]
 
 
-def dirichlet_coefficients(redshift, alpha0, alpha1, z1=1.):
+def dirichlet_coefficients(redshift, alpha0, alpha1, z1=1., weight=None):
     r"""Dirichlet-distributed SED coefficients.
 
     Spectral coefficients to calculate the rest-frame spectral energy
@@ -29,6 +30,8 @@ def dirichlet_coefficients(redshift, alpha0, alpha1, z1=1.):
         (3.9) in [1]_.
     z1 : float or scalar, optional
        Reference redshift at which alpha = alpha1. The default value is 1.0.
+    weight : (nc,) array_like, optional
+        Different weights for each component.
 
     Returns
     -------
@@ -83,172 +86,87 @@ def dirichlet_coefficients(redshift, alpha0, alpha1, z1=1.):
     >>> coefficients = dirichlet_coefficients(redshift, alpha0, alpha1)
 
     """
-    if np.isscalar(alpha0) or np.isscalar(alpha1):
-        raise ValueError("alpha0 and alpha1 must be array_like.")
-    return_shape = (*np.shape(redshift), *np.shape(alpha0))
-    redshift = np.atleast_1d(redshift)[:, np.newaxis]
 
-    alpha = np.power(alpha0, 1. - redshift / z1) * \
-        np.power(alpha1, redshift / z1)
+    if np.ndim(alpha0) != 1 or np.ndim(alpha1) != 1:
+        raise ValueError('alpha0, alpha1 must be 1D arrays')
+    if len(alpha0) != len(alpha1):
+        raise ValueError('alpha0 and alpha1 must have the same length')
+    if weight is not None and (np.ndim(weight) != 1 or len(weight) != len(alpha0)):
+        raise ValueError('weight must be 1D and match alpha0, alpha1')
 
-    # To sample Dirichlet distributed variables of order k we first sample k
-    # Gamma distributed variables y_i with the parameters alpha_i.
-    # Normalising all y_i by the sum of all k y_i gives us the k Dirichlet
-    # distributed variables.
-    y = np.random.gamma(alpha)
-    sum_y = y.sum(axis=1)
-    coefficients = np.divide(y.T, sum_y.T).T
-    return coefficients.reshape(return_shape)
+    redshift = np.expand_dims(redshift, -1)
 
+    alpha = np.power(alpha0, 1-redshift/z1)*np.power(alpha1, redshift/z1)
 
-def kcorrect_spectra(redshift, stellar_mass, coefficients):
-    r"""Flux densities of galaxies.
+    # sample Dirichlet by normalising independent gamma draws
+    coeff = np.random.gamma(alpha)
+    if weight is not None:
+        coeff *= weight
+    coeff /= coeff.sum(axis=-1)[..., np.newaxis]
 
-    The flux density as a sum of the 5 kcorrect templates.
-
-    Parameters
-    ----------
-    redshift : (nz,) array-like
-        The redshift values of the galaxies.
-    stellar_mass : (nz, ) array-like
-        The stellar masses of the galaxies.
-    coefficients: (nz, 5) array-like
-        Coefficients to be multiplied with the kcorrect templates.
+    return coeff
 
 
-    Returns
-    -------
-    wavelength_observe : (nl, ) array_like
-        Wavelengths corresponding to the flux density. Given in units of
-        Angstrom
-    sed: (nz, nl) array-like
-        Flux density of the galaxies in units of erg/s/cm^2/Angstrom as it
-        would be observed at a distance of 10 pc.
+@spectral_data_input(spectrum=units.Jy,
+                     bandpass=units.dimensionless_unscaled)
+def mag_ab(spectrum, bandpass, redshift=None):
+    r'''Compute absolute AB magnitudes from spectra and bandpasses.
 
-    Notes
-    -----
-    The rest-frame flux-density can be calculated as a sum of the five kcorrect
-    templates [1]_
-
-    .. math::
-        f_e(\lambda) = \sum_i c_i t_i(\lambda) \;,
-
-    with kcorrect templates :math:`t_i(\lambda)` and coefficients :math:`c_i`.
-
-    The kcorrect templates are given in units of
-    erg/s/cm^2/Angstrom per solar mass and as it would be observed in a
-    distance of 10pc. To obtain the correct flux density if the object would be
-    at 10 pc distance we have to adjust the coefficients by the stellar mass
-    :math:`M` of the galaxy
-
-    .. math::
-         \tilde{c_i} = c_i \cdot M \;.
-
-    Thus, the flux density is given by
-
-    .. math::
-        f_e(\lambda) = \sum_i \tilde{c_i} t_i(\lambda) \;.
-
-    To get the flux density in observed frame we have to redshift it
-
-    .. math::
-        f_o(\lambda_o) = \frac{f_e(\lambda)}{1+z} \;
-
-    where
-
-    .. math::
-        \lambda_o = (1+z) \lambda \;.
-
-    References
-    ----------
-    .. [1] Blanton M., Roweis S., 2006, The Astronomical Journal, Issue 2,
-        Volume 133, Pages 734 - 754
-
-    Examples
-    --------
-    >>> from skypy.galaxy.spectrum import kcorrect_spectra
-    >>> from astropy.cosmology import FlatLambdaCDM
-    >>> from skypy.galaxy.spectrum import dirichlet_coefficients
-
-    Calculate the flux density for two galaxies.
-
-    >>> cosmology = FlatLambdaCDM(H0=70, Om0=0.3)
-    >>> alpha0 = np.array([2.079, 3.524, 1.917, 1.992, 2.536])
-    >>> alpha1 = np.array([2.265, 3.862, 1.921, 1.685, 2.480])
-    >>> redshift = np.array([0.5,1])
-    >>> coefficients = dirichlet_coefficients(redshift, alpha0, alpha1)
-    >>> stellar_mass = np.array([5*10**10, 7*10**9])
-    >>>
-    >>> wavelength_o, sed = kcorrect_spectra(redshift, stellar_mass,
-    ...                                       coefficients)
-
-    """
-
-    kcorrect_templates_url = "https://github.com/blanton144/kcorrect/raw/" \
-                             "master/data/templates/k_nmf_derived.default.fits"
-    templates = getdata(kcorrect_templates_url, 1)
-    wavelength = getdata(kcorrect_templates_url, 11)
-
-    rescaled_coeff = (coefficients.T * stellar_mass).T
-
-    sed = (np.matmul(rescaled_coeff, templates).T / (1 + redshift)).T
-    wavelength_observed = np.matmul((1 + redshift).reshape(len(redshift), 1),
-                                    wavelength.reshape(1, len(wavelength)))
-
-    return wavelength_observed, sed
-
-
-def mag_ab(spec_lam, spec_flux, band_lam, band_tx, redshift=None):
-    r'''Compute absolute AB magnitude from spectrum and bandpass.
-
-    This function takes an *emission* spectrum and an observation bandpass and
-    computes the AB magnitude for a source at 10pc (i.e. absolute magnitude).
-    The emission spectrum can optionally be redshifted. The definition of the
-    bandpass AB magnitude is taken from [1]_.
-
-    Both the spectrum and the bandpass must be given as functions of wavelength
-    in Angstrom. The spectrum must be given as flux in erg/s/cm2/A.
+    This function takes *emission* spectra and observation bandpasses and
+    computes the AB magnitudes. The definition of the bandpass AB magnitude is
+    taken from [1]_. The emission spectra can optionally be redshifted and the
+    bandpasses should have dimensionless `flux` units.
 
     Parameters
     ----------
-    spec_lam : (ns,) array_like
-        Vector of spectrum wavelengths in units of Angstrom.
-    spec_flux : (ns,) array_like
-        Vector of spectrum fluxes in units of erg/s/cm2/A.
-    band_lam : (nb,) array_like
-        Vector of bandpass wavelengths in units of Angstrom.
-    band_tx : (nb,) array_like
-        Vector of bandpass transmissions.
-    redshift : array_like, optional
-        Optional array of values for redshifting the source spectrum. Default
-        is a redshift of 0.0.
+    spectrum : spectral_data
+        Emission spectra of the sources.
+    bandpass : spectral_data
+        Bandpass filters.
+    redshift : (nz,) array_like, optional
+        Optional array of values for redshifting the source spectra.
 
     Returns
     -------
-    mag_ab : array_like
-        The absolute AB magnitude. If redshifts are given, the output has the
-        same shape *and type* as the `redshift` argument.
+    mag_ab : (nz, nb, ns) array_like
+        Absolute AB magnitudes.
 
     References
     ----------
     .. [1] M. R. Blanton et al., 2003, AJ, 125, 2348
+
+    Examples
+    --------
+    Get B-band magnitudes for the kcorrect spec templaces using auto-loading
+    of known spectral data:
+    >>> from skypy.galaxy.spectrum import mag_ab
+    >>> mag_B = mag_ab('kcorrect_spec', 'Johnson_B')
+
     '''
 
-    assert np.ndim(spec_lam) == 1, 'spec_lam must be 1d array'
-    assert np.ndim(spec_flux) == 1, 'spec_flux must be 1d array'
-    assert len(spec_lam) == len(spec_flux), 'spec_lam and spec_flux must match'
-    assert np.all(np.less_equal(spec_lam[:-1], spec_lam[1:])), 'spec_lam must be ordered'
-    assert np.ndim(band_lam) == 1, 'band_lam must be 1d array'
-    assert np.ndim(band_tx) == 1, 'band_tx must be 1d array'
-    assert len(band_lam) == len(band_tx), 'band_lam and band_tx must match'
-    assert np.all(np.less_equal(band_lam[:-1], band_lam[1:])), 'band_lam must be ordered'
+    # get the spectra and bandpasses
+    spec_lam = spectrum.wavelength.to_value(units.AA, equivalencies=units.spectral())
+    spec_flux = spectrum.flux.to_value('erg s-1 cm-2 AA-1',
+                                       equivalencies=units.spectral_density(spec_lam))
+    band_lam = bandpass.wavelength.to_value(units.AA, equivalencies=units.spectral())
+    band_tx = bandpass.flux.to_value(units.dimensionless_unscaled)
 
     # redshift zero if not given
     if redshift is None:
         redshift = 0.
 
-    # allocate output array
-    mag_ab = np.empty_like(redshift)
+    # Array shapes
+    nz_loop = np.atleast_1d(redshift).shape
+    ns_loop = np.atleast_2d(spec_flux).shape[:-1]
+    nb_loop = np.atleast_2d(band_tx).shape[:-1]
+    nz_return = np.shape(redshift)
+    ns_return = spec_flux.shape[:-1]
+    nb_return = band_tx.shape[:-1]
+    loop_shape = (*nz_loop, *nb_loop, *ns_loop)
+    return_shape = (*nz_return, *nb_return, *ns_return)
+
+    # allocate magnitude array
+    mag_ab = np.empty(loop_shape, dtype=float)
 
     # compute magnitude contribution from band normalisation [denominator of (2)]
     m_band = -2.5*np.log10(np.trapz(band_tx/band_lam, band_lam))
@@ -260,23 +178,73 @@ def mag_ab(spec_lam, spec_flux, band_lam, band_tx, redshift=None):
     spec_intg = spec_lam*spec_flux
 
     # go through redshifts ...
-    for i, z in np.ndenumerate(redshift):
+    for i, z in enumerate(np.atleast_1d(redshift)):
 
-        # observed wavelength of spectrum
+        # observed wavelength of spectra
         obs_lam = (1 + z)*spec_lam
 
-        # interpolate band to get transmission at observed wavelengths
-        obs_tx = np.interp(obs_lam, band_lam, band_tx, left=0, right=0)
+        for j, b in enumerate(np.atleast_2d(band_tx)):
 
-        # compute magnitude contribution from flux [numerator of (2)]
-        m_flux = -2.5*np.log10(np.trapz(spec_intg*obs_tx, obs_lam))
+            # interpolate band to get transmission at observed wavelengths
+            obs_tx = np.interp(obs_lam, band_lam, b, left=0, right=0)
 
-        # combine AB magnitude [all of (2)]
-        mag_ab[i] = m_flux + m_offs
+            # compute magnitude contribution from flux [numerator of (2)]
+            mag_ab[i, j, :] = -2.5*np.log10(np.trapz(spec_intg*obs_tx, obs_lam))
 
-    # simplify scalar output
-    if np.isscalar(redshift):
-        mag_ab = mag_ab.item()
+    # combine AB magnitude [all of (2)]
+    mag_ab += np.atleast_1d(m_offs)[:, np.newaxis]
 
-    # all done
-    return mag_ab
+    return mag_ab.item() if not return_shape else mag_ab.reshape(return_shape)
+
+
+def load_spectral_data(name):
+    '''Load spectral data from a known source or a local file.
+
+    If the given name refers to a known source, the associated spectral data is
+    constructed by its designated loader. If no source with the given name is
+    found, it is assumed to be a filename.
+
+    Parameters
+    ----------
+    name : str or list of str
+        The name of the spectral data to load, or a list of multiple names.
+
+    Returns
+    -------
+    spectrum : `~specutils.Spectrum1D` or `~specutils.SpectrumList`
+        The spectral data. The wavelength or frequency column is the
+        `~specutils.Spectrum1D.spectral_axis` (with units) of the returned
+        spectrum, and the spectral column or columns are the
+        `~specutils.Spectrum1D.flux` array (with units) of the returned
+        spectrum.
+
+    Warnings
+    --------
+    The :mod:`specutils` package must be installed to use this function.
+
+    '''
+
+    import re
+
+    # loaders registry
+    from ._spectrum_loaders import spectrum_loaders
+
+    # check non-string input
+    if not isinstance(name, str):
+        # recurse on lists
+        if hasattr(name, '__iter__'):
+            return list(map(load_spectral_data, name))
+        else:
+            raise TypeError('name: not a string or list of strings')
+
+    # go through loaders
+    for pattern, loader, *args in spectrum_loaders:
+        # try to match given name against pattern
+        match = re.fullmatch(pattern, name)
+        if match:
+            # collect nonempty group matches
+            groups = [g for g in match.groups() if g]
+            break
+
+    # run the loader
+    return loader(*args, *groups)

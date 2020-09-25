@@ -1,69 +1,104 @@
 import numpy as np
-import scipy.stats
-import scipy.integrate
-import scipy.special
 import pytest
-
-import skypy.galaxy.luminosity as lum
-import skypy.utils.special as special
-import skypy.utils.astronomy as astro
+from scipy.stats import kstest
 
 
-def test_calculate_luminosity_star():
-    luminosity_star = lum._calculate_luminosity_star(1, 2.5, 5)
-    assert luminosity_star == 0.001
+def test_magnitude_functions():
 
-    redshift = np.array([0.1, 0.6, 1])
-    luminosity_star = lum._calculate_luminosity_star(redshift, 2.5, 5)
-    result = np.array([0.00794328, 0.00251189, 0.001])
-    np.testing.assert_allclose(luminosity_star, result, rtol=1e-05)
+    from astropy.cosmology import default_cosmology
+
+    from skypy.galaxy.luminosity import (absolute_to_apparent_magnitude,
+            apparent_to_absolute_magnitude, distance_modulus,
+            luminosity_in_band, luminosity_from_absolute_magnitude,
+            absolute_magnitude_from_luminosity)
+
+    cosmo = default_cosmology.get()
+
+    # sample some redshifts
+    z = np.random.uniform(0, 10, size=1000)
+
+    # sample some absolute magnitudes
+    M = np.random.uniform(15, 25, size=1000)
+
+    # sample distance moduli
+    DM = cosmo.distmod(z).value
+
+    # compare with function
+    np.testing.assert_allclose(distance_modulus(z), DM)
+
+    # compute apparent magnitudes
+    m = absolute_to_apparent_magnitude(M, DM)
+
+    # compare with values
+    np.testing.assert_allclose(m, M+DM)
+
+    # go back to absolute magnitudes
+    M_ = apparent_to_absolute_magnitude(m, DM)
+
+    # compare with original values
+    np.testing.assert_allclose(M_, M)
+
+    # convert between absolute luminosity and magnitude
+    assert np.isclose(luminosity_from_absolute_magnitude(-22), 630957344.5)
+    assert np.isclose(absolute_magnitude_from_luminosity(630957344.5), -22)
+
+    # convert with standard luminosities
+    for ref, mag in luminosity_in_band.items():
+        assert np.isclose(luminosity_from_absolute_magnitude(mag, ref), 1.0)
+        assert np.isclose(absolute_magnitude_from_luminosity(1.0, ref), mag)
+
+    # error when unknown reference is used
+    with pytest.raises(KeyError):
+        luminosity_from_absolute_magnitude(0., 'unknown')
+    with pytest.raises(KeyError):
+        absolute_magnitude_from_luminosity(1., 'unknown')
 
 
-def test_herbel_luminosities():
-    # Test that error is returned if redshift input is an array but size !=
-    # None and size != redshift,size
-    with pytest.raises(ValueError):
-        lum.herbel_luminosities(np.array([1, 2]), -1.3, -0.9408582,
-                                -20.40492365, size=3)
+@pytest.mark.flaky
+def test_schechter_lf_magnitude():
+    from skypy.galaxy.luminosity import schechter_lf_magnitude
+    from astropy.cosmology import default_cosmology
+    import pytest
 
-    # Test that sampling corresponds to sampling from the right pdf.
-    # For this, we sample an array of luminosities for redshift z = 1.0 and we
-    # compare it to the corresponding cdf.
-    # The B-band zeropoint for the model is -4.73.
+    # use default cosmology
+    cosmo = default_cosmology.get()
 
-    def calc_pdf(luminosity, z, alpha, a_m, b_m, absolute_magnitude_max=-16.0,
-                 absolute_magnitude_min=-28.0):
-        luminosity_min = astro.luminosity_from_absolute_magnitude(
-            absolute_magnitude_max, -4.73)
-        luminosity_max = astro.luminosity_from_absolute_magnitude(
-            absolute_magnitude_min, -4.73)
-        lum_star = lum._calculate_luminosity_star(z, a_m, b_m, -4.73)
-        c = np.fabs(special.gammaincc(alpha+1, luminosity_min/lum_star))
-        d = np.fabs(special.gammaincc(alpha+1, luminosity_max/lum_star))
-        return 1./lum_star*np.power(luminosity/lum_star, alpha)*np.exp(
-                -luminosity/lum_star-scipy.special.gammaln(alpha+1))/(c - d)
+    # Schechter function parameters for tests
+    M_star = -20.5
+    alpha = -1.3
 
-    def calc_cdf(L):
-        a_m = -0.9408582
-        b_m = -20.40492365
-        alpha = -1.3
-        pdf = calc_pdf(L, 1.0, alpha, a_m, b_m)
-        cdf = scipy.integrate.cumtrapz(pdf, L, initial=0)
-        cdf = cdf / cdf[-1]
-        return cdf
+    # sample 1000 galaxies at a fixed redshift of 1.0
+    z = np.repeat(1.0, 1000)
+    M = schechter_lf_magnitude(z, M_star, alpha, 30., cosmo)
 
-    sample = lum.herbel_luminosities(1.0, -1.3, -0.9408582, -20.40492365,
-                                     size=1000)
-    p_value = scipy.stats.kstest(sample, calc_cdf)[1]
-    assert p_value >= 0.01
+    # get the distribution function
+    log10_x_min = -0.4*(30. - cosmo.distmod(1.0).value - M_star)
+    x = np.logspace(log10_x_min, log10_x_min + 3, 1000)
+    pdf = x**(alpha+1)*np.exp(-x)
+    cdf = np.concatenate([[0.], np.cumsum((pdf[1:]+pdf[:-1])/2*np.diff(np.log(x)))])
+    cdf /= cdf[-1]
 
+    # test the samples against the CDF
+    D, p = kstest(10.**(-0.4*(M - M_star)), lambda t: np.interp(t, x, cdf))
+    assert p > 0.01, 'D = {}, p = {}'.format(D, p)
 
-def test_exponential_distribution():
-    # When alpha=0, L*=1 and x_min~0 we get a truncated exponential
-    # the b_m value offsets the B-band zeropoint of -4.73
-    q_max = 1e2
-    sample = lum.herbel_luminosities(0, 0, 0, 4.73, size=1000,
-                                     x_min=1e-10, x_max=q_max,
-                                     resolution=1000)
-    d, p_value = scipy.stats.kstest(sample, 'truncexpon', args=(q_max,))
-    assert p_value >= 0.01
+    # test for 1000 galaxies with Pareto redshift distribution
+    z = np.random.pareto(3., size=1000)
+
+    # for scalar parameters, sample galaxies with magnitude limit of 30
+    M = schechter_lf_magnitude(z, M_star, alpha, 30., cosmo)
+
+    # check that the output has the correct shape
+    assert np.shape(M) == (1000,)
+
+    # make sure magnitude limit was respected
+    M_lim = 30. - cosmo.distmod(z).value
+    assert np.all(M <= M_lim)
+
+    # sample with array for alpha
+    # not implemented at the moment
+    with pytest.raises(NotImplementedError):
+        M = schechter_lf_magnitude(z, M_star, np.broadcast_to(alpha, z.shape), 30., cosmo)
+
+    # sample with an explicit size
+    schechter_lf_magnitude(1.0, M_star, alpha, 30., cosmo, size=100)

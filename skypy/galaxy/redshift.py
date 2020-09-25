@@ -5,16 +5,21 @@ models.
 """
 
 import numpy as np
-import scipy.special as sc
 import scipy.integrate
+import scipy.special
 
-import skypy.utils.special as special
+from ..utils import uses_default_cosmology, broadcast_arguments, dependent_argument
 
 
 __all__ = [
-    'herbel_redshift',
+    'redshifts_from_comoving_density',
+    'schechter_lf_redshift',
     'smail',
 ]
+
+
+# largest number x such that exp(x) is a float
+_LOGMAX = np.log(np.finfo(0.).max)
 
 
 def smail(z_median, alpha, beta, size=None):
@@ -62,186 +67,154 @@ def smail(z_median, alpha, beta, size=None):
     '''
 
     k = (alpha+1)/beta
-    t = z_median**beta/sc.gammainccinv(k, 0.5)
+    t = z_median**beta/scipy.special.gammainccinv(k, 0.5)
     g = np.random.gamma(shape=k, scale=t, size=size)
     return g**(1/beta)
 
 
-def herbel_redshift(alpha, a_phi, b_phi, a_m, b_m, cosmology, low=0.0,
-                    high=2.0,
-                    size=None, absolute_magnitude_max=-16.0, resolution=100):
-    r""" Redshift following the Schechter luminosity function marginalised over
-    luminosities following the Herbel et al. [1]_ model.
+@uses_default_cosmology
+@dependent_argument('M_star', 'redshift')
+@dependent_argument('phi_star', 'redshift')
+@dependent_argument('alpha', 'redshift')
+@broadcast_arguments('redshift', 'M_star', 'phi_star', 'alpha')
+def schechter_lf_redshift(redshift, M_star, phi_star, alpha, m_lim, fsky, cosmology, noise=True):
+    r'''Sample redshifts from Schechter luminosity function.
 
-    Parameters
-    ----------
-    alpha : float or scalar
-        The alpha parameter in the Schechter luminosity function
-    a_phi, b_phi : float or scalar
-        Parametrisation factors of the normalisation factor Phi_* as a function
-        of redshift according to Herbel et al. [1]_ equation (3.4).
-    a_m, b_m : float or scalar
-        Parametrisation factors of the characteristic absolute magnitude M_* as
-        a function of redshift according to Herbel et al. [1]_ equation (3.3).
-    cosmology : instance
-        Instance of an Astropy Cosmology class.
-    low : float or array_like of floats, optional
-        The lower boundary of teh output interval. All values generated will be
-        greater than or equal to low.
-        The default value is 0.0.
-    high : float or array_like of floats, optional
-        Upper boundary of output interval. All values generated will be less
-        than high. The default value is 2.0
-    size : int or tuple of ints, optional
-        The number of redshifts to sample. If None one value is sampled.
-    absolute_magnitude_max : float or scalar, optional
-        Upper limit of the considered absolute magnitudes of the galaxies to
-        wanna sample.
-    resolution : int, optional
-        Characterises the resolution of the sampling. Default is 100.
-
-    Returns
-    -------
-    redshift_sample : ndarray or float
-        Drawn redshifts from the marginalised Schechter luminosity function.
-
-    Notes
-    -----
-    The Schechter luminosity function is given as
-
-    .. math::
-
-        \Phi(L, z) = \frac{\Phi_\star(z)}{L_\star(z)}
-            \left(\frac{L}{L_\star(z)}\right)^\alpha
-            \exp\left(-\frac{L}{L_\star(z)}\right) \;.
-
-    Here the luminosity is defined as
-
-    .. math::
-
-        L = 10^{-0.4M} \;,
-
-    with absolute magnitude :math:`M`. Furthermore, Herbel et al. [1]_
-    introduced
-
-    .. math::
-
-        \Phi_\star(z) = b_\phi \exp(a_\phi z) \;,
-        M_\star(z) = a_M z + b_M \;.
-
-    Now we have to rescale the Schechter function by the comoving element and
-    get
-
-    .. math::
-
-        \phi(L,z) = \frac{d_H d_M^2}{E(z)}  \Phi(L,z) \;.
-
-     References
-    ----------
-    .. [1] Herbel J., Kacprzak T., Amara A. et al., 2017, Journal of Cosmology
-           and Astroparticle Physics, Issue 08, article id. 035 (2017)
-
-    Examples
-    --------
-    >>> from skypy.galaxy.redshift import herbel_redshift
-    >>> from astropy.cosmology import FlatLambdaCDM
-
-    Sample 100 redshift values from the Schechter luminosity function with
-    a_m = -0.9408582, b_m = -20.40492365, a_phi = -0.10268436,
-    b_phi = 0.00370253, alpha = -1.3.
-
-    >>> cosmology = FlatLambdaCDM(H0=70, Om0=0.3, Tcmb0=2.725)
-    >>> redshift = herbel_redshift(size=1000, low=0.01, alpha=-1.3,
-    ...                     a_phi=-0.10268436,a_m=-0.9408582, b_phi=0.00370253,
-    ...                     b_m=-20.40492365, cosmology=cosmology,
-    ...                     absolute_magnitude_max=-16.)
-
-    """
-
-    redshift = np.linspace(low, high, resolution)
-    pdf = herbel_pdf(redshift, alpha, a_phi, b_phi, a_m, b_m, cosmology,
-                     absolute_magnitude_max)
-    cdf = scipy.integrate.cumtrapz(pdf, redshift, initial=0)
-    cdf = cdf / cdf[-1]
-    u = np.random.uniform(size=size)
-    redshift_sample = np.interp(u, cdf, redshift)
-
-    return redshift_sample
-
-
-def herbel_pdf(redshift, alpha, a_phi, b_phi, a_m, b_m, cosmology,
-               absolute_magnitude_max):
-    r"""Calculates the redshift pdf of the Schechter luminosity function
-    according to the model of Herbel et al. [1]_ equation (3.6).
-
-    That is, changing the absolute magnitude M in equation (3.2) to luminosity
-    L, integrate over all possible L and multiplying by the comoving element
-    using a flat :math:`\Lambda \mathrm{CDM}` model to get the corresponding
-    pdf.
+    Sample the redshifts of galaxies following a Schechter luminosity function
+    with potentially redshift-dependent parameters, limited by an apparent
+    magnitude `m_lim`, for a fraction `fsky` of the sky.
 
     Parameters
     ----------
     redshift : array_like
-        Input redshifts.
-    alpha : float or scalar
-        The alpha parameter in the Schechter luminosity function
-    a_phi, b_phi : float or scalar
-        Parametrisation factors of the normalisation factor Phi_* as a function
-        of redshift according to Herbel et al. [1]_ equation (3.4).
-    a_m, b_m : float or scalar
-        Parametrisation factors of the characteristic absolute magnitude M_* as
-        a function of redshift according to Herbel et al. [1]_ equation (3.3).
-    cosmology : instance
-        Instance of an Astropy Cosmology class.
-    luminosity_min : float or scalar
-        Cut-off luminosity value such that the Schechter luminosity function
-        diverges for L -> 0
+        Input redshift grid on which the Schechter function parameters are
+        evaluated. Galaxies are sampled over this redshift range.
+    M_star : array_like or function
+        Characteristic absolute magnitude of the Schechter function. Can be a
+        single value, an array of values for each `redshift`, or a function of
+        redshift.
+    phi_star : array_like or function
+        Normalisation of the Schechter function. Can be a single value, an
+        array of values for each `redshift`, or a function of redshift.
+    alpha : array_like or function
+        Schechter function power law index. Can be a single value, an array of
+        values for each `redshift`, or a function of redshift.
+    m_lim : float
+        Limiting apparent magnitude.
+    fsky : array_like
+        Sky fraction over which galaxies are sampled.
+    cosmology : Cosmology, optional
+        Cosmology object to convert apparent to absolute magnitudes. If not
+        given, the default cosmology is used.
+    noise : bool, optional
+        Poisson-sample the number of galaxies. Default is `True`.
 
     Returns
     -------
-    pdf : ndarray or float
-    Un-normalised probability density function as a function of redshift
-    according to Herbel et al. [1]_.
-
-    Notes
-    -----
-    This module calculates the function
-
-    .. math::
-
-        \mathrm{pdf}(z) = \Phi_\star(z) \cdot \frac{d_H d_M^2}{E(z)} \cdot
-            \Gamma\left(\alpha + 1, \frac{L_\mathrm{min}}{L_\star(z)}\right)\:,
-
-    with :math:`\Phi_\star(z) = b_\phi \exp(a_\phi z)` and the second term the
-    comoving element.
-
-    References
-    ----------
-    .. [1] Herbel J., Kacprzak T., Amara A. et al., 2017, Journal of Cosmology
-           and Astroparticle Physics, Issue 08, article id. 035 (2017)
+    redshifts : array_like
+        Redshifts of the galaxy sample described by the Schechter luminosity
+        function.
 
     Examples
     --------
-    >>> from skypy.galaxy.redshift import herbel_pdf
-    >>> from astropy.cosmology import FlatLambdaCDM
-    >>> import numpy as np
+    Compute the number density of galaxies with redshifts between 0 and 5
+    for typical values of the "blue" galaxy luminosity function above an
+    apparent magnitude cut of 22 for a survey of 1 square degree = 1/41253 of
+    the sky.
 
-    Calculate the pdf for 100 redshift values between 0 and 2 with
-    a_m = -0.9408582, b_m = -20.40492365, a_phi = -0.10268436,
-    b_phi = 0.00370253, alpha = -1.3 for a flat cosmology.
+    >>> from skypy.galaxy.redshift import schechter_lf_redshift
+    >>> z = [0., 5.]
+    >>> M_star = -20.5
+    >>> phi_star = 3.5e-3
+    >>> alpha = -1.3
+    >>> z_gal = schechter_lf_redshift(z, M_star, phi_star, alpha, 22, 1/41253)
 
-    >>> cosmology = FlatLambdaCDM(H0=70, Om0=0.3, Tcmb0=2.725)
-    >>> redshift = np.linspace(0, 2, 100)
-    >>> mag_lim = -16.0
-    >>> redshift = herbel_pdf(redshift=redshift, alpha=-1.3,
-    ...                     a_phi=-0.10268436,a_m=-0.9408582, b_phi=0.00370253,
-    ...                     b_m=-20.40492365, cosmology=cosmology,
-    ...                     absolute_magnitude_max=mag_lim)
-    """
-    abs_mag = a_m*redshift + b_m
-    dv = cosmology.differential_comoving_volume(redshift).value
-    x = 10.**(-0.4*(absolute_magnitude_max - abs_mag))
-    lg = sc.gammaln(alpha+1)
-    gx = np.fabs(special.gammaincc(alpha+1, x))
-    pdf = dv * b_phi * np.exp(a_phi * redshift + lg) * gx
-    return pdf
+    '''
+
+    # compute lower truncation of scaled Schechter random variable
+    lnxmin = m_lim - cosmology.distmod(np.clip(redshift, 1e-10, None)).value
+    lnxmin -= M_star
+    lnxmin *= -0.92103403719761827361
+
+    # gamma function integrand
+    def f(lnx, a):
+        return np.exp((a + 1)*lnx - np.exp(lnx)) if lnx < _LOGMAX else 0.
+
+    # integrate gamma function for each redshift
+    gam = np.empty_like(lnxmin)
+    for i, _ in np.ndenumerate(gam):
+        gam[i], _ = scipy.integrate.quad(f, lnxmin[i], np.inf, args=(alpha[i],))
+
+    # comoving number density is normalisation times upper incomplete gamma
+    density = phi_star*gam
+
+    # sample redshifts from the comoving density
+    return redshifts_from_comoving_density(redshift=redshift, density=density,
+                                           fsky=fsky, cosmology=cosmology, noise=noise)
+
+
+@uses_default_cosmology
+def redshifts_from_comoving_density(redshift, density, fsky, cosmology, noise=True):
+    r'''Sample redshifts from a comoving density function.
+
+    Sample galaxy redshifts such that the resulting distribution matches a past
+    lightcone with comoving galaxy number density `density` at redshifts
+    `redshift`. The comoving volume sampled corresponds to a sky fraction `fsky`
+    and transverse comoving distance given by the cosmology `cosmology`.
+
+    If the `noise` parameter is set to true, the number of galaxies has Poisson
+    noise. If `noise` is false, the expected number of galaxies is used.
+
+    Parameters
+    ----------
+    redshift : array_like
+        Redshifts at which comoving number densities are provided.
+    density : array_like
+        Comoving galaxy number density at each redshift in Mpc-3.
+    fsky : array_like
+        Sky fraction over which galaxies are sampled.
+    cosmology : Cosmology, optional
+        Cosmology object for conversion to comoving volume. If not given, the
+        default cosmology is used.
+    noise : bool, optional
+        Poisson-sample the number of galaxies. Default is `True`.
+
+    Returns
+    -------
+    redshifts : array_like
+        Sampled redshifts such that the comoving number density of galaxies
+        corresponds to the input distribution.
+
+    Examples
+    --------
+    Sample redshifts with a constant comoving number density 1e-3/Mpc3 up to
+    redshift 1 for a survey of 1 square degree = 1/41253 of the sky.
+
+    >>> from skypy.galaxy.redshift import redshifts_from_comoving_density
+    >>> z_range = np.arange(0, 1.01, 0.1)
+    >>> z_gal = redshifts_from_comoving_density(z_range, 1e-3, 1/41253)
+
+    '''
+
+    # redshift number density
+    dN_dz = cosmology.differential_comoving_volume(redshift).to_value('Mpc3/sr')
+    dN_dz *= density
+    dN_dz *= 4*np.pi*fsky
+
+    # integrate density to get expected number of galaxies
+    N = np.trapz(dN_dz, redshift)
+
+    # Poisson sample galaxy number if requested
+    if noise:
+        N = np.random.poisson(N)
+    else:
+        N = int(N)
+
+    # cumulative trapezoidal rule to get redshift CDF
+    cdf = dN_dz  # reuse memory
+    np.cumsum((dN_dz[1:]+dN_dz[:-1])/2*np.diff(redshift), out=cdf[1:])
+    cdf[0] = 0
+    cdf /= cdf[-1]
+
+    # sample N galaxy redshifts
+    return np.interp(np.random.rand(N), cdf, redshift)

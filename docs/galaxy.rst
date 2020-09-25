@@ -36,7 +36,7 @@ The following models are found in the `skypy.galaxy.luminosity` package.
 .. autosummary::
    :nosignatures:
 
-   herbel_luminosities
+   schechter_lf_magnitude
 
 
 Redshift
@@ -48,7 +48,8 @@ The following models are found in the `skypy.galaxy.redshift` package.
 .. autosummary::
    :nosignatures:
 
-   herbel_redshift
+   redshifts_from_comoving_density
+   schechter_lf_redshift
    smail
 
 
@@ -77,7 +78,6 @@ The following models are found in the `skypy.galaxy.spectrum` package.
    :nosignatures:
 
    dirichlet_coefficients
-   kcorrect_spectra
 
 
 Stellar mass
@@ -97,6 +97,7 @@ Reference/API
 
 .. automodapi:: skypy.galaxy
 .. automodapi:: skypy.galaxy.luminosity
+   :include-all-objects:
 .. automodapi:: skypy.galaxy.ellipticity
    :include-all-objects:
 .. automodapi:: skypy.galaxy.redshift
