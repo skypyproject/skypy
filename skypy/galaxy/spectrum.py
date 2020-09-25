@@ -280,7 +280,7 @@ def stellar_mass_from_reference_band(coefficients, templates, magnitudes, bandpa
     template fluxes *per solar mass* and multiplicative coefficients and
     calculates the stellar mass required to match given absolute magnitudes for
     a given bandpass filter in the rest frame.
-    
+
     Parameters
     ----------
     coefficients : (ng, nt) array_like
