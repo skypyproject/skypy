@@ -32,6 +32,7 @@ tables:
       size: 100
     luminosity: !skypy.galaxy.luminosity.luminosity_from_absolute_magnitude
       absolute_magnitude: $galaxies.magnitude
+      zeropoint: Lsun_B
   abundance_matching:
     .init: !skypy.halo.abundance_matching.vale_ostriker
       .depends: [halos.complete, galaxies.complete]
