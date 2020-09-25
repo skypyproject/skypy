@@ -37,7 +37,6 @@ values as keyword arguments.
 import argparse
 from astropy.cosmology import z_at_value
 from astropy.table import Table, vstack
-from copy import deepcopy
 import numpy as np
 from skypy import __version__ as skypy_version
 from skypy.pipeline import Pipeline
