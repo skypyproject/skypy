@@ -147,12 +147,6 @@ should be placed below decorators which modify any of the independent
 arguments.
 
 
-Astronomy (`skypy.utils.astronomy`)
-===================================
-
-.. automodule:: skypy.utils.astronomy
-
-
 Random sampling (`skypy.utils.random`)
 ======================================
 

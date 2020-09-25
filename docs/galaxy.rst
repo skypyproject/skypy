@@ -78,6 +78,9 @@ The following models are found in the `skypy.galaxy.spectrum` package.
    :nosignatures:
 
    dirichlet_coefficients
+   load_spectral_data
+   mag_ab
+   magnitudes_from_templates
 
 
 Stellar mass
@@ -97,6 +100,7 @@ Reference/API
 
 .. automodapi:: skypy.galaxy
 .. automodapi:: skypy.galaxy.luminosity
+   :include-all-objects:
 .. automodapi:: skypy.galaxy.ellipticity
    :include-all-objects:
 .. automodapi:: skypy.galaxy.redshift

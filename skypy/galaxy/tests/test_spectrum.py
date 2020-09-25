@@ -149,6 +149,51 @@ def test_mag_ab_multi():
 
 
 @pytest.mark.skipif(not HAS_SPECUTILS, reason='test requires specutils')
+def test_template_spectra():
+
+    from astropy import units
+    from skypy.galaxy.spectrum import mag_ab, magnitudes_from_templates
+    from astropy.cosmology import Planck15
+
+    # 3 Flat Templates
+    lam = np.logspace(0, 4, 1000)*units.AA
+    A = np.array([[2], [3], [4]])
+    flam = A * 0.10884806248538730623*units.Unit('erg s-1 cm-2 AA')/lam**2
+    spec = specutils.Spectrum1D(spectral_axis=lam, flux=flam)
+
+    # Gaussian bandpass
+    bp_lam = np.logspace(0, 4, 1000)*units.AA
+    bp_tx = np.exp(-((bp_lam - 1000*units.AA)/(100*units.AA))**2)*units.dimensionless_unscaled
+    bp = specutils.Spectrum1D(spectral_axis=bp_lam, flux=bp_tx)
+
+    # Each test galaxy is exactly one of the templates
+    coefficients = np.diag(np.ones(3))
+    mt = magnitudes_from_templates(coefficients, spec, bp)
+    m = mag_ab(spec, bp)
+    np.testing.assert_allclose(mt, m)
+
+    # Test distance modulus
+    redshift = np.array([0, 1, 2])
+    dm = Planck15.distmod(redshift).value
+    mt = magnitudes_from_templates(coefficients, spec, bp, distance_modulus=dm)
+    np.testing.assert_allclose(mt, m + dm)
+
+    # Test stellar mass
+    sm = np.array([1, 2, 3]) * units.Msun
+    mt = magnitudes_from_templates(coefficients, spec, bp, stellar_mass=sm)
+    np.testing.assert_allclose(mt, m - 2.5*np.log10(sm.to_value('Msun')))
+
+    # Redshift interpolation test; linear interpolation sufficient over a small
+    # redshift range at low relative tolerance
+    z = np.linspace(0, 0.1, 3)
+    m_true = magnitudes_from_templates(coefficients, spec, bp, redshift=z, resolution=4)
+    m_interp = magnitudes_from_templates(coefficients, spec, bp, redshift=z, resolution=2)
+    np.testing.assert_allclose(m_true, m_interp, rtol=1e-2)
+    with pytest.raises(AssertionError):
+        np.testing.assert_allclose(m_true, m_interp, rtol=1e-5)
+
+
+@pytest.mark.skipif(not HAS_SPECUTILS, reason='test requires specutils')
 def test_stellar_mass_from_reference_band():
 
     from astropy import units
