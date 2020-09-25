@@ -271,6 +271,38 @@ def magnitudes_from_templates(coefficients, templates, bandpass, redshift=None,
     return magnitudes.item() if not return_shape else magnitudes.reshape(return_shape)
 
 
+@spectral_data_input(templates=units.Jy,
+                     bandpass=units.dimensionless_unscaled)
+def stellar_mass_from_reference_band(coefficients, templates, magnitudes, bandpass):
+    r'''Compute stellar mass from absolute magnitudes in a reference band.
+
+    This function takes composite spectra for a set of galaxies defined by
+    template fluxes *per solar mass* and multiplicative coefficients and
+    calculates the stellar mass required to match given absolute magnitudes for
+    a given bandpass filter in the rest frame.
+
+    Parameters
+    ----------
+    coefficients : (ng, nt) array_like
+        Array of template coefficients.
+    templates : (nt,) spectral_data
+        Emission spectra of the templates.
+    magnitudes : (ng,) array_like
+        The magnitudes to match in the reference bandpass.
+    bandpass : spectral_data
+        A single reference bandpass filter.
+
+    Returns
+    -------
+    stellar_mass : (ng,) array_like
+        Stellar mass of each galaxy in solar masses.
+    '''
+
+    flux = np.power(10, -0.4 * mag_ab(templates, bandpass))
+    stellar_mass = np.power(10, -0.4*magnitudes) / np.sum(coefficients * flux, axis=1)
+    return stellar_mass * units.Msun
+
+
 def load_spectral_data(name):
     '''Load spectral data from a known source or a local file.
 
