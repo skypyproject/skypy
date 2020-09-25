@@ -11,6 +11,7 @@ __all__ = [
     'dirichlet_coefficients',
     'load_spectral_data',
     'mag_ab',
+    'magnitudes_from_templates',
 ]
 
 
@@ -195,6 +196,79 @@ def mag_ab(spectrum, bandpass, redshift=None):
     mag_ab += np.atleast_1d(m_offs)[:, np.newaxis]
 
     return mag_ab.item() if not return_shape else mag_ab.reshape(return_shape)
+
+
+@spectral_data_input(templates=units.Jy,
+                     bandpass=units.dimensionless_unscaled)
+def magnitudes_from_templates(coefficients, templates, bandpass, redshift=None,
+                              resolution=1000, stellar_mass=None, distance_modulus=None):
+    r'''Compute AB magnitudes from template spectra.
+
+    This function calculates photometric AB magnitudes for objects whose
+    spectra are modelled as a linear combination of template spectra following
+    [1]_ and [2]_.
+
+    Parameters
+    ----------
+    coefficients : (ng, nt) array_like
+        Array of spectrum coefficients.
+    templates : spectral_data
+        Template spectra.
+    bandpass : spectral_data
+        Bandpass filters.
+    redshift : (ng,) array_like, optional
+        Optional array of values for redshifting the source spectrum.
+    resolution : integer, optional
+        Redshift resolution for intepolating magnitudes. Default is 1000. If
+        the number of objects is less than resolution their magnitudes are
+        calculated directly without interpolation.
+    stellar_mass : (ng,) array_like, optional
+        Optional array of stellar masses for each galaxy in units of Msun.
+    distance_modulus : (ng,) array_like, optional
+        Optional array of distance moduli for each galaxy.
+
+    Returns
+    -------
+    mag_ab : (ng, nb) array_like
+        The absolute AB magnitude of each object.
+
+    References
+    ----------
+    .. [1] M. R. Blanton et al., 2003, AJ, 125, 2348
+    .. [2] M. R. Blanton and S. Roweis, 2007, AJ, 125, 2348
+    '''
+
+    # Array shapes
+    nz_loop = np.atleast_1d(redshift).shape[0]
+    nb_loop = np.atleast_2d(bandpass.flux).shape[0]
+    nt_loop = np.atleast_2d(templates.flux).shape[0]
+    ng_return = coefficients.shape[:-1]
+    nb_return = bandpass.flux.shape[:-1]
+    M_z_shape = (resolution, nb_loop, nt_loop)
+    M_shape = (nz_loop, nb_loop, nt_loop)
+    return_shape = (*ng_return, *nb_return)
+
+    # Interpolation flag
+    interpolate = np.size(redshift) > resolution
+
+    if interpolate:
+        z = np.linspace(np.min(redshift), np.max(redshift), resolution)
+        M_z = mag_ab(templates, bandpass, z).reshape(M_z_shape)
+        M = np.empty(M_shape, dtype=float)
+        for b in range(nb_loop):
+            for t in range(nt_loop):
+                M[:, b, t] = np.interp(redshift, z, M_z[:, b, t])
+    else:
+        M = mag_ab(templates, bandpass, redshift).reshape(M_shape)
+
+    stellar_mass = 1 if stellar_mass is None else stellar_mass.to_value(units.Msun)
+    distance_modulus = 0 if distance_modulus is None else distance_modulus
+
+    flux = np.sum(coefficients[:, np.newaxis, :] * np.power(10, -0.4*M), axis=2)
+    flux *= np.atleast_1d(stellar_mass)[:, np.newaxis]
+    magnitudes = -2.5 * np.log10(flux) + np.atleast_1d(distance_modulus)[:, np.newaxis]
+
+    return magnitudes.item() if not return_shape else magnitudes.reshape(return_shape)
 
 
 def load_spectral_data(name):
