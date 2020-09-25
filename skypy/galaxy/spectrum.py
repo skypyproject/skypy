@@ -198,7 +198,9 @@ def mag_ab(spectrum, bandpass, redshift=None):
     return mag_ab.item() if not return_shape else mag_ab.reshape(return_shape)
 
 
-def magnitudes_from_templates(coefficients, templates, bandpasses, redshift=None,
+@spectral_data_input(templates=units.Jy,
+                     bandpass=units.dimensionless_unscaled)
+def magnitudes_from_templates(coefficients, templates, bandpass, redshift=None,
                               resolution=1000, stellar_mass=None, distance_modulus=None):
     r'''Compute AB magnitudes from template spectra.
 
@@ -210,9 +212,9 @@ def magnitudes_from_templates(coefficients, templates, bandpasses, redshift=None
     ----------
     coefficients : (ng, nt) array_like
         Array of spectrum coefficients.
-    templates : specutils.Spectrum1D
+    templates : spectral_data
         Template spectra.
-    bandpasses : specutils.Spectrum1D
+    bandpass : spectral_data
         Bandpass filters.
     redshift : (ng,) array_like, optional
         Optional array of values for redshifting the source spectrum.
@@ -238,10 +240,10 @@ def magnitudes_from_templates(coefficients, templates, bandpasses, redshift=None
 
     # Array shapes
     nz_loop = np.atleast_1d(redshift).shape[0]
-    nb_loop = np.atleast_2d(bandpasses.flux).shape[0]
+    nb_loop = np.atleast_2d(bandpass.flux).shape[0]
     nt_loop = np.atleast_2d(templates.flux).shape[0]
     ng_return = coefficients.shape[:-1]
-    nb_return = bandpasses.flux.shape[:-1]
+    nb_return = bandpass.flux.shape[:-1]
     M_z_shape = (resolution, nb_loop, nt_loop)
     M_shape = (nz_loop, nb_loop, nt_loop)
     return_shape = (*ng_return, *nb_return)
@@ -251,13 +253,13 @@ def magnitudes_from_templates(coefficients, templates, bandpasses, redshift=None
 
     if interpolate:
         z = np.linspace(np.min(redshift), np.max(redshift), resolution)
-        M_z = mag_ab(templates, bandpasses, z).reshape(M_z_shape)
+        M_z = mag_ab(templates, bandpass, z).reshape(M_z_shape)
         M = np.empty(M_shape, dtype=float)
         for b in range(nb_loop):
             for t in range(nt_loop):
                 M[:, b, t] = np.interp(redshift, z, M_z[:, b, t])
     else:
-        M = mag_ab(templates, bandpasses, redshift).reshape(M_shape)
+        M = mag_ab(templates, bandpass, redshift).reshape(M_shape)
 
     stellar_mass = 1 if stellar_mass is None else stellar_mass.to_value(units.Msun)
     distance_modulus = 0 if distance_modulus is None else distance_modulus
