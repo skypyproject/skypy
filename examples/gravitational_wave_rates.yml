@@ -22,8 +22,9 @@ tables:
       M_star: $M_star_red
       alpha: $alpha_red
       m_lim: $mag_lim
-    luminosity: !skypy.utils.astronomy.luminosity_from_absolute_magnitude
+    luminosity: !skypy.galaxy.luminosity.luminosity_from_absolute_magnitude
       absolute_magnitude: $merger_rates.magnitude
+      zeropoint: Lsun_B
     ns_ns_rate: !skypy.gravitational_wave.b_band_merger_rate
       population: NS-NS
       optimism: low
