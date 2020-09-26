@@ -38,12 +38,14 @@ def combine_spectra(a, b):
     if (len(a.spectral_axis) == len(b.spectral_axis)
             and np.allclose(a.spectral_axis, b.spectral_axis, atol=0, rtol=1e-10)
             and a.flux.unit.is_equivalent(b.flux.unit)):
-        flux_a = np.atleast_2d(a.flux.value)
-        flux_b = np.atleast_2d(b.flux.to_value(a.flux.unit))
-        if (np.ndim(flux_a) == np.ndim(flux_b)
-                and np.shape(flux_a)[1:] == np.shape(flux_b)[1:]):
+        flux_a = a.flux.value
+        flux_b = b.flux.to_value(a.flux.unit)
+        if np.shape(flux_a) == np.shape(flux_b):
             return specutils.Spectrum1D(spectral_axis=a.spectral_axis,
-                                        flux=np.vstack([flux_a, flux_b])*a.flux.unit)
+                                        flux=[flux_a, flux_b]*a.flux.unit)
+        if np.shape(flux_a)[1:] == np.shape(flux_b):
+            return specutils.Spectrum1D(spectral_axis=a.spectral_axis,
+                                        flux=np.concatenate([flux_a, [flux_b]])*a.flux.unit)
 
     return specutils.SpectrumList([a, b])
 
@@ -92,7 +94,7 @@ def skypy_data_loader(folder, name, *tags):
         fluxes = []
         while 'flux_%d' % len(fluxes) in data.colnames:
             fluxes.append(data['flux_%d' % len(fluxes)].quantity.to_value(flux_unit))
-        fluxes = fluxes*flux_unit
+        fluxes = np.squeeze(fluxes)*flux_unit
 
         # construct the Spectrum1D
         spectrum = specutils.Spectrum1D(spectral_axis=spectral_axis, flux=fluxes)
@@ -123,7 +125,7 @@ def decam_loader(*bands):
     throughput = []
     for band in bands:
         throughput.append(data[band])
-    throughput = throughput*units.dimensionless_unscaled
+    throughput = np.squeeze(throughput)*units.dimensionless_unscaled
 
     # return the bandpasses as Spectrum1D
     return specutils.Spectrum1D(spectral_axis=spectral_axis, flux=throughput)
