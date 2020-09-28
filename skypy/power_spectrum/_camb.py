@@ -8,7 +8,7 @@ __all__ = [
 
 
 def camb(wavenumber, redshift, cosmology,
-         A_s, n_s, z_reio):
+         A_s, n_s):
     r'''CAMB linear matter power spectrum.
     Compute the linear matter power spectrum on a two dimensional grid of
     redshift and wavenumber using CAMB [1]_.
@@ -16,7 +16,7 @@ def camb(wavenumber, redshift, cosmology,
     Parameters
     ----------
     wavenumber : (nk,) array_like
-        Array of wavenumbers in units of [Mpc^-1] at which to
+        Array of wavenumbers in units of Mpc-1 at which to
         evaluate the linear matter power spectrum.
     redshift : (nz,) array_like
         Array of redshifts at which to evaluate the linear matter power
@@ -30,8 +30,6 @@ def camb(wavenumber, redshift, cosmology,
     n_s : float
         Cosmology parameter, spectral index of scalar perturbation power
         spectrum
-    z_reio : float
-        Cosmology parameter, redshift of re-ionisation
 
     Returns
     -------
@@ -86,8 +84,6 @@ def camb(wavenumber, redshift, cosmology,
 
     pars.InitPower.ns = n_s
     pars.InitPower.As = A_s
-
-    pars.Reion.redshift = z_reio
 
     pars.NonLinear = model.NonLinear_none
 
