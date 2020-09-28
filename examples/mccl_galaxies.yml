@@ -14,18 +14,13 @@ red_galaxy_sersic_index: 4
 blue_galaxy_sersic_index: 1
 tables:
   red_galaxies:
-    redshift: !skypy.galaxy.redshift.schechter_lf_redshift
+    redshift, magnitude: !skypy.galaxy.schechter_lf
       redshift: $z_range
       M_star: $M_star_red
       phi_star: $phi_star_red
       alpha: $alpha_red
       m_lim: $mag_lim
       fsky: $fsky
-    magnitude: !skypy.galaxy.luminosity.schechter_lf_magnitude
-      redshift: $red_galaxies.redshift
-      M_star: $M_star_red
-      alpha: $alpha_red
-      m_lim: $mag_lim
     spectral_coefficients: !skypy.galaxy.spectrum.dirichlet_coefficients
       alpha0: [2.461, 2.358, 2.568, 2.268, 2.402]
       alpha1: [2.410, 2.340, 2.200, 2.540, 2.464]
@@ -47,18 +42,13 @@ tables:
       e_sum: 3.5
       size: !len [$red_galaxies.redshift]
   blue_galaxies:
-    redshift: !skypy.galaxy.redshift.schechter_lf_redshift
+    redshift, magnitude: !skypy.galaxy.schechter_lf
       redshift: $z_range
       M_star: $M_star_blue
       phi_star: $phi_star_blue
       alpha: $alpha_blue
       m_lim: $mag_lim
       fsky: $fsky
-    magnitude: !skypy.galaxy.luminosity.schechter_lf_magnitude
-      redshift: $blue_galaxies.redshift
-      M_star: $M_star_blue
-      alpha: $alpha_blue
-      m_lim: $mag_lim
     spectral_coefficients: !skypy.galaxy.spectrum.dirichlet_coefficients
       alpha0: [2.079, 3.524, 1.917, 1.992, 2.536]
       alpha1: [2.265, 3.862, 1.921, 1.685, 2.480]
