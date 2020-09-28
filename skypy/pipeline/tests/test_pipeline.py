@@ -128,7 +128,9 @@ def test_multi_column_assignment():
     config = {'tables': {
                 'multi_column_test_table': {
                   'a/b/c': ('skypy.pipeline.tests.test_pipeline.multi_column_array', [7, 3]),
-                  'd/e/f': ('skypy.pipeline.tests.test_pipeline.multi_column_tuple', [7, 3])}}}
+                  'd/e/f': ('skypy.pipeline.tests.test_pipeline.multi_column_tuple', [7, 3]),
+                  'g': ('list', '$multi_column_test_table.a'),
+                  'h': ('list', '$multi_column_test_table.e')}}}
 
     pipeline = Pipeline(config)
     pipeline.execute()
