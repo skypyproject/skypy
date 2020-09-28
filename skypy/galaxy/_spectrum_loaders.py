@@ -38,14 +38,15 @@ def combine_spectra(a, b):
     if (len(a.spectral_axis) == len(b.spectral_axis)
             and np.allclose(a.spectral_axis, b.spectral_axis, atol=0, rtol=1e-10)
             and a.flux.unit.is_equivalent(b.flux.unit)):
-        flux_a = a.flux.value
-        flux_b = b.flux.to_value(a.flux.unit)
-        if np.shape(flux_a) == np.shape(flux_b):
+        flux_a = np.atleast_2d(a.flux.value)
+        flux_b = np.atleast_2d(b.flux.to_value(a.flux.unit))
+        while flux_a.ndim < flux_b.ndim:
+            flux_a = flux_a[np.newaxis, ...]
+        while flux_b.ndim < flux_a.ndim:
+            flux_b = flux_b[np.newaxis, ...]
+        if flux_a.shape[1:] == flux_b.shape[1:]:
             return specutils.Spectrum1D(spectral_axis=a.spectral_axis,
-                                        flux=[flux_a, flux_b]*a.flux.unit)
-        if np.shape(flux_a)[1:] == np.shape(flux_b):
-            return specutils.Spectrum1D(spectral_axis=a.spectral_axis,
-                                        flux=np.concatenate([flux_a, [flux_b]])*a.flux.unit)
+                                        flux=np.concatenate([flux_a, flux_b])*a.flux.unit)
 
     return specutils.SpectrumList([a, b])
 
