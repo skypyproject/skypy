@@ -127,8 +127,8 @@ def test_multi_column_assignment():
     # Test multi-column assignment from 2d arrays and tuples of 1d arrays
     config = {'tables': {
                 'multi_column_test_table': {
-                  'a/b/c': ('skypy.pipeline.tests.test_pipeline.multi_column_array', [7, 3]),
-                  'd/e/f': ('skypy.pipeline.tests.test_pipeline.multi_column_tuple', [7, 3]),
+                  'a,b,c': ('skypy.pipeline.tests.test_pipeline.multi_column_array', [7, 3]),
+                  'd, e, f': ('skypy.pipeline.tests.test_pipeline.multi_column_tuple', [7, 3]),
                   'g': ('list', '$multi_column_test_table.a'),
                   'h': ('list', '$multi_column_test_table.e')}}}
 

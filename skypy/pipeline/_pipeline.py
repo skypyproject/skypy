@@ -9,6 +9,7 @@ from copy import deepcopy
 from importlib import import_module
 import builtins
 import networkx
+import re
 
 
 __all__ = [
@@ -142,7 +143,7 @@ class Pipeline:
                 if isinstance(settings, tuple):
                     functions[job] = settings
                 # DAG nodes for individual columns in multi-column assignment
-                names = column.split('/')
+                names = re.split(',\s?', column)
                 if len(names) > 1:
                     for name in names:
                         subjob = '.'.join((table, name))
@@ -185,7 +186,7 @@ class Pipeline:
             else:
                 table, column = job.split('.')
                 settings = self.table_config[table][column]
-                names = column.split('/')
+                names = re.split(',\s?', column)
                 if len(names) > 1:
                     # Multi-column assignment
                     t = Table(self.get_value(settings), names=names)

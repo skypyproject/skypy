@@ -14,7 +14,7 @@ red_galaxy_sersic_index: 4
 blue_galaxy_sersic_index: 1
 tables:
   red_galaxies:
-    redshift/magnitude: !skypy.galaxy.schechter_lf
+    redshift, magnitude: !skypy.galaxy.schechter_lf
       redshift: $z_range
       M_star: $M_star_red
       phi_star: $phi_star_red
@@ -42,7 +42,7 @@ tables:
       e_sum: 3.5
       size: !len [$red_galaxies.redshift]
   blue_galaxies:
-    redshift/magnitude: !skypy.galaxy.schechter_lf
+    redshift, magnitude: !skypy.galaxy.schechter_lf
       redshift: $z_range
       M_star: $M_star_blue
       phi_star: $phi_star_blue
