@@ -324,7 +324,7 @@ def _dlns_dlnM(sigma, M):
     return np.absolute((M / sigma) * ds)
 
 
-def number_subhalos(halo_mass, alpha, beta, gamma_M, x, m_min):
+def number_subhalos(halo_mass, alpha, beta, gamma_M, x, m_min, noise=True):
     r'''Number of subhalos.
     This function calculates the number of subhalos above a given initial mass
     for a parent halo of given mass according to the model of Vale & Ostriker
@@ -346,6 +346,8 @@ def number_subhalos(halo_mass, alpha, beta, gamma_M, x, m_min):
     m_min : array_like
         Original mass of the least massive subhalo, in units of solar mass.
         Current stripped mass is given by :math:`x m_{min}`.
+    noise : bool, optional
+        Poisson-sample the number of subhalos. Default is `True`.
 
     Returns
     --------
@@ -379,7 +381,7 @@ def number_subhalos(halo_mass, alpha, beta, gamma_M, x, m_min):
 
     # Random number of subhalos following a Poisson distribution
     # with mean n_subhalos
-    return np.random.poisson(n_subhalos)
+    return np.random.poisson(n_subhalos) if noise else n_subhalos
 
 
 def subhalo_mass_sampler(halo_mass, nsubhalos, alpha, beta, gamma_M,
