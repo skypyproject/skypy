@@ -326,11 +326,10 @@ def _dlns_dlnM(sigma, M):
 
 def number_subhalos(halo_mass, alpha, beta, gamma_M, x, m_min):
     r'''Number of subhalos.
-    This function calculates the number of subhalos for a parent halo of given mass
-    according to the model of Vale & Ostriker  2004 [1]_. The mean number of subhalos
-    above a mass threshold can be obtained by integrating equation (1) in [1]. The
-    number of subhalos returned is randomly drawn from a Poisson distribution with
-    that mean.
+    This function calculates the number of subhalos above a given initial mass
+    for a parent halo of given mass according to the model of Vale & Ostriker
+    2004 [1]_ equation (7). The number of subhalos returned can optionally be
+    sampled from a Poisson distribution with that mean.
 
     Parameters
     -----------
@@ -338,7 +337,7 @@ def number_subhalos(halo_mass, alpha, beta, gamma_M, x, m_min):
         The mass of the halo parent, in units of solar mass.
     alpha, beta : float
         Parameters that determines the subhalo Schechter function. Its the amplitude
-        is defined by equation 2 in [1].
+        is defined by equation (2) in [1].
     gamma_M : float
         Present day mass fraction in subhalos.
     x : float
@@ -370,7 +369,7 @@ def number_subhalos(halo_mass, alpha, beta, gamma_M, x, m_min):
     .. [1] Vale, A. and Ostriker, J.P. (2005), arXiv: astro-ph/0402500.
     '''
     m_star = beta * halo_mass
-    # m_min is the current minimum subhalo mass, the original mass is x * m_min
+    # m_min is the minimum original subhalo mass
     x_low = m_min / (x * m_star)
     # Subhalo amplitude from equation [2]
     A = gamma_M / (beta * gamma(2.0 - alpha))
@@ -386,9 +385,10 @@ def number_subhalos(halo_mass, alpha, beta, gamma_M, x, m_min):
 def subhalo_mass_sampler(halo_mass, nsubhalos, alpha, beta, gamma_M,
                          x, m_min, resolution):
     r'''Subhalo mass sampler.
-    This function samples subhaloes from their mass function, given the mass
-    of the parent halo.
-    This function uses equation 1 in [1]_ and the upper subhalo mass limit from [2]_.
+    This function samples the original, unstriped masses of subhaloes from the
+    subhalo mass function of their parent halo with a constant mass stripping
+    factor given by equation (1) in [1]_ and the upper subhalo mass limit from
+    [2]_.
 
     Parameters
     -----------
@@ -405,17 +405,17 @@ def subhalo_mass_sampler(halo_mass, nsubhalos, alpha, beta, gamma_M,
         Parameter that accounts for the added mass of the original, unstripped
         subhalos.
     m_min : array_like
-        Mass of the least massive subhalo, in units of solar mass.
-        Current stripped mass is given by :math:`x m_{min}`.
+        Original mass of the least massive subhalo, in units of solar mass.
+        Current stripped mass is given by :math:`m_{min} / x`.
     resolution: int
         Resolution of the inverse transform sampling spline.
 
     Returns
     --------
     sample: (nh, ) array_like
-        List of samples drawn from the mass function, in units of solar mass.
-        The length corresponds to the addition of all subhalos of all parent halos,
-        i.e. `np.sum(nsubhalos)`
+        List of original masses drawn from the subhalo mass function for each
+        parent halo, in units of solar mass. The length corresponds to the total
+        number of subhalos for all parent halos, i.e. `np.sum(nsubhalos)`.
 
     Examples
     ---------
