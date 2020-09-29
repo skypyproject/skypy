@@ -1,5 +1,5 @@
 import numpy as np
-from astropy import units as u
+from astropy import units
 
 
 __all__ = [
@@ -57,7 +57,7 @@ def camb(wavenumber, redshift, cosmology, A_s, n_s):
     '''
 
     try:
-        from camb import CAMBparams, get_results, model
+        from camb import CAMBparams, model, get_matter_power_interpolator
     except ImportError:
         raise Exception("camb is required to use skypy.power_spectrum.camb")
 
@@ -72,29 +72,25 @@ def camb(wavenumber, redshift, cosmology, A_s, n_s):
                        omch2=cosmology.Odm0 * h2,
                        omk=cosmology.Ok0,
                        TCMB=cosmology.Tcmb0.value,
-                       mnu=np.sum(cosmology.m_nu.value),
+                       mnu=np.sum(cosmology.m_nu.to_value(units.eV)),
                        standard_neutrino_neff=cosmology.Neff
                        )
 
-    # camb requires redshifts to be in decreasing order
-    redshift_order = np.argsort(redshift)[::-1]
+    # camb interpolator requires redshifts to be in increasing order
+    redshift_order = np.argsort(redshift)
+    wavenumber_order = np.argsort(wavenumber)
 
     pars.InitPower.ns = n_s
     pars.InitPower.As = A_s
 
-    pars.set_matter_power(redshifts=list(redshift[redshift_order]),
-                          kmax=np.max(wavenumber))
-
     pars.NonLinear = model.NonLinear_none
 
-    results = get_results(pars)
+    pk_interp = get_matter_power_interpolator(pars,
+                                              nonlinear=False,
+                                              hubble_units=False, k_hunit=False,
+                                              kmax=np.max(wavenumber),
+                                              zmax=np.max(redshift))
 
-    k = wavenumber * (1. / u.Mpc)
+    pzk = pk_interp.P(redshift[redshift_order], wavenumber[wavenumber_order])
 
-    k_h = k.to((u.littleh / u.Mpc), u.with_H0(cosmology.H0))
-
-    kh, z, pzk = results.get_matter_power_spectrum(minkh=np.min(k_h.value),
-                                                   maxkh=np.max(k_h.value),
-                                                   npoints=len(k_h.value))
-
-    return pzk[redshift_order[::-1]].reshape(return_shape)
+    return pzk[redshift_order].reshape(return_shape)
