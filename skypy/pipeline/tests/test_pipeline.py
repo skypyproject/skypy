@@ -22,7 +22,7 @@ def test_pipeline():
 
     pipeline = Pipeline(config)
     pipeline.execute()
-    assert pipeline.test_cosmology == default_cosmology.get()
+    assert pipeline['test_cosmology'] == default_cosmology.get()
 
     # Generate a simple two column table with a dependency. Also write the
     # table to a fits file and check it's contents.
@@ -39,10 +39,10 @@ def test_pipeline():
     pipeline = Pipeline(config)
     pipeline.execute()
     pipeline.write(file_format='fits')
-    assert len(pipeline.test_table) == size
-    assert np.all(pipeline.test_table['column1'] < pipeline.test_table['column2'])
+    assert len(pipeline['test_table']) == size
+    assert np.all(pipeline['test_table.column1'] < pipeline['test_table.column2'])
     with fits.open('test_table.fits') as hdu:
-        assert np.all(Table(hdu[1].data) == pipeline.test_table)
+        assert np.all(Table(hdu[1].data) == pipeline['test_table'])
 
     # Check for failure if output files already exist and overwrite is False
     pipeline = Pipeline(config)
@@ -97,16 +97,16 @@ def test_pipeline():
               'test_dict': {'a': 'b'}}
     pipeline = Pipeline(config)
     pipeline.execute()
-    assert isinstance(pipeline.test_int, int)
-    assert isinstance(pipeline.test_float, float)
-    assert isinstance(pipeline.test_string, str)
-    assert isinstance(pipeline.test_list, list)
-    assert isinstance(pipeline.test_dict, dict)
-    assert pipeline.test_int == 1
-    assert pipeline.test_float == 1.0
-    assert pipeline.test_string == 'hello world'
-    assert pipeline.test_list == [0, 'one', 2.]
-    assert pipeline.test_dict == {'a': 'b'}
+    assert isinstance(pipeline['test_int'], int)
+    assert isinstance(pipeline['test_float'], float)
+    assert isinstance(pipeline['test_string'], str)
+    assert isinstance(pipeline['test_list'], list)
+    assert isinstance(pipeline['test_dict'], dict)
+    assert pipeline['test_int'] == 1
+    assert pipeline['test_float'] == 1.0
+    assert pipeline['test_string'] == 'hello world'
+    assert pipeline['test_list'] == [0, 'one', 2.]
+    assert pipeline['test_dict'] == {'a': 'b'}
 
     # Check variables intialised by function
     config = {'test_func': ('list', 'hello world'),
@@ -116,10 +116,22 @@ def test_pipeline():
               'nested_functions': ('list', ('range', ('len', '$test_func')))}
     pipeline = Pipeline(config)
     pipeline.execute()
-    assert pipeline.test_func == list('hello world')
-    assert pipeline.len_of_test_func == len('hello world')
-    assert pipeline.nested_references == list('hello world hello world')
-    assert pipeline.nested_functions == list(range(len('hello world')))
+    assert pipeline['test_func'] == list('hello world')
+    assert pipeline['len_of_test_func'] == len('hello world')
+    assert pipeline['nested_references'] == list('hello world hello world')
+    assert pipeline['nested_functions'] == list(range(len('hello world')))
+
+    # Check parameter initialisation
+    config = {'parameters': {
+                'param1': 1.0}}
+    pipeline = Pipeline(config)
+    pipeline.execute()
+    assert pipeline['param1'] == 1.0
+
+    # Update parameter and re-run
+    new_parameters = {'param1': 5.0}
+    pipeline.execute(parameters=new_parameters)
+    assert pipeline['param1'] == new_parameters['param1']
 
 
 def test_multi_column_assignment():
