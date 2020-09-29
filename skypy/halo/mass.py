@@ -391,7 +391,8 @@ def subhalo_mass_sampler(halo_mass, nsubhalos, alpha, beta, gamma_M,
                          x, m_min, resolution):
     r'''Subhalo mass sampler.
     This function samples subhaloes from their mass function, given the mass
-    of the parent halo. Refer to equation 1 in [1]_.
+    of the parent halo.
+    This function uses equation 1 in [1]_ and the upper subhalo mass limit from [2]_.
 
     Parameters
     -----------
@@ -440,14 +441,14 @@ def subhalo_mass_sampler(halo_mass, nsubhalos, alpha, beta, gamma_M,
     References
     ----------
     .. [1] Vale, A. and Ostriker, J.P. (2004), arXiv: astro-ph/0402500.
+    .. [2] Vale, A. and Ostriker, J.P. (2004), arXiv: astro-ph/0511816.
     '''
     halo_mass = np.atleast_1d(halo_mass)
     nsubhalos = np.atleast_1d(nsubhalos)
     subhalo_list = []
     for M, n in zip(halo_mass, nsubhalos):
-        m_star = beta * M
-        x_min = m_min / (x * m_star)
-        x_max = 0.5 * halo_mass / m_star
-        subhalo_mass = schechter(alpha, x_min, x_max, resolution, size=n, scale=m_star)
+        x_min = m_min / (x * beta * M)
+        x_max = 0.5 * M / (x * beta * M)
+        subhalo_mass = schechter(alpha, x_min, x_max, resolution, size=n, scale=x * beta * M)
         subhalo_list.append(subhalo_mass)
     return np.concatenate(subhalo_list)
