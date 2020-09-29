@@ -4,6 +4,7 @@ This module provides methods to run pipelines of functions with dependencies
 and handle their results.
 """
 
+from astropy.table import Table
 from copy import deepcopy
 from importlib import import_module
 import builtins
@@ -115,6 +116,10 @@ class Pipeline:
         # Create a Directed Acyclic Graph of all jobs and dependencies
         self.dag = networkx.DiGraph()
 
+        # Jobs that do not call a function but require entries in the DAG
+        # for the purpose of maintaining dependencies
+        self.skip_jobs = set()
+
         # - add nodes for each variable, table and column
         # - add edges for the table dependencies
         # - keep track where functions need to be called
@@ -128,6 +133,7 @@ class Pipeline:
             table_complete = '.'.join((table, 'complete'))
             self.dag.add_node(table_complete)
             self.dag.add_edge(table, table_complete)
+            self.skip_jobs.add(table_complete)
             for column, settings in columns.items():
                 job = '.'.join((table, column))
                 self.dag.add_node(job)
@@ -135,6 +141,14 @@ class Pipeline:
                 self.dag.add_edge(job, table_complete)
                 if isinstance(settings, tuple):
                     functions[job] = settings
+                # DAG nodes for individual columns in multi-column assignment
+                names = [n.strip() for n in column.split(',')]
+                if len(names) > 1:
+                    for name in names:
+                        subjob = '.'.join((table, name))
+                        self.dag.add_node(subjob)
+                        self.dag.add_edge(job, subjob)
+                        self.skip_jobs.add(subjob)
 
         # go through functions and add edges for all references
         for job, settings in functions.items():
@@ -163,7 +177,7 @@ class Pipeline:
 
         '''
         for job in networkx.topological_sort(self.dag):
-            if job.endswith('.complete'):
+            if job in self.skip_jobs:
                 continue
             elif job in self.config:
                 settings = self.config.get(job)
@@ -171,7 +185,14 @@ class Pipeline:
             else:
                 table, column = job.split('.')
                 settings = self.table_config[table][column]
-                getattr(self, table)[column] = self.get_value(settings)
+                names = [n.strip() for n in column.split(',')]
+                if len(names) > 1:
+                    # Multi-column assignment
+                    t = Table(self.get_value(settings), names=names)
+                    getattr(self, table).add_columns(t.columns.values())
+                else:
+                    # Single column assignment
+                    getattr(self, table)[column] = self.get_value(settings)
 
     def write(self, file_format=None, overwrite=False):
         r'''Write pipeline results to disk.

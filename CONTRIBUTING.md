@@ -72,12 +72,10 @@ When you feel that work on your new feature is complete, you should create a *Pu
 
 A series of automated checks will be run on your pull request, some of which will be required to pass before it can be merged into the main codebase:
 
-  - `Documentation` (Required) checks that the documentation builds successfully. Click "Details" to view the output including any errors.
   - `Tests` (Required) runs the [unit tests](#unit-tests) in four predefined environments; `latest supported versions`, `oldest supported versions`, `macOS latest supported` and `Windows latest supported`. Click "Details" to view the output including any failures.
-  - `build_docs` builds the html documentation so that you can view it using `giles` (see below).
   - `codeclimate` (Required) runs [pycodestyle](https://pycodestyle.pycqa.org/en/latest/) to check that your code conforms to the [PEP 8](https://www.python.org/dev/peps/pep-0008/) style guidelines. Click "Details" to view any errors.
   - `codecov` reports the test coverage for your pull request; you should aim for `codecov/patch — 100.00%`. Click "Details" to view coverage data.
-  - `giles` lets you view the html documentation built by `circleci: build_docs`. Click "Details" to view the documentation.
+  - `docs` (Required) builds the [documentation](#docstrings) on [readthedocs](https://readthedocs.org/). Click "Details" to view the documentation or the failed build log.
 
 ### Updating your branch
 
@@ -123,6 +121,8 @@ Before your pull request can be merged into the codebase, it will be reviewed by
 ### Unit Tests
 
 Pull requests will require existing unit tests to pass before they can be merged. Additionally, new unit tests should be written for all new public methods and functions. Unit tests for each submodule are contained in subdirectories called `tests` and you can run them locally using `pytest`. For more information see the [Astropy Testing Guidelines](https://docs.astropy.org/en/stable/development/testguide.html).
+
+If your unit tests check the statistical distribution of a random sample, the test outcome itself is a random variable, and the test will fail from time to time. Please mark such tests with the `@pytest.mark.flaky` decorator, so that they will be automatically tried again on failure. To prevent non-random test failures from being run multiple times, please isolate random statistical tests and deterministic tests in their own test cases.
 
 ### Docstrings
 
