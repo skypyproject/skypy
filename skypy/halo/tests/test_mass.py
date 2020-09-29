@@ -105,6 +105,25 @@ def test_ellipsoidal_collapse_function():
     assert allclose(fps, PS_fsigma)
 
 
+def test_number_subhalos():
+    # Test analytic solution
+    halo_mass, min_sh = 1.0e12, 1.0e6
+    alpha, beta, gamma_M ,x = 1.9, 1.0, 0.3, 1.0
+    nsh_output = number_subhalos(halo_mass, alpha, beta, gamma_M, x, min_sh, noise=False)
+    # Test mean number of subhalos
+    x_low = min_sh / (x * beta * halo_mass)
+    A = gamma_M / (beta * gamma(2.0 - alpha))
+    nsh_mean = A * gammaincc(1.0 - alpha, x_low) * gamma(1.0 - alpha)
+
+    assert nsh_output == nsh_mean
+
+    # Test for array input of halo parents
+    halo_parents = np.array([1.0e12, 1.0e6])
+    array_nsh = number_subhalos(halo_parents, alpha, beta, gamma_M, x, min_sh)
+
+    assert len(array_nsh) = len(halo_parents)
+
+
 def test_subhalo_mass_sampler():
     # Test the output shape is correct given the sample size
     halo, min_sh = 1.0e12, 1.0e6
