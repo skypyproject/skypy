@@ -28,11 +28,11 @@ def halo_circular_velocity(halo_virial_mass, Delta_v, redshift, cosmology):
     ----------
     halo_virial_mass : (nm,) array_like
     	Array for the virial mass, in units of solar mass.
-	Delta_v : (nm,) array_like
-		The mean overdensity of the halo.
-	redshift : (nm,) array_like
-		The redshift of each halo.
-	cosmology : astropy.cosmology.Cosmology
+    Delta_v : (nm,) array_like
+        The mean overdensity of the halo.
+    redshift : (nm,) array_like
+        The redshift of each halo.
+    cosmology : astropy.cosmology.Cosmology
         Cosmology object providing methods for the evolution history of
         omega_matter and omega_lambda with redshift.
     
