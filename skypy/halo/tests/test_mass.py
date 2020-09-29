@@ -1,6 +1,8 @@
 import numpy as np
 from astropy.cosmology import Planck15
 from astropy.units import allclose
+from scipy.special import gamma
+from skypy.utils.special import gammaincc
 from skypy.power_spectrum import eisenstein_hu
 
 
@@ -107,11 +109,11 @@ def test_ellipsoidal_collapse_function():
 
 def test_number_subhalos():
     # Test analytic solution
-    halo_mass, min_sh = 1.0e12, 1.0e6
-    alpha, beta, gamma_M ,x = 1.9, 1.0, 0.3, 1.0
-    nsh_output = mass.number_subhalos(halo_mass, alpha, beta, gamma_M, x, min_sh, noise=False)
+    halo_mass, shm_min = 1.0e12, 1.0e14
+    alpha, beta, gamma_M, x = 1.9, 1.0, 0.3, 1.0
+    nsh_output = mass.number_subhalos(halo_mass, alpha, beta, gamma_M, x, shm_min, noise=False)
     # Test mean number of subhalos
-    x_low = min_sh / (x * beta * halo_mass)
+    x_low = shm_min / (x * beta * halo_mass)
     A = gamma_M / (beta * gamma(2.0 - alpha))
     nsh_mean = A * gammaincc(1.0 - alpha, x_low) * gamma(1.0 - alpha)
 
@@ -119,20 +121,23 @@ def test_number_subhalos():
 
     # Test for array input of halo parents
     halo_parents = np.array([1.0e12, 1.0e6])
-    array_nsh = mass.number_subhalos(halo_parents, alpha, beta, gamma_M, x, min_sh)
+    array_nsh = mass.number_subhalos(halo_parents, alpha, beta, gamma_M, x, shm_min)
 
     assert len(array_nsh) == len(halo_parents)
 
 
 def test_subhalo_mass_sampler():
     # Test the output shape is correct given the sample size
-    halo, min_sh = 1.0e12, 1.0e6
-    alpha, beta, gamma_M = 1.9, 1.0, 0.3
-    x = 3
-    nsh = mass.number_subhalos(halo, alpha, beta, gamma_M, x, min_sh)
+    halo_mass, shm_min = 1.0e12, 1.0e6
+    alpha, beta, gamma_M, x = 1.9, 1.0, 0.3, 1.0
+    nsh = mass.number_subhalos(halo_mass, alpha, beta, gamma_M, x, shm_min)
 
-    array_output = mass.subhalo_mass_sampler(halo, nsh, alpha, beta, gamma_M, x, min_sh, 100)
+    array_output = mass.subhalo_mass_sampler(halo_mass, nsh, alpha, beta, gamma_M, x, shm_min, 100)
 
     assert len(array_output) == np.sum(nsh)
 
-    # For each halo test that each subhalo satisfy m_min < m < m_max
+    # For each halo test that each subhalo satisfy shm_min < m < shm_max
+    shm_max = 0.5 * halo_mass
+    sh_mass = mass.subhalo_mass_sampler(halo_mass, nsh, alpha, beta, gamma_M, x, shm_min, 100)
+
+    assert np.all(sh_mass > shm_min) and np.all(sh_mass < shm_max)
