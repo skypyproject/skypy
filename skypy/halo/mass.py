@@ -324,11 +324,6 @@ def _dlns_dlnM(sigma, M):
     return np.absolute((M / sigma) * ds)
 
 
-def _subhalo_amplitude(M, alpha, beta, gamma_M):
-    # astro-ph/0402500 Equation 2
-    return gamma_M / (beta * gamma(2.0 - alpha))
-
-
 def number_subhalos(halo_mass, alpha, beta, gamma_M, x, m_min):
     r'''Number of subhalos.
     This function calculates the number of subhalos for a parent halo of given mass
@@ -377,7 +372,8 @@ def number_subhalos(halo_mass, alpha, beta, gamma_M, x, m_min):
     m_star = beta * halo_mass
     # m_min is the current minimum subhalo mass, the original mass is x * m_min
     x_low = m_min / (x * m_star)
-    A = _subhalo_amplitude(halo_mass, alpha, beta, gamma_M)
+    # Subhalo amplitude from equation [2]
+    A = gamma_M / (beta * gamma(2.0 - alpha))
     # The mean number of subhalos above a mass threshold
     # can be obtained by integrating equation (1) in [1]
     n_subhalos = A * gammaincc(1.0 - alpha, x_low) * gamma(1.0 - alpha)
@@ -448,7 +444,7 @@ def subhalo_mass_sampler(halo_mass, nsubhalos, alpha, beta, gamma_M,
     subhalo_list = []
     for M, n in zip(halo_mass, nsubhalos):
         x_min = m_min / (x * beta * M)
-        x_max = 0.5 * M / (x * beta * M)
+        x_max = 0.5 / (x * beta)
         subhalo_mass = schechter(alpha, x_min, x_max, resolution, size=n, scale=x * beta * M)
         subhalo_list.append(subhalo_mass)
     return np.concatenate(subhalo_list)
