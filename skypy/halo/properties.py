@@ -27,8 +27,7 @@ def halo_circular_velocity(M, Delta_v, redshift, cosmology):
     Parameters
     ----------
     M : (nm,) array_like
-    	Array for the halo mass, in units of solar mass.
-    	We assume here that the halo mass is equal to the virial mass.
+    	Array for the virial mass, in units of solar mass.
 	Delta_v : (nm,) array_like
 		The mean overdensity of the halo.
 	redshift : (nm,) array_like
