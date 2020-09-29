@@ -22,7 +22,7 @@ __all__ = [
 def halo_circular_velocity(M, Delta_v, redshift, cosmology):
     """Halo circular velocity.
     This function computes the halo circular velocity, setting it 
-    equal to the virial velocity using equation (3) from [1]_.
+    equal to the virial velocity using equation (3) and footnote 2 from [1]_.
 
     Parameters
     ----------
