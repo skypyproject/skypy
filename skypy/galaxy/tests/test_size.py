@@ -28,6 +28,7 @@ def test_angular_size():
         size.angular_size(radius_without_units, scalar_redshift, cosmology)
 
 
+@pytest.mark.flaky
 def test_late_type_lognormal():
     """ Test lognormal distribution of late-type galaxy sizes"""
     # Test that a scalar input gives a scalar output
@@ -69,6 +70,7 @@ def test_late_type_lognormal():
     assert p > 0.01
 
 
+@pytest.mark.flaky
 def test_early_type_lognormal():
     """ Test lognormal distribution of late-type galaxy sizes"""
     # Test that a scalar input gives a scalar output
@@ -107,6 +109,7 @@ def test_early_type_lognormal():
     assert p > 0.01
 
 
+@pytest.mark.flaky
 def test_linear_lognormal():
     """ Test lognormal distribution of galaxy sizes"""
     # Test that a scalar input gives a scalar output

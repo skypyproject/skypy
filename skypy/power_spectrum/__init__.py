@@ -9,6 +9,7 @@ Linear Power Spectrum
    :toctree: ../api/
 
    camb
+   classy
    eisenstein_hu
    transfer_no_wiggles
    transfer_with_wiggles
@@ -42,6 +43,7 @@ Growth Functions
 
 """
 
+from ._classy import *  # noqa F401,F403
 from ._camb import *  # noqa F401,F403
 from ._eisenstein_hu import *  # noqa F401,F403
 from ._halofit import *  # noqa F401,F403

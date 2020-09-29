@@ -1,7 +1,60 @@
 import numpy as np
+import pytest
 from scipy.stats import kstest
 
 
+def test_magnitude_functions():
+
+    from astropy.cosmology import default_cosmology
+
+    from skypy.galaxy.luminosity import (absolute_to_apparent_magnitude,
+            apparent_to_absolute_magnitude, distance_modulus,
+            luminosity_in_band, luminosity_from_absolute_magnitude,
+            absolute_magnitude_from_luminosity)
+
+    cosmo = default_cosmology.get()
+
+    # sample some redshifts
+    z = np.random.uniform(0, 10, size=1000)
+
+    # sample some absolute magnitudes
+    M = np.random.uniform(15, 25, size=1000)
+
+    # sample distance moduli
+    DM = cosmo.distmod(z).value
+
+    # compare with function
+    np.testing.assert_allclose(distance_modulus(z), DM)
+
+    # compute apparent magnitudes
+    m = absolute_to_apparent_magnitude(M, DM)
+
+    # compare with values
+    np.testing.assert_allclose(m, M+DM)
+
+    # go back to absolute magnitudes
+    M_ = apparent_to_absolute_magnitude(m, DM)
+
+    # compare with original values
+    np.testing.assert_allclose(M_, M)
+
+    # convert between absolute luminosity and magnitude
+    assert np.isclose(luminosity_from_absolute_magnitude(-22), 630957344.5)
+    assert np.isclose(absolute_magnitude_from_luminosity(630957344.5), -22)
+
+    # convert with standard luminosities
+    for ref, mag in luminosity_in_band.items():
+        assert np.isclose(luminosity_from_absolute_magnitude(mag, ref), 1.0)
+        assert np.isclose(absolute_magnitude_from_luminosity(1.0, ref), mag)
+
+    # error when unknown reference is used
+    with pytest.raises(KeyError):
+        luminosity_from_absolute_magnitude(0., 'unknown')
+    with pytest.raises(KeyError):
+        absolute_magnitude_from_luminosity(1., 'unknown')
+
+
+@pytest.mark.flaky
 def test_schechter_lf_magnitude():
     from skypy.galaxy.luminosity import schechter_lf_magnitude
     from astropy.cosmology import default_cosmology
