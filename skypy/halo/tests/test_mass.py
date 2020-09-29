@@ -121,7 +121,7 @@ def test_number_subhalos():
     halo_parents = np.array([1.0e12, 1.0e6])
     array_nsh = mass.number_subhalos(halo_parents, alpha, beta, gamma_M, x, min_sh)
 
-    assert len(array_nsh) = len(halo_parents)
+    assert len(array_nsh) == len(halo_parents)
 
 
 def test_subhalo_mass_sampler():
@@ -134,3 +134,5 @@ def test_subhalo_mass_sampler():
     array_output = mass.subhalo_mass_sampler(halo, nsh, alpha, beta, gamma_M, x, min_sh, 100)
 
     assert len(array_output) == np.sum(nsh)
+
+    # For each halo test that each subhalo satisfy m_min < m < m_max
