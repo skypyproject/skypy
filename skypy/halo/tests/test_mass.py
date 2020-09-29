@@ -1,8 +1,6 @@
 import numpy as np
 from astropy.cosmology import Planck15
 from astropy.units import allclose
-from scipy.special import gamma
-from skypy.utils.special import gammaincc
 from skypy.power_spectrum import eisenstein_hu
 
 
@@ -108,19 +106,22 @@ def test_ellipsoidal_collapse_function():
 
 
 def test_number_subhalos():
-    # Test analytic solution
-    halo_mass, shm_min = 1.0e12, 1.0e14
-    alpha, beta, gamma_M, x = 1.9, 1.0, 0.3, 1.0
+    # Test analytic solution for the mean number of subhalos
+    halo_mass = 1.0e12
+    shm_min = halo_mass / 100
+    alpha, beta, gamma_M, x = 0.0, 1.0, 0.3, 1.0
     nsh_output = mass.number_subhalos(halo_mass, alpha, beta, gamma_M, x, shm_min, noise=False)
-    # Test mean number of subhalos
-    x_low = shm_min / (x * beta * halo_mass)
-    A = gamma_M / (beta * gamma(2.0 - alpha))
-    nsh_mean = A * gammaincc(1.0 - alpha, x_low) * gamma(1.0 - alpha)
 
-    assert nsh_output == nsh_mean
+    x_low = 0.01
+    A = gamma_M
+    nsh_mean = A * np.exp(-x_low)
+
+    assert round(nsh_output) == round(nsh_mean)
 
     # Test for array input of halo parents
-    halo_parents = np.array([1.0e12, 1.0e6])
+    halo_parents = np.array([1.0e12, 1.0e14])
+    shm_min = 1.0e6
+    alpha, beta, gamma_M, x = 1.9, 1.0, 0.3, 1.0
     array_nsh = mass.number_subhalos(halo_parents, alpha, beta, gamma_M, x, shm_min)
 
     assert len(array_nsh) == len(halo_parents)
