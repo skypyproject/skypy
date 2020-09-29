@@ -8,6 +8,13 @@ import pytest
 from skypy.pipeline import Pipeline
 
 
+def setup_module(module):
+
+    # Define function for multi-column assignment tests
+    module.multi_column_array = lambda nrows, ncols: np.ones((nrows, ncols))
+    module.multi_column_tuple = lambda nrows, ncols: (np.ones(nrows),) * ncols
+
+
 def test_pipeline():
 
     # Evaluate and store the default astropy cosmology.
@@ -113,6 +120,34 @@ def test_pipeline():
     assert pipeline.len_of_test_func == len('hello world')
     assert pipeline.nested_references == list('hello world hello world')
     assert pipeline.nested_functions == list(range(len('hello world')))
+
+
+def test_multi_column_assignment():
+
+    # Test multi-column assignment from 2d arrays and tuples of 1d arrays
+    config = {'tables': {
+                'multi_column_test_table': {
+                  'a,b ,c, d': ('skypy.pipeline.tests.test_pipeline.multi_column_array', [7, 4]),
+                  'e , f,  g': ('skypy.pipeline.tests.test_pipeline.multi_column_tuple', [7, 3]),
+                  'h': ('list', '$multi_column_test_table.a'),
+                  'i': ('list', '$multi_column_test_table.f')}}}
+
+    pipeline = Pipeline(config)
+    pipeline.execute()
+
+
+@pytest.mark.parametrize(('na', 'nt'), [(2, 3), (4, 3), (3, 2), (3, 4)])
+def test_multi_column_assignment_failure(na, nt):
+
+    # Test multi-column assignment failure with too few/many columns
+    config = {'tables': {
+                'multi_column_test_table': {
+                  'a,b,c': ('skypy.pipeline.tests.test_pipeline.multi_column_array', [7, na]),
+                  'd,e,f': ('skypy.pipeline.tests.test_pipeline.multi_column_tuple', [7, nt])}}}
+
+    pipeline = Pipeline(config)
+    with pytest.raises(ValueError):
+        pipeline.execute()
 
 
 def teardown_module(module):
