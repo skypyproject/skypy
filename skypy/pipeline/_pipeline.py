@@ -9,7 +9,6 @@ from copy import deepcopy
 from importlib import import_module
 import builtins
 import networkx
-from astropy import log
 
 
 __all__ = [
@@ -193,7 +192,6 @@ class Pipeline:
 
         # go through the jobs in dependency order
         for job in networkx.topological_sort(self.dag):
-            log.debug(f'job: {job}')
             if job in self.skip_jobs:
                 continue
             elif job in self.parameters:

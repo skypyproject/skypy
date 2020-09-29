@@ -128,6 +128,11 @@ def test_pipeline():
     pipeline.execute()
     assert pipeline['param1'] == 1.0
 
+    # Update parameter and re-run
+    new_parameters = {'param1': 5.0}
+    pipeline.execute(parameters=new_parameters)
+    assert pipeline['param1'] == new_parameters['param1']
+
 
 def test_multi_column_assignment():
 
