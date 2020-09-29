@@ -333,13 +333,16 @@ def load_spectral_data(name):
     import re
 
     # loaders registry
-    from ._spectrum_loaders import spectrum_loaders
+    from ._spectrum_loaders import spectrum_loaders, combine_spectra
 
     # check non-string input
     if not isinstance(name, str):
         # recurse on lists
         if hasattr(name, '__iter__'):
-            return list(map(load_spectral_data, name))
+            spectra = None
+            for name_ in name:
+                spectra = combine_spectra(spectra, load_spectral_data(name_))
+            return spectra
         else:
             raise TypeError('name: not a string or list of strings')
 

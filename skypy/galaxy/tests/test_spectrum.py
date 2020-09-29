@@ -285,6 +285,12 @@ def test_combine_spectra():
     assert ab.flux.unit == units.Jy
     assert np.allclose([[1, 2, 3], [4, 5, 6]], ab.flux.value)
 
+    abb = combine_spectra(ab, b)
+    assert isinstance(ab, specutils.Spectrum1D)
+    assert abb.shape == (3, 3)
+    assert abb.flux.unit == units.Jy
+    assert np.allclose([[1, 2, 3], [4, 5, 6], [4, 5, 6]], abb.flux.value)
+
     c = specutils.Spectrum1D(spectral_axis=[1., 2., 3., 4.]*units.AA,
                              flux=[1., 2., 3., 4.]*units.Jy)
 
