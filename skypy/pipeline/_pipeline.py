@@ -108,6 +108,7 @@ class Pipeline:
         # config contains settings for all variables and table initialisation
         # table_config contains settings for all table columns
         self.config = deepcopy(configuration)
+        self.parameters = self.config.pop('parameters', {})
         self.table_config = self.config.pop('tables', {})
         default_table = ('astropy.table.Table',)
         self.config.update({k: v.pop('.init', default_table)
@@ -120,11 +121,13 @@ class Pipeline:
         # for the purpose of maintaining dependencies
         self.skip_jobs = set()
 
-        # - add nodes for each variable, table and column
+        # - add nodes for each parameter, variable, table and column
         # - add edges for the table dependencies
         # - keep track where functions need to be called
         #   functions are tuples (function name, [function args])
         functions = {}
+        for job in self.parameters:
+            self.dag.add_node(job)
         for job, settings in self.config.items():
             self.dag.add_node(job)
             if isinstance(settings, tuple):
@@ -163,7 +166,7 @@ class Pipeline:
                 else:
                     raise KeyError(d)
 
-    def execute(self):
+    def execute(self, parameters={}):
         r'''Run a pipeline.
 
         This function runs a pipeline of functions to generate variables and
@@ -171,17 +174,31 @@ class Pipeline:
         determine a non-blocking order of execution that resolves any
         dependencies, see [1]_.
 
+        Parameters
+        ----------
+        parameters : dict
+            Updated parameter values for this execution.
+
         References
         ----------
         .. [1] https://networkx.github.io/documentation/stable/
 
         '''
+        # update parameter state
+        self.parameters.update(parameters)
+
+        # initialise state object
+        self.state = {}
+
+        # go through the jobs in dependency order
         for job in networkx.topological_sort(self.dag):
             if job in self.skip_jobs:
                 continue
+            elif job in self.parameters:
+                self.state[job] = self.parameters[job]
             elif job in self.config:
                 settings = self.config.get(job)
-                setattr(self, job, self.get_value(settings))
+                self.state[job] = self.get_value(settings)
             else:
                 table, column = job.split('.')
                 settings = self.table_config[table][column]
@@ -189,10 +206,10 @@ class Pipeline:
                 if len(names) > 1:
                     # Multi-column assignment
                     t = Table(self.get_value(settings), names=names)
-                    getattr(self, table).add_columns(t.columns.values())
+                    self.state[table].add_columns(t.columns.values())
                 else:
                     # Single column assignment
-                    getattr(self, table)[column] = self.get_value(settings)
+                    self.state[table][column] = self.get_value(settings)
 
     def write(self, file_format=None, overwrite=False):
         r'''Write pipeline results to disk.
@@ -214,7 +231,7 @@ class Pipeline:
         if file_format:
             for table in self.table_config.keys():
                 filename = '.'.join((table, file_format))
-                getattr(self, table).write(filename, overwrite=overwrite)
+                self.state[table].write(filename, overwrite=overwrite)
 
     def get_value(self, value):
         '''return the value of a field
@@ -307,5 +324,5 @@ class Pipeline:
 
     def __getitem__(self, label):
         name, _, key = label.partition('.')
-        item = getattr(self, name)
+        item = self.state[name]
         return item[key] if key else item
