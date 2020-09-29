@@ -19,14 +19,14 @@ __all__ = [
     'halo_circular_velocity',
  ]
 
-def halo_circular_velocity(M, Delta_v, redshift, cosmology):
+def halo_circular_velocity(halo_virial_mass, Delta_v, redshift, cosmology):
     """Halo circular velocity.
     This function computes the halo circular velocity, setting it 
     equal to the virial velocity using equation (3) and footnote 2 from [1]_.
 
     Parameters
     ----------
-    M : (nm,) array_like
+    halo_virial_mass : (nm,) array_like
     	Array for the virial mass, in units of solar mass.
 	Delta_v : (nm,) array_like
 		The mean overdensity of the halo.
@@ -60,16 +60,10 @@ def halo_circular_velocity(M, Delta_v, redshift, cosmology):
     References
     ----------
     .. [1] Maller and Bullock 2004 MNRAS 355 694 DOI:10.1111/j.1365-2966.2004.08349.x
-    
-	Notes of things to ask / think about:
-	* where to get Delta_v from - do we have a module for this already, or compute it in here too?
-	* fix h hack / check h in Maller & Bullock is h100
-	* should we call it the circular_velocity or the virial_velocity?
-	* ditto M - should we call it M_v or pretend virial mass = halo mass throughout?
-	* should we output the virial radius here as well or is this already done elsewhere?
     """
 
-    h = cosmology.H0 / 100
-    circular_velocity = 96.6 * (Delta_v * cosmology.Om0 * h **2) * pow((1 + redshift)/0.3,0.5) * pow(M/1e11,1/3)
+    virial_velocity = 96.6 * Unit('km s-1') * \
+        (Delta_v * cosmology.Om0 * cosmology.h**2) * pow((1 + redshift)/0.3,0.5) * \
+        pow(halo_virial_mass/(mass.to_value('Msun') / 1e11),1/3)
 
-    return circular_velocity
+    return virial_velocity
