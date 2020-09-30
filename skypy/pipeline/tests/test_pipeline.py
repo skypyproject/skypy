@@ -117,6 +117,27 @@ def test_pipeline():
     assert pipeline['param1'] == new_parameters['param1']
 
 
+def test_unknown_reference():
+    config = {'param1': '$param2'}
+    pipeline = Pipeline(config)
+    with pytest.raises(KeyError):
+        pipeline.execute()
+
+    config = {'mydict': {
+                'param1': '$mydict.param2'}}
+    pipeline = Pipeline(config)
+    with pytest.raises(KeyError):
+        pipeline.execute()
+
+    config = {'tables': {
+                'mytable': {
+                  'mycolumn': [0, 1, 2]}},
+              'myvalue': '$mytable.myothercolumn'}
+    pipeline = Pipeline(config)
+    with pytest.raises(KeyError):
+        pipeline.execute()
+
+
 def test_multi_column_assignment():
 
     # Test multi-column assignment from 2d arrays and tuples of 1d arrays

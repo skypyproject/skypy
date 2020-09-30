@@ -135,16 +135,11 @@ class Pipeline:
         # for the purpose of maintaining dependencies
         self.skip_jobs = set()
 
-        # - add nodes for each parameter, variable, table and column
+        # - add nodes for each variable, table and column
         # - add edges for the table dependencies
         # - keep track where functions need to be called
         #   functions are tuples (function name, [function args])
         functions = {}
-        for job in self.parameters:
-            self.dag.add_node(job)
-            self.skip_jobs.add(job)
-        self.dag.add_node('cosmology')
-        self.skip_jobs.add('cosmology')
         for job, settings in self.config.items():
             self.dag.add_node(job)
             if isinstance(settings, tuple):
@@ -178,10 +173,14 @@ class Pipeline:
             deps = self.get_deps(args)
             # add edges for dependencies
             for d in deps:
-                if self.dag.has_node(d):
-                    self.dag.add_edge(d, job)
-                else:
-                    raise KeyError(d)
+                # job depends on d
+                self.dag.add_edge(d, job)
+                # recurse dependencies such that d = 'a.b.c' -> 'a.b' -> 'a'
+                c = d.rpartition('.')[0]
+                while c:
+                    self.dag.add_edge(c, d)
+                    c, d = c.rpartition('.')[0], c
+
 
     def execute(self, parameters={}):
         r'''Run a pipeline.
@@ -263,47 +262,28 @@ class Pipeline:
         tuples specify function calls `(function name, function args)`
         '''
 
-        # check if not function
-        if not isinstance(value, tuple):
-            # check for reference
-            if isinstance(value, str) and value[0] == '$':
-                return self[value[1:]]
+        if isinstance(value, dict):
+            # recurse dicts
+            return {k: self.get_value(v) for k, v in value.items()}
+        elif isinstance(value, list):
+            # recurse lists
+            return [self.get_value(v) for v in value]
+        elif isinstance(value, tuple):
+            # tuple (function, [args])
+            function = value[0]
+            args = value[1] if len(value) > 1 else []
+            if isinstance(args, dict):
+                return function(**self.get_value(args))
+            elif isinstance(args, list):
+                return function(*self.get_value(args))
             else:
-                # plain value
-                return value
-
-        # value is tuple (function, [args])
-        function = value[0]
-        args = value[1] if len(value) > 1 else []
-
-        # Parse arguments
-        parsed_args = self.get_args(args)
-
-        # Call function
-        if isinstance(args, dict):
-            result = function(**parsed_args)
-        elif isinstance(args, list):
-            result = function(*parsed_args)
+                return function(self.get_value(args))
+        elif isinstance(value, str) and value[0] == '$':
+            # reference
+            return self[value[1:]]
         else:
-            result = function(parsed_args)
-
-        return result
-
-    def get_args(self, args):
-        '''parse function arguments
-
-        strings beginning with `$` are references to other fields
-        '''
-
-        if isinstance(args, dict):
-            # recurse kwargs
-            return {k: self.get_args(v) for k, v in args.items()}
-        elif isinstance(args, list):
-            # recurse args
-            return [self.get_args(a) for a in args]
-        else:
-            # return value
-            return self.get_value(args)
+            # plain value
+            return value
 
     def get_deps(self, args):
         '''get dependencies from function args
@@ -333,6 +313,13 @@ class Pipeline:
             return []
 
     def __getitem__(self, label):
-        name, _, key = label.partition('.')
-        item = self.state[name]
-        return item[key] if key else item
+        item = self.state
+        name = None
+        while label:
+            key, _, label = label.partition('.')
+            name = f'{name}.{key}' if name else key
+            try:
+                item = item[key]
+            except KeyError as e:
+                raise KeyError('unknown reference: ' + name) from e
+        return item
