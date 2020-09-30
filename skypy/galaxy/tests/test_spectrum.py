@@ -149,6 +149,89 @@ def test_mag_ab_multi():
 
 
 @pytest.mark.skipif(not HAS_SPECUTILS, reason='test requires specutils')
+def test_template_spectra():
+
+    from astropy import units
+    from skypy.galaxy.spectrum import mag_ab, magnitudes_from_templates
+    from astropy.cosmology import Planck15
+
+    # 3 Flat Templates
+    lam = np.logspace(0, 4, 1000)*units.AA
+    A = np.array([[2], [3], [4]])
+    flam = A * 0.10884806248538730623*units.Unit('erg s-1 cm-2 AA')/lam**2
+    spec = specutils.Spectrum1D(spectral_axis=lam, flux=flam)
+
+    # Gaussian bandpass
+    bp_lam = np.logspace(0, 4, 1000)*units.AA
+    bp_tx = np.exp(-((bp_lam - 1000*units.AA)/(100*units.AA))**2)*units.dimensionless_unscaled
+    bp = specutils.Spectrum1D(spectral_axis=bp_lam, flux=bp_tx)
+
+    # Each test galaxy is exactly one of the templates
+    coefficients = np.diag(np.ones(3))
+    mt = magnitudes_from_templates(coefficients, spec, bp)
+    m = mag_ab(spec, bp)
+    np.testing.assert_allclose(mt, m)
+
+    # Test distance modulus
+    redshift = np.array([0, 1, 2])
+    dm = Planck15.distmod(redshift).value
+    mt = magnitudes_from_templates(coefficients, spec, bp, distance_modulus=dm)
+    np.testing.assert_allclose(mt, m + dm)
+
+    # Test stellar mass
+    sm = np.array([1, 2, 3])
+    mt = magnitudes_from_templates(coefficients, spec, bp, stellar_mass=sm)
+    np.testing.assert_allclose(mt, m - 2.5*np.log10(sm))
+
+    # Redshift interpolation test; linear interpolation sufficient over a small
+    # redshift range at low relative tolerance
+    z = np.linspace(0, 0.1, 3)
+    m_true = magnitudes_from_templates(coefficients, spec, bp, redshift=z, resolution=4)
+    m_interp = magnitudes_from_templates(coefficients, spec, bp, redshift=z, resolution=2)
+    np.testing.assert_allclose(m_true, m_interp, rtol=1e-2)
+    with pytest.raises(AssertionError):
+        np.testing.assert_allclose(m_true, m_interp, rtol=1e-5)
+
+
+@pytest.mark.skipif(not HAS_SPECUTILS, reason='test requires specutils')
+def test_stellar_mass_from_reference_band():
+
+    from astropy import units
+    from skypy.galaxy.spectrum import mag_ab, stellar_mass_from_reference_band
+
+    # Gaussian bandpass
+    bp_lam = np.logspace(0, 4, 1000) * units.AA
+    bp_mean = 1000 * units.AA
+    bp_width = 100 * units.AA
+    bp_tx = np.exp(-((bp_lam-bp_mean)/bp_width)**2)*units.dimensionless_unscaled
+    band = specutils.Spectrum1D(spectral_axis=bp_lam, flux=bp_tx)
+
+    # 3 Flat template spectra
+    lam = np.logspace(0, 4, 1000)*units.AA
+    A = np.array([[2], [3], [4]])
+    flam = A * 0.10884806248538730623*units.Unit('erg s-1 cm-2 AA')/lam**2
+    templates = specutils.Spectrum1D(spectral_axis=lam, flux=flam)
+
+    # Absolute magnitudes for each template
+    Mt = mag_ab(templates, band)
+
+    # Using the identity matrix for the coefficients yields trivial test cases
+    coeff = np.diag(np.ones(3))
+
+    # Using the absolute magnitudes of the templates as reference magnitudes
+    # should return one solar mass for each template.
+    stellar_mass = stellar_mass_from_reference_band(coeff, templates, Mt, band)
+    truth = 1
+    np.testing.assert_allclose(stellar_mass, truth)
+
+    # Solution for given magnitudes without template mixing
+    Mb = np.array([10, 20, 30])
+    stellar_mass = stellar_mass_from_reference_band(coeff, templates, Mb, band)
+    truth = np.power(10, -0.4*(Mb-Mt))
+    np.testing.assert_allclose(stellar_mass, truth)
+
+
+@pytest.mark.skipif(not HAS_SPECUTILS, reason='test requires specutils')
 def test_load_spectral_data():
 
     from skypy.galaxy.spectrum import load_spectral_data
@@ -201,6 +284,12 @@ def test_combine_spectra():
     assert ab.shape == (2, 3)
     assert ab.flux.unit == units.Jy
     assert np.allclose([[1, 2, 3], [4, 5, 6]], ab.flux.value)
+
+    abb = combine_spectra(ab, b)
+    assert isinstance(ab, specutils.Spectrum1D)
+    assert abb.shape == (3, 3)
+    assert abb.flux.unit == units.Jy
+    assert np.allclose([[1, 2, 3], [4, 5, 6], [4, 5, 6]], abb.flux.value)
 
     c = specutils.Spectrum1D(spectral_axis=[1., 2., 3., 4.]*units.AA,
                              flux=[1., 2., 3., 4.]*units.Jy)
