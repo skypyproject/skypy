@@ -4,116 +4,224 @@ r"""Models of galaxy luminosities.
 
 import numpy as np
 
-import skypy.utils.astronomy as astro
-from skypy.utils.random import schechter
+from ..utils.random import schechter
+from ..utils import uses_default_cosmology, dependent_argument
 
 
 __all__ = [
-    'herbel_luminosities',
+    'absolute_to_apparent_magnitude',
+    'apparent_to_absolute_magnitude',
+    'distance_modulus',
+    'luminosity_in_band',
+    'luminosity_from_absolute_magnitude',
+    'absolute_magnitude_from_luminosity',
+    'schechter_lf_magnitude',
 ]
 
 
-def herbel_luminosities(redshift, alpha, a_m, b_m, size=None,
-                        x_min=0.00305,
-                        x_max=1100.0, resolution=100):
-
-    r"""Model of Herbel et al (2017)
-
-    Luminosities following the Schechter luminosity function following the
-    Herbel et al. [1]_ model.
+def absolute_to_apparent_magnitude(absolute_magnitude, distance_modulus):
+    '''Convert absolute to apparent magnitude.
 
     Parameters
     ----------
-    redshift : (nz,) array-like
-        The redshift values at which to sample luminosities.
-    alpha : float or int
-        The alpha parameter in the Schechter luminosity function.
-    a_m, b_m : float or int
-        Factors parameterising the characteristic absolute magnitude M_* as
-        a linear function of redshift according to Equation 3.3 in [1]_.
-    size: int, optional
-         Output shape of luminosity samples. If size is None and redshift
-         is a scalar, a single sample is returned. If size is None and
-         redshift is an array, an array of samples is returned with the same
-         shape as redshift.
-    x_min, x_max : float or int, optional
-        Lower and upper luminosity bounds in units of L*.
-    resolution : int, optional
-        Resolution of the inverse transform sampling spline. Default is 100.
+    absolute_magnitude : array_like
+        Absolute magnitude M.
+    distance_modulus : array_like
+        Distance modulus DM.
+
+    Returns
+    -------
+    apparent_magnitude : array_like
+        Apparent magnitude M + DM.
+
+    '''
+
+    return np.add(absolute_magnitude, distance_modulus)
+
+
+def apparent_to_absolute_magnitude(apparent_magnitude, distance_modulus):
+    '''Convert apparent to absolute magnitude.
+
+    Parameters
+    ----------
+    apparent_magnitude : array_like
+        Apparent magnitude m.
+    distance_modulus : array_like
+        Distance modulus DM.
+
+    Returns
+    -------
+    absolute_magnitude : array_like
+        Absolute magnitude m - DM.
+
+    '''
+
+    return np.subtract(apparent_magnitude, distance_modulus)
+
+
+@uses_default_cosmology
+def distance_modulus(redshift, cosmology):
+    '''Compute the distance modulus.
+
+    Parameters
+    ----------
+    redshift : array_like
+        Redshift of objects.
+    cosmology : Cosmology, optional
+        The cosmology from which the luminosity distance is taken. If not
+        given, the default cosmology is used.
+
+    Returns
+    -------
+    distmod : array_like
+        The distance modulus m - M for each input redshift.
+    '''
+
+    return cosmology.distmod(redshift).value
+
+
+luminosity_in_band = {
+    'Lsun_U': 6.33,
+    'Lsun_B': 5.31,
+    'Lsun_V': 4.80,
+    'Lsun_R': 4.60,
+    'Lsun_I': 4.51,
+}
+'''Bandpass magnitude of reference luminosities.
+
+These values can be used for conversion in `absolute_magnitude_from_luminosity`
+and `luminosity_from_absolute_magnitude`. The `Lsun_{UBVRI}` values contain the
+absolute AB magnitude of the sun in Johnson/Cousins bands from [1]_.
+
+References
+----------
+.. [1] Christopher N. A. Willmer 2018 ApJS 236 47
+
+'''
+
+
+def luminosity_from_absolute_magnitude(absolute_magnitude, zeropoint=None):
+    """Converts absolute magnitudes to luminosities.
+
+    Parameters
+    ----------
+    absolute_magnitude : array_like
+        Input absolute magnitudes.
+    zeropoint : float or str, optional
+        Zeropoint for the conversion. If a string is given, uses the reference
+        luminosities from `luminosity_in_band`.
 
     Returns
     -------
     luminosity : array_like
-        Drawn luminosities from the Schechter luminosity function. Luminosities
-        are B-band luminosities in units of solar luminosity.
-
-    Notes
-    -----
-    The Schechter luminosity function is given as
-
-    .. math::
-        \Phi(L, z) = \frac{\Phi_\star(z)}{L_\star(z)}
-            \left(\frac{L}{L_\star(z)}\right)^\alpha
-            \exp\left(-\frac{L}{L_\star(z)}\right) \;.
-
-    Here the luminosity is defined as
-
-    .. math::
-
-        L = 10^{-0.4M} \;,
-
-    with absolute magnitude :math:`M`. Furthermore, Herbel et al. [1]_
-    introduced
-
-    .. math::
-
-        \Phi_\star(z) = b_\phi \exp(a_\phi z) \;,
-        M_\star(z) = a_M z + b_M \;.
-
-    Now we have to rescale the Schechter function by the comoving element and
-    get
-
-    .. math::
-
-        \phi(L,z) = \frac{d_H d_M^2}{E(z)}  \Phi(L,z)\;.
-
-    References
-    ----------
-    .. [1] Herbel J., Kacprzak T., Amara A. et al., 2017, Journal of Cosmology
-        and Astroparticle Physics, Issue 08, article id. 035 (2017)
-
-    Examples
-    --------
-    >>> import skypy.galaxy.luminosity as lum
-
-    Sample 100 luminosity values at redshift z = 1.0 with
-    a_m = -0.9408582, b_m = -20.40492365, alpha = -1.3.
-
-    >>> luminosities = lum.herbel_luminosities(1.0, -1.3, -0.9408582,
-    ...                                         -20.40492365, size=100)
-
-    Sample a luminosity value for every redshift in an array z with
-    a_m = -0.9408582, b_m = -20.40492365, alpha = -1.3.
-
-    >>> z = np.linspace(0,2, 100)
-    >>> luminosities = lum.herbel_luminosities(z, -1.3, -0.9408582,
-    ...                                         -20.40492365)
+        Luminosity values.
 
     """
 
-    if size is None and np.shape(redshift):
-        size = np.shape(redshift)
+    if zeropoint is None:
+        zeropoint = 0.
+    elif isinstance(zeropoint, str):
+        if zeropoint not in luminosity_in_band:
+            raise KeyError('unknown zeropoint `{}`'.format(zeropoint))
+        zeropoint = -luminosity_in_band[zeropoint]
 
-    # this is the AB zeropoint of the B-band in units of solar luminosity
-    zeropoint = -4.73
-
-    luminosity_star = _calculate_luminosity_star(redshift, a_m, b_m, zeropoint)
-
-    x_sample = schechter(alpha, x_min, x_max, resolution=resolution, size=size)
-
-    return luminosity_star * x_sample
+    return 10.**(-0.4*np.add(absolute_magnitude, zeropoint))
 
 
-def _calculate_luminosity_star(redshift, a_m, b_m, zeropoint=None):
-    absolute_magnitude_star = a_m * redshift + b_m
-    return astro.luminosity_from_absolute_magnitude(absolute_magnitude_star, zeropoint)
+def absolute_magnitude_from_luminosity(luminosity, zeropoint=None):
+    """Converts luminosities to absolute magnitudes.
+
+    Parameters
+    ----------
+    luminosity : array_like
+        Input luminosity.
+    zeropoint : float, optional
+        Zeropoint for the conversion. If a string is given, uses the reference
+        luminosities from `luminosity_in_band`.
+
+    Returns
+    -------
+    absolute_magnitude : array_like
+        Absolute magnitude values.
+
+    """
+
+    if zeropoint is None:
+        zeropoint = 0.
+    elif isinstance(zeropoint, str):
+        if zeropoint not in luminosity_in_band:
+            raise KeyError('unknown zeropoint `{}`'.format(zeropoint))
+        zeropoint = -luminosity_in_band[zeropoint]
+
+    return -2.5*np.log10(luminosity) - zeropoint
+
+
+@uses_default_cosmology
+@dependent_argument('M_star', 'redshift')
+@dependent_argument('alpha', 'redshift')
+def schechter_lf_magnitude(redshift, M_star, alpha, m_lim, cosmology, size=None,
+                           x_max=1e3, resolution=1000):
+    r'''Sample magnitudes from a Schechter luminosity function.
+
+    Given a list of galaxy redshifts, and an apparent magnitude limit, sample
+    galaxy absolute magnitudes from a Schechter luminosity function.
+
+    Parameters
+    ----------
+    redshift : array_like
+        Galaxy redshifts for which to sample magnitudes.
+    M_star : array_like or function
+        Characteristic absolute magnitude, either constant, or an array with
+        values for each galaxy, or a function of galaxy redshift.
+    alpha : array_like or function
+        Schechter function index, either a constant, or an array of values for
+        each galaxy, or a function of galaxy redshift.
+    m_lim : float
+        Apparent magnitude limit.
+    cosmology : Cosmology, optional
+        Cosmology object for converting apparent and absolute magnitudes. If
+        no cosmology is given, the default cosmology is used.
+    size : int, optional
+        Explicit size for the sampling. If not given, one magnitude is sampled
+        for each redshift.
+
+    Returns
+    -------
+    magnitude : array_like
+        Absolute magnitude sampled from a Schechter luminosity function for
+        each input galaxy redshift.
+
+    Examples
+    --------
+
+    Sample a number of blue (alpha = -1.3, M_star = -20.5) galaxy magnitudes
+    brighter than m = 22.0 around redshift 0.5.
+
+    >>> import numpy as np
+    >>> from skypy.galaxy.luminosity import schechter_lf_magnitude
+    >>> z = np.random.uniform(4.9, 5.1, size=20)
+    >>> M = schechter_lf_magnitude(z, -20.5, -1.3, 22.0)
+
+    '''
+
+    # only alpha scalars supported at the moment
+    if np.ndim(alpha) > 0:
+        raise NotImplementedError('only scalar alpha is supported')
+
+    # get x_min for each galaxy
+    x_min = m_lim - cosmology.distmod(redshift).value
+    x_min -= M_star
+    x_min *= -0.4
+    if np.ndim(x_min) > 0:
+        np.power(10., x_min, out=x_min)
+    else:
+        x_min = 10.**x_min
+
+    # sample magnitudes
+    #   x == 10**(-0.4*(M - M_star))
+    M = schechter(alpha, x_min, x_max, resolution, size=size)
+    np.log10(M, out=M)
+    M *= -2.5
+    M += M_star
+
+    return M

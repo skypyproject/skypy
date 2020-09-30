@@ -74,9 +74,9 @@ def mass_quenched(halo_mass, offset, width):
     Parameters
     ----------
     halo_mass: (nh,) array_like
-        Array of halo masses in units of solar mass, :math:`M_{sun}`.
+        Array of halo masses in units of solar mass, Msun.
     offset: float
-        Halo mass in :math:`M_{sun}` at which quenching probability is 50%.
+        Halo mass in Msun at which quenching probability is 50%.
     width: float
         Width of the error function.
 

@@ -43,6 +43,13 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python }}
+    - name: Cache SkyPy data
+      uses: actions/cache@v2
+      with:
+        path: ~/.skypy/cache
+        key: ${{ runner.os }}-skypy-cache-${{ matrix.toxenv }}-${{ github.run_id }}
+        restore-keys: |
+          ${{ runner.os }}-skypy-cache-${{ matrix.toxenv }}-
     - name: Install Dependencies
       run: |
         pip install tox

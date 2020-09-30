@@ -1,0 +1,71 @@
+name: Mirror Examples
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+      - 'v[0-9]+.*'
+    tags:
+      - 'v[0-9]+.*'
+    paths:
+      - 'examples/**'
+      - LICENSE.rst
+jobs:
+  examples:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout SkyPy
+      uses: actions/checkout@v2
+      with:
+        repository: skypyproject/skypy
+        path: skypy
+        fetch-depth: 0
+    - name: Checkout Examples
+      uses: actions/checkout@v2
+      with:
+        repository: skypyproject/examples
+        token: ${{ secrets.SKYPYBOT_TOKEN }}
+        path: examples
+        fetch-depth: 0
+    - name: Configure git
+      run: |
+        git config --global user.name skypybot
+        git config --global user.email skypybot@users.noreply.github.com
+        git config --global advice.detachedHead false
+    - name: Mirror Branches and Tags
+      run: |
+        cd skypy
+        branches=$(git branch -r --format='%(refname:short)' | cut -d/ -f2 | grep -E '^master$|^v')
+        tags=$(git tag | grep -E '^v')
+        refs="${branches} ${tags}"
+        cd ..
+
+        for ref in ${refs}; do
+          cd examples
+          (git checkout -qf ${ref} 2> /dev/null && echo "update ${ref}") || (git checkout -qf --orphan ${ref} && echo "create ${ref}")
+          git rm -qrf .
+          cd ..
+
+          cd skypy
+          git checkout -qf ${ref}
+          cd ..
+
+          cp -a $(find skypy -maxdepth 2 -name LICENSE.rst) examples/
+          cp -a skypy/examples/* examples/
+
+          cd examples
+          git add -Af
+          git checkout master -- README.md
+          git diff --cached --quiet || git commit -qm "${ref}"
+          if [ -n "$(echo "${tags}" | grep "${ref}")" ]; then
+            git tag -f ${ref}
+            git symbolic-ref -q HEAD > /dev/null && git checkout -qf --detach && git branch -qD ${ref}
+          fi
+          cd ..
+        done
+    - name: Push Changes
+      run: |
+        cd examples
+        git push -f --all origin
+        git push -f --tags origin
+        cd ..
