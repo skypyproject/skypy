@@ -128,6 +128,11 @@ class Pipeline:
         # - keep track where functions need to be called
         #   functions are tuples (function name, [function args])
         functions = {}
+        for job in self.parameters:
+            self.dag.add_node(job)
+            self.skip_jobs.add(job)
+        self.dag.add_node('cosmology')
+        self.skip_jobs.add('cosmology')
         for job, settings in self.config.items():
             self.dag.add_node(job)
             if isinstance(settings, tuple):
