@@ -4,8 +4,9 @@ This module provides methods to run pipelines of functions with dependencies
 and handle their results.
 """
 
+from astropy.cosmology import default_cosmology
 from astropy.table import Table
-from copy import deepcopy
+from copy import copy, deepcopy
 from importlib import import_module
 import builtins
 import networkx
@@ -108,6 +109,7 @@ class Pipeline:
         # config contains settings for all variables and table initialisation
         # table_config contains settings for all table columns
         self.config = deepcopy(configuration)
+        self.cosmology = self.config.pop('cosmology', {})
         self.parameters = self.config.pop('parameters', {})
         self.table_config = self.config.pop('tables', {})
         default_table = ('astropy.table.Table',)
@@ -128,6 +130,9 @@ class Pipeline:
         functions = {}
         for job in self.parameters:
             self.dag.add_node(job)
+            self.skip_jobs.add(job)
+        self.dag.add_node('cosmology')
+        self.skip_jobs.add('cosmology')
         for job, settings in self.config.items():
             self.dag.add_node(job)
             if isinstance(settings, tuple):
@@ -188,28 +193,35 @@ class Pipeline:
         self.parameters.update(parameters)
 
         # initialise state object
-        self.state = {}
+        self.state = copy(self.parameters)
 
-        # go through the jobs in dependency order
-        for job in networkx.topological_sort(self.dag):
-            if job in self.skip_jobs:
-                continue
-            elif job in self.parameters:
-                self.state[job] = self.parameters[job]
-            elif job in self.config:
-                settings = self.config.get(job)
-                self.state[job] = self.get_value(settings)
-            else:
-                table, column = job.split('.')
-                settings = self.table_config[table][column]
-                names = [n.strip() for n in column.split(',')]
-                if len(names) > 1:
-                    # Multi-column assignment
-                    t = Table(self.get_value(settings), names=names)
-                    self.state[table].add_columns(t.columns.values())
+        # Initialise cosmology from config parameters or use astropy default
+        if self.cosmology:
+            self.state['cosmology'] = self.get_value(self.cosmology)
+        else:
+            self.state['cosmology'] = default_cosmology.get()
+
+        # Execute pipeline setting state cosmology as the default
+        with default_cosmology.set(self.state['cosmology']):
+
+            # go through the jobs in dependency order
+            for job in networkx.topological_sort(self.dag):
+                if job in self.skip_jobs:
+                    continue
+                elif job in self.config:
+                    settings = self.config.get(job)
+                    self.state[job] = self.get_value(settings)
                 else:
-                    # Single column assignment
-                    self.state[table][column] = self.get_value(settings)
+                    table, column = job.split('.')
+                    settings = self.table_config[table][column]
+                    names = [n.strip() for n in column.split(',')]
+                    if len(names) > 1:
+                        # Multi-column assignment
+                        t = Table(self.get_value(settings), names=names)
+                        self.state[table].add_columns(t.columns.values())
+                    else:
+                        # Single column assignment
+                        self.state[table][column] = self.get_value(settings)
 
     def write(self, file_format=None, overwrite=False):
         r'''Write pipeline results to disk.
