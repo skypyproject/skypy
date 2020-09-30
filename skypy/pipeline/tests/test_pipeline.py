@@ -169,6 +169,9 @@ def test_multi_column_assignment_failure(na, nt):
 
 def test_pipeline_cosmology():
 
+    # Initial default_cosmology
+    initial_default = default_cosmology.get()
+
     # Test pipeline correctly sets default cosmology from parameters
     from astropy.cosmology import FlatLambdaCDM
     H0, Om0 = 70, 0.3
@@ -189,8 +192,8 @@ def test_pipeline_cosmology():
     assert pipeline['test'].H0.value == H0_new
     assert pipeline['test'].Om0 == Om0_new
 
-
-
+    # Check that the astropy default cosmology is unchanged
+    assert default_cosmology.get() == initial_default
 
 
 def teardown_module(module):
