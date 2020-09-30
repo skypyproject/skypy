@@ -8,6 +8,7 @@ from astropy.cosmology import default_cosmology
 from astropy.table import Table
 from copy import copy, deepcopy
 from importlib import import_module
+from skypy.pipeline import skypy_config
 import builtins
 import networkx
 
@@ -15,28 +16,6 @@ import networkx
 __all__ = [
     'Pipeline',
 ]
-
-
-def _yaml_tag(loader, tag, node):
-    '''handler for generic YAML tags
-
-    tags are stored as a tuple `(tag, value)`
-    '''
-
-    import yaml
-
-    if isinstance(node, yaml.ScalarNode):
-        value = loader.construct_scalar(node)
-    elif isinstance(node, yaml.SequenceNode):
-        value = loader.construct_sequence(node)
-    elif isinstance(node, yaml.MappingNode):
-        value = loader.construct_mapping(node)
-
-    # tags without arguments have empty string value
-    if value == '':
-        return tag,
-
-    return tag, value
 
 
 class Pipeline:
@@ -56,16 +35,7 @@ class Pipeline:
             The name of the configuration file.
 
         '''
-        import yaml
-
-        # register custom tags
-        yaml.SafeLoader.add_multi_constructor('!', _yaml_tag)
-
-        # read the file
-        with open(filename, 'r') as stream:
-            config = yaml.safe_load(stream) or {}
-
-        # construct the pipeline
+        config = skypy_config(filename)
         return cls(config)
 
     def __init__(self, configuration):
