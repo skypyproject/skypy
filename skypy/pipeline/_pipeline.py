@@ -190,29 +190,33 @@ class Pipeline:
         # initialise state object
         self.state = copy(self.parameters)
 
-        # initialise cosmology
+        # Initialise cosmology from config parameters or use astropy default
         if self.cosmology:
             self.state['cosmology'] = self.get_value(self.cosmology)
-            default_cosmology.set(self.state['cosmology'])
+        else:
+            self.state['cosmology'] = default_cosmology.get()
 
-        # go through the jobs in dependency order
-        for job in networkx.topological_sort(self.dag):
-            if job in self.skip_jobs:
-                continue
-            elif job in self.config:
-                settings = self.config.get(job)
-                self.state[job] = self.get_value(settings)
-            else:
-                table, column = job.split('.')
-                settings = self.table_config[table][column]
-                names = [n.strip() for n in column.split(',')]
-                if len(names) > 1:
-                    # Multi-column assignment
-                    t = Table(self.get_value(settings), names=names)
-                    self.state[table].add_columns(t.columns.values())
+        # Execute pipeline setting state cosmology as the default
+        with default_cosmology.set(self.state['cosmology']):
+
+            # go through the jobs in dependency order
+            for job in networkx.topological_sort(self.dag):
+                if job in self.skip_jobs:
+                    continue
+                elif job in self.config:
+                    settings = self.config.get(job)
+                    self.state[job] = self.get_value(settings)
                 else:
-                    # Single column assignment
-                    self.state[table][column] = self.get_value(settings)
+                    table, column = job.split('.')
+                    settings = self.table_config[table][column]
+                    names = [n.strip() for n in column.split(',')]
+                    if len(names) > 1:
+                        # Multi-column assignment
+                        t = Table(self.get_value(settings), names=names)
+                        self.state[table].add_columns(t.columns.values())
+                    else:
+                        # Single column assignment
+                        self.state[table][column] = self.get_value(settings)
 
     def write(self, file_format=None, overwrite=False):
         r'''Write pipeline results to disk.
