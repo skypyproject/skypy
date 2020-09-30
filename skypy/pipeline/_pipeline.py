@@ -181,7 +181,6 @@ class Pipeline:
                     self.dag.add_edge(c, d)
                     c, d = c.rpartition('.')[0], c
 
-
     def execute(self, parameters={}):
         r'''Run a pipeline.
 
