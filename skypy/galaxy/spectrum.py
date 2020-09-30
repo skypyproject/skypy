@@ -223,7 +223,7 @@ def magnitudes_from_templates(coefficients, templates, bandpass, redshift=None,
         the number of objects is less than resolution their magnitudes are
         calculated directly without interpolation.
     stellar_mass : (ng,) array_like, optional
-        Optional array of stellar masses for each galaxy in units of Msun.
+        Optional array of stellar masses for each galaxy in template units.
     distance_modulus : (ng,) array_like, optional
         Optional array of distance moduli for each galaxy.
 
@@ -261,7 +261,7 @@ def magnitudes_from_templates(coefficients, templates, bandpass, redshift=None,
     else:
         M = mag_ab(templates, bandpass, redshift).reshape(M_shape)
 
-    stellar_mass = 1 if stellar_mass is None else stellar_mass.to_value(units.Msun)
+    stellar_mass = 1 if stellar_mass is None else stellar_mass
     distance_modulus = 0 if distance_modulus is None else distance_modulus
 
     flux = np.sum(coefficients[:, np.newaxis, :] * np.power(10, -0.4*M), axis=2)
@@ -295,12 +295,12 @@ def stellar_mass_from_reference_band(coefficients, templates, magnitudes, bandpa
     Returns
     -------
     stellar_mass : (ng,) array_like
-        Stellar mass of each galaxy in solar masses.
+        Stellar mass of each galaxy in template units.
     '''
 
     flux = np.power(10, -0.4 * mag_ab(templates, bandpass))
     stellar_mass = np.power(10, -0.4*magnitudes) / np.sum(coefficients * flux, axis=1)
-    return stellar_mass * units.Msun
+    return stellar_mass
 
 
 def load_spectral_data(name):
