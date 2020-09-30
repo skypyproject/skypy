@@ -173,6 +173,7 @@ def test_pipeline_cosmology():
     initial_default = default_cosmology.get()
 
     # Test pipeline correctly sets default cosmology from parameters
+    # N.B. astropy cosmology class has not implemented __eq__ for comparison
     from astropy.cosmology import FlatLambdaCDM
     H0, Om0 = 70, 0.3
     config = {'parameters': {'H0': H0, 'Om0': Om0},
