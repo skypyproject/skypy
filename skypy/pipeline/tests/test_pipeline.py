@@ -14,6 +14,12 @@ def setup_module(module):
     module.multi_column_array = lambda nrows, ncols: np.ones((nrows, ncols))
     module.multi_column_tuple = lambda nrows, ncols: (np.ones(nrows),) * ncols
 
+    # Define function for testing pipeline cosmology
+    from skypy.utils import uses_default_cosmology
+    @uses_default_cosmology
+    def return_cosmology(cosmology):
+        return cosmology
+    module.return_cosmology = return_cosmology
 
 def test_pipeline():
 
@@ -160,6 +166,31 @@ def test_multi_column_assignment_failure(na, nt):
     pipeline = Pipeline(config)
     with pytest.raises(ValueError):
         pipeline.execute()
+
+def test_pipeline_cosmology():
+
+    # Test pipeline correctly sets default cosmology from parameters
+    from astropy.cosmology import FlatLambdaCDM
+    H0, Om0 = 70, 0.3
+    config = {'parameters': {'H0': H0, 'Om0': Om0},
+              'cosmology': ('astropy.cosmology.FlatLambdaCDM', ['$H0', '$Om0']),
+              'test': ('skypy.pipeline.tests.test_pipeline.return_cosmology', ),
+              }
+    pipeline = Pipeline(config)
+    pipeline.execute()
+    assert type(pipeline['test']) == FlatLambdaCDM
+    assert pipeline['test'].H0.value == H0
+    assert pipeline['test'].Om0 == Om0
+
+    # Test pipeline correctly updates cosmology from new parameters
+    H0_new, Om0_new = 75, 0.25
+    pipeline.execute({'H0': H0_new, 'Om0': Om0_new})
+    assert type(pipeline['test']) == FlatLambdaCDM
+    assert pipeline['test'].H0.value == H0_new
+    assert pipeline['test'].Om0 == Om0_new
+
+
+
 
 
 def teardown_module(module):
