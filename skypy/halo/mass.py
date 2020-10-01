@@ -7,30 +7,39 @@ Models
    :nosignatures:
    :toctree: ../api/
 
-   press_schechter
+   ellipsoidal_collapse_function
    halo_mass_function
    halo_mass_sampler
-   ellipsoidal_collapse_function
-   press_schechter_collapse_function
-   sheth_tormen_collapse_function
+   number_subhalos
    press_schechter
+   press_schechter_collapse_function
+   press_schechter_mass_function
    sheth_tormen
+   sheth_tormen_collapse_function
+   sheth_tormen_mass_function
+   subhalo_mass_sampler
 '''
 
 import numpy as np
 from scipy import integrate
+from scipy.special import gamma
+from skypy.utils.special import gammaincc
 from functools import partial
 from astropy import units
+from skypy.utils.random import schechter
 
 __all__ = [
+    'ellipsoidal_collapse_function',
     'halo_mass_function',
     'halo_mass_sampler',
-    'sheth_tormen_collapse_function',
+    'number_subhalos',
+    'press_schechter',
     'press_schechter_collapse_function',
-    'sheth_tormen_mass_function',
     'press_schechter_mass_function',
     'sheth_tormen',
-    'press_schechter',
+    'sheth_tormen_collapse_function',
+    'sheth_tormen_mass_function',
+    'subhalo_mass_sampler',
  ]
 
 
@@ -151,6 +160,7 @@ def halo_mass_sampler(m_min, m_max, resolution, wavenumber, power_spectrum,
         the collapse function.
     size: int, optional
         Output shape of samples. Default is None.
+
 
     Returns
     --------
@@ -312,3 +322,124 @@ def _sigma_squared(M, k, Pk, growth_function, cosmology):
 def _dlns_dlnM(sigma, M):
     ds = np.gradient(sigma, M)
     return np.absolute((M / sigma) * ds)
+
+
+def number_subhalos(halo_mass, alpha, beta, gamma_M, x, m_min, noise=True):
+    r'''Number of subhalos.
+    This function calculates the number of subhalos above a given initial mass
+    for a parent halo of given mass according to the model of Vale & Ostriker
+    2004 [1]_ equation (7). The number of subhalos returned can optionally be
+    sampled from a Poisson distribution with that mean.
+
+    Parameters
+    -----------
+    halo_mass : (nm, ) array_like
+        The mass of the halo parent, in units of solar mass.
+    alpha, beta : float
+        Parameters that determines the subhalo Schechter function. Its the amplitude
+        is defined by equation (2) in [1].
+    gamma_M : float
+        Present day mass fraction in subhalos.
+    x : float
+        Parameter that accounts for the added mass of the original, unstripped
+        subhalos.
+    m_min : array_like
+        Original mass of the least massive subhalo, in units of solar mass.
+        Current stripped mass is given by :math:`x m_{min}`.
+    noise : bool, optional
+        Poisson-sample the number of subhalos. Default is `True`.
+
+    Returns
+    --------
+    nsubhalos: array_like
+        Array of the number of subhalos assigned to parent halos with mass halo_mass.
+
+    Examples
+    ---------
+    >>> import numpy as np
+    >>> from skypy.halo import mass
+
+    This gives the number of subhalos in a parent halo of mass :math:`10^{12} M_\odot`
+
+    >>> halo, min_sh = 1.0e12, 1.0e6
+    >>> alpha, beta, gamma_M = 1.9, 1.0, 0.3
+    >>> x = 3
+    >>> nsh = mass.number_subhalos(halo, alpha, beta, gamma_M, x, min_sh)
+
+    References
+    ----------
+    .. [1] Vale, A. and Ostriker, J.P. (2005), arXiv: astro-ph/0402500.
+    '''
+    # m_min is the minimum original subhalo mass
+    x_low = m_min / (x * beta * halo_mass)
+    # Subhalo amplitude from equation [2]
+    A = gamma_M / (beta * gamma(2.0 - alpha))
+    # The mean number of subhalos above a mass threshold
+    # can be obtained by integrating equation (1) in [1]
+    n_subhalos = A * gammaincc(1.0 - alpha, x_low) * gamma(1.0 - alpha)
+
+    # Random number of subhalos following a Poisson distribution
+    # with mean n_subhalos
+    return np.random.poisson(n_subhalos) if noise else n_subhalos
+
+
+def subhalo_mass_sampler(halo_mass, nsubhalos, alpha, beta,
+                         x, m_min, resolution=100):
+    r'''Subhalo mass sampler.
+    This function samples the original, unstriped masses of subhaloes from the
+    subhalo mass function of their parent halo with a constant mass stripping
+    factor given by equation (1) in [1]_ and the upper subhalo mass limit from
+    [2]_.
+
+    Parameters
+    -----------
+    halo_mass : (nm, ) array_like
+        The mass of the halo parent, in units of solar mass.
+    nsubhalos: (nm, ) array_like
+        Array of the number of subhalos assigned to parent halos with mass `halo_mass`.
+    alpha, beta : float
+        Parameters that determines the subhalo Schechter function. Its the amplitude
+        is defined by equation 2 in [1].
+    x : float
+        Parameter that accounts for the added mass of the original, unstripped
+        subhalos.
+    m_min : float
+        Original mass of the least massive subhalo, in units of solar mass.
+        Current stripped mass is given by :math:`m_{min} / x`.
+    resolution: int, optional
+        Resolution of the inverse transform sampling spline. Default is 100.
+
+    Returns
+    --------
+    sample: (nh, ) array_like
+        List of original masses drawn from the subhalo mass function for each
+        parent halo, in units of solar mass. The length corresponds to the total
+        number of subhalos for all parent halos, i.e. `np.sum(nsubhalos)`.
+
+    Examples
+    ---------
+    >>> import numpy as np
+    >>> from skypy.halo import mass
+
+    This example samples 100 subhalos for a parent halo of mass 1.0E12 Msun:
+
+    >>> halo, min_sh = 1.0e12, 1.0e6
+    >>> alpha, beta, gamma_M = 1.9, 1.0, 0.3
+    >>> x = 3
+    >>> nsh = 100
+    >>> sh = mass.subhalo_mass_sampler(halo, nsh, alpha, beta, x, min_sh)
+
+    References
+    ----------
+    .. [1] Vale, A. and Ostriker, J.P. (2004), arXiv: astro-ph/0402500.
+    .. [2] Vale, A. and Ostriker, J.P. (2004), arXiv: astro-ph/0511816.
+    '''
+    halo_mass = np.atleast_1d(halo_mass)
+    nsubhalos = np.atleast_1d(nsubhalos)
+    subhalo_list = []
+    for M, n in zip(halo_mass, nsubhalos):
+        x_min = m_min / (x * beta * M)
+        x_max = 0.5 / (x * beta)
+        subhalo_mass = schechter(alpha, x_min, x_max, resolution, size=n, scale=x * beta * M)
+        subhalo_list.append(subhalo_mass)
+    return np.concatenate(subhalo_list)
