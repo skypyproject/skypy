@@ -25,10 +25,8 @@ __all__ = [
 
 def vale_ostriker(halo_kwargs, subhalo_kwargs, galaxy_kwargs):
     """Vale & Ostriker abundance matching.
-    Takes catalogs of (sub)halos and galaxies and performs abundance matching
-    following the method outlined in Vale & Ostriker (2004) assuming
-    monotonicity between halo mass and galaxy luminosity to return an
-    abundance-matched table of halo-galaxy pairs.
+    Generate matched arrays of (sub)halos masses and galaxy absolute magnitudes
+    following the abundance matching model in Vale & Ostriker (2004).
 
     Parameters
     ----------
