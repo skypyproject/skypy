@@ -35,11 +35,11 @@ values as keyword arguments.
 """
 
 import argparse
-from astropy.cosmology import z_at_value
+from astropy.cosmology import default_cosmology, z_at_value
 from astropy.table import Table, vstack
 import numpy as np
 from skypy import __version__ as skypy_version
-from skypy.pipeline import Pipeline
+from skypy.pipeline import Pipeline, skypy_config
 import sys
 
 
@@ -64,12 +64,25 @@ def main(args=None):
 
     if args.lightcone:
 
-        # Equally spaced comoving distance slices and corresponding redshifts
-        pipeline = Pipeline.read(args.config)
-        cosmology = pipeline.get_value('cosmology')
-        lightcone_z_min = float(args.lightcone[0])
-        lightcone_z_max = float(args.lightcone[1])
+        # Parse lightcone parameters
+        z_min = float(args.lightcone[0])
+        z_max = float(args.lightcone[1])
         n_slice = int(args.lightcone[2])
+        config = skypy_config(args.config)
+        if 'parameters' not in config:
+            config['parameters'] = {}
+        config['parameters']['lightcone_z_min'] = z_min
+        config['parameters']['lightcone_z_max'] = z_max
+        config['parameters']['slice_z_min'] = None
+        config['parameters']['slice_z_max'] = None
+        config['parameters']['slice_z_mid'] = None
+        pipeline = Pipeline(config)
+
+        # Equally spaced comoving distance slices and corresponding redshifts
+        if 'cosmology' in config:
+            cosmology = pipeline.get_value(config['cosmology'])
+        else:
+            cosmology = default_cosmology.get()
         chi_min = cosmology.comoving_distance(z_min)
         chi_max = cosmology.comoving_distance(z_max)
         chi = np.linspace(chi_min, chi_max, n_slice + 1)
@@ -78,15 +91,12 @@ def main(args=None):
         z_mid = [z_at_value(cosmology.comoving_distance, c, z_min, z_max) for c in chi_mid]
         redshift_slices = zip([z_min] + z, z + [z_max], z_mid)
 
-        tables = {k: Table() for k in pipeline.config.get('tables', {}).keys()}
-        for slice_z_min, slice_z_max, slice_z in redshift_slices:
-            pipeline = Pipeline.read(args.config)
-            pipeline.config['lightcone_z_min'] = lightcone_z_min
-            pipeline.config['lightcone_z_max'] = lightcone_z_max
-            pipeline.config['slice_z_min'] = slice_z_min
-            pipeline.config['slice_z_max'] = slice_z_max
-            pipeline.config['slice_z'] = slice_z
-            pipeline.execute()
+        tables = {k: Table() for k in pipeline.table_config.keys()}
+        for slice_z_min, slice_z_max, slice_z_mid in redshift_slices:
+            parameters = {'slice_z_min': slice_z_min,
+                          'slice_z_max': slice_z_max,
+                          'slice_z_mid': slice_z_mid}
+            pipeline.execute(parameters=parameters)
             for k, v in tables.items():
                 tables[k] = vstack((v, pipeline[k]))
 
