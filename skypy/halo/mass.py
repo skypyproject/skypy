@@ -370,9 +370,8 @@ def number_subhalos(halo_mass, alpha, beta, gamma_M, x, m_min, noise=True):
     ----------
     .. [1] Vale, A. and Ostriker, J.P. (2005), arXiv: astro-ph/0402500.
     '''
-    m_star = beta * halo_mass
     # m_min is the minimum original subhalo mass
-    x_low = m_min / (x * m_star)
+    x_low = m_min / (x * beta * halo_mass)
     # Subhalo amplitude from equation [2]
     A = gamma_M / (beta * gamma(2.0 - alpha))
     # The mean number of subhalos above a mass threshold
