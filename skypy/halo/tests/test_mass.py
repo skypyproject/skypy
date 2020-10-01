@@ -133,12 +133,12 @@ def test_subhalo_mass_sampler():
     alpha, beta, gamma_M, x = 1.9, 1.0, 0.3, 1.0
     nsh = mass.number_subhalos(halo_mass, alpha, beta, gamma_M, x, shm_min)
 
-    array_output = mass.subhalo_mass_sampler(halo_mass, nsh, alpha, beta, gamma_M, x, shm_min, 100)
+    array_output = mass.subhalo_mass_sampler(halo_mass, nsh, alpha, beta, x, shm_min, 100)
 
     assert len(array_output) == np.sum(nsh)
 
     # For each halo test that each subhalo satisfy shm_min < m < shm_max
     shm_max = 0.5 * halo_mass
-    sh_mass = mass.subhalo_mass_sampler(halo_mass, nsh, alpha, beta, gamma_M, x, shm_min, 100)
+    sh_mass = mass.subhalo_mass_sampler(halo_mass, nsh, alpha, beta, x, shm_min, 100)
 
     assert np.all(sh_mass > shm_min) and np.all(sh_mass < shm_max)

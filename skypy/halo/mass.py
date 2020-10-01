@@ -383,8 +383,8 @@ def number_subhalos(halo_mass, alpha, beta, gamma_M, x, m_min, noise=True):
     return np.random.poisson(n_subhalos) if noise else n_subhalos
 
 
-def subhalo_mass_sampler(halo_mass, nsubhalos, alpha, beta, gamma_M,
-                         x, m_min, resolution):
+def subhalo_mass_sampler(halo_mass, nsubhalos, alpha, beta,
+                         x, m_min, resolution=100):
     r'''Subhalo mass sampler.
     This function samples the original, unstriped masses of subhaloes from the
     subhalo mass function of their parent halo with a constant mass stripping
@@ -400,16 +400,14 @@ def subhalo_mass_sampler(halo_mass, nsubhalos, alpha, beta, gamma_M,
     alpha, beta : float
         Parameters that determines the subhalo Schechter function. Its the amplitude
         is defined by equation 2 in [1].
-    gamma_M : float
-        Present day mass fraction in subhalos.
     x : float
         Parameter that accounts for the added mass of the original, unstripped
         subhalos.
-    m_min : array_like
+    m_min : float
         Original mass of the least massive subhalo, in units of solar mass.
         Current stripped mass is given by :math:`m_{min} / x`.
-    resolution: int
-        Resolution of the inverse transform sampling spline.
+    resolution: int, optional
+        Resolution of the inverse transform sampling spline. Default is 100.
 
     Returns
     --------
@@ -423,17 +421,13 @@ def subhalo_mass_sampler(halo_mass, nsubhalos, alpha, beta, gamma_M,
     >>> import numpy as np
     >>> from skypy.halo import mass
 
-    This example samples from the subhalo mass function given given by equation 4 in [1]
-    with a parent halo of mass :math:`10^{12} M_\odot`. The number of subhalos can be obtained
+    This example samples 100 subhalos for a parent halo of mass 1.0E12 Msun:
 
     >>> halo, min_sh = 1.0e12, 1.0e6
     >>> alpha, beta, gamma_M = 1.9, 1.0, 0.3
     >>> x = 3
-    >>> nsh = mass.number_subhalos(halo, alpha, beta, gamma_M, x, min_sh)
-
-    The list of subhalo masses:
-
-    >>> sh = mass.subhalo_mass_sampler(halo, nsh, alpha, beta, gamma_M, x, min_sh, 100)
+    >>> nsh = 10
+    >>> sh = mass.subhalo_mass_sampler(halo, nsh, alpha, beta, x, min_sh, 100)
 
     References
     ----------
