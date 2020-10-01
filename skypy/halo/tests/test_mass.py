@@ -109,7 +109,7 @@ def test_number_subhalos():
     # Test analytic solution for the mean number of subhalos
     halo_mass = 1.0e12
     shm_min = halo_mass / 100
-    alpha, beta, gamma_M, x = 0.0, 1.0, 0.3, 1.0
+    alpha, beta, gamma_M, x = 0.0, 0.39, 0.18, 3.0
     nsh_output = mass.number_subhalos(halo_mass, alpha, beta, gamma_M, x, shm_min, noise=False)
     nsh_mean = (gamma_M / beta) * np.exp(- shm_min / (x * beta * halo_mass))
 
