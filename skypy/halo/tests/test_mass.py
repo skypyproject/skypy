@@ -111,10 +111,7 @@ def test_number_subhalos():
     shm_min = halo_mass / 100
     alpha, beta, gamma_M, x = 0.0, 1.0, 0.3, 1.0
     nsh_output = mass.number_subhalos(halo_mass, alpha, beta, gamma_M, x, shm_min, noise=False)
-
-    x_low = 0.01
-    A = gamma_M
-    nsh_mean = A * np.exp(-x_low)
+    nsh_mean = (gamma_M / beta) * np.exp(- shm_min / (x * beta * halo_mass))
 
     assert round(nsh_output) == round(nsh_mean)
 
