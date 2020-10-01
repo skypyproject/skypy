@@ -179,9 +179,9 @@ def test_template_spectra():
     np.testing.assert_allclose(mt, m + dm)
 
     # Test stellar mass
-    sm = np.array([1, 2, 3]) * units.Msun
+    sm = np.array([1, 2, 3])
     mt = magnitudes_from_templates(coefficients, spec, bp, stellar_mass=sm)
-    np.testing.assert_allclose(mt, m - 2.5*np.log10(sm.to_value('Msun')))
+    np.testing.assert_allclose(mt, m - 2.5*np.log10(sm))
 
     # Redshift interpolation test; linear interpolation sufficient over a small
     # redshift range at low relative tolerance
@@ -221,13 +221,13 @@ def test_stellar_mass_from_reference_band():
     # Using the absolute magnitudes of the templates as reference magnitudes
     # should return one solar mass for each template.
     stellar_mass = stellar_mass_from_reference_band(coeff, templates, Mt, band)
-    truth = 1 * units.Msun
+    truth = 1
     np.testing.assert_allclose(stellar_mass, truth)
 
     # Solution for given magnitudes without template mixing
     Mb = np.array([10, 20, 30])
     stellar_mass = stellar_mass_from_reference_band(coeff, templates, Mb, band)
-    truth = np.power(10, -0.4*(Mb-Mt)) * units.Msun
+    truth = np.power(10, -0.4*(Mb-Mt))
     np.testing.assert_allclose(stellar_mass, truth)
 
 
@@ -284,6 +284,12 @@ def test_combine_spectra():
     assert ab.shape == (2, 3)
     assert ab.flux.unit == units.Jy
     assert np.allclose([[1, 2, 3], [4, 5, 6]], ab.flux.value)
+
+    abb = combine_spectra(ab, b)
+    assert isinstance(ab, specutils.Spectrum1D)
+    assert abb.shape == (3, 3)
+    assert abb.flux.unit == units.Jy
+    assert np.allclose([[1, 2, 3], [4, 5, 6], [4, 5, 6]], abb.flux.value)
 
     c = specutils.Spectrum1D(spectral_axis=[1., 2., 3., 4.]*units.AA,
                              flux=[1., 2., 3., 4.]*units.Jy)

@@ -44,3 +44,4 @@ def test_classy():
     wavenumber = 1.e-1
     pzk = classy(wavenumber, redshift, Pl15massless)
     assert np.isscalar(pzk)
+    
