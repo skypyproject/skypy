@@ -18,12 +18,8 @@ def download_file(url, cache=True):
         extra_kwargs = {}
     else:
         extra_kwargs = {'pkgname': 'skypy'}
-    try:
-        filename = astropy.utils.data.download_file(
-                url, cache=cache, show_progress=False, **extra_kwargs)
-    except urllib.error.URLError:  # pragma: no cover
-        raise FileNotFoundError('data file not available: {}'.format(url))
-    return filename
+    return astropy.utils.data.download_file(
+            url, cache=cache, show_progress=False, **extra_kwargs)
 
 
 def combine_spectra(a, b):
@@ -123,7 +119,7 @@ spectrum_loaders = [
     ('DECam_(g)?(r)?(i)?(z)?(Y)?', decam_loader),
 
     # spectrum templates
-    ('(kcorrect)_([a-z]+)', skypy_data_loader, 'spectrum_templates'),
+    ('(kcorrect)_((?:raw)?spec(?:_nl)?(?:_nd)?)', skypy_data_loader, 'spectrum_templates'),
 
     # catchall file loader
     ('(.*)', file_loader),
