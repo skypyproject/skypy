@@ -85,4 +85,4 @@ def vale_ostriker(halo_kwargs, subhalo_kwargs, galaxy_kwargs):
     argsort_halos = np.argsort(mass)[-n_matches:][::-1]
     argsort_galaxies = np.argsort(magnitude)[:n_matches]
 
-    return mass[argsort_halos], magnitude[argsort_galaxies], group[argsort_halos], parent[argsort_halos]
+    return mass[argsort_halos], group[argsort_halos], parent[argsort_halos], magnitude[argsort_galaxies]

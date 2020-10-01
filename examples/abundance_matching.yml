@@ -13,8 +13,8 @@ power_spectrum: !skypy.power_spectrum.eisenstein_hu
   n_s: $n_s
   cosmology: $cosmology
 tables:
-  galaxies:
-    mass, magnitude, group, parent: !skypy.halo.abundance_matching.vale_ostriker
+  halos:
+    halo_mass, halo_group, parent_halo, galaxy_magnitude: !skypy.halo.abundance_matching.vale_ostriker
       halo_kwargs:
         m_min: 1.0E+9
         m_max: 1.0E+12
