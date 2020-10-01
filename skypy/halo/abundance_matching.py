@@ -14,11 +14,16 @@ Models
 
 """
 
-from astropy.table import hstack, vstack
+import numpy as np
+from skypy.halo.mass import press_schechter, number_subhalos, subhalo_mass_sampler
+from skypy.galaxy.luminosity import schechter_lf_magnitude
+
+__all__ = [
+    'vale_ostriker',
+]
 
 
-def vale_ostriker(halos, galaxies, subhalos=None,
-                  mass='mass', luminosity='luminosity', join_type='inner'):
+def vale_ostriker(halo_kwargs, subhalo_kwargs, galaxy_kwargs):
     """Vale & Ostriker abundance matching.
     Takes catalogs of (sub)halos and galaxies and performs abundance matching
     following the method outlined in Vale & Ostriker (2004) assuming
@@ -27,32 +32,59 @@ def vale_ostriker(halos, galaxies, subhalos=None,
 
     Parameters
     ----------
-    halos, galaxies : Astropy Table
-        Tables of halos and galaxies to be matched.
-    subhalos : Astropy Table
-        Optional table of subhalos to be matched..
-    mass, luminosity : str
-        Halo mass and galaxy luminosity column names.
-    join_type : str
-        Join type (‘inner’ | ‘exact’ | ‘outer’), default is inner
+    halo_kwargs : dict
+        Dictionary of keyword arguments for skypy.halo.press_schechter.
+    subhalo_kwargs : dict
+        Dictionary of keyword arguments for skypy.halo.number_subhalos and
+        skypy.halo.subhalo_mass_sampler.
+    galaxy_kwargs : dict
+        Dictionary of keyword arguments for skypy.galaxy.schechter_lf_magnitude.
 
     Returns
     -------
-    matched_Table : Astropy Table
-        Table of abundance-matched halos and galaxies.
-
+    mass : array_like
+        Array of (sub)halo masses.
+    magnitude : array_like
+        Array of galaxy absolute magnitudes.
+    group : array_like
+        Array of halo group ids.
+    parent : array_like
+        Array of boolean values indicating if the halo is a parent.
     References
     ----------
     .. [1] Vale A., Ostriker J. P., 2004, MNRAS, 353, 189
     """
 
-    if subhalos:
-        if mass not in halos.columns:
-            raise ValueError("{} is not a column in halos".format(mass))
-        if mass not in subhalos.columns:
-            raise ValueError("{} is not a column in subhalos".format(mass))
-        halos = vstack((halos, subhalos))
+    # Sample halo and subhalo masses
+    halo_mass = press_schechter(**halo_kwargs)
+    halo_mass[::-1].sort()
+    n_subhalos = number_subhalos(halo_mass, **subhalo_kwargs)
+    del(subhalo_kwargs['gamma_M'])
+    del(subhalo_kwargs['noise'])
+    subhalo_mass = subhalo_mass_sampler(halo_mass, n_subhalos, **subhalo_kwargs)
 
-    halos.sort(mass, reverse=True)
-    galaxies.sort(luminosity, reverse=True)
-    return hstack([halos, galaxies], join_type=join_type)
+    # Assign subhalos to groups with their parent halos
+    n_halos = halo_kwargs.get('size')
+    halo_group = np.arange(n_halos)
+    indexing = np.zeros(n_halos + 1, dtype=int)
+    indexing[1:] = np.cumsum(n_subhalos)
+    total_subhalos = indexing[-1]
+    subhalo_group = np.empty(total_subhalos)
+    for first, last, id in zip(indexing[:-1], indexing[1:], halo_group):
+        subhalo_group[first:last] = id
+
+    # Concatenate halos and subhalos
+    mass = np.concatenate([halo_mass, subhalo_mass])
+    group = np.concatenate([halo_group, subhalo_group])
+    parent = np.array((True,) * n_halos + (False,) * total_subhalos)
+
+    # Sample galaxy magnitudes
+    n_galaxies = galaxy_kwargs.get('size')
+    magnitude = schechter_lf_magnitude(**galaxy_kwargs)
+
+    # Sort halos and galaxies by mass and magnitude
+    n_matches = min(n_halos + total_subhalos, n_galaxies)
+    argsort_halos = np.argsort(mass)[-n_matches:][::-1]
+    argsort_galaxies = np.argsort(magnitude)[:n_matches]
+
+    return mass[argsort_halos], magnitude[argsort_galaxies], group[argsort_halos], parent[argsort_halos]
