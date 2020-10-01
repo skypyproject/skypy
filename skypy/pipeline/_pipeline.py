@@ -131,27 +131,22 @@ class Pipeline:
         # Create a Directed Acyclic Graph of all jobs and dependencies
         self.dag = networkx.DiGraph()
 
-        # Jobs that do not call a function but require entries in the DAG
-        # for the purpose of maintaining dependencies
-        self.skip_jobs = set()
-
         # - add nodes for each variable, table and column
         # - add edges for the table dependencies
         # - keep track where functions need to be called
         #   functions are tuples (function name, [function args])
         functions = {}
         for job, settings in self.config.items():
-            self.dag.add_node(job)
+            self.dag.add_node(job, skip=False)
             if isinstance(settings, tuple):
                 functions[job] = settings
         for table, columns in self.table_config.items():
             table_complete = '.'.join((table, 'complete'))
             self.dag.add_node(table_complete)
             self.dag.add_edge(table, table_complete)
-            self.skip_jobs.add(table_complete)
             for column, settings in columns.items():
                 job = '.'.join((table, column))
-                self.dag.add_node(job)
+                self.dag.add_node(job, skip=False)
                 self.dag.add_edge(table, job)
                 self.dag.add_edge(job, table_complete)
                 if isinstance(settings, tuple):
@@ -163,7 +158,6 @@ class Pipeline:
                         subjob = '.'.join((table, name))
                         self.dag.add_node(subjob)
                         self.dag.add_edge(job, subjob)
-                        self.skip_jobs.add(subjob)
 
         # go through functions and add edges for all references
         for job, settings in functions.items():
@@ -216,7 +210,9 @@ class Pipeline:
 
             # go through the jobs in dependency order
             for job in networkx.topological_sort(self.dag):
-                if job in self.skip_jobs:
+                node = self.dag.nodes[job]
+                skip = node.get('skip', True)
+                if skip:
                     continue
                 elif job in self.config:
                     settings = self.config.get(job)
@@ -320,5 +316,5 @@ class Pipeline:
             try:
                 item = item[key]
             except KeyError as e:
-                raise KeyError('unknown reference: ' + name) from e
+                raise KeyError('unknown label: ' + name) from e
         return item
