@@ -426,8 +426,8 @@ def subhalo_mass_sampler(halo_mass, nsubhalos, alpha, beta,
     >>> halo, min_sh = 1.0e12, 1.0e6
     >>> alpha, beta, gamma_M = 1.9, 1.0, 0.3
     >>> x = 3
-    >>> nsh = 10
-    >>> sh = mass.subhalo_mass_sampler(halo, nsh, alpha, beta, x, min_sh, 100)
+    >>> nsh = 100
+    >>> sh = mass.subhalo_mass_sampler(halo, nsh, alpha, beta, x, min_sh)
 
     References
     ----------
