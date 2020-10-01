@@ -137,3 +137,13 @@ def test_subhalo_mass_sampler():
     shm_max = 0.5 * halo_mass
 
     assert np.all(array_output > shm_min) and np.all(array_output < shm_max)
+
+    # Repeat the tests for arrays of halos
+    halo_mass = np.array([1.0e12, 1.0e14])
+    nsh = np.array([10, 100])
+    shm_max = 0.5 * halo_mass
+    array_output = mass.subhalo_mass_sampler(halo_mass, nsh, alpha, beta, x, shm_min, 100)
+
+    assert len(array_output) == np.sum(nsh)
+    assert np.all(array_output[:10] > shm_min) and np.all(array_output[:10] < 0.5 * halo_mass[0])
+    assert np.all(array_output[10:] > shm_min) and np.all(array_output[10:] < 0.5 * halo_mass[1])
