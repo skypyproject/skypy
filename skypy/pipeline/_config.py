@@ -1,3 +1,5 @@
+import builtins
+from importlib import import_module
 import yaml
 
 __all__ = [
@@ -5,24 +7,38 @@ __all__ = [
 ]
 
 
-def _yaml_tag(loader, tag, node):
-    '''handler for generic YAML tags
+def import_function(qualname):
+    '''load function from fully qualified name'''
+    path = qualname.split('.')
+    module = builtins
+    for i, key in enumerate(path[:-1]):
+        if not hasattr(module, key):
+            module = import_module('.'.join(path[:i+1]))
+        else:
+            module = getattr(module, key)
+    function = getattr(module, path[-1])
+    return function
 
-    tags are stored as a tuple `(tag, value)`
+
+def function_tag(loader, name, node):
+    '''load function from !function tag
+
+    tags are stored as a tuple `(function, args)`
     '''
 
     if isinstance(node, yaml.ScalarNode):
-        value = loader.construct_scalar(node)
+        args = loader.construct_scalar(node)
     elif isinstance(node, yaml.SequenceNode):
-        value = loader.construct_sequence(node)
+        args = loader.construct_sequence(node)
     elif isinstance(node, yaml.MappingNode):
-        value = loader.construct_mapping(node)
+        args = loader.construct_mapping(node)
 
-    # tags without arguments have empty string value
-    if value == '':
-        return tag,
+    try:
+        function = import_function(name)
+    except (ModuleNotFoundError, AttributeError) as e:  # pragma: no cover
+        raise ImportError(f'{e}\n{node.start_mark}') from e
 
-    return tag, value
+    return (function,) if args == '' else (function, args)
 
 
 def skypy_config(filename):
@@ -34,6 +50,6 @@ def skypy_config(filename):
         The name of the configuration file.
     '''
 
-    yaml.SafeLoader.add_multi_constructor('!', _yaml_tag)
+    yaml.SafeLoader.add_multi_constructor('!', function_tag)
     with open(filename, 'r') as stream:
         return yaml.safe_load(stream) or {}

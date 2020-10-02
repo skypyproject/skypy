@@ -7,51 +7,13 @@ and handle their results.
 from astropy.cosmology import default_cosmology
 from astropy.table import Table
 from copy import copy, deepcopy
-from importlib import import_module
 from skypy.pipeline import skypy_config
-import builtins
 import networkx
 
 
 __all__ = [
     'Pipeline',
 ]
-
-
-def import_function(qualname):
-    '''load function from fully qualified name'''
-    path = qualname.split('.')
-    module = builtins
-    for i, key in enumerate(path[:-1]):
-        if not hasattr(module, key):
-            module = import_module('.'.join(path[:i+1]))
-        else:
-            module = getattr(module, key)
-    function = getattr(module, path[-1])
-    return function
-
-
-def function_tag(loader, name, node):
-    '''load function from !function tag
-
-    tags are stored as a tuple `(function, args)`
-    '''
-
-    import yaml
-
-    if isinstance(node, yaml.ScalarNode):
-        args = loader.construct_scalar(node)
-    elif isinstance(node, yaml.SequenceNode):
-        args = loader.construct_sequence(node)
-    elif isinstance(node, yaml.MappingNode):
-        args = loader.construct_mapping(node)
-
-    try:
-        function = import_function(name)
-    except (ModuleNotFoundError, AttributeError) as e:  # pragma: no cover
-        raise ImportError(f'{e}\n{node.start_mark}') from e
-
-    return (function,) if args == '' else (function, args)
 
 
 class Pipeline:
