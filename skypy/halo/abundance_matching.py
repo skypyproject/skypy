@@ -77,8 +77,8 @@ def vale_ostriker(halo_kwargs, subhalo_kwargs, galaxy_kwargs):
     parent = np.array((True,) * n_halos + (False,) * total_subhalos)
 
     # Sample galaxy magnitudes
-    n_galaxies = galaxy_kwargs.get('size')
     magnitude = schechter_lf_magnitude(**galaxy_kwargs)
+    n_galaxies = len(magnitude)
 
     # Sort halos and galaxies by mass and magnitude
     n_matches = min(n_halos + total_subhalos, n_galaxies)
