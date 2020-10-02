@@ -7,7 +7,7 @@ and handle their results.
 from astropy.cosmology import default_cosmology
 from astropy.table import Table
 from copy import copy, deepcopy
-from skypy.pipeline import skypy_config
+from ._config import load_skypy_yaml
 import networkx
 
 
@@ -33,7 +33,7 @@ class Pipeline:
             The name of the configuration file.
 
         '''
-        config = skypy_config(filename)
+        config = load_skypy_yaml(filename)
         return cls(config)
 
     def __init__(self, configuration):

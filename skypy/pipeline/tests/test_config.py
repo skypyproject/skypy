@@ -1,18 +1,18 @@
 from astropy.utils.data import get_pkg_data_filename
 from collections.abc import Callable
 import pytest
-from skypy.pipeline import skypy_config
+from skypy.pipeline import load_skypy_yaml
 
 
-def test_config():
+def test_load_skypy_yaml():
 
     # Read empty config file
     filename = get_pkg_data_filename('data/empty_config.yml')
-    assert skypy_config(filename) == {}
+    assert load_skypy_yaml(filename) == {}
 
     # Read config file and check entries are parsed to the correct types
     filename = get_pkg_data_filename('data/test_config.yml')
-    config = skypy_config(filename)
+    config = load_skypy_yaml(filename)
     assert isinstance(config['test_int'], int)
     assert isinstance(config['test_float'], float)
     assert isinstance(config['test_str'], str)
@@ -25,9 +25,9 @@ def test_config():
     # Bad function
     filename = get_pkg_data_filename('data/bad_function.yml')
     with pytest.raises(ImportError):
-        skypy_config(filename)
+        load_skypy_yaml(filename)
 
     # Bad module
     filename = get_pkg_data_filename('data/bad_module.yml')
     with pytest.raises(ImportError):
-        skypy_config(filename)
+        load_skypy_yaml(filename)

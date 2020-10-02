@@ -3,7 +3,7 @@ from importlib import import_module
 import yaml
 
 __all__ = [
-    'skypy_config',
+    'load_skypy_yaml',
 ]
 
 
@@ -41,7 +41,7 @@ def function_tag(loader, name, node):
     return (function,) if args == '' else (function, args)
 
 
-def skypy_config(filename):
+def load_skypy_yaml(filename):
     '''Read a SkyPy pipeline configuration from a YAML file.
 
     Parameters
