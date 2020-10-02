@@ -41,8 +41,8 @@ def angular_size(physical_size, redshift, cosmology):
     Examples
     --------
     >>> from astropy import units
-    >>> angular_size(10*units.kpc, 1)
-    <Quantity 5.85990062e-06 rad>
+    >>> from skypy.galaxy.size import angular_size
+    >>> r = angular_size(10*units.kpc, 1)
 
     References
     ----------
