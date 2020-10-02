@@ -40,7 +40,7 @@ You can also sample halos:
 .. plot::
 
     halo_massST = pipeline['sheth-tormen']
-    halo_massPS = pipeline['press-schechter
+    halo_massPS = pipeline['press-schechter]
 
     plt.hist(halo_massST, histtype='step', label='Sheth-Tormen')
     plt.hist(halo_massPS, histtype='step', label='Press-Schechter')
