@@ -48,16 +48,3 @@ press-schechter: !skypy.halo.mass.press_schechter
   growth_function: $growth_0
   cosmology: $cosmology
   size: $size
-# ellipsoidal: !skypy.halo.mass.halo_mass_sampler
-#   m_min: $m_min
-#   m_max: $m_max
-#   resolution: $resolution
-#   wavenumber: $k
-#   power_spectrum: $power_spectrum
-#   growth_function: $growth_0
-#   cosmology: $cosmology
-#   collapse_function: !skypy.halo.mass.ellipsoidal_collapse_function
-#     sigma: $sigma
-#     params: $params_model
-#   params: $params_model
-#   size: $size
