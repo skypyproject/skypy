@@ -103,3 +103,47 @@ def test_ellipsoidal_collapse_function():
     sigma = np.sqrt(mass._sigma_squared(m_array, k, Pk, 1.0, cosmo))
     fps = mass.press_schechter_collapse_function(sigma)
     assert allclose(fps, PS_fsigma)
+
+
+def test_number_subhalos():
+    # Test analytic solution for the mean number of subhalos
+    halo_mass = 1.0e12
+    shm_min = halo_mass / 100
+    alpha, beta, gamma_M, x = 0.0, 0.39, 0.18, 3.0
+    nsh_output = mass.number_subhalos(halo_mass, alpha, beta, gamma_M, x, shm_min, noise=False)
+    nsh_mean = (gamma_M / beta) * np.exp(- shm_min / (x * beta * halo_mass))
+
+    assert round(nsh_output) == round(nsh_mean)
+
+    # Test for array input of halo parents
+    halo_parents = np.array([1.0e12, 1.0e14])
+    shm_min = 1.0e6
+    alpha, beta, gamma_M, x = 1.9, 1.0, 0.3, 1.0
+    array_nsh = mass.number_subhalos(halo_parents, alpha, beta, gamma_M, x, shm_min)
+
+    assert len(array_nsh) == len(halo_parents)
+
+
+def test_subhalo_mass_sampler():
+    # Test the output shape is correct given the sample size
+    halo_mass, shm_min = 1.0e12, 1.0e6
+    alpha, beta, x = 1.9, 1.0, 1.0
+    nsh = 20
+    array_output = mass.subhalo_mass_sampler(halo_mass, nsh, alpha, beta, x, shm_min, 100)
+
+    assert len(array_output) == np.sum(nsh)
+
+    # For each halo test that each subhalo satisfy shm_min < m < shm_max
+    shm_max = 0.5 * halo_mass
+
+    assert np.all(array_output > shm_min) and np.all(array_output < shm_max)
+
+    # Repeat the tests for arrays of halos
+    halo_mass = np.array([1.0e12, 1.0e14])
+    nsh = np.array([10, 100])
+    shm_max = 0.5 * halo_mass
+    array_output = mass.subhalo_mass_sampler(halo_mass, nsh, alpha, beta, x, shm_min, 100)
+
+    assert len(array_output) == np.sum(nsh)
+    assert np.all(array_output[:10] > shm_min) and np.all(array_output[:10] < 0.5 * halo_mass[0])
+    assert np.all(array_output[10:] > shm_min) and np.all(array_output[10:] < 0.5 * halo_mass[1])
