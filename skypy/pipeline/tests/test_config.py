@@ -1,4 +1,5 @@
 from astropy.utils.data import get_pkg_data_filename
+import pytest
 from skypy.pipeline import skypy_config
 
 
@@ -17,3 +18,13 @@ def test_config():
     assert isinstance(config['test_func'], tuple)
     assert isinstance(config['test_cosmology'][1], dict)
     assert isinstance(config['tables']['test_table_1']['test_column_3'][1], list)
+
+    # Bad function
+    filename = get_pkg_data_filename('data/bad_function.yml')
+    with pytest.raises(ImportError):
+        skypy_config(filename)
+
+    # Bad module
+    filename = get_pkg_data_filename('data/bad_module.yml')
+    with pytest.raises(ImportError):
+        skypy_config(filename)
