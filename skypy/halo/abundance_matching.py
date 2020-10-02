@@ -42,12 +42,12 @@ def vale_ostriker(halo_kwargs, subhalo_kwargs, galaxy_kwargs):
     -------
     mass : array_like
         Array of (sub)halo masses.
-    magnitude : array_like
-        Array of galaxy absolute magnitudes.
     group : array_like
         Array of halo group ids.
     parent : array_like
         Array of boolean values indicating if the halo is a parent.
+    magnitude : array_like
+        Array of galaxy absolute magnitudes.
     References
     ----------
     .. [1] Vale A., Ostriker J. P., 2004, MNRAS, 353, 189
