@@ -55,12 +55,12 @@ def main(args=None):
         args = sys.argv[1:]
 
     args = parser.parse_args(args or ['--help'])
-
     config = skypy_config(args.config)
+
     if 'lightcone' in config:
-        pipeline = Lightcone(args.config)
+        pipeline = Lightcone(config)
     else:
-        pipeline = Pipeline(args.config)
+        pipeline = Pipeline(config)
     pipeline.execute()
     pipeline.write(file_format=args.format, overwrite=args.overwrite)
     return(0)
