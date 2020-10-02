@@ -4,8 +4,6 @@ Dark Matter Halos (`skypy.halo`)
 
 .. automodule:: skypy.halo
 
-Halo mass function
-==================
 You can reproduce figure 2 in Sheth and Tormen 1999
 and plot the collapse functions for different halo models:
 
@@ -35,7 +33,7 @@ and plot the collapse functions for different halo models:
     plt.ylabel(r'$f_c(\nu)$')
     # show plot labels
     plt.legend()
-    plt.show()
+    # plt.show()
 
 You can also sample halos:
 
@@ -46,7 +44,7 @@ You can also sample halos:
 
     plt.hist(halo_massST, histtype='step', label='Sheth-Tormen')
     plt.hist(halo_massPS, histtype='step', label='Press-Schechter')
-    # plt.hist(halo_massEM, histtype='step', label='Ellipsoidal')  
+    # plt.hist(halo_massEM, histtype='step', label='Ellipsoidal')
 
     # axis label
     plt.xlabel(r'Halo mass $M_\odot$')
