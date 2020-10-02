@@ -9,6 +9,7 @@ and plot the collapse functions for different halo models:
 
 .. plot::
 
+    %matplotlib inline
     import matplotlib.pyplot as plt
     from skypy.pipeline import Pipeline
 
@@ -33,7 +34,6 @@ and plot the collapse functions for different halo models:
     plt.ylabel(r'$f_c(\nu)$')
     # show plot labels
     plt.legend()
-    # plt.show()
 
 You can also sample halos:
 
@@ -51,7 +51,6 @@ You can also sample halos:
 
     # show plot labels
     plt.legend()
-    plt.show()
 
 
 Abundance Matching (`skypy.halo.abundance_matching`)
