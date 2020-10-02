@@ -6,17 +6,12 @@ Dark Matter Halos (`skypy.halo`)
 
 Halo mass function
 ==================
-You can reproduce figure 2 in Sheth and Tormen 1999. For that, you can execute the
-pipeline
-
-.. literalinclude:: examples/halo.yml
-   :language: yaml
-   :caption:
-
-And plot the collapse functions for different halo models:
+You can reproduce figure 2 in Sheth and Tormen 1999 
+and plot the collapse functions for different halo models:
 
 .. plot::
 
+    import matplotlib.pyplot as plt
     from skypy.pipeline import Pipeline
 
     # read the example pipeline
