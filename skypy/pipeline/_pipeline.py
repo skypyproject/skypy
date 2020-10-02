@@ -4,8 +4,9 @@ This module provides methods to run pipelines of functions with dependencies
 and handle their results.
 """
 
+from astropy.cosmology import default_cosmology
 from astropy.table import Table
-from copy import deepcopy
+from copy import copy, deepcopy
 from importlib import import_module
 import builtins
 import networkx
@@ -16,26 +17,40 @@ __all__ = [
 ]
 
 
-def _yaml_tag(loader, tag, node):
-    '''handler for generic YAML tags
+def import_function(qualname):
+    '''load function from fully qualified name'''
+    path = qualname.split('.')
+    module = builtins
+    for i, key in enumerate(path[:-1]):
+        if not hasattr(module, key):
+            module = import_module('.'.join(path[:i+1]))
+        else:
+            module = getattr(module, key)
+    function = getattr(module, path[-1])
+    return function
 
-    tags are stored as a tuple `(tag, value)`
+
+def function_tag(loader, name, node):
+    '''load function from !function tag
+
+    tags are stored as a tuple `(function, args)`
     '''
 
     import yaml
 
     if isinstance(node, yaml.ScalarNode):
-        value = loader.construct_scalar(node)
+        args = loader.construct_scalar(node)
     elif isinstance(node, yaml.SequenceNode):
-        value = loader.construct_sequence(node)
+        args = loader.construct_sequence(node)
     elif isinstance(node, yaml.MappingNode):
-        value = loader.construct_mapping(node)
+        args = loader.construct_mapping(node)
 
-    # tags without arguments have empty string value
-    if value == '':
-        return tag,
+    try:
+        function = import_function(name)
+    except (ModuleNotFoundError, AttributeError) as e:  # pragma: no cover
+        raise ImportError(f'{e}\n{node.start_mark}') from e
 
-    return tag, value
+    return (function,) if args == '' else (function, args)
 
 
 class Pipeline:
@@ -58,7 +73,7 @@ class Pipeline:
         import yaml
 
         # register custom tags
-        yaml.SafeLoader.add_multi_constructor('!', _yaml_tag)
+        yaml.SafeLoader.add_multi_constructor('!', function_tag)
 
         # read the file
         with open(filename, 'r') as stream:
@@ -80,14 +95,12 @@ class Pipeline:
         Each step in the pipeline is configured by a dictionary specifying
         a variable name and the associated value.
 
-        A value that is a tuple `(function_name, function_args)` specifies that
-        the value will be the result of a function call. The first item is the
-        fully qualified function name, and the second value specifies the
-        function arguments.
+        A value that is a tuple `(function, args)` specifies that the value will
+        be the result of a function call. The first item is a callable, and the
+        second value specifies the function arguments.
 
-        If a function argument is a tuple `(variable_name,)`, it refers to the
-        values of previous step in the pipeline. The tuple item must be the
-        name of the reference variable.
+        If a function argument is a string `$variable_name`, it refers to the
+        values of previous step in the pipeline.
 
         'configuration' should contain the name and configuration of each
         variable and/or an entry named 'tables'. 'tables' should contain a set
@@ -108,8 +121,10 @@ class Pipeline:
         # config contains settings for all variables and table initialisation
         # table_config contains settings for all table columns
         self.config = deepcopy(configuration)
+        self.cosmology = self.config.pop('cosmology', {})
+        self.parameters = self.config.pop('parameters', {})
         self.table_config = self.config.pop('tables', {})
-        default_table = ('astropy.table.Table',)
+        default_table = (Table,)
         self.config.update({k: v.pop('.init', default_table)
                             for k, v in self.table_config.items()})
 
@@ -120,11 +135,16 @@ class Pipeline:
         # for the purpose of maintaining dependencies
         self.skip_jobs = set()
 
-        # - add nodes for each variable, table and column
+        # - add nodes for each parameter, variable, table and column
         # - add edges for the table dependencies
         # - keep track where functions need to be called
         #   functions are tuples (function name, [function args])
         functions = {}
+        for job in self.parameters:
+            self.dag.add_node(job)
+            self.skip_jobs.add(job)
+        self.dag.add_node('cosmology')
+        self.skip_jobs.add('cosmology')
         for job, settings in self.config.items():
             self.dag.add_node(job)
             if isinstance(settings, tuple):
@@ -163,7 +183,7 @@ class Pipeline:
                 else:
                     raise KeyError(d)
 
-    def execute(self):
+    def execute(self, parameters={}):
         r'''Run a pipeline.
 
         This function runs a pipeline of functions to generate variables and
@@ -171,28 +191,49 @@ class Pipeline:
         determine a non-blocking order of execution that resolves any
         dependencies, see [1]_.
 
+        Parameters
+        ----------
+        parameters : dict
+            Updated parameter values for this execution.
+
         References
         ----------
         .. [1] https://networkx.github.io/documentation/stable/
 
         '''
-        for job in networkx.topological_sort(self.dag):
-            if job in self.skip_jobs:
-                continue
-            elif job in self.config:
-                settings = self.config.get(job)
-                setattr(self, job, self.get_value(settings))
-            else:
-                table, column = job.split('.')
-                settings = self.table_config[table][column]
-                names = [n.strip() for n in column.split(',')]
-                if len(names) > 1:
-                    # Multi-column assignment
-                    t = Table(self.get_value(settings), names=names)
-                    getattr(self, table).add_columns(t.columns.values())
+        # update parameter state
+        self.parameters.update(parameters)
+
+        # initialise state object
+        self.state = copy(self.parameters)
+
+        # Initialise cosmology from config parameters or use astropy default
+        if self.cosmology:
+            self.state['cosmology'] = self.get_value(self.cosmology)
+        else:
+            self.state['cosmology'] = default_cosmology.get()
+
+        # Execute pipeline setting state cosmology as the default
+        with default_cosmology.set(self.state['cosmology']):
+
+            # go through the jobs in dependency order
+            for job in networkx.topological_sort(self.dag):
+                if job in self.skip_jobs:
+                    continue
+                elif job in self.config:
+                    settings = self.config.get(job)
+                    self.state[job] = self.get_value(settings)
                 else:
-                    # Single column assignment
-                    getattr(self, table)[column] = self.get_value(settings)
+                    table, column = job.split('.')
+                    settings = self.table_config[table][column]
+                    names = [n.strip() for n in column.split(',')]
+                    if len(names) > 1:
+                        # Multi-column assignment
+                        t = Table(self.get_value(settings), names=names)
+                        self.state[table].add_columns(t.columns.values())
+                    else:
+                        # Single column assignment
+                        self.state[table][column] = self.get_value(settings)
 
     def write(self, file_format=None, overwrite=False):
         r'''Write pipeline results to disk.
@@ -214,7 +255,7 @@ class Pipeline:
         if file_format:
             for table in self.table_config.keys():
                 filename = '.'.join((table, file_format))
-                getattr(self, table).write(filename, overwrite=overwrite)
+                self.state[table].write(filename, overwrite=overwrite)
 
     def get_value(self, value):
         '''return the value of a field
@@ -231,23 +272,9 @@ class Pipeline:
                 # plain value
                 return value
 
-        # value is tuple (function name, [function args])
-        name = value[0]
+        # value is tuple (function, [args])
+        function = value[0]
         args = value[1] if len(value) > 1 else []
-
-        # Import function
-        function_path = name.split('.')
-        module = builtins
-        for i, key in enumerate(function_path[:-1]):
-            if not hasattr(module, key):
-                module_name = '.'.join(function_path[:i+1])
-                try:
-                    module = import_module(module_name)
-                except ModuleNotFoundError:
-                    raise ModuleNotFoundError(module_name)
-            else:
-                module = getattr(module, key)
-        function = getattr(module, function_path[-1])
 
         # Parse arguments
         parsed_args = self.get_args(args)
@@ -307,5 +334,5 @@ class Pipeline:
 
     def __getitem__(self, label):
         name, _, key = label.partition('.')
-        item = getattr(self, name)
+        item = self.state[name]
         return item[key] if key else item
