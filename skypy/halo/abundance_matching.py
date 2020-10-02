@@ -74,7 +74,9 @@ def vale_ostriker(halo_kwargs, subhalo_kwargs, galaxy_kwargs):
     # Concatenate halos and subhalos
     mass = np.concatenate([halo_mass, subhalo_mass])
     group = np.concatenate([halo_group, subhalo_group])
-    parent = np.array((True,) * n_halos + (False,) * total_subhalos)
+    parent = np.empty(n_halos+total_subhalos, dtype=bool)
+    parent[:n_halos] = True
+    parent[n_halos:] = False
 
     # Sample galaxy magnitudes
     magnitude = schechter_lf_magnitude(**galaxy_kwargs)
