@@ -107,6 +107,6 @@ class Lightcone:
 
         '''
         if file_format:
-            for name, data in self.table.items():
+            for name, data in self.tables.items():
                 filename = '.'.join((name, file_format))
                 data.write(filename, overwrite=overwrite)
