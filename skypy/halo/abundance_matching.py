@@ -41,9 +41,9 @@ def vale_ostriker(halo_kwargs, subhalo_kwargs, galaxy_kwargs):
     Returns
     -------
     mass : array_like
-        Array of (sub)halo masses.
+        Array of (sub)halo masses in units of solar masses.
     group : array_like
-        Array of halo group ids.
+        Array of halo group ID numbers.
     parent : array_like
         Array of boolean values indicating if the halo is a parent.
     magnitude : array_like
@@ -55,14 +55,13 @@ def vale_ostriker(halo_kwargs, subhalo_kwargs, galaxy_kwargs):
 
     # Sample halo and subhalo masses
     halo_mass = press_schechter(**halo_kwargs)
-    halo_mass[::-1].sort()
+    halo_mass[::-1].sort()  # Sort in-place from high to low for indexing
     n_subhalos = number_subhalos(halo_mass, **subhalo_kwargs)
-    del(subhalo_kwargs['gamma_M'])
-    del(subhalo_kwargs['noise'])
-    subhalo_mass = subhalo_mass_sampler(halo_mass, n_subhalos, **subhalo_kwargs)
+    sampler_kwargs = {k: v for k, v in subhalo_kwargs.items() if k not in ['gamma_M', 'noise']}
+    subhalo_mass = subhalo_mass_sampler(halo_mass, n_subhalos, **sampler_kwargs)
 
     # Assign subhalos to groups with their parent halos
-    n_halos = len(halos)
+    n_halos = len(halo_mass)
     halo_group = np.arange(n_halos)
     indexing = np.zeros(n_halos + 1, dtype=int)
     indexing[1:] = np.cumsum(n_subhalos)
@@ -87,4 +86,9 @@ def vale_ostriker(halo_kwargs, subhalo_kwargs, galaxy_kwargs):
     sort_mass = np.argsort(mass)[-n_matches:][::-1]
     sort_magnitudes = np.argsort(magnitude)[:n_matches]
 
-    return mass[sort_mass], group[sort_mass], parent[sort_mass], magnitude[sort_magnitudes]
+    mass = mass[sort_mass]
+    group = group[sort_mass]
+    parent = parent[sort_mass]
+    magnitude = magnitude[sort_magnitudes]
+
+    return mass, group, parent, magnitude
