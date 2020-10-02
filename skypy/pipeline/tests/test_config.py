@@ -1,4 +1,5 @@
 from astropy.utils.data import get_pkg_data_filename
+from collections.abc import Callable
 import pytest
 from skypy.pipeline import skypy_config
 
@@ -16,7 +17,9 @@ def test_config():
     assert isinstance(config['test_float'], float)
     assert isinstance(config['test_str'], str)
     assert isinstance(config['test_func'], tuple)
+    assert isinstance(config['test_cosmology'][0], Callable)
     assert isinstance(config['test_cosmology'][1], dict)
+    assert isinstance(config['tables']['test_table_1']['test_column_3'][0], Callable)
     assert isinstance(config['tables']['test_table_1']['test_column_3'][1], list)
 
     # Bad function
