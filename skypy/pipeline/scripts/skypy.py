@@ -35,11 +35,8 @@ values as keyword arguments.
 """
 
 import argparse
-from astropy.cosmology import default_cosmology, z_at_value
-from astropy.table import Table, vstack
-import numpy as np
 from skypy import __version__ as skypy_version
-from skypy.pipeline import Pipeline, skypy_config
+from skypy.pipeline import Lightcone, Pipeline, skypy_config
 import sys
 
 
@@ -52,9 +49,6 @@ def main(args=None):
                         choices=['fits', 'hdf5'], help='Table file format')
     parser.add_argument('-o', '--overwrite', action='store_true',
                         help='Whether to overwrite existing files')
-    parser.add_argument('-l', '--lightcone', nargs=3,
-                        metavar=('z_min', 'z_max', 'n_slice'),
-                        help='Lightcone simulation in redshift slices')
 
     # get system args if none passed
     if args is None:
@@ -62,54 +56,11 @@ def main(args=None):
 
     args = parser.parse_args(args or ['--help'])
 
-    if args.lightcone:
-
-        # Parse lightcone parameters
-        z_min = float(args.lightcone[0])
-        z_max = float(args.lightcone[1])
-        n_slice = int(args.lightcone[2])
-        config = skypy_config(args.config)
-        if 'parameters' not in config:
-            config['parameters'] = {}
-        config['parameters']['lightcone_z_min'] = z_min
-        config['parameters']['lightcone_z_max'] = z_max
-        config['parameters']['slice_z_min'] = None
-        config['parameters']['slice_z_max'] = None
-        config['parameters']['slice_z_mid'] = None
-        pipeline = Pipeline(config)
-
-        # Equally spaced comoving distance slices and corresponding redshifts
-        if 'cosmology' in config:
-            cosmology = pipeline.get_value(config['cosmology'])
-        else:
-            cosmology = default_cosmology.get()
-        chi_min = cosmology.comoving_distance(z_min)
-        chi_max = cosmology.comoving_distance(z_max)
-        chi = np.linspace(chi_min, chi_max, n_slice + 1)
-        chi_mid = (chi[:-1] + chi[1:]) / 2
-        z = [z_at_value(cosmology.comoving_distance, c, z_min, z_max) for c in chi[1:-1]]
-        z_mid = [z_at_value(cosmology.comoving_distance, c, z_min, z_max) for c in chi_mid]
-        redshift_slices = zip([z_min] + z, z + [z_max], z_mid)
-
-        tables = {k: Table() for k in pipeline.table_config.keys()}
-        for slice_z_min, slice_z_max, slice_z_mid in redshift_slices:
-            parameters = {'slice_z_min': slice_z_min,
-                          'slice_z_max': slice_z_max,
-                          'slice_z_mid': slice_z_mid}
-            pipeline.execute(parameters=parameters)
-            for k, v in tables.items():
-                tables[k] = vstack((v, pipeline[k]))
-
-        # Write tables to file
-        if args.format:
-            for name, table in tables.items():
-                filename = '.'.join((name, args.format))
-                table.write(filename, overwrite=args.overwrite)
-
+    config = skypy_config(args.config)
+    if 'lightcone' in config:
+        pipeline = Lightcone(args.config)
     else:
-
-        pipeline = Pipeline.read(args.config)
-        pipeline.execute()
-        pipeline.write(file_format=args.format, overwrite=args.overwrite)
-
+        pipeline = Pipeline(args.config)
+    pipeline.execute()
+    pipeline.write(file_format=args.format, overwrite=args.overwrite)
     return(0)
