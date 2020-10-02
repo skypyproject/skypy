@@ -62,7 +62,7 @@ def vale_ostriker(halo_kwargs, subhalo_kwargs, galaxy_kwargs):
     subhalo_mass = subhalo_mass_sampler(halo_mass, n_subhalos, **subhalo_kwargs)
 
     # Assign subhalos to groups with their parent halos
-    n_halos = halo_kwargs.get('size')
+    n_halos = len(halos)
     halo_group = np.arange(n_halos)
     indexing = np.zeros(n_halos + 1, dtype=int)
     indexing[1:] = np.cumsum(n_subhalos)
