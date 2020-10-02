@@ -14,6 +14,7 @@ Models
 """
 
 import numpy as np
+from astropy.units import Unit
 
 __all__ = [
     'halo_circular_velocity',
@@ -51,19 +52,20 @@ def halo_circular_velocity(halo_virial_mass, Delta_v, redshift, cosmology):
 
     >>> from astropy.cosmology import Planck15
     >>> cosmology = Planck15
-    >>> M = 10**np.arange(9.0, 12.0, 2)
-    >>> Delta_v = np.arange(1.0, 1.1, 0.1)
+    >>> halo_virial_mass = 10**np.arange(9.0, 12.0, 2) * Unit.Msun
+    >>> Delta_v = np.arange(201.0, 201.1, 0.1)
     >>> redshift = np.arange(0.3, 1, 0.5)
-    >>> properties.halo_circular_velocity(M, Delta_v, redshift, cosmology)
+    >>> properties.halo_circular_velocity(halo_virial_mass, Delta_v, redshift, cosmology)
     <Quantity [ 6.11303684, 36.72661831] km2 / (Mpc2 s2)>
 
     References
     ----------
-    .. [1] Maller and Bullock 2004 MNRAS 355 694 DOI:10.1111/j.1365-2966.2004.08349.x
+    .. [1] Barnes and Haehnelt 2010 equation 3 https://arxiv.org/pdf/1403.1873.pdf
     """
 
     virial_velocity = 96.6 * Unit('km s-1') * \
-        (Delta_v * cosmology.Om0 * cosmology.h**2) * pow((1 + redshift)/0.3,0.5) * \
-        pow(halo_virial_mass/(mass.to_value('Msun') / 1e11),1/3)
+        np.power(Delta_v * cosmology.Om0 * cosmology.h**2 / 24.4, 1.0/6.0) * \
+        np.sqrt((1 + redshift) / 3.3) * \
+        np.power(halo_virial_mass / (1.0e11 * Unit('Msun')), 1.0/3.0)
 
     return virial_velocity
