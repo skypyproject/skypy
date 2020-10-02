@@ -42,7 +42,8 @@ def angular_size(physical_size, redshift, cosmology):
     --------
     >>> from astropy import units
     >>> from skypy.galaxy.size import angular_size
-    >>> r = angular_size(10*units.kpc, 1)
+    >>> from astropy.cosmology import Planck15
+    >>> r = angular_size(10*units.kpc, 1, Planck15)
 
     References
     ----------
