@@ -66,7 +66,7 @@ def vale_ostriker(halo_kwargs, subhalo_kwargs, galaxy_kwargs):
     indexing = np.zeros(n_halos + 1, dtype=int)
     indexing[1:] = np.cumsum(n_subhalos)
     total_subhalos = indexing[-1]
-    subhalo_group = np.empty(total_subhalos)
+    subhalo_group = np.empty(total_subhalos, dtype=int)
     for first, last, id in zip(indexing[:-1], indexing[1:], halo_group):
         subhalo_group[first:last] = id
 
