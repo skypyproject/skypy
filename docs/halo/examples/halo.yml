@@ -1,0 +1,63 @@
+cosmology: !astropy.cosmology.default_cosmology.get
+A_s: 2.1982e-09
+n_s: 0.969453
+growth_0: 1.0
+mass: !numpy.logspace [9, 15, 100]
+k: !numpy.logspace [-3, 1, 100]
+power_spectrum: !skypy.power_spectrum.eisenstein_hu
+  wavenumber: $k
+  A_s: $A_s
+  n_s: $n_s
+  cosmology: $cosmology
+sigma2: !skypy.halo.mass._sigma_squared
+  M: $mass
+  k: $k
+  Pk: $power_spectrum
+  growth_function: $growth_0
+  cosmology: $cosmology
+sigma: !numpy.sqrt [$sigma2]
+delta_c: 1.69
+params_model: [0.3, 0.7, 0.3, 1.686]
+nu: !numpy.square [ !numpy.divide [$delta_c, $sigma]]
+sheth-tormen-collapse-function: !skypy.halo.mass.sheth_tormen_collapse_function
+  sigma: $sigma
+press-schechter-collapse-function: !skypy.halo.mass.press_schechter_collapse_function
+  sigma: $sigma
+ellipsoidal-collapse-function: !skypy.halo.mass.ellipsoidal_collapse_function
+  sigma: $sigma
+  params: $params_model
+m_min: 1.0E+10
+m_max: 1.0E+11
+resolution: 1000
+size: 500
+sheth-tormen: !skypy.halo.mass.sheth_tormen
+  m_min: $m_min
+  m_max: $m_max
+  resolution: $resolution
+  wavenumber: $k
+  power_spectrum: $power_spectrum
+  growth_function: $growth_0
+  cosmology: $cosmology
+  size: $size
+press-schechter: !skypy.halo.mass.press_schechter
+  m_min: $m_min
+  m_max: $m_max
+  resolution: $resolution
+  wavenumber: $k
+  power_spectrum: $power_spectrum
+  growth_function: $growth_0
+  cosmology: $cosmology
+  size: $size
+# ellipsoidal: !skypy.halo.mass.halo_mass_sampler
+#   m_min: $m_min
+#   m_max: $m_max
+#   resolution: $resolution
+#   wavenumber: $k
+#   power_spectrum: $power_spectrum
+#   growth_function: $growth_0
+#   cosmology: $cosmology
+#   collapse_function: !skypy.halo.mass.ellipsoidal_collapse_function
+#     sigma: $sigma
+#     params: $params_model
+#   params: $params_model
+#   size: $size
