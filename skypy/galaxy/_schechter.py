@@ -13,12 +13,12 @@ __all__ = [
 
 
 @uses_default_cosmology
-def schechter_lf(redshift, M_star, phi_star, alpha, m_lim, fsky, cosmology, noise=True):
+def schechter_lf(redshift, M_star, phi_star, alpha, m_lim, sky_area, cosmology, noise=True):
     r'''Sample redshifts and magnitudes from a Schechter luminosity function.
 
     Sample the redshifts and magnitudes of galaxies following a Schechter
     luminosity function with potentially redshift-dependent parameters, limited
-    by an apparent magnitude `m_lim`, for a fraction `fsky` of the sky.
+    by an apparent magnitude `m_lim`, for a sky area `sky_area`.
 
     Parameters
     ----------
@@ -37,8 +37,9 @@ def schechter_lf(redshift, M_star, phi_star, alpha, m_lim, fsky, cosmology, nois
         values for each `redshift`, or a function of redshift.
     m_lim : float
         Limiting apparent magnitude.
-    fsky : array_like
-        Sky fraction over which galaxies are sampled.
+    sky_area : astropy quantity
+        Sky area over which galaxies are sampled. Must be in astropy units
+        sr or deg2.
     cosmology : Cosmology, optional
         Cosmology object to convert apparent to absolute magnitudes. If not
         given, the default cosmology is used.
@@ -61,7 +62,7 @@ def schechter_lf(redshift, M_star, phi_star, alpha, m_lim, fsky, cosmology, nois
     '''
 
     # sample galaxy redshifts
-    z = schechter_lf_redshift(redshift, M_star, phi_star, alpha, m_lim, fsky, cosmology, noise)
+    z = schechter_lf_redshift(redshift, M_star, phi_star, alpha, m_lim, sky_area, cosmology, noise)
 
     # if a function is NOT given for M_star, phi_star, alpha, interpolate to z
     if not callable(M_star) and np.ndim(M_star) > 0:

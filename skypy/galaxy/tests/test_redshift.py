@@ -6,8 +6,9 @@ from scipy.stats import kstest
 @pytest.mark.flaky
 def test_schechter_lf_redshift():
 
-    from skypy.galaxy.redshift import schechter_lf_redshift, redshifts_from_comoving_density
+    from skypy.galaxy.redshift import schechter_lf_redshift
     from astropy.cosmology import FlatLambdaCDM
+    from astropy import units
     from scipy.special import gamma, gammaincc
 
     # fix this cosmology
@@ -19,10 +20,10 @@ def test_schechter_lf_redshift():
     phi_star = 1e-3
     alpha = -0.5
     m_lim = 30.
-    fsky = 1/41253
+    sky_area = 1.0 * units.degree * units.degree
 
     # sample redshifts
-    z_gal = schechter_lf_redshift(z, M_star, phi_star, alpha, m_lim, fsky, cosmo, noise=False)
+    z_gal = schechter_lf_redshift(z, M_star, phi_star, alpha, m_lim, sky_area, cosmo, noise=False)
 
     # the absolute magnitude limit as function of redshift
     M_lim = m_lim - cosmo.distmod(z).value
@@ -34,7 +35,8 @@ def test_schechter_lf_redshift():
     density = phi_star*gamma(alpha+1)*gammaincc(alpha+1, x_min)
 
     # turn into galaxies/surface area
-    density *= 4*np.pi*fsky*cosmo.differential_comoving_volume(z).to_value('Mpc3/sr')
+    density *= sky_area.to(units.steradian).value * \
+        cosmo.differential_comoving_volume(z).to_value('Mpc3/sr')
 
     # integrate total number
     n_gal = np.trapz(density, z, axis=-1)
@@ -58,6 +60,8 @@ def test_redshifts_from_comoving_density():
 
     from skypy.galaxy.redshift import redshifts_from_comoving_density
     from astropy.cosmology import LambdaCDM
+    from astropy import units
+    from astropy.units.core import UnitTypeError
 
     # random cosmology
     H0 = np.random.uniform(50, 100)
@@ -69,10 +73,10 @@ def test_redshifts_from_comoving_density():
     Ngal = 1000
     redshift = np.arange(0.0, 2.001, 0.1)
     density = Ngal/cosmo.comoving_volume(redshift[-1]).to_value('Mpc3')
-    fsky = 1.0
+    sky_area = 4 * np.pi * units.steradian
 
     # sample galaxies over full sky without Poisson noise
-    z_gal = redshifts_from_comoving_density(redshift, density, fsky, cosmo, noise=False)
+    z_gal = redshifts_from_comoving_density(redshift, density, sky_area, cosmo, noise=False)
 
     # make sure number of galaxies is correct (no noise)
     assert np.isclose(len(z_gal), Ngal, atol=1, rtol=0)
@@ -81,6 +85,32 @@ def test_redshifts_from_comoving_density():
     V_max = cosmo.comoving_volume(redshift[-1]).to_value('Mpc3')
     D, p = kstest(z_gal, lambda z: cosmo.comoving_volume(z).to_value('Mpc3')/V_max)
     assert p > 0.01, 'D = {}, p = {}'.format(D, p)
+
+    # test that error is returned if sky_area is smaller than 0
+    sky_area = -1 * units.steradian
+    with pytest.raises(ValueError):
+        redshifts_from_comoving_density(redshift, density, sky_area, cosmo, noise=False)
+
+    # test that error is returned if sky_area is too big
+    sky_area = 5 * np.pi * units.steradian
+    with pytest.raises(ValueError):
+        redshifts_from_comoving_density(redshift, density, sky_area, cosmo, noise=False)
+
+    # test that deg2 are transformed to sr
+    sky_area = 50000 * units.degree * units.degree
+    with pytest.raises(ValueError):
+        redshifts_from_comoving_density(redshift, density, sky_area, cosmo,
+                                        noise=False)
+
+    # test that error is returned if wrong unit is given
+    sky_area = 1 * units.degree
+    with pytest.raises(UnitTypeError):
+        redshifts_from_comoving_density(redshift, density, sky_area, cosmo, noise=False)
+
+    # test that error is returned if no unit is given
+    sky_area = 1
+    with pytest.raises(AttributeError):
+        redshifts_from_comoving_density(redshift, density, sky_area, cosmo, noise=False)
 
 
 @pytest.mark.flaky
