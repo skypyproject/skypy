@@ -1,0 +1,21 @@
+lightcone:
+  z_min: 1
+  z_max: 2
+  n_slice: 5
+cosmology: !astropy.cosmology.FlatLambdaCDM
+  H0: 67.74
+  Om0: 0.3075
+tables:
+  test_table_1:
+    test_column_1: !numpy.random.uniform
+      low: $z_min
+      high: $z_max
+      size: 10
+    test_column_2: !numpy.random.uniform
+      low: $slice_z_min
+      high: $slice_z_max
+      size: 10
+    test_column_3: !numpy.random.uniform
+      low: $slice_z_mid
+      high: $slice_z_max
+      size: 10

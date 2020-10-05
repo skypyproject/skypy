@@ -9,6 +9,7 @@ from astropy import units
 
 import os
 import urllib
+from pkg_resources import resource_filename
 
 
 def download_file(url, cache=True):
@@ -17,12 +18,8 @@ def download_file(url, cache=True):
         extra_kwargs = {}
     else:
         extra_kwargs = {'pkgname': 'skypy'}
-    try:
-        filename = astropy.utils.data.download_file(
-                url, cache=cache, show_progress=False, **extra_kwargs)
-    except urllib.error.URLError:  # pragma: no cover
-        raise FileNotFoundError('data file not available: {}'.format(url))
-    return filename
+    return astropy.utils.data.download_file(
+            url, cache=cache, show_progress=False, **extra_kwargs)
 
 
 def combine_spectra(a, b):
@@ -55,17 +52,8 @@ def file_loader(*filenames):
     return spectra[0] if len(spectra) == 1 else specutils.SpectrumList(spectra)
 
 
-def skypy_data_loader(folder, name, *tags):
-    '''load data from the skypy data repository'''
-
-    # move most of these to config?
-    request = {
-        'repo': 'https://github.com/skypyproject/data',
-        'version': '1.0',
-        'folder': urllib.parse.quote_plus(folder),
-        'name': urllib.parse.quote_plus(name),
-        'format': 'ecsv',
-    }
+def skypy_data_loader(module, name, *tags):
+    '''load data from the skypy data package'''
 
     # result is spectrum or list of spectra
     spectra = None
@@ -73,12 +61,8 @@ def skypy_data_loader(folder, name, *tags):
     # load each tag separately
     for tag in tags:
 
-        # build url from request dict and tag
-        url = '{repo:}/raw/{version:}/{folder:}/{name:}.{tag:}.{format:}'.format(
-                **request, tag=urllib.parse.quote_plus(tag))
-
-        # download file from remote server to cache
-        filename = download_file(url)
+        # get resource filename from module, name, and tag
+        filename = resource_filename(f'skypy-data.{module}', f'{name}_{tag}.ecsv')
 
         # load the data file
         data = astropy.table.Table.read(filename, format='ascii.ecsv')
@@ -135,7 +119,7 @@ spectrum_loaders = [
     ('DECam_(g)?(r)?(i)?(z)?(Y)?', decam_loader),
 
     # spectrum templates
-    ('(kcorrect)_([a-z]+)', skypy_data_loader, 'spectrum_templates'),
+    ('(kcorrect)_((?:raw)?spec(?:_nl)?(?:_nd)?)', skypy_data_loader, 'spectrum_templates'),
 
     # catchall file loader
     ('(.*)', file_loader),
