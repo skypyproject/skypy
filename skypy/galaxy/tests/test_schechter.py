@@ -18,7 +18,7 @@ def test_schechter_lf():
     phi_star = 1e-3
     alpha = -0.5
     m_lim = 30.
-    sky_area = 1.0 * units.degree * units.degree
+    sky_area = 1.0 * units.deg**2
 
     # sample redshifts and magnitudes
     z_gal, M_gal = schechter_lf(z, M_star, phi_star, alpha, m_lim, sky_area)

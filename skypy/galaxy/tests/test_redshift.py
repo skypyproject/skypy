@@ -20,7 +20,7 @@ def test_schechter_lf_redshift():
     phi_star = 1e-3
     alpha = -0.5
     m_lim = 30.
-    sky_area = 1.0 * units.degree * units.degree
+    sky_area = 1.0 * units.deg**2
 
     # sample redshifts
     z_gal = schechter_lf_redshift(z, M_star, phi_star, alpha, m_lim, sky_area, cosmo, noise=False)
@@ -35,8 +35,8 @@ def test_schechter_lf_redshift():
     density = phi_star*gamma(alpha+1)*gammaincc(alpha+1, x_min)
 
     # turn into galaxies/surface area
-    density *= sky_area.to(units.steradian).value * \
-        cosmo.differential_comoving_volume(z).to_value('Mpc3/sr')
+    density *= (sky_area *
+                cosmo.differential_comoving_volume(z)).to_value('Mpc3')
 
     # integrate total number
     n_gal = np.trapz(density, z, axis=-1)
@@ -61,7 +61,6 @@ def test_redshifts_from_comoving_density():
     from skypy.galaxy.redshift import redshifts_from_comoving_density
     from astropy.cosmology import LambdaCDM
     from astropy import units
-    from astropy.units.core import UnitsError
 
     # random cosmology
     H0 = np.random.uniform(50, 100)
@@ -86,19 +85,9 @@ def test_redshifts_from_comoving_density():
     D, p = kstest(z_gal, lambda z: cosmo.comoving_volume(z).to_value('Mpc3')/V_max)
     assert p > 0.01, 'D = {}, p = {}'.format(D, p)
 
-    # test that error is returned if sky_area is smaller than 0
-    sky_area = -1 * units.steradian
-    with pytest.raises(ValueError):
-        redshifts_from_comoving_density(redshift, density, sky_area, cosmo, noise=False)
-
-    # test that error is returned if sky_area is too big
-    sky_area = 5 * np.pi * units.steradian
-    with pytest.raises(ValueError):
-        redshifts_from_comoving_density(redshift, density, sky_area, cosmo, noise=False)
-
     # test that error is returned if wrong unit is given
     sky_area = 1 * units.degree
-    with pytest.raises(UnitsError):
+    with pytest.raises(units.UnitsError):
         redshifts_from_comoving_density(redshift, density, sky_area, cosmo, noise=False)
 
     # test that error is returned if no unit is given

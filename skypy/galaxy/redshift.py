@@ -8,7 +8,6 @@ import numpy as np
 import scipy.integrate
 import scipy.special
 from astropy import units
-from astropy.units.core import UnitTypeError
 
 from ..utils import uses_default_cosmology, broadcast_arguments, dependent_argument
 
@@ -79,6 +78,7 @@ def smail(z_median, alpha, beta, size=None):
 @dependent_argument('phi_star', 'redshift')
 @dependent_argument('alpha', 'redshift')
 @broadcast_arguments('redshift', 'M_star', 'phi_star', 'alpha')
+@units.quantity_input(sky_area=units.sr)
 def schechter_lf_redshift(redshift, M_star, phi_star, alpha, m_lim, sky_area,
                           cosmology, noise=True):
     r'''Sample redshifts from Schechter luminosity function.
@@ -104,9 +104,8 @@ def schechter_lf_redshift(redshift, M_star, phi_star, alpha, m_lim, sky_area,
         values for each `redshift`, or a function of redshift.
     m_lim : float
         Limiting apparent magnitude.
-    sky_area : astropy quantity
-        Sky area over which galaxies are sampled. Must be in astropy units
-        sr or deg2.
+    sky_area : `~astropy.units.Quantity`
+        Sky area over which galaxies are sampled. Must be in units of solid angle.
     cosmology : Cosmology, optional
         Cosmology object to convert apparent to absolute magnitudes. If not
         given, the default cosmology is used.
@@ -132,7 +131,7 @@ def schechter_lf_redshift(redshift, M_star, phi_star, alpha, m_lim, sky_area,
     >>> M_star = -20.5
     >>> phi_star = 3.5e-3
     >>> alpha = -1.3
-    >>> sky_area = 1 * units.degree * units.degree
+    >>> sky_area = 1*units.deg**2
     >>> z_gal = schechter_lf_redshift(z, M_star, phi_star, alpha, 22, sky_area)
 
     '''
@@ -178,9 +177,8 @@ def redshifts_from_comoving_density(redshift, density, sky_area, cosmology, nois
         Redshifts at which comoving number densities are provided.
     density : array_like
         Comoving galaxy number density at each redshift in Mpc-3.
-    sky_area : astropy quantity
-        Sky area over which galaxies are sampled. Must be in astropy units
-        sr or deg2.
+    sky_area : `~astropy.units.Quantity`
+        Sky area over which galaxies are sampled. Must be in units of solid angle.
     cosmology : Cosmology, optional
         Cosmology object for conversion to comoving volume. If not given, the
         default cosmology is used.
@@ -201,14 +199,10 @@ def redshifts_from_comoving_density(redshift, density, sky_area, cosmology, nois
     >>> from skypy.galaxy.redshift import redshifts_from_comoving_density
     >>> from astropy import units
     >>> z_range = np.arange(0, 1.01, 0.1)
-    >>> sky_area = 1 * units.degree * units.degree
+    >>> sky_area = 1*units.deg**2
     >>> z_gal = redshifts_from_comoving_density(z_range, 1e-3, sky_area)
 
     '''
-
-    # check sky_area and change to sr if given in deg2
-    if sky_area.to(units.steradian).value > 4*np.pi or sky_area.to(units.steradian).value < 0:
-        raise ValueError('Sky area cannot be negative or larger than full sky.')
 
     # redshift number density
     dN_dz = (cosmology.differential_comoving_volume(redshift) * sky_area).to_value('Mpc3')
