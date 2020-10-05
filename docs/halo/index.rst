@@ -10,7 +10,6 @@ it shows how you can also sample halos.
 
 .. plot::
 
-    %matplotlib inline
     import matplotlib.pyplot as plt
     from skypy.pipeline import Pipeline
 
