@@ -29,16 +29,19 @@ it shows how you can also sample halos.
     halo_massPS = pipeline['press-schechter']
 
     # set figure size
-    plt.figure(figsize=(6, 4))
+    plt.figure(figsize=(10, 4))
+
     plt.subplot(121)
     # plot different collapse functions
     plt.loglog(pipeline['nu'], ST, label='Sheth-Tormen')
     plt.loglog(pipeline['nu'], PS, label='Press-Schechter')
     plt.loglog(pipeline['nu'], EM, label='Ellipsoidal')
 
-    # axes labels
+    # axes labels and title
     plt.xlabel(r'$\nu \equiv (\delta_c / \sigma)^2$')
     plt.ylabel(r'$f_c(\nu)$')
+    plt.title('Collapse function')
+
     # show plot labels
     plt.legend()
 
@@ -46,8 +49,9 @@ it shows how you can also sample halos.
     plt.hist(halo_massST, histtype='step', label='Sheth-Tormen')
     plt.hist(halo_massPS, histtype='step', label='Press-Schechter')
 
-    # axis label
+    # axis label and title
     plt.xlabel(r'Halo mass $M_\odot$')
+    plt.title('Halo sampler')
 
     # show plot labels
     plt.legend()
