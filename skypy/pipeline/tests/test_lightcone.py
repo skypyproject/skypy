@@ -10,8 +10,8 @@ def test_lightcone():
     config = {'lightcone': {'z_min': z_min, 'z_max': z_max, 'n_slice': n_slice},
               'tables':
               {'test_table':
-               {'z1': ('numpy.random.uniform', ['$slice_z_min', '$slice_z_max', nz]),
-                'z2': ('numpy.random.uniform', ['$slice_z_mid', '$slice_z_max', nz])
+               {'z1': (np.random.uniform, ['$slice_z_min', '$slice_z_max', nz]),
+                'z2': (np.random.uniform, ['$slice_z_mid', '$slice_z_max', nz])
                 }
                }
               }
