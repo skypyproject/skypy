@@ -7,6 +7,32 @@ Dark Matter Halos (`skypy.halo`)
 You can reproduce figure 2 in Sheth and Tormen 1999
 and plot the collapse functions for different halo models.
 
+.. code-block:: python
+    import numpy as np
+    from astropy.cosmology import Planck15
+    from skypy.power_spectrum import eisenstein_hu
+    from skypy.halo.mass import _sigma_squared
+
+    # Power spectrum and amplitude of perturbations
+    k = np.logspace(-3, 1, num=1000, base=10.0)
+    A_s, n_s = 2.1982e-09, 0.969453
+    mass = 10**np.arange(9.0, 15.0, 0.1)
+    growth_0 = 1.0
+
+    pk0 = eisenstein_hu(k, A_s, n_s, Planck15, kwmap=0.02, wiggle=True)
+    sigma = np.sqrt(_sigma_squared(mass, k, pk0, growth_0, Planck15))
+
+    # Collapse functions
+    from skypy.halo.mass import ellipsoidal_collapse_function, press_schechter_collapse_function, sheth_tormen_collapse_function
+    delta_c = 1.69
+    nu = np.square(delta_c / sigma)
+    params_model = (0.3, 0.7, 0.3, 1.686)
+
+    ST = sheth_tormen_collapse_function(sigma)
+    PS = press_schechter_collapse_function(sigma)
+    EM = ellipsoidal_collapse_function(sigma, params=params_model)
+
+
 .. plot::
     :include-source: false
     import matplotlib.pyplot as plt
