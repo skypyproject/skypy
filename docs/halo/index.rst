@@ -28,6 +28,8 @@ it shows how you can also sample halos.
     halo_massST = pipeline['sheth-tormen']
     halo_massPS = pipeline['press-schechter']
 
+    # set figure size
+    plt.figure(figsize=(6, 4))
     plt.subplot(121)
     # plot different collapse functions
     plt.loglog(pipeline['nu'], ST, label='Sheth-Tormen')
