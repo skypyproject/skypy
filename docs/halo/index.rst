@@ -14,7 +14,7 @@ it shows how you can also sample halos.
     from skypy.pipeline import Pipeline
 
     # read the example pipeline
-    pipeline = Pipeline.read('examples/pipeline.yml')
+    pipeline = Pipeline.read('examples/halo.yml')
 
     # run the pipeline as given
     pipeline.execute()
