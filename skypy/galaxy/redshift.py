@@ -79,7 +79,8 @@ def smail(z_median, alpha, beta, size=None):
 @dependent_argument('phi_star', 'redshift')
 @dependent_argument('alpha', 'redshift')
 @broadcast_arguments('redshift', 'M_star', 'phi_star', 'alpha')
-def schechter_lf_redshift(redshift, M_star, phi_star, alpha, m_lim, sky_area, cosmology, noise=True):
+def schechter_lf_redshift(redshift, M_star, phi_star, alpha, m_lim, sky_area,
+                          cosmology, noise=True):
     r'''Sample redshifts from Schechter luminosity function.
 
     Sample the redshifts of galaxies following a Schechter luminosity function
@@ -159,6 +160,7 @@ def schechter_lf_redshift(redshift, M_star, phi_star, alpha, m_lim, sky_area, co
 
 
 @uses_default_cosmology
+@units.quantity_input(sky_area=units.sr)
 def redshifts_from_comoving_density(redshift, density, sky_area, cosmology, noise=True):
     r'''Sample redshifts from a comoving density function.
 
@@ -205,18 +207,12 @@ def redshifts_from_comoving_density(redshift, density, sky_area, cosmology, nois
     '''
 
     # check sky_area and change to sr if given in deg2
-    if sky_area.unit == 'deg2':
-        sky_area = sky_area.to(units.steradian)
-    if sky_area.unit == 'sr':
-        if sky_area.value > 4*np.pi or sky_area.value < 0:
-            raise ValueError('Sky area cannot be negative or larger than full sky.')
-    else:
-        raise UnitTypeError('Unit must be deg2 or sr.')
+    if sky_area.to(units.steradian).value > 4*np.pi or sky_area.to(units.steradian).value < 0:
+        raise ValueError('Sky area cannot be negative or larger than full sky.')
 
     # redshift number density
-    dN_dz = cosmology.differential_comoving_volume(redshift).to_value('Mpc3/sr')
+    dN_dz = (cosmology.differential_comoving_volume(redshift) * sky_area).to_value('Mpc3')
     dN_dz *= density
-    dN_dz *= sky_area.value
 
     # integrate density to get expected number of galaxies
     N = np.trapz(dN_dz, redshift)

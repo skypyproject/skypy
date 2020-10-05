@@ -61,7 +61,7 @@ def test_redshifts_from_comoving_density():
     from skypy.galaxy.redshift import redshifts_from_comoving_density
     from astropy.cosmology import LambdaCDM
     from astropy import units
-    from astropy.units.core import UnitTypeError
+    from astropy.units.core import UnitsError
 
     # random cosmology
     H0 = np.random.uniform(50, 100)
@@ -96,20 +96,14 @@ def test_redshifts_from_comoving_density():
     with pytest.raises(ValueError):
         redshifts_from_comoving_density(redshift, density, sky_area, cosmo, noise=False)
 
-    # test that deg2 are transformed to sr
-    sky_area = 50000 * units.degree * units.degree
-    with pytest.raises(ValueError):
-        redshifts_from_comoving_density(redshift, density, sky_area, cosmo,
-                                        noise=False)
-
     # test that error is returned if wrong unit is given
     sky_area = 1 * units.degree
-    with pytest.raises(UnitTypeError):
+    with pytest.raises(UnitsError):
         redshifts_from_comoving_density(redshift, density, sky_area, cosmo, noise=False)
 
     # test that error is returned if no unit is given
     sky_area = 1
-    with pytest.raises(AttributeError):
+    with pytest.raises(TypeError):
         redshifts_from_comoving_density(redshift, density, sky_area, cosmo, noise=False)
 
 
