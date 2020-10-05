@@ -4,7 +4,7 @@ from skypy.pipeline import Lightcone
 
 def test_lightcone():
 
-    # Test that lightcone parameters are parsed correctly
+    # Test that lightcone parameters are parsed and handled correctly
     z_min, z_max, n_slice = 1, 2, 5
     nz = 100
     config = {'lightcone': {'z_min': z_min, 'z_max': z_max, 'n_slice': n_slice},
