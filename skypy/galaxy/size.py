@@ -6,6 +6,8 @@ This modules computes the angular size of galaxies from their physical size.
 import numpy as np
 from astropy import units
 
+from skypy.utils import uses_default_cosmology
+
 
 __all__ = [
     'angular_size',
@@ -15,6 +17,7 @@ __all__ = [
 ]
 
 
+@uses_default_cosmology
 def angular_size(physical_size, redshift, cosmology):
     """Angular size of a galaxy.
     This function transforms physical radius into angular distance, described
@@ -38,11 +41,9 @@ def angular_size(physical_size, redshift, cosmology):
     Examples
     --------
     >>> from astropy import units
-    >>> from astropy.cosmology import FlatLambdaCDM
-    >>> cosmology = FlatLambdaCDM(H0=67.04, Om0=0.3183, Ob0=0.047745)
-    >>> size = 10.0 * units.kpc
-    >>> angular_size(size, 1, cosmology)
-    <Quantity 5.85990062e-06 rad>
+    >>> from skypy.galaxy.size import angular_size
+    >>> from astropy.cosmology import Planck15
+    >>> r = angular_size(10*units.kpc, 1, Planck15)
 
     References
     ----------

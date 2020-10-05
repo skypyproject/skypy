@@ -7,36 +7,13 @@ and handle their results.
 from astropy.cosmology import default_cosmology
 from astropy.table import Table
 from copy import copy, deepcopy
-from importlib import import_module
-import builtins
+from ._config import load_skypy_yaml
 import networkx
 
 
 __all__ = [
     'Pipeline',
 ]
-
-
-def _yaml_tag(loader, tag, node):
-    '''handler for generic YAML tags
-
-    tags are stored as a tuple `(tag, value)`
-    '''
-
-    import yaml
-
-    if isinstance(node, yaml.ScalarNode):
-        value = loader.construct_scalar(node)
-    elif isinstance(node, yaml.SequenceNode):
-        value = loader.construct_sequence(node)
-    elif isinstance(node, yaml.MappingNode):
-        value = loader.construct_mapping(node)
-
-    # tags without arguments have empty string value
-    if value == '':
-        return tag,
-
-    return tag, value
 
 
 class Pipeline:
@@ -56,16 +33,7 @@ class Pipeline:
             The name of the configuration file.
 
         '''
-        import yaml
-
-        # register custom tags
-        yaml.SafeLoader.add_multi_constructor('!', _yaml_tag)
-
-        # read the file
-        with open(filename, 'r') as stream:
-            config = yaml.safe_load(stream) or {}
-
-        # construct the pipeline
+        config = load_skypy_yaml(filename)
         return cls(config)
 
     def __init__(self, configuration):
@@ -81,14 +49,12 @@ class Pipeline:
         Each step in the pipeline is configured by a dictionary specifying
         a variable name and the associated value.
 
-        A value that is a tuple `(function_name, function_args)` specifies that
-        the value will be the result of a function call. The first item is the
-        fully qualified function name, and the second value specifies the
-        function arguments.
+        A value that is a tuple `(function, args)` specifies that the value will
+        be the result of a function call. The first item is a callable, and the
+        second value specifies the function arguments.
 
-        If a function argument is a tuple `(variable_name,)`, it refers to the
-        values of previous step in the pipeline. The tuple item must be the
-        name of the reference variable.
+        If a function argument is a string `$variable_name`, it refers to the
+        values of previous step in the pipeline.
 
         'configuration' should contain the name and configuration of each
         variable and/or an entry named 'tables'. 'tables' should contain a set
@@ -112,7 +78,7 @@ class Pipeline:
         self.cosmology = self.config.pop('cosmology', {})
         self.parameters = self.config.pop('parameters', {})
         self.table_config = self.config.pop('tables', {})
-        default_table = ('astropy.table.Table',)
+        default_table = (Table,)
         self.config.update({k: v.pop('.init', default_table)
                             for k, v in self.table_config.items()})
 
@@ -260,23 +226,9 @@ class Pipeline:
                 # plain value
                 return value
 
-        # value is tuple (function name, [function args])
-        name = value[0]
+        # value is tuple (function, [args])
+        function = value[0]
         args = value[1] if len(value) > 1 else []
-
-        # Import function
-        function_path = name.split('.')
-        module = builtins
-        for i, key in enumerate(function_path[:-1]):
-            if not hasattr(module, key):
-                module_name = '.'.join(function_path[:i+1])
-                try:
-                    module = import_module(module_name)
-                except ModuleNotFoundError:
-                    raise ModuleNotFoundError(module_name)
-            else:
-                module = getattr(module, key)
-        function = getattr(module, function_path[-1])
 
         # Parse arguments
         parsed_args = self.get_args(args)
