@@ -5,7 +5,8 @@ Dark Matter Halos (`skypy.halo`)
 .. automodule:: skypy.halo
 
 You can reproduce figure 2 in Sheth and Tormen 1999
-and plot the collapse functions for different halo models:
+and plot the collapse functions for different halo models. In the second subplot,
+it shows how you can also sample halos.
 
 .. plot::
 
@@ -24,6 +25,11 @@ and plot the collapse functions for different halo models:
     PS = pipeline['press-schechter-collapse-function']
     EM = pipeline['ellipsoidal-collapse-function']
 
+    # Draw from different halo mass samplers
+    halo_massST = pipeline['sheth-tormen']
+    halo_massPS = pipeline['press-schechter']
+
+    plt.subplot(121)
     # plot different collapse functions
     plt.loglog(pipeline['nu'], ST, label='Sheth-Tormen')
     plt.loglog(pipeline['nu'], PS, label='Press-Schechter')
@@ -35,22 +41,16 @@ and plot the collapse functions for different halo models:
     # show plot labels
     plt.legend()
 
-You can also sample halos:
-
-.. plot::
-
-    halo_massST = pipeline['sheth-tormen']
-    halo_massPS = pipeline['press-schechter]
-
+    plt.subplot(122)
     plt.hist(halo_massST, histtype='step', label='Sheth-Tormen')
     plt.hist(halo_massPS, histtype='step', label='Press-Schechter')
-    # plt.hist(halo_massEM, histtype='step', label='Ellipsoidal')
 
     # axis label
     plt.xlabel(r'Halo mass $M_\odot$')
 
     # show plot labels
     plt.legend()
+    plt.show()
 
 
 Abundance Matching (`skypy.halo.abundance_matching`)
