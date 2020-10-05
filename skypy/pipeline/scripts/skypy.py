@@ -36,7 +36,7 @@ values as keyword arguments.
 
 import argparse
 from skypy import __version__ as skypy_version
-from skypy.pipeline import Lightcone, Pipeline, skypy_config
+from skypy.pipeline import Lightcone, Pipeline, load_skypy_yaml
 import sys
 
 
@@ -55,7 +55,7 @@ def main(args=None):
         args = sys.argv[1:]
 
     args = parser.parse_args(args or ['--help'])
-    config = skypy_config(args.config)
+    config = load_skypy_yaml(args.config)
 
     if 'lightcone' in config:
         pipeline = Lightcone(config)
