@@ -9,7 +9,7 @@ and plot the collapse functions for different halo models. In the second subplot
 it shows how you can also sample halos.
 
 .. plot::
-
+    :include-source: false
     import matplotlib.pyplot as plt
     from skypy.pipeline import Pipeline
 
