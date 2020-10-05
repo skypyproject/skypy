@@ -31,7 +31,7 @@ it shows how you can also sample halos.
     # set figure size
     plt.figure(figsize=(9, 3))
 
-    plt.subplot(121)
+    plt.subplot(211)
     # plot different collapse functions
     plt.loglog(pipeline['nu'], ST, label='Sheth-Tormen')
     plt.loglog(pipeline['nu'], PS, label='Press-Schechter')
@@ -45,7 +45,7 @@ it shows how you can also sample halos.
     # show plot labels
     plt.legend()
 
-    plt.subplot(122)
+    plt.subplot(212)
     plt.hist(halo_massST, histtype='step', label='Sheth-Tormen')
     plt.hist(halo_massPS, histtype='step', label='Press-Schechter')
 
@@ -55,6 +55,7 @@ it shows how you can also sample halos.
 
     # show plot labels
     plt.legend()
+    plt.tight_layout()
     plt.show()
 
 
