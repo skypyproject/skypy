@@ -22,7 +22,7 @@ tables:
         m_min: 1.0E+9
         m_max: 1.0E+12
         resolution: 1000
-        size: 100
+        size: 1000
         wavenumber: $wavenumber
         power_spectrum: $power_spectrum
         growth_function: $growth_function
@@ -39,4 +39,4 @@ tables:
         M_star: $M_star
         alpha: -0.5
         m_lim: 35
-        size: 100
+        size: 1000
