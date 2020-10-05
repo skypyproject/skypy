@@ -29,7 +29,7 @@ it shows how you can also sample halos.
     halo_massPS = pipeline['press-schechter']
 
     # set figure size
-    plt.figure(figsize=(14, 4))
+    plt.figure(figsize=(10, 10))
 
     plt.subplot(121)
     # plot different collapse functions
