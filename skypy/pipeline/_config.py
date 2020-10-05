@@ -35,7 +35,7 @@ def function_tag(loader, name, node):
 
     try:
         function = import_function(name)
-    except (ModuleNotFoundError, AttributeError) as e:  # pragma: no cover
+    except (ModuleNotFoundError, AttributeError) as e:
         raise ImportError(f'{e}\n{node.start_mark}') from e
 
     return (function,) if args == '' else (function, args)
