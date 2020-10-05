@@ -1,6 +1,8 @@
 import builtins
 from importlib import import_module
 import yaml
+import re
+from astropy.units import Quantity
 
 __all__ = [
     'load_skypy_yaml',
@@ -52,9 +54,19 @@ class SkyPyLoader(yaml.SafeLoader):
 
         return (function,) if args == '' else (function, args)
 
+    def construct_quantity(self, node):
+        value = self.construct_scalar(node)
+        return Quantity(value)
+
 
 # constructor for generic functions
 SkyPyLoader.add_multi_constructor('!', SkyPyLoader.construct_function)
+
+# constructor for quantities
+SkyPyLoader.add_constructor('!quantity', SkyPyLoader.construct_quantity)
+SkyPyLoader.add_implicit_resolver('!quantity', re.compile(r'''
+    -? [1-9] ( \. [0-9]* [1-9] )? ( e [-+] [1-9] [0-9]* )? \w* \W+
+''', re.VERBOSE), list('-+0123456789.'))
 
 
 def load_skypy_yaml(filename):
