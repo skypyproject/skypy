@@ -65,7 +65,7 @@ def skypy_data_loader(module, name, *tags):
         try:
             filename = resource_filename(f'skypy-data.{module}', f'{name}_{tag}.ecsv')
         except ModuleNotFoundError:
-            message = str("No module named 'skypy-data'.  To install:\n"
+            message = str("No module named 'skypy-data'. To install:\n"
                           "pip install skypy-data@https://github.com/"
                           "skypyproject/skypy-data/archive/master.tar.gz")
             raise ModuleNotFoundError(message)
