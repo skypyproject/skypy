@@ -64,11 +64,11 @@ def skypy_data_loader(module, name, *tags):
         # get resource filename from module, name, and tag
         try:
             filename = resource_filename(f'skypy-data.{module}', f'{name}_{tag}.ecsv')
-        except ModuleNotFoundError:
+        except ModuleNotFoundError as exc:
             message = str("No module named 'skypy-data'. To install:\n"
                           "pip install skypy-data@https://github.com/"
                           "skypyproject/skypy-data/archive/master.tar.gz")
-            raise ModuleNotFoundError(message)
+            raise ModuleNotFoundError(message) from exc
 
         # load the data file
         data = astropy.table.Table.read(filename, format='ascii.ecsv')
