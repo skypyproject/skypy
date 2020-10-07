@@ -68,25 +68,19 @@ file and run the pipeline, for example.
    :language: yaml
 
 .. plot::
-   :include-source: true
-   :nofigs:
-   :context: close-figs
-
-    from skypy.pipeline import Pipeline
-    pipeline = Pipeline.read('examples/halo.yml')
-    pipeline.execute()
-
-
-.. plot::
    :include-source: false
    :context: close-figs
+
+   from skypy.pipeline import Pipeline
+   pipeline = Pipeline.read('examples/halo.yml')
+   pipeline.execute()
 
     # Draw from different halo mass samplers
     halo_massST = pipeline['sheth-tormen']
     halo_massPS = pipeline['press-schechter']
 
-    plt.hist(np.log(halo_massST), histtype='step', label='Sheth-Tormen')
-    plt.hist(np.log(halo_massPS), histtype='step', label='Press-Schechter')
+    plt.hist(np.log10(halo_massST), histtype='step', label='Sheth-Tormen')
+    plt.hist(np.log10(halo_massPS), histtype='step', label='Press-Schechter')
 
     # axis label and title
     plt.xlabel(r'$log(mass)$')
