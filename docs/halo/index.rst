@@ -28,16 +28,13 @@ a python script, for example.
     sigma = np.sqrt(_sigma_squared(mass, k, pk0, growth_0, Planck15))
 
     # Collapse functions
-    from skypy.halo.mass import (ellipsoidal_collapse_function,
-                                 press_schechter_collapse_function,
-                                 sheth_tormen_collapse_function)
-    delta_c = 1.69
-    nu = np.square(delta_c / sigma)
-    params_model = (0.3, 0.7, 0.3, 1.686)
+    from skypy.halo import mass
 
-    ST = sheth_tormen_collapse_function(sigma)
-    PS = press_schechter_collapse_function(sigma)
-    EM = ellipsoidal_collapse_function(sigma, params=params_model)
+    params_ellipsoidal = (0.3, 0.7, 0.3, 1.686)
+
+    ST = mass.sheth_tormen_collapse_function(sigma)
+    PS = mass.press_schechter_collapse_function(sigma)
+    EM = mass.ellipsoidal_collapse_function(sigma, params=params_ellipsoidal)
 
 
 .. plot::
@@ -45,6 +42,9 @@ a python script, for example.
    :context: close-figs
 
     import matplotlib.pyplot as plt
+
+    delta_c = 1.69
+    nu = np.square(delta_c / sigma)
 
     # plot different collapse functions
     plt.loglog(nu, ST, label='Sheth-Tormen')
@@ -68,7 +68,7 @@ file and run the pipeline, for example.
    :include-source: true
    :nofigs:
    :context: close-figs
-   
+
     from skypy.pipeline import Pipeline
     pipeline = Pipeline.read('examples/halo.yml')
     pipeline.execute()
