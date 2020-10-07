@@ -5,8 +5,8 @@ Dark Matter Halos (`skypy.halo`)
 .. automodule:: skypy.halo
 
 You can reproduce figure 2 in Sheth and Tormen 1999
-and plot the collapse functions for different halo models. You can do that
-from a python script, for example.
+and plot the collapse functions for different halo models. For this, you can use
+a python script, for example.
 
 .. plot::
    :include-source: true
@@ -28,7 +28,9 @@ from a python script, for example.
     sigma = np.sqrt(_sigma_squared(mass, k, pk0, growth_0, Planck15))
 
     # Collapse functions
-    from skypy.halo.mass import ellipsoidal_collapse_function, press_schechter_collapse_function, sheth_tormen_collapse_function
+    from skypy.halo.mass import (ellipsoidal_collapse_function,
+                                 press_schechter_collapse_function,
+                                 sheth_tormen_collapse_function)
     delta_c = 1.69
     nu = np.square(delta_c / sigma)
     params_model = (0.3, 0.7, 0.3, 1.686)
@@ -59,16 +61,21 @@ from a python script, for example.
     plt.show()
 
 
-You can also sample halos using their mass function. You can do that using a config
-file and running the pipeline, for example.
+You can also sample halos using their mass function. For this, you can use a config
+file and run the pipeline, for example.
+
+.. plot::
+   :include-source: true
+   :nofigs:
+   :context: close-figs
+    from skypy.pipeline import Pipeline
+    pipeline = Pipeline.read('examples/halo.yml')
+    pipeline.execute()
+
 
 .. plot::
    :include-source: false
    :context: close-figs
-
-    from skypy.pipeline import Pipeline
-    pipeline = Pipeline.read('examples/halo.yml')
-    pipeline.execute()
 
     # Draw from different halo mass samplers
     halo_massST = pipeline['sheth-tormen']
