@@ -1,6 +1,9 @@
 from astropy.cosmology import FlatLambdaCDM, default_cosmology
+from astropy.cosmology.core import Cosmology
 from astropy.io import fits
 from astropy.table import Table
+from astropy.table.column import Column
+from astropy.utils.data import get_pkg_data_filename
 import networkx
 import numpy as np
 import os
@@ -144,10 +147,12 @@ def test_multi_column_assignment_failure(na, nt):
     with pytest.raises(ValueError):
         pipeline.execute()
 
+
 def test_pipeline_cosmology():
 
     # Define function for testing pipeline cosmology
     from skypy.utils import uses_default_cosmology
+
     @uses_default_cosmology
     def return_cosmology(cosmology):
         return cosmology
@@ -177,6 +182,20 @@ def test_pipeline_cosmology():
 
     # Check that the astropy default cosmology is unchanged
     assert default_cosmology.get() == initial_default
+
+
+def test_pipeline_read():
+
+    # Test reading config from a file
+    filename = get_pkg_data_filename('data/test_config.yml')
+    pipeline = Pipeline.read(filename)
+    pipeline.execute()
+    assert isinstance(pipeline['test_int'], int)
+    assert isinstance(pipeline['test_float'], float)
+    assert isinstance(pipeline['test_str'], str)
+    assert isinstance(pipeline['test_cosmology'], Cosmology)
+    assert isinstance(pipeline['test_table_1'], Table)
+    assert isinstance(pipeline['test_table_1']['test_column_3'], Column)
 
 
 def teardown_module(module):
