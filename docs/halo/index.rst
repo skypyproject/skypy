@@ -66,7 +66,6 @@ file and running the pipeline, for example.
    :include-source: false
    :context: close-figs
 
-    import matplotlib.pyplot as plt
     from skypy.pipeline import Pipeline
     pipeline = Pipeline.read('examples/halo.yml')
     pipeline.execute()
