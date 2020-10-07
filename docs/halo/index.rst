@@ -64,6 +64,9 @@ a python script, for example.
 You can also sample halos using their mass function. For this, you can use a config
 file and run the pipeline, for example.
 
+.. literalinclude:: examples/halo.yml
+   :language: yaml
+
 .. plot::
    :include-source: true
    :nofigs:
