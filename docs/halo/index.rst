@@ -44,6 +44,7 @@ and plot the collapse functions for different halo models.
     import matplotlib.pyplot as plt
     from skypy.pipeline import Pipeline
 
+
     # plot different collapse functions
     plt.loglog(nu, ST, label='Sheth-Tormen')
     plt.loglog(nu, PS, label='Press-Schechter')
@@ -64,9 +65,11 @@ You can also sample halos using their mass function:
 .. plot::
    :include-source: false
    :context: close-figs
-   
+
     import matplotlib.pyplot as plt
     from skypy.pipeline import Pipeline
+    pipeline = Pipeline.read('examples/halo.yml')
+    pipeline.execute()
 
     # Draw from different halo mass samplers
     halo_massST = pipeline['sheth-tormen']
