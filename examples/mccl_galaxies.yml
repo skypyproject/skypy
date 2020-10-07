@@ -36,7 +36,6 @@ tables:
     angular_size: !skypy.galaxy.size.angular_size
       physical_size: $red_galaxies.physical_size
       redshift: $red_galaxies.redshift
-      cosmology: $cosmology
     ellipticity: !skypy.galaxy.ellipticity.beta_ellipticity
       e_ratio: 0.45
       e_sum: 3.5
@@ -65,7 +64,6 @@ tables:
     angular_size: !skypy.galaxy.size.angular_size
       physical_size: $blue_galaxies.physical_size
       redshift: $blue_galaxies.redshift
-      cosmology: $cosmology
     ellipticity: !skypy.galaxy.ellipticity.beta_ellipticity
       e_ratio: 0.45
       e_sum: 3.5

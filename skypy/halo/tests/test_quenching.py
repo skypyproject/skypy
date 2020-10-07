@@ -1,10 +1,12 @@
 import numpy as np
+import pytest
 from scipy import stats
 from collections import Counter
 
 from skypy.halo.quenching import environment_quenched, mass_quenched
 
 
+@pytest.mark.flaky
 def test_environment_quenched():
     # Test the quenching process follows a binomial distribution
     n, p = 1000, 0.7
@@ -16,6 +18,7 @@ def test_environment_quenched():
     assert p_value > 0.01
 
 
+@pytest.mark.flaky
 def test_mass_quenched():
     # Test the quenching process follows a binomial distribution if the
     # logarithmic halo masses are symmetrical about the offset

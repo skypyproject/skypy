@@ -14,6 +14,20 @@ __all__ = [
     'magnitudes_from_templates',
 ]
 
+try:
+    __import__('specutils')
+except ImportError:
+    HAS_SPECUTILS = False
+else:
+    HAS_SPECUTILS = True
+
+try:
+    __import__('skypy-data')
+except ImportError:
+    HAS_SKYPY_DATA = False
+else:
+    HAS_SKYPY_DATA = True
+
 
 def dirichlet_coefficients(redshift, alpha0, alpha1, z1=1., weight=None):
     r"""Dirichlet-distributed SED coefficients.
@@ -141,7 +155,7 @@ def mag_ab(spectrum, bandpass, redshift=None):
     Get B-band magnitudes for the kcorrect spec templaces using auto-loading
     of known spectral data:
     >>> from skypy.galaxy.spectrum import mag_ab
-    >>> mag_B = mag_ab('kcorrect_spec', 'Johnson_B')
+    >>> mag_B = mag_ab('kcorrect_spec', 'Johnson_B')  # doctest: +SKIP
 
     '''
 
@@ -223,7 +237,7 @@ def magnitudes_from_templates(coefficients, templates, bandpass, redshift=None,
         the number of objects is less than resolution their magnitudes are
         calculated directly without interpolation.
     stellar_mass : (ng,) array_like, optional
-        Optional array of stellar masses for each galaxy in units of Msun.
+        Optional array of stellar masses for each galaxy in template units.
     distance_modulus : (ng,) array_like, optional
         Optional array of distance moduli for each galaxy.
 
@@ -261,7 +275,7 @@ def magnitudes_from_templates(coefficients, templates, bandpass, redshift=None,
     else:
         M = mag_ab(templates, bandpass, redshift).reshape(M_shape)
 
-    stellar_mass = 1 if stellar_mass is None else stellar_mass.to_value(units.Msun)
+    stellar_mass = 1 if stellar_mass is None else stellar_mass
     distance_modulus = 0 if distance_modulus is None else distance_modulus
 
     flux = np.sum(coefficients[:, np.newaxis, :] * np.power(10, -0.4*M), axis=2)
@@ -295,12 +309,12 @@ def stellar_mass_from_reference_band(coefficients, templates, magnitudes, bandpa
     Returns
     -------
     stellar_mass : (ng,) array_like
-        Stellar mass of each galaxy in solar masses.
+        Stellar mass of each galaxy in template units.
     '''
 
     flux = np.power(10, -0.4 * mag_ab(templates, bandpass))
     stellar_mass = np.power(10, -0.4*magnitudes) / np.sum(coefficients * flux, axis=1)
-    return stellar_mass * units.Msun
+    return stellar_mass
 
 
 def load_spectral_data(name):
@@ -333,13 +347,16 @@ def load_spectral_data(name):
     import re
 
     # loaders registry
-    from ._spectrum_loaders import spectrum_loaders
+    from ._spectrum_loaders import spectrum_loaders, combine_spectra
 
     # check non-string input
     if not isinstance(name, str):
         # recurse on lists
         if hasattr(name, '__iter__'):
-            return list(map(load_spectral_data, name))
+            spectra = None
+            for name_ in name:
+                spectra = combine_spectra(spectra, load_spectral_data(name_))
+            return spectra
         else:
             raise TypeError('name: not a string or list of strings')
 

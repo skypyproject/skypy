@@ -1,7 +1,6 @@
 '''Implementations for spectrum loaders.'''
 
 import numpy as np
-import specutils
 import astropy.utils.data
 import astropy.table
 from astropy import __version__ as astropy_version
@@ -9,6 +8,14 @@ from astropy import units
 
 import os
 import urllib
+from pkg_resources import resource_filename
+
+# this file is only ever imported when specutils is present
+# but without the try/except pytest will fail when doctests are discovered
+try:
+    import specutils
+except ImportError:
+    pass
 
 
 def download_file(url, cache=True):
@@ -17,12 +24,8 @@ def download_file(url, cache=True):
         extra_kwargs = {}
     else:
         extra_kwargs = {'pkgname': 'skypy'}
-    try:
-        filename = astropy.utils.data.download_file(
-                url, cache=cache, show_progress=False, **extra_kwargs)
-    except urllib.error.URLError:  # pragma: no cover
-        raise FileNotFoundError('data file not available: {}'.format(url))
-    return filename
+    return astropy.utils.data.download_file(
+            url, cache=cache, show_progress=False, **extra_kwargs)
 
 
 def combine_spectra(a, b):
@@ -40,10 +43,9 @@ def combine_spectra(a, b):
             and a.flux.unit.is_equivalent(b.flux.unit)):
         flux_a = np.atleast_2d(a.flux.value)
         flux_b = np.atleast_2d(b.flux.to_value(a.flux.unit))
-        if (np.ndim(flux_a) == np.ndim(flux_b)
-                and np.shape(flux_a)[1:] == np.shape(flux_b)[1:]):
+        if flux_a.shape[1:] == flux_b.shape[1:]:
             return specutils.Spectrum1D(spectral_axis=a.spectral_axis,
-                                        flux=np.vstack([flux_a, flux_b])*a.flux.unit)
+                                        flux=np.concatenate([flux_a, flux_b])*a.flux.unit)
 
     return specutils.SpectrumList([a, b])
 
@@ -56,17 +58,8 @@ def file_loader(*filenames):
     return spectra[0] if len(spectra) == 1 else specutils.SpectrumList(spectra)
 
 
-def skypy_data_loader(folder, name, *tags):
-    '''load data from the skypy data repository'''
-
-    # move most of these to config?
-    request = {
-        'repo': 'https://github.com/skypyproject/data',
-        'version': '1.0',
-        'folder': urllib.parse.quote_plus(folder),
-        'name': urllib.parse.quote_plus(name),
-        'format': 'ecsv',
-    }
+def skypy_data_loader(module, name, *tags):
+    '''load data from the skypy data package'''
 
     # result is spectrum or list of spectra
     spectra = None
@@ -74,12 +67,14 @@ def skypy_data_loader(folder, name, *tags):
     # load each tag separately
     for tag in tags:
 
-        # build url from request dict and tag
-        url = '{repo:}/raw/{version:}/{folder:}/{name:}.{tag:}.{format:}'.format(
-                **request, tag=urllib.parse.quote_plus(tag))
-
-        # download file from remote server to cache
-        filename = download_file(url)
+        # get resource filename from module, name, and tag
+        try:
+            filename = resource_filename(f'skypy-data.{module}', f'{name}_{tag}.ecsv')
+        except ModuleNotFoundError as exc:
+            message = str("No module named 'skypy-data'. To install:\n"
+                          "pip install skypy-data@https://github.com/"
+                          "skypyproject/skypy-data/archive/master.tar.gz")
+            raise ModuleNotFoundError(message) from exc
 
         # load the data file
         data = astropy.table.Table.read(filename, format='ascii.ecsv')
@@ -92,7 +87,7 @@ def skypy_data_loader(folder, name, *tags):
         fluxes = []
         while 'flux_%d' % len(fluxes) in data.colnames:
             fluxes.append(data['flux_%d' % len(fluxes)].quantity.to_value(flux_unit))
-        fluxes = fluxes*flux_unit
+        fluxes = np.squeeze(fluxes)*flux_unit
 
         # construct the Spectrum1D
         spectrum = specutils.Spectrum1D(spectral_axis=spectral_axis, flux=fluxes)
@@ -123,7 +118,7 @@ def decam_loader(*bands):
     throughput = []
     for band in bands:
         throughput.append(data[band])
-    throughput = throughput*units.dimensionless_unscaled
+    throughput = np.squeeze(throughput)*units.dimensionless_unscaled
 
     # return the bandpasses as Spectrum1D
     return specutils.Spectrum1D(spectral_axis=spectral_axis, flux=throughput)
@@ -136,7 +131,7 @@ spectrum_loaders = [
     ('DECam_(g)?(r)?(i)?(z)?(Y)?', decam_loader),
 
     # spectrum templates
-    ('(kcorrect)_([a-z]+)', skypy_data_loader, 'spectrum_templates'),
+    ('(kcorrect)_((?:raw)?spec(?:_nl)?(?:_nd)?)', skypy_data_loader, 'spectrum_templates'),
 
     # catchall file loader
     ('(.*)', file_loader),
