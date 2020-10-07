@@ -1,7 +1,6 @@
 '''Implementations for spectrum loaders.'''
 
 import numpy as np
-import specutils
 import astropy.utils.data
 import astropy.table
 from astropy import __version__ as astropy_version
@@ -10,6 +9,11 @@ from astropy import units
 import os
 import urllib
 from pkg_resources import resource_filename
+
+try:
+    import specutils
+except ImportError:
+    pass
 
 
 def download_file(url, cache=True):

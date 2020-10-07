@@ -155,7 +155,7 @@ def mag_ab(spectrum, bandpass, redshift=None):
     Get B-band magnitudes for the kcorrect spec templaces using auto-loading
     of known spectral data:
     >>> from skypy.galaxy.spectrum import mag_ab
-    >>> mag_B = mag_ab('kcorrect_spec', 'Johnson_B')
+    >>> mag_B = mag_ab('kcorrect_spec', 'Johnson_B')  # doctest: +SKIP
 
     '''
 
