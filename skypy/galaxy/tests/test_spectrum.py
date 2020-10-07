@@ -1,13 +1,7 @@
 import numpy as np
 import scipy.stats
 import pytest
-
-try:
-    import specutils
-except ImportError:
-    HAS_SPECUTILS = False
-else:
-    HAS_SPECUTILS = True
+from skypy.galaxy.spectrum import HAS_SPECUTILS, HAS_SKYPY_DATA
 
 
 @pytest.mark.flaky
@@ -231,7 +225,8 @@ def test_stellar_mass_from_reference_band():
     np.testing.assert_allclose(stellar_mass, truth)
 
 
-@pytest.mark.skipif(not HAS_SPECUTILS, reason='test requires specutils')
+@pytest.mark.skipif(not HAS_SPECUTILS or not HAS_SKYPY_DATA,
+                    reason='test requires specutils and skypy-data')
 def test_load_spectral_data():
 
     from skypy.galaxy.spectrum import load_spectral_data
