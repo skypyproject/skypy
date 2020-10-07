@@ -19,16 +19,20 @@ fitting formula:
     pipeline = Pipeline.read('examples/power_spectrum.yml')
     pipeline.execute()
 
+    # Eisenstein and Hu power spectrum with and without wiggles
+    wavenumber = pipeline['k']
+    power_EH_w = pipeline['eisenstein_hu_wiggle']
+    power_EH_nw = pipeline['eisenstein_hu_nowiggle']
+
 
 .. plot::
    :include-source: true
    :context: close-figs
 
-    # Eisenstein and Hu power spectrum
-    wavenumber = pipeline['k']
-    power_EH = pipeline['power_spectrum']
+    import matplotlib.pyplot as plt
 
-    plt.loglog(wavenumber, power_EH, label='Wiggles')
+    plt.loglog(wavenumber, power_EH_w, label='Wiggles')
+    plt.loglog(wavenumber, power_EH_nw, '--', label='Wiggles', lw=1)
     plt.xlabel(r'Wavenumber $(1/Mpc)$')
     plt.ylabel(r'Power spectrum $(Mpc^3)$')
     plt.title('Linear power spectrum')
