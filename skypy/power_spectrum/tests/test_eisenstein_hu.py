@@ -69,7 +69,7 @@ def test_eisenstein_hu():
                       wiggle=True)
 
     # Test for failure when cosmology has Tcmb = 0  and wiggle = True
-    zero_Tcmb0_cosmology = FlatLambdaCDM(H0=70, Om0=0.3, Omb=0.05)
+    zero_Tcmb0_cosmology = FlatLambdaCDM(H0=70, Om0=0.3, Ob0=0.05)
     wavenumber = np.logspace(-3, 1, num=5, base=10.0)
     with pytest.raises(ValueError):
         eisenstein_hu(wavenumber, A_s, n_s, zero_Tcmb0_cosmology, kwmap,
