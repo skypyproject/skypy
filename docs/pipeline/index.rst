@@ -89,13 +89,20 @@ changed for individual executions of the pipeline:
     # read the example pipeline
     pipeline = Pipeline.read('examples/pipeline.yml')
 
-    # change the median redshift in a loop
-    for z in [1.0, 1.2, 1.4, 1.6, 1.8, 2.0]:
+    # run the pipeline as given
+    pipeline.execute()
+
+    # plot the results for the given parameters
+    plt.hist(pipeline['galaxy-redshifts'], histtype='step', density=True,
+             label='{:.2f}'.format(parameters['median-redshift']))
+
+    # change the median redshift parameter in a loop
+    for z in [1.2, 1.4, 1.6, 1.8, 2.0]:
 
         # median redshift parameter
         parameters = {'median-redshift': z}
 
-        # run pipeline with updated parameter
+        # run pipeline with updated parameters
         pipeline.execute(parameters)
 
         # plot the new results
@@ -159,7 +166,7 @@ colour-coded by the slice that they were sampled in.
     for i, c, l, h in zip(np.arange(n_slice), colors, bounds[:-1], bounds[1:]):
       mask = np.logical_and(chi > l, chi < h)
       plt.scatter(ids[mask], z[mask], marker='+', label=f'Slice {i+1}', color=c)
-    plt.xlabel('ID')
+    plt.xlabel('Galaxy ID')
     plt.ylabel('Redshift')
     plt.legend()
 
