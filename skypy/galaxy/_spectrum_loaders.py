@@ -10,6 +10,8 @@ import os
 import urllib
 from pkg_resources import resource_filename
 
+# this file is only ever imported when specutils is present
+# but without the try/except pytest will fail when doctests are discovered
 try:
     import specutils
 except ImportError:
