@@ -94,7 +94,7 @@ changed for individual executions of the pipeline:
 
     # plot the results for the given parameters
     plt.hist(pipeline['galaxy-redshifts'], histtype='step', density=True,
-             label='{:.2f}'.format(parameters['median-redshift']))
+             label='{:.2f}'.format(pipeline.parameters['median-redshift']))
 
     # change the median redshift parameter in a loop
     for z in [1.2, 1.4, 1.6, 1.8, 2.0]:
