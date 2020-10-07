@@ -36,4 +36,3 @@ def test_camb():
     pzk = camb(wavenumber, redshift, Planck15, 2.e-9, 0.965)
     assert pzk.shape == (len(redshift), len(wavenumber))
     assert allclose(pzk, test_pzk[np.argsort(redshift), :], rtol=1.e-4)
-    
