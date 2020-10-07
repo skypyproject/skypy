@@ -68,6 +68,7 @@ file and run the pipeline, for example.
    :include-source: true
    :nofigs:
    :context: close-figs
+   
     from skypy.pipeline import Pipeline
     pipeline = Pipeline.read('examples/halo.yml')
     pipeline.execute()
