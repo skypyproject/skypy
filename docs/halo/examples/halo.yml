@@ -26,9 +26,9 @@ ellipsoidal-collapse-function: !skypy.halo.mass.ellipsoidal_collapse_function
   sigma: $sigma
   params: $params_model
 m_min: 1.0E+10
-m_max: 1.0E+12
-resolution: 1000
-size: 1000
+m_max: 1.0E+14
+resolution: 10000
+size: 10000
 sheth-tormen: !skypy.halo.mass.sheth_tormen
   m_min: $m_min
   m_max: $m_max

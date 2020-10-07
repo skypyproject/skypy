@@ -82,11 +82,11 @@ file and run the pipeline, for example.
     halo_massST = pipeline['sheth-tormen']
     halo_massPS = pipeline['press-schechter']
 
-    plt.hist(halo_massST, histtype='step', label='Sheth-Tormen')
-    plt.hist(halo_massPS, histtype='step', label='Press-Schechter')
+    plt.hist(np.log(halo_massST), histtype='step', label='Sheth-Tormen')
+    plt.hist(np.log(halo_massPS), histtype='step', label='Press-Schechter')
 
     # axis label and title
-    plt.xlabel(r'Halo mass $M_\odot$')
+    plt.xlabel(r'$log(mass)$')
     plt.title('Halo sampler')
 
     # show plot labels
