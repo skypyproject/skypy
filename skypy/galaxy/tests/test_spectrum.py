@@ -173,7 +173,7 @@ def test_template_spectra():
     np.testing.assert_allclose(mt, m)
 
     # Test distance modulus
-    redshift = np.array([0, 1, 2])
+    redshift = np.array([1, 2, 3])
     dm = Planck15.distmod(redshift).value
     mt = magnitudes_from_templates(coefficients, spec, bp, distance_modulus=dm)
     np.testing.assert_allclose(mt, m + dm)
