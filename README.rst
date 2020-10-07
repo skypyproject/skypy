@@ -57,8 +57,8 @@ The SkyPy library can then be imported from python:
     >>> help(skypy)
 
 SkyPy has a number of optional dependencies which can be installed separately.
-One of these is `skypy-data`_ which contains generic data (such as Johnson bandpasses)
-used for calculations in SkyPy. This can be installed with:
+One of these is `skypy-data`_ which contains data such as photometric bandpasses
+required for some calculations in SkyPy. This can be installed with:
 
 .. code:: bash
     
