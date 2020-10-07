@@ -1,13 +1,7 @@
 import numpy as np
 import scipy.stats
 import pytest
-
-try:
-    import specutils
-except ImportError:
-    HAS_SPECUTILS = False
-else:
-    HAS_SPECUTILS = True
+from skypy.galaxy.spectrum import HAS_SPECUTILS, HAS_SKYPY_DATA
 
 
 @pytest.mark.flaky
@@ -74,18 +68,18 @@ def test_sampling_coefficients():
 def test_mag_ab_standard_source():
 
     from astropy import units
-
+    from specutils import Spectrum1D
     from skypy.galaxy.spectrum import mag_ab
 
     # create a bandpass
     bp_lam = np.logspace(0, 4, 1000)*units.AA
     bp_tx = np.exp(-((bp_lam - 1000*units.AA)/(100*units.AA))**2)*units.dimensionless_unscaled
-    bp = specutils.Spectrum1D(spectral_axis=bp_lam, flux=bp_tx)
+    bp = Spectrum1D(spectral_axis=bp_lam, flux=bp_tx)
 
     # test that the AB standard source has zero magnitude
     lam = np.logspace(0, 4, 1000)*units.AA
     flam = 0.10884806248538730623*units.Unit('erg s-1 cm-2 AA')/lam**2
-    spec = specutils.Spectrum1D(spectral_axis=lam, flux=flam)
+    spec = Spectrum1D(spectral_axis=lam, flux=flam)
 
     m = mag_ab(spec, bp)
 
@@ -96,18 +90,18 @@ def test_mag_ab_standard_source():
 def test_mag_ab_redshift_dependence():
 
     from astropy import units
-
+    from specutils import Spectrum1D
     from skypy.galaxy.spectrum import mag_ab
 
     # make a wide tophat bandpass
     bp_lam = np.logspace(-10, 10, 3)*units.AA
     bp_tx = np.ones(3)*units.dimensionless_unscaled
-    bp = specutils.Spectrum1D(spectral_axis=bp_lam, flux=bp_tx)
+    bp = Spectrum1D(spectral_axis=bp_lam, flux=bp_tx)
 
     # create a narrow gaussian source
     lam = np.logspace(0, 3, 1000)*units.AA
     flam = np.exp(-((lam - 100*units.AA)/(10*units.AA))**2)*units.Unit('erg s-1 cm-2 AA-1')
-    spec = specutils.Spectrum1D(spectral_axis=lam, flux=flam)
+    spec = Spectrum1D(spectral_axis=lam, flux=flam)
 
     # array of redshifts
     z = np.linspace(0, 1, 11)
@@ -124,6 +118,7 @@ def test_mag_ab_multi():
 
     from astropy import units
     from skypy.galaxy.spectrum import mag_ab
+    from specutils import Spectrum1D
 
     # 5 redshifts
     z = np.linspace(0, 1, 5)
@@ -133,13 +128,13 @@ def test_mag_ab_multi():
     bp_mean = np.array([[1000], [2000]]) * units.AA
     bp_width = np.array([[100], [10]]) * units.AA
     bp_tx = np.exp(-((bp_lam-bp_mean)/bp_width)**2)*units.dimensionless_unscaled
-    bp = specutils.Spectrum1D(spectral_axis=bp_lam, flux=bp_tx)
+    bp = Spectrum1D(spectral_axis=bp_lam, flux=bp_tx)
 
     # 3 Flat Spectra
     lam = np.logspace(0, 4, 1000)*units.AA
     A = np.array([[2], [3], [4]])
     flam = A * 0.10884806248538730623*units.Unit('erg s-1 cm-2 AA')/lam**2
-    spec = specutils.Spectrum1D(spectral_axis=lam, flux=flam)
+    spec = Spectrum1D(spectral_axis=lam, flux=flam)
 
     # Compare calculated magnitudes with truth
     magnitudes = mag_ab(spec, bp, z)
@@ -154,17 +149,18 @@ def test_template_spectra():
     from astropy import units
     from skypy.galaxy.spectrum import mag_ab, magnitudes_from_templates
     from astropy.cosmology import Planck15
+    from specutils import Spectrum1D
 
     # 3 Flat Templates
     lam = np.logspace(0, 4, 1000)*units.AA
     A = np.array([[2], [3], [4]])
     flam = A * 0.10884806248538730623*units.Unit('erg s-1 cm-2 AA')/lam**2
-    spec = specutils.Spectrum1D(spectral_axis=lam, flux=flam)
+    spec = Spectrum1D(spectral_axis=lam, flux=flam)
 
     # Gaussian bandpass
     bp_lam = np.logspace(0, 4, 1000)*units.AA
     bp_tx = np.exp(-((bp_lam - 1000*units.AA)/(100*units.AA))**2)*units.dimensionless_unscaled
-    bp = specutils.Spectrum1D(spectral_axis=bp_lam, flux=bp_tx)
+    bp = Spectrum1D(spectral_axis=bp_lam, flux=bp_tx)
 
     # Each test galaxy is exactly one of the templates
     coefficients = np.diag(np.ones(3))
@@ -173,7 +169,7 @@ def test_template_spectra():
     np.testing.assert_allclose(mt, m)
 
     # Test distance modulus
-    redshift = np.array([0, 1, 2])
+    redshift = np.array([1, 2, 3])
     dm = Planck15.distmod(redshift).value
     mt = magnitudes_from_templates(coefficients, spec, bp, distance_modulus=dm)
     np.testing.assert_allclose(mt, m + dm)
@@ -198,19 +194,20 @@ def test_stellar_mass_from_reference_band():
 
     from astropy import units
     from skypy.galaxy.spectrum import mag_ab, stellar_mass_from_reference_band
+    from specutils import Spectrum1D
 
     # Gaussian bandpass
     bp_lam = np.logspace(0, 4, 1000) * units.AA
     bp_mean = 1000 * units.AA
     bp_width = 100 * units.AA
     bp_tx = np.exp(-((bp_lam-bp_mean)/bp_width)**2)*units.dimensionless_unscaled
-    band = specutils.Spectrum1D(spectral_axis=bp_lam, flux=bp_tx)
+    band = Spectrum1D(spectral_axis=bp_lam, flux=bp_tx)
 
     # 3 Flat template spectra
     lam = np.logspace(0, 4, 1000)*units.AA
     A = np.array([[2], [3], [4]])
     flam = A * 0.10884806248538730623*units.Unit('erg s-1 cm-2 AA')/lam**2
-    templates = specutils.Spectrum1D(spectral_axis=lam, flux=flam)
+    templates = Spectrum1D(spectral_axis=lam, flux=flam)
 
     # Absolute magnitudes for each template
     Mt = mag_ab(templates, band)
@@ -231,7 +228,8 @@ def test_stellar_mass_from_reference_band():
     np.testing.assert_allclose(stellar_mass, truth)
 
 
-@pytest.mark.skipif(not HAS_SPECUTILS, reason='test requires specutils')
+@pytest.mark.skipif(not HAS_SPECUTILS or not HAS_SKYPY_DATA,
+                    reason='test requires specutils and skypy-data')
 def test_load_spectral_data():
 
     from skypy.galaxy.spectrum import load_spectral_data
@@ -268,11 +266,11 @@ def test_combine_spectra():
 
     from skypy.galaxy._spectrum_loaders import combine_spectra
     from astropy import units
+    from specutils import Spectrum1D, SpectrumList
 
-    a = specutils.Spectrum1D(spectral_axis=[1., 2., 3.]*units.AA,
-                             flux=[1., 2., 3.]*units.Jy)
-    b = specutils.Spectrum1D(spectral_axis=[1e-10, 2e-10, 3e-10]*units.m,
-                             flux=[4e-23, 5e-23, 6e-23]*units.Unit('erg s-1 cm-2 Hz-1'))
+    a = Spectrum1D(spectral_axis=[1., 2., 3.]*units.AA, flux=[1., 2., 3.]*units.Jy)
+    b = Spectrum1D(spectral_axis=[1e-10, 2e-10, 3e-10]*units.m,
+                   flux=[4e-23, 5e-23, 6e-23]*units.Unit('erg s-1 cm-2 Hz-1'))
 
     assert np.allclose(a.spectral_axis, b.spectral_axis, atol=0, rtol=1e-10)
 
@@ -280,22 +278,21 @@ def test_combine_spectra():
     assert a == combine_spectra(None, a)
 
     ab = combine_spectra(a, b)
-    assert isinstance(ab, specutils.Spectrum1D)
+    assert isinstance(ab, Spectrum1D)
     assert ab.shape == (2, 3)
     assert ab.flux.unit == units.Jy
     assert np.allclose([[1, 2, 3], [4, 5, 6]], ab.flux.value)
 
     abb = combine_spectra(ab, b)
-    assert isinstance(ab, specutils.Spectrum1D)
+    assert isinstance(ab, Spectrum1D)
     assert abb.shape == (3, 3)
     assert abb.flux.unit == units.Jy
     assert np.allclose([[1, 2, 3], [4, 5, 6], [4, 5, 6]], abb.flux.value)
 
-    c = specutils.Spectrum1D(spectral_axis=[1., 2., 3., 4.]*units.AA,
-                             flux=[1., 2., 3., 4.]*units.Jy)
+    c = Spectrum1D(spectral_axis=[1., 2., 3., 4.]*units.AA, flux=[1., 2., 3., 4.]*units.Jy)
 
     ac = combine_spectra(a, c)
-    assert isinstance(ac, specutils.SpectrumList)
+    assert isinstance(ac, SpectrumList)
 
     aca = combine_spectra(ac, a)
-    assert isinstance(aca, specutils.SpectrumList)
+    assert isinstance(aca, SpectrumList)
