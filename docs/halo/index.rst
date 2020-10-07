@@ -9,18 +9,18 @@ and plot the collapse functions for different halo models.
 
 .. plot::
     :include-source: true
-    :nofigs:
+    :nofigs: true
     :context: close-figs
     import numpy as np
     from astropy.cosmology import Planck15
     from skypy.power_spectrum import eisenstein_hu
     from skypy.halo.mass import _sigma_squared
 
-    # Power spectrum and amplitude of perturbations
-    k = np.logspace(-3, 1, num=1000, base=10.0)
-    A_s, n_s = 2.1982e-09, 0.969453
-    mass = 10**np.arange(9.0, 15.0, 0.1)
+    # Power spectrum and amplitude of perturbations at redshift 0
     growth_0 = 1.0
+    A_s, n_s = 2.1982e-09, 0.969453
+    k = np.logspace(-3, 1, num=1000, base=10.0)
+    mass = 10**np.arange(9.0, 15.0, 0.1)
 
     pk0 = eisenstein_hu(k, A_s, n_s, Planck15, kwmap=0.02, wiggle=True)
     sigma = np.sqrt(_sigma_squared(mass, k, pk0, growth_0, Planck15))
