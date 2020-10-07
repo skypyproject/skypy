@@ -66,7 +66,7 @@ used for calculations in SkyPy. This can be installed with:
 
 SkyPy also has a driver script that can run simulation pipelines from the
 command line. The `skypyproject/examples`_ repository contains sample
-configuration files that you can clone and run.
+configuration files that you can clone and run:
 
 .. code:: bash
 
