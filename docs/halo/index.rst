@@ -10,7 +10,7 @@ and plot the collapse functions for different halo models.
 .. plot::
     :include-source: true
     :nofigs: true
-    :context: close-figs
+    
     import numpy as np
     from astropy.cosmology import Planck15
     from skypy.power_spectrum import eisenstein_hu
