@@ -11,7 +11,7 @@ fitting formula:
 
 
 .. plot::
-   :include-source: false
+   :include-source: true
    :nofigs:
    :context: close-figs
 
@@ -26,7 +26,7 @@ fitting formula:
 
 
 .. plot::
-   :include-source: true
+   :include-source: false
    :context: close-figs
 
     import matplotlib.pyplot as plt
@@ -38,7 +38,6 @@ fitting formula:
     plt.title('Linear power spectrum')
     plt.legend()
     plt.show()
-
 
 
 .. automodule:: skypy.power_spectrum

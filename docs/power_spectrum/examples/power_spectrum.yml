@@ -1,7 +1,14 @@
 cosmology: !astropy.cosmology.default_cosmology.get
 k: !numpy.logspace [-3, 1, 100]
-power_spectrum: !skypy.power_spectrum.eisenstein_hu
+eisenstein_hu_wiggle: !skypy.power_spectrum.eisenstein_hu
   wavenumber: $k
   A_s: 2.1982e-09
   n_s: 0.969453
   cosmology: $cosmology
+  wiggles: True
+eisenstein_hu_nowiggle: !skypy.power_spectrum.eisenstein_hu
+  wavenumber: $k
+  A_s: 2.1982e-09
+  n_s: 0.969453
+  cosmology: $cosmology
+  wiggles: False
