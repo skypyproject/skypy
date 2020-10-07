@@ -8,9 +8,10 @@ You can reproduce figure 2 in Sheth and Tormen 1999
 and plot the collapse functions for different halo models.
 
 .. plot::
-    :include-source: true
-    :nofigs: true
-    
+   :include-source: true
+   :nofigs:
+   :context: close-figs
+
     import numpy as np
     from astropy.cosmology import Planck15
     from skypy.power_spectrum import eisenstein_hu
@@ -37,9 +38,9 @@ and plot the collapse functions for different halo models.
 
 
 .. plot::
-    :include-source: false
-    :nofigs: false
-    :context: close-figs
+   :include-source: false
+   :context: close-figs
+
     import matplotlib.pyplot as plt
     from skypy.pipeline import Pipeline
 
