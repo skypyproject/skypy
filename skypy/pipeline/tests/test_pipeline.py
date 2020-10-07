@@ -147,10 +147,12 @@ def test_multi_column_assignment_failure(na, nt):
     with pytest.raises(ValueError):
         pipeline.execute()
 
+
 def test_pipeline_cosmology():
 
     # Define function for testing pipeline cosmology
     from skypy.utils import uses_default_cosmology
+
     @uses_default_cosmology
     def return_cosmology(cosmology):
         return cosmology
