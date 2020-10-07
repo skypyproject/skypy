@@ -38,6 +38,7 @@ and plot the collapse functions for different halo models.
 
 .. plot::
     :include-source: false
+    :nofigs: false
     :context: close-figs
     import matplotlib.pyplot as plt
     from skypy.pipeline import Pipeline
