@@ -1,5 +1,6 @@
 import numpy as np
 import pytest
+from skypy.galaxy.spectrum import HAS_SPECUTILS, HAS_SKYPY_DATA
 
 
 def test_uses_default_cosmology():
@@ -82,6 +83,8 @@ def test_dependent_argument():
             pass
 
 
+@pytest.mark.skipif(not HAS_SPECUTILS or not HAS_SKYPY_DATA,
+                    reason='test requires specutils and skypy-data')
 def test_spectral_data_input():
 
     from astropy import units

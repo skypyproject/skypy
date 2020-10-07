@@ -1,7 +1,6 @@
 '''Implementations for spectrum loaders.'''
 
 import numpy as np
-import specutils
 import astropy.utils.data
 import astropy.table
 from astropy import __version__ as astropy_version
@@ -10,6 +9,13 @@ from astropy import units
 import os
 import urllib
 from pkg_resources import resource_filename
+
+# this file is only ever imported when specutils is present
+# but without the try/except pytest will fail when doctests are discovered
+try:
+    import specutils
+except ImportError:
+    pass
 
 
 def download_file(url, cache=True):
@@ -62,7 +68,13 @@ def skypy_data_loader(module, name, *tags):
     for tag in tags:
 
         # get resource filename from module, name, and tag
-        filename = resource_filename(f'skypy-data.{module}', f'{name}_{tag}.ecsv')
+        try:
+            filename = resource_filename(f'skypy-data.{module}', f'{name}_{tag}.ecsv')
+        except ModuleNotFoundError as exc:
+            message = str("No module named 'skypy-data'. To install:\n"
+                          "pip install skypy-data@https://github.com/"
+                          "skypyproject/skypy-data/archive/master.tar.gz")
+            raise ModuleNotFoundError(message) from exc
 
         # load the data file
         data = astropy.table.Table.read(filename, format='ascii.ecsv')
