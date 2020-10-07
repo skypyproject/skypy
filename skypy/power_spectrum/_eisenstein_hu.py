@@ -75,15 +75,15 @@ def transfer_with_wiggles(wavenumber, A_s, n_s, cosmology, kwmap=0.02):
     ob0 = cosmology.Ob0
 
     if not ob0:
-        raise ValueError("Ob0 for input cosmology must be positive if you " \
-                        "set wiggles = True")
+        raise ValueError("Ob0 for input cosmology must be positive if you "
+                            "set wiggles = True")
 
     h0 = cosmology.H0.value / 100
     Tcmb0 = cosmology.Tcmb0.value
 
     if not Tcmb0:
-        raise ValueError("Tcmb0 for input cosmology must be positive if you " \
-                        "set wiggles = True")
+        raise ValueError("Tcmb0 for input cosmology must be positive if you "
+                            "set wiggles = True")
 
     ak = wavenumber * h0
     om0h2 = om0 * h0**2
