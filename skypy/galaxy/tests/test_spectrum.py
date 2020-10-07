@@ -173,10 +173,15 @@ def test_template_spectra():
     np.testing.assert_allclose(mt, m)
 
     # Test distance modulus
-    redshift = np.array([0, 1, 2])
+    redshift = np.array([0.00001, 1, 2])
     dm = Planck15.distmod(redshift).value
     mt = magnitudes_from_templates(coefficients, spec, bp, distance_modulus=dm)
     np.testing.assert_allclose(mt, m + dm)
+
+    # Test warning occurs if distance modulus is calculated at redshift 0
+    redshift = 0
+    with pytest.warns(RuntimeWarning):
+        Planck15.distmod(redshift).value
 
     # Test stellar mass
     sm = np.array([1, 2, 3])
