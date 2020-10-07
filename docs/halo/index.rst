@@ -71,9 +71,9 @@ file and run the pipeline, for example.
    :include-source: false
    :context: close-figs
 
-   from skypy.pipeline import Pipeline
-   pipeline = Pipeline.read('examples/halo.yml')
-   pipeline.execute()
+    from skypy.pipeline import Pipeline
+    pipeline = Pipeline.read('examples/halo.yml')
+    pipeline.execute()
 
     # Draw from different halo mass samplers
     halo_massST = pipeline['sheth-tormen']
