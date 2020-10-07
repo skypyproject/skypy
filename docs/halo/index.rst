@@ -5,7 +5,8 @@ Dark Matter Halos (`skypy.halo`)
 .. automodule:: skypy.halo
 
 You can reproduce figure 2 in Sheth and Tormen 1999
-and plot the collapse functions for different halo models.
+and plot the collapse functions for different halo models. You can do that
+from a python script, for example.
 
 .. plot::
    :include-source: true
@@ -42,8 +43,6 @@ and plot the collapse functions for different halo models.
    :context: close-figs
 
     import matplotlib.pyplot as plt
-    from skypy.pipeline import Pipeline
-
 
     # plot different collapse functions
     plt.loglog(nu, ST, label='Sheth-Tormen')
@@ -60,7 +59,8 @@ and plot the collapse functions for different halo models.
     plt.show()
 
 
-You can also sample halos using their mass function:
+You can also sample halos using their mass function. You can do that using a config
+file and running the pipeline, for example.
 
 .. plot::
    :include-source: false
