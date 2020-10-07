@@ -76,14 +76,14 @@ def transfer_with_wiggles(wavenumber, A_s, n_s, cosmology, kwmap=0.02):
 
     if not ob0:
         raise ValueError("Ob0 for input cosmology must be positive if you "
-                            "set wiggles = True")
+                         "set wiggles = True")
 
     h0 = cosmology.H0.value / 100
     Tcmb0 = cosmology.Tcmb0.value
 
     if not Tcmb0:
         raise ValueError("Tcmb0 for input cosmology must be positive if you "
-                            "set wiggles = True")
+                         "set wiggles = True")
 
     ak = wavenumber * h0
     om0h2 = om0 * h0**2
@@ -119,13 +119,13 @@ def transfer_with_wiggles(wavenumber, A_s, n_s, cosmology, kwmap=0.02):
     beta_c = 1 / (1 + beta_c_b1 * ((1 - f_baryon)**beta_c_b2 - 1))
 
     y = (1.0 + z_eq) / (1 + z_drag)
-    alpha_b_G = y * (-6 * np.sqrt(1 + y) + (2 + 3 * y)
-                     * np.log((np.sqrt(1 + y) + 1) / (np.sqrt(1 + y) - 1)))
+    alpha_b_G = y * (-6 * np.sqrt(1 + y) + (2 + 3 * y) *
+                     np.log((np.sqrt(1 + y) + 1) / (np.sqrt(1 + y) - 1)))
     alpha_b = 2.07 * k_eq * sound_horizon * (1 + r_drag)**-0.75 * alpha_b_G
 
     beta_node = 8.41 * om0h2 ** 0.435
-    beta_b = 0.5 + f_baryon + (3 - 2 * f_baryon) * np.sqrt((17.2 * om0h2)**2
-                                                           + 1.0)
+    beta_b = 0.5 + f_baryon + (3 - 2 * f_baryon) * np.sqrt((17.2 * om0h2)**2 +
+                                                           1.0)
 
     q = ak / (13.41 * k_eq)
     ks = ak * sound_horizon
