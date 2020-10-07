@@ -61,31 +61,27 @@ and plot the collapse functions for different halo models.
 
 You can also sample halos using their mass function:
 
-  .. plot::
-      :include-source: false
-      import matplotlib.pyplot as plt
-      from skypy.pipeline import Pipeline
+.. plot::
+   :include-source: false
+   :context: close-figs
+   
+    import matplotlib.pyplot as plt
+    from skypy.pipeline import Pipeline
 
-      # read the example pipeline
-      pipeline = Pipeline.read('examples/halo.yml')
+    # Draw from different halo mass samplers
+    halo_massST = pipeline['sheth-tormen']
+    halo_massPS = pipeline['press-schechter']
 
-      # run the pipeline as given
-      pipeline.execute()
+    plt.hist(halo_massST, histtype='step', label='Sheth-Tormen')
+    plt.hist(halo_massPS, histtype='step', label='Press-Schechter')
 
-      # Draw from different halo mass samplers
-      halo_massST = pipeline['sheth-tormen']
-      halo_massPS = pipeline['press-schechter']
+    # axis label and title
+    plt.xlabel(r'Halo mass $M_\odot$')
+    plt.title('Halo sampler')
 
-      plt.hist(halo_massST, histtype='step', label='Sheth-Tormen')
-      plt.hist(halo_massPS, histtype='step', label='Press-Schechter')
-
-      # axis label and title
-      plt.xlabel(r'Halo mass $M_\odot$')
-      plt.title('Halo sampler')
-
-      # show plot labels
-      plt.legend()
-      plt.show()
+    # show plot labels
+    plt.legend()
+    plt.show()
 
 
 Abundance Matching (`skypy.halo.abundance_matching`)
