@@ -1,0 +1,8 @@
+# healpix map information
+nside: 2
+
+# sample 500 galaxies in healpix pixel 1
+positions: !skypy.position.uniform_in_pixel
+  nside: $nside
+  ipix: 5
+  size: 500
