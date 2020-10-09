@@ -48,7 +48,6 @@ The SkyPy library can then be imported from python:
 .. code:: python
 
     >>> import skypy
-    >>> help(skypy)
 
 SkyPy has a number of optional dependencies which can be installed separately.
 One of these is `skypy-data`_ which contains data such as photometric bandpasses
