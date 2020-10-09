@@ -48,26 +48,29 @@ def uniform_around(centre, area, size):
 
 
 def uniform_in_pixel(nside, ipix, size, nest=False):
-    from healpy import max_pixrad, pix2ang, ang2pix
+    from healpy import pix2ang, max_pixrad, nside2pixarea, ang2pix
 
     # get the centre of the healpix pixel as a SkyCoord
-    centre_lon, centre_lat = pix2ang(nside, ipix, nest=False, lonlat=True)
+    centre_lon, centre_lat = pix2ang(nside, ipix, nest=nest, lonlat=True)
     centre = SkyCoord(centre_lon, centre_lat, unit=units.deg)
 
     # get the maximum radius of a healpix pixel in radian
-    r = max_pixrad(nside, degrees=False)
+    r = max_pixrad(nside)
 
     # use that radius as the aperture of a spherical area in steradian
     area = TWO_PI*(1 - np.cos(r))*units.sr
 
+    # oversampling factor = 1/(probability of the draw)
+    over = area.value/nside2pixarea(nside)
+
     # the array of longitudes and latitudes of the sample
-    lon, lat = np.empty(size), np.empty(size)
+    lon, lat = np.empty(0), np.empty(0)
 
     # rejection sampling over irregularly shaped healpix pixels
-    n_pos = 0
-    while n_pos < size:
+    miss = size
+    while miss > 0:
         # get the coordinates in a circular aperture around centre
-        sample = uniform_around(centre, area, size-n_pos)
+        sample = uniform_around(centre, area, int(miss*over))
 
         # get longitude and latitude of the sample
         sample_lon, sample_lat = sample.ra.deg, sample.dec.deg
@@ -75,13 +78,10 @@ def uniform_in_pixel(nside, ipix, size, nest=False):
         # accept those positions that are inside the correct pixel
         accept = ipix == ang2pix(nside, sample_lon, sample_lat, nest=nest, lonlat=True)
 
-        # count how many positions were accepted
-        n_new = n_pos + accept.sum()
-
         # store the new positions
-        lon[n_pos:n_new] = sample_lon[accept]
-        lat[n_pos:n_new] = sample_lat[accept]
-        n_pos = n_new
+        lon = np.append(lon, np.extract(accept, sample_lon))
+        lat = np.append(lat, np.extract(accept, sample_lat))
+        miss = size - len(lon)
 
     # construct the coordinates
-    return SkyCoord(lon, lat, unit=units.deg)
+    return SkyCoord(lon[:size], lat[:size], unit=units.deg)
