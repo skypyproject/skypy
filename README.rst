@@ -2,7 +2,7 @@
 SkyPy: A package for modelling the Universe
 ===========================================
 
-|Zenodo Badge| |Test Status| |Coverage Status| |PyPI Status| |Anaconda Status| |Documentation Status|
+|Zenodo| |PyPI| |conda-forge| |Read the Docs| |GitHub| |Codecov|
 
 This package contains methods for modelling the Universe, galaxies and the Milky
 Way. Also included are methods for generating observed data.
@@ -114,26 +114,21 @@ Note: This disclaimer was originally written by
 SkyPy based on its use in the README file for the
 `MetPy project <https://github.com/Unidata/MetPy>`_.
 
-.. |Zenodo Badge| image:: https://zenodo.org/badge/221432358.svg
+.. |Zenodo| image:: https://zenodo.org/badge/221432358.svg
    :target: https://zenodo.org/badge/latestdoi/221432358
-   :alt: DOI of Latest SkyPy Release
+   :alt: SkyPy Concept DOI
 
-.. |Test Status| image:: https://github.com/skypyproject/skypy/workflows/Tests/badge.svg
+.. |GitHub| image:: https://github.com/skypyproject/skypy/workflows/Tests/badge.svg
     :target: https://github.com/skypyproject/skypy/actions
-    :alt: SkyPy's Test Status
 
-.. |Coverage Status| image:: https://codecov.io/gh/skypyproject/skypy/branch/master/graph/badge.svg
+.. |Codecov| image:: https://codecov.io/gh/skypyproject/skypy/branch/master/graph/badge.svg
     :target: https://codecov.io/gh/skypyproject/skypy
-    :alt: SkyPy's Coverage Status
 
-.. |PyPI Status| image:: https://img.shields.io/pypi/v/skypy?label=PyPI&logo=pypi
+.. |PyPI| image:: https://img.shields.io/pypi/v/skypy?label=PyPI&logo=pypi
     :target: https://pypi.python.org/pypi/skypy
-    :alt: SkyPy's PyPI Status
 
-.. |Anaconda Status| image:: https://img.shields.io/conda/vn/conda-forge/skypy?logo=conda-forge
+.. |conda-forge| image:: https://img.shields.io/conda/vn/conda-forge/skypy?logo=conda-forge
     :target: https://anaconda.org/conda-forge/skypy
-    :alt: SkyPy's Anaconda Status
 
-.. |Documentation Status| image:: https://img.shields.io/readthedocs/skypy/stable?label=Docs&logo=read%20the%20docs
-    :target: https://skypy.readthedocs.io/en/latest/?badge=latest
-    :alt: Documentation Status
+.. |Read the Docs| image:: https://img.shields.io/readthedocs/skypy/stable?label=Docs&logo=read%20the%20docs
+    :target: https://skypy.readthedocs.io/en/stable
