@@ -137,14 +137,14 @@ SkyPy based on its use in the README file for the
     :target: https://codecov.io/gh/skypyproject/skypy
     :alt: SkyPy's Coverage Status
 
-.. |PyPI Status| image:: https://img.shields.io/pypi/v/skypy.svg
+.. |PyPI Status| image:: https://img.shields.io/pypi/v/skypy?label=PyPI&logo=pypi
     :target: https://pypi.python.org/pypi/skypy
     :alt: SkyPy's PyPI Status
 
-.. |Anaconda Status| image:: https://anaconda.org/conda-forge/skypy/badges/version.svg
+.. |Anaconda Status| image:: https://img.shields.io/conda/vn/conda-forge/skypy?logo=conda-forge
     :target: https://anaconda.org/conda-forge/skypy
     :alt: SkyPy's Anaconda Status
 
-.. |Documentation Status| image:: https://readthedocs.org/projects/githubapps/badge/?version=latest
+.. |Documentation Status| image:: https://img.shields.io/readthedocs/skypy/stable?label=Docs&logo=read%20the%20docs
     :target: https://skypy.readthedocs.io/en/latest/?badge=latest
     :alt: Documentation Status
