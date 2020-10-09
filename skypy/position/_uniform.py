@@ -62,8 +62,8 @@ def uniform_in_pixel(nside, ipix, size, nest=False):
     size : int
         Number of points to draw.
     nest : bool, optional
-        If `True`, assume `NESTED` pixel ordering, or `RING` pixel ordering
-        otherwise. Default is `RING` pixel ordering.
+        Assume ``NESTED`` pixel ordering, or ``RING`` pixel ordering otherwise.
+        Default is ``RING`` pixel ordering.
 
     Returns
     -------
@@ -72,7 +72,7 @@ def uniform_in_pixel(nside, ipix, size, nest=False):
 
     Warnings
     --------
-    This function requires the `healpy` package.
+    This function requires the ``healpy`` package.
 
     Examples
     --------
