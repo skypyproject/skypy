@@ -2,7 +2,7 @@
 SkyPy: A package for modelling the Universe
 ===========================================
 
-|Zenodo Badge| |Astropy Badge| |Test Status| |Coverage Status| |PyPI Status| |Anaconda Status| |Documentation Status|
+|Zenodo Badge| |Test Status| |Coverage Status| |PyPI Status| |Anaconda Status| |Documentation Status|
 
 This package contains methods for modelling the Universe, galaxies and the Milky
 Way. Also included are methods for generating observed data.
@@ -117,10 +117,6 @@ SkyPy based on its use in the README file for the
 .. |Zenodo Badge| image:: https://zenodo.org/badge/221432358.svg
    :target: https://zenodo.org/badge/latestdoi/221432358
    :alt: DOI of Latest SkyPy Release
-
-.. |Astropy Badge| image:: http://img.shields.io/badge/powered%20by-AstroPy-orange.svg?style=flat
-    :target: http://www.astropy.org
-    :alt: Powered by Astropy Badge
 
 .. |Test Status| image:: https://github.com/skypyproject/skypy/workflows/Tests/badge.svg
     :target: https://github.com/skypyproject/skypy/actions
