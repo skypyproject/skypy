@@ -48,7 +48,7 @@ def uniform_around(centre, area, size):
 
 
 def uniform_in_pixel(nside, ipix, size, nest=False):
-    from healpy.pixelfunc import max_pixrad, pix2ang, ang2pix
+    from healpy import max_pixrad, pix2ang, ang2pix
 
     # get the centre of the healpix pixel as a SkyCoord
     centre_lon, centre_lat = pix2ang(nside, ipix, nest=False, lonlat=True)
