@@ -43,12 +43,6 @@ To install using conda_:
 
     $ conda install -c conda-forge skypy
 
-You can test your SkyPy intallation using pytest_:
-
-.. code:: bash
-
-    $ pytest --pyargs skypy
-
 The SkyPy library can then be imported from python:
 
 .. code:: python
