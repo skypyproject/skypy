@@ -48,6 +48,38 @@ def uniform_around(centre, area, size):
 
 
 def uniform_in_pixel(nside, ipix, size, nest=False):
+    '''Uniform distribution of points over healpix pixel.
+
+    Draws randomly distributed points from the healpix pixel `ipix` for a map
+    of with `nside` parameter.
+
+    Parameters
+    ----------
+    nside : int
+        Healpix map `nside` parameter.
+    ipix : int
+        Healpix map pixel index.
+    size : int
+        Number of points to draw.
+    nest : bool, optional
+        If `True`, assume `NESTED` pixel ordering, or `RING` pixel ordering
+        otherwise. Default is `RING` pixel ordering.
+
+    Returns
+    -------
+    coords : `~astropy.coordinates.SkyCoord`
+        Randomly distributed points over the healpix pixel.
+
+    Warnings
+    --------
+    This function requires the `healpy` package.
+
+    Examples
+    --------
+    See :ref:`User Documentation <skypy.position.uniform_in_pixel>`.
+
+    '''
+
     from healpy import pix2ang, max_pixrad, nside2pixarea, ang2pix
 
     # get the centre of the healpix pixel as a SkyCoord
