@@ -2,7 +2,7 @@
 SkyPy: A package for modelling the Universe
 ===========================================
 
-|Zenodo| |PyPI| |conda-forge| |Read the Docs| |GitHub| |Codecov|
+|PyPI| |conda-forge| |Read the Docs| |GitHub| |Codecov| |Zenodo|
 
 This package contains methods for modelling the Universe, galaxies and the Milky
 Way. Also included are methods for generating observed data.
@@ -114,16 +114,6 @@ Note: This disclaimer was originally written by
 SkyPy based on its use in the README file for the
 `MetPy project <https://github.com/Unidata/MetPy>`_.
 
-.. |Zenodo| image:: https://zenodo.org/badge/221432358.svg
-   :target: https://zenodo.org/badge/latestdoi/221432358
-   :alt: SkyPy Concept DOI
-
-.. |GitHub| image:: https://github.com/skypyproject/skypy/workflows/Tests/badge.svg
-    :target: https://github.com/skypyproject/skypy/actions
-
-.. |Codecov| image:: https://codecov.io/gh/skypyproject/skypy/branch/master/graph/badge.svg
-    :target: https://codecov.io/gh/skypyproject/skypy
-
 .. |PyPI| image:: https://img.shields.io/pypi/v/skypy?label=PyPI&logo=pypi
     :target: https://pypi.python.org/pypi/skypy
 
@@ -132,3 +122,13 @@ SkyPy based on its use in the README file for the
 
 .. |Read the Docs| image:: https://img.shields.io/readthedocs/skypy/stable?label=Docs&logo=read%20the%20docs
     :target: https://skypy.readthedocs.io/en/stable
+
+.. |GitHub| image:: https://github.com/skypyproject/skypy/workflows/Tests/badge.svg
+    :target: https://github.com/skypyproject/skypy/actions
+
+.. |Codecov| image:: https://codecov.io/gh/skypyproject/skypy/branch/master/graph/badge.svg
+    :target: https://codecov.io/gh/skypyproject/skypy
+
+.. |Zenodo| image:: https://zenodo.org/badge/221432358.svg
+    :target: https://zenodo.org/badge/latestdoi/221432358
+    :alt: SkyPy Concept DOI
