@@ -2,9 +2,9 @@
 
 import numpy as np
 from astropy import units
+from astropy.coordinates import SkyCoord
 
 TWO_PI = 2*np.pi
-PI_HALF = np.pi/2
 
 
 @units.quantity_input(area=units.sr)
@@ -45,3 +45,43 @@ def uniform_around(centre, area, size):
 
     # construct random sky coordinates around centre
     return centre.directional_offset_by(phi, theta)
+
+
+def uniform_in_pixel(nside, ipix, size, nest=False):
+    from healpy.pixelfunc import max_pixrad, pix2ang, ang2pix
+
+    # get the centre of the healpix pixel as a SkyCoord
+    centre_lon, centre_lat = pix2ang(nside, ipix, nest=False, lonlat=True)
+    centre = SkyCoord(centre_lon, centre_lat, unit=units.deg)
+
+    # get the maximum radius of a healpix pixel in radian
+    r = max_pixrad(nside, degrees=False)
+
+    # use that radius as the aperture of a spherical area in steradian
+    area = TWO_PI*(1 - np.cos(r))*units.sr
+
+    # the array of longitudes and latitudes of the sample
+    lon, lat = np.empty(size), np.empty(size)
+
+    # rejection sampling over irregularly shaped healpix pixels
+    n_pos = 0
+    while n_pos < size:
+        # get the coordinates in a circular aperture around centre
+        sample = uniform_around(centre, area, size-n_pos)
+
+        # get longitude and latitude of the sample
+        sample_lon, sample_lat = sample.ra.deg, sample.dec.deg
+
+        # accept those positions that are inside the correct pixel
+        accept = ipix == ang2pix(nside, sample_lon, sample_lat, nest=nest, lonlat=True)
+
+        # count how many positions were accepted
+        n_new = n_pos + accept.sum()
+
+        # store the new positions
+        lon[n_pos:n_new] = sample_lon[accept]
+        lat[n_pos:n_new] = sample_lat[accept]
+        n_pos = n_new
+
+    # construct the coordinates
+    return SkyCoord(lon, lat, unit=units.deg)
