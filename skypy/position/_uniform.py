@@ -51,7 +51,7 @@ def uniform_in_pixel(nside, ipix, size, nest=False):
     '''Uniform distribution of points over healpix pixel.
 
     Draws randomly distributed points from the healpix pixel `ipix` for a map
-    of with `nside` parameter.
+    with a given `nside` parameter.
 
     Parameters
     ----------
@@ -62,8 +62,8 @@ def uniform_in_pixel(nside, ipix, size, nest=False):
     size : int
         Number of points to draw.
     nest : bool, optional
-        Assume ``NESTED`` pixel ordering, or ``RING`` pixel ordering otherwise.
-        Default is ``RING`` pixel ordering.
+        If True assume ``NESTED`` pixel ordering, otherwise ``RING`` pixel
+        ordering. Default is ``RING`` pixel ordering.
 
     Returns
     -------

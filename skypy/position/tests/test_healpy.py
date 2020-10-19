@@ -13,8 +13,9 @@ def test_uniform_in_pixel_correctness():
 
     ipix = np.random.randint(npix)
 
-    pos = uniform_in_pixel(nside, ipix, size=1000)
-    assert len(pos) == 1000
+    size = 1000
+    pos = uniform_in_pixel(nside, ipix, size=size)
+    assert len(pos) == size
 
     lon, lat = pos.ra.deg, pos.dec.deg
     apix = healpy.ang2pix(nside, lon, lat, lonlat=True)
@@ -32,12 +33,13 @@ def test_uniform_in_pixel_distribution():
     npix = healpy.nside2npix(nside)
 
     # sample entire sky with 20 positions per pixel
-    theta, phi = np.empty(npix*20), np.empty(npix*20)
+    size = 20
+    theta, phi = np.empty(npix*size), np.empty(npix*size)
     for ipix in range(npix):
-        pos = uniform_in_pixel(nside, ipix, size=20)
-        assert len(pos) == 20
-        theta[ipix*20:(ipix+1)*20] = np.pi/2 - pos.dec.rad
-        phi[ipix*20:(ipix+1)*20] = pos.ra.rad
+        pos = uniform_in_pixel(nside, ipix, size=size)
+        assert len(pos) == size
+        theta[ipix*size:(ipix+1)*size] = np.pi/2 - pos.dec.rad
+        phi[ipix*size:(ipix+1)*size] = pos.ra.rad
 
     # test for uniform distribution
     D, p = kstest(theta, lambda t: (1 - np.cos(t))/2)
