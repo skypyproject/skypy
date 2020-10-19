@@ -64,8 +64,10 @@ SkyPyLoader.add_multi_constructor('!', SkyPyLoader.construct_function)
 
 # constructor for quantities
 SkyPyLoader.add_constructor('!quantity', SkyPyLoader.construct_quantity)
+# Implicitly resolve quantities using the regex from astropy
 SkyPyLoader.add_implicit_resolver('!quantity', re.compile(r'''
-    -? [1-9] ( \. [0-9]* [1-9] )? ( e [-+] [1-9] [0-9]* )? \w* \W+
+    \s*[+-]?((\d+\.?\d*)|(\.\d+)|([nN][aA][nN])|
+    ([iI][nN][fF]([iI][nN][iI][tT][yY]){0,1}))([eE][+-]?\d+)?[.+-]? \w* \W+
 ''', re.VERBOSE), list('-+0123456789.'))
 
 
