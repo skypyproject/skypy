@@ -4,6 +4,7 @@ This module provides methods to run pipelines of functions with dependencies
 and handle their results.
 """
 
+from astropy import __version__ as astropy_version
 from astropy.cosmology import default_cosmology
 from astropy.table import Table
 from copy import copy, deepcopy
@@ -187,7 +188,11 @@ class Pipeline:
                     if len(names) > 1:
                         # Multi-column assignment
                         t = Table(self.get_value(settings), names=names)
-                        self.state[table].add_columns(t.columns.values())
+                        if astropy_version.startswith('3.'):  # pragma: no cover
+                            self.state[table].add_columns(t.columns.values())
+                        else:
+                            self.state[table].add_columns(t.columns)
+
                     else:
                         # Single column assignment
                         self.state[table][column] = self.get_value(settings)
