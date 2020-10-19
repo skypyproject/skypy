@@ -54,8 +54,8 @@ One of these is `skypy-data`_ which contains data such as photometric bandpasses
 required for some calculations in SkyPy. This can be installed with:
 
 .. code:: bash
-    
-    pip install skypy-data@https://github.com/skypyproject/skypy-data/archive/master.tar.gz
+
+    $ pip install skypy-data@https://github.com/skypyproject/skypy-data/archive/master.tar.gz
 
 SkyPy also has a driver script that can run simulation pipelines from the
 command line. The `skypyproject/examples`_ repository contains sample
@@ -63,8 +63,8 @@ configuration files that you can clone and run:
 
 .. code:: bash
 
-    git clone --depth 1 -b v$(skypy --version) https://github.com/skypyproject/examples.git
-    skypy examples/mccl_galaxies.yml --format fits
+    $ git clone --depth 1 -b v$(skypy --version) https://github.com/skypyproject/examples.git
+    $ skypy examples/mccl_galaxies.yml --format fits
 
 .. _PyPI: https://pypi.org/project/skypy/
 .. _conda-forge: https://anaconda.org/conda-forge/skypy
