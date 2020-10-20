@@ -43,3 +43,7 @@ def test_skypy():
     # Process test config file
     filename = get_pkg_data_filename('data/test_config.yml')
     assert skypy.main([filename]) == 0
+
+    # Process lightcone config file
+    filename = get_pkg_data_filename('data/lightcone_config.yml')
+    assert skypy.main([filename]) == 0

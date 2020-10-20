@@ -1,0 +1,13 @@
+lightcone:
+  z_min: 0.8
+  z_max: 1.2
+  n_slice: 4
+tables:
+  galaxies:
+    redshift: !skypy.galaxy.redshift.schechter_lf_redshift
+      redshift: !numpy.linspace [$slice_z_min, $slice_z_max, 100]
+      M_star: -21
+      phi_star: 0.0017
+      alpha: -0.5
+      m_lim: 25
+      fsky: 1.0e-6

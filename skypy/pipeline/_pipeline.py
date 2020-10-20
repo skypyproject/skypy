@@ -82,6 +82,9 @@ class Pipeline:
         self.config.update({k: v.pop('.init', default_table)
                             for k, v in self.table_config.items()})
 
+        # Initalise state with parameters
+        self.state = copy(self.parameters)
+
         # Create a Directed Acyclic Graph of all jobs and dependencies
         self.dag = networkx.DiGraph()
 
