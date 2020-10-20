@@ -7,7 +7,7 @@ You can plot the linear power spectrum using CAMB or CLASS from SkyPy.
 
 Here we plot the Eisenstein and
 Hu fitting formula and the non-linear power spectrum, using the Smith
-halofit model. For this we use a config file. We
+halofit model. For this we use a config file. 
 
 .. literalinclude:: examples/power_spectrum.yml
    :language: yaml
