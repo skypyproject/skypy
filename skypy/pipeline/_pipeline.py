@@ -7,50 +7,13 @@ and handle their results.
 from astropy.cosmology import default_cosmology
 from astropy.table import Table
 from copy import copy, deepcopy
-from importlib import import_module
-import builtins
+from ._config import load_skypy_yaml
 import networkx
 
 
 __all__ = [
     'Pipeline',
 ]
-
-
-def import_function(qualname):
-    '''load function from fully qualified name'''
-    path = qualname.split('.')
-    module = builtins
-    for i, key in enumerate(path[:-1]):
-        if not hasattr(module, key):
-            module = import_module('.'.join(path[:i+1]))
-        else:
-            module = getattr(module, key)
-    function = getattr(module, path[-1])
-    return function
-
-
-def function_tag(loader, name, node):
-    '''load function from !function tag
-
-    tags are stored as a tuple `(function, args)`
-    '''
-
-    import yaml
-
-    if isinstance(node, yaml.ScalarNode):
-        args = loader.construct_scalar(node)
-    elif isinstance(node, yaml.SequenceNode):
-        args = loader.construct_sequence(node)
-    elif isinstance(node, yaml.MappingNode):
-        args = loader.construct_mapping(node)
-
-    try:
-        function = import_function(name)
-    except (ModuleNotFoundError, AttributeError) as e:  # pragma: no cover
-        raise ImportError(f'{e}\n{node.start_mark}') from e
-
-    return (function,) if args == '' else (function, args)
 
 
 class Pipeline:
@@ -70,16 +33,7 @@ class Pipeline:
             The name of the configuration file.
 
         '''
-        import yaml
-
-        # register custom tags
-        yaml.SafeLoader.add_multi_constructor('!', function_tag)
-
-        # read the file
-        with open(filename, 'r') as stream:
-            config = yaml.safe_load(stream) or {}
-
-        # construct the pipeline
+        config = load_skypy_yaml(filename)
         return cls(config)
 
     def __init__(self, configuration):
@@ -127,6 +81,9 @@ class Pipeline:
         default_table = (Table,)
         self.config.update({k: v.pop('.init', default_table)
                             for k, v in self.table_config.items()})
+
+        # Initalise state with parameters
+        self.state = copy(self.parameters)
 
         # Create a Directed Acyclic Graph of all jobs and dependencies
         self.dag = networkx.DiGraph()
