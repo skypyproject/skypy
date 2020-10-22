@@ -1,7 +1,7 @@
 cosmology: !astropy.cosmology.default_cosmology.get
 z_range: !numpy.arange [0, 2.01, 0.1]
 mag_lim: 30
-sky_area: !astropy.units.Quantity ['1 deg2']
+sky_area: 1 deg2
 M_star_red: !astropy.modeling.models.Linear1D [-0.70798041, -20.37196157]
 phi_star_red: !astropy.modeling.models.Exponential1D [0.0035097, -1.41649]
 alpha_red: -0.5

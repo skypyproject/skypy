@@ -35,8 +35,7 @@ def test_schechter_lf_redshift():
     density = phi_star*gamma(alpha+1)*gammaincc(alpha+1, x_min)
 
     # turn into galaxies/surface area
-    density *= (sky_area *
-                cosmo.differential_comoving_volume(z)).to_value('Mpc3')
+    density *= (sky_area * cosmo.differential_comoving_volume(z)).to_value('Mpc3')
 
     # integrate total number
     n_gal = np.trapz(density, z, axis=-1)
@@ -85,12 +84,12 @@ def test_redshifts_from_comoving_density():
     D, p = kstest(z_gal, lambda z: cosmo.comoving_volume(z).to_value('Mpc3')/V_max)
     assert p > 0.01, 'D = {}, p = {}'.format(D, p)
 
-    # test that error is returned if wrong unit is given
+    # Test that an error is raised if sky_area has the wrong units
     sky_area = 1 * units.degree
     with pytest.raises(units.UnitsError):
         redshifts_from_comoving_density(redshift, density, sky_area, cosmo, noise=False)
 
-    # test that error is returned if no unit is given
+    # Test that an error is raised if sky_area has no units
     sky_area = 1
     with pytest.raises(TypeError):
         redshifts_from_comoving_density(redshift, density, sky_area, cosmo, noise=False)
