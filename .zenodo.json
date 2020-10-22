@@ -17,9 +17,7 @@
     "creators": [
         {
             "name": "SkyPy Collaboration"
-        }
-    ],
-    "contributors": [
+        },
         {
             "orcid": "0000-0003-3481-3491",
             "affiliation": "University of Portsmouth",
@@ -121,7 +119,9 @@
             "affiliation": "University of Portsmouth",
             "name": "Andrew R. Williamson",
             "type": "ProjectMember"
-        },
+        }
+    ],
+    "contributors": [
         {
             "orcid": "0000-0003-3954-3291",
             "affiliation": "University of Toronto",
