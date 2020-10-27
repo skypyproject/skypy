@@ -187,7 +187,7 @@ class Pipeline:
                     if len(names) > 1:
                         # Multi-column assignment
                         t = Table(self.get_value(settings), names=names)
-                        self.state[table].add_columns(t.columns.values())
+                        self.state[table].add_columns(t.columns)
                     else:
                         # Single column assignment
                         self.state[table][column] = self.get_value(settings)
