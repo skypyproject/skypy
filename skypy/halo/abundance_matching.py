@@ -26,17 +26,18 @@ __all__ = [
 def vale_ostriker(halo_kwargs, subhalo_kwargs, galaxy_kwargs):
     """Vale & Ostriker abundance matching.
     Generate matched arrays of (sub)halos masses and galaxy absolute magnitudes
-    following the abundance matching model in Vale & Ostriker (2004).
+    following the abundance matching model in [1]_.
 
     Parameters
     ----------
     halo_kwargs : dict
-        Dictionary of keyword arguments for skypy.halo.press_schechter.
+        Dictionary of keyword arguments for `~skypy.halo.mass.press_schechter`.
     subhalo_kwargs : dict
-        Dictionary of keyword arguments for skypy.halo.number_subhalos and
-        skypy.halo.subhalo_mass_sampler.
+        Dictionary of keyword arguments for `~skypy.halo.mass.number_subhalos`
+        and `~skypy.halo.mass.subhalo_mass_sampler`.
     galaxy_kwargs : dict
-        Dictionary of keyword arguments for skypy.galaxy.schechter_lf_magnitude.
+        Dictionary of keyword arguments for
+        `~skypy.galaxy.luminosity.schechter_lf_magnitude`.
 
     Returns
     -------
@@ -48,6 +49,7 @@ def vale_ostriker(halo_kwargs, subhalo_kwargs, galaxy_kwargs):
         Array of boolean values indicating if the halo is a parent.
     magnitude : array_like
         Array of galaxy absolute magnitudes.
+
     References
     ----------
     .. [1] Vale A., Ostriker J. P., 2004, MNRAS, 353, 189

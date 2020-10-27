@@ -14,6 +14,20 @@ __all__ = [
     'magnitudes_from_templates',
 ]
 
+try:
+    __import__('specutils')
+except ImportError:
+    HAS_SPECUTILS = False
+else:
+    HAS_SPECUTILS = True
+
+try:
+    __import__('skypy-data')
+except ImportError:
+    HAS_SKYPY_DATA = False
+else:
+    HAS_SKYPY_DATA = True
+
 
 def dirichlet_coefficients(redshift, alpha0, alpha1, z1=1., weight=None):
     r"""Dirichlet-distributed SED coefficients.
@@ -141,7 +155,7 @@ def mag_ab(spectrum, bandpass, redshift=None):
     Get B-band magnitudes for the kcorrect spec templaces using auto-loading
     of known spectral data:
     >>> from skypy.galaxy.spectrum import mag_ab
-    >>> mag_B = mag_ab('kcorrect_spec', 'Johnson_B')
+    >>> mag_B = mag_ab('kcorrect_spec', 'Johnson_B')  # doctest: +SKIP
 
     '''
 

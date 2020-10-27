@@ -1,23 +1,25 @@
 '''Implementations for spectrum loaders.'''
 
 import numpy as np
-import specutils
 import astropy.utils.data
 import astropy.table
-from astropy import __version__ as astropy_version
 from astropy import units
 
 import os
 import urllib
 from pkg_resources import resource_filename
 
+# this file is only ever imported when specutils is present
+# but without the try/except pytest will fail when doctests are discovered
+try:
+    import specutils
+except ImportError:
+    pass
+
 
 def download_file(url, cache=True):
     '''download_file with some specific settings'''
-    if astropy_version.startswith('3.'):  # pragma: no cover
-        extra_kwargs = {}
-    else:
-        extra_kwargs = {'pkgname': 'skypy'}
+    extra_kwargs = {'pkgname': 'skypy'}
     return astropy.utils.data.download_file(
             url, cache=cache, show_progress=False, **extra_kwargs)
 

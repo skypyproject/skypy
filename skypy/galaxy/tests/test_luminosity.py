@@ -8,9 +8,9 @@ def test_magnitude_functions():
     from astropy.cosmology import default_cosmology
 
     from skypy.galaxy.luminosity import (absolute_to_apparent_magnitude,
-            apparent_to_absolute_magnitude, distance_modulus,
-            luminosity_in_band, luminosity_from_absolute_magnitude,
-            absolute_magnitude_from_luminosity)
+                                         apparent_to_absolute_magnitude, distance_modulus,
+                                         luminosity_in_band, luminosity_from_absolute_magnitude,
+                                         absolute_magnitude_from_luminosity)
 
     cosmo = default_cosmology.get()
 

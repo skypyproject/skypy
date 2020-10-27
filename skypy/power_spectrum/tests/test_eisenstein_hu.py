@@ -1,6 +1,6 @@
 import numpy as np
 import pytest
-from astropy.cosmology import default_cosmology
+from astropy.cosmology import default_cosmology, FlatLambdaCDM
 from skypy.power_spectrum import eisenstein_hu
 
 
@@ -60,3 +60,17 @@ def test_eisenstein_hu():
     with pytest.raises(ValueError):
         eisenstein_hu(negative_wavenumber_array, A_s, n_s, cosmology, kwmap,
                       wiggle=False)
+
+    # Test for failure when cosmology has Ob0 = 0 and wiggle = True
+    zero_ob0_cosmology = FlatLambdaCDM(H0=70, Om0=0.3, Tcmb0=2.725)
+    wavenumber = np.logspace(-3, 1, num=5, base=10.0)
+    with pytest.raises(ValueError):
+        eisenstein_hu(wavenumber, A_s, n_s, zero_ob0_cosmology, kwmap,
+                      wiggle=True)
+
+    # Test for failure when cosmology has Tcmb = 0  and wiggle = True
+    zero_Tcmb0_cosmology = FlatLambdaCDM(H0=70, Om0=0.3, Ob0=0.05)
+    wavenumber = np.logspace(-3, 1, num=5, base=10.0)
+    with pytest.raises(ValueError):
+        eisenstein_hu(wavenumber, A_s, n_s, zero_Tcmb0_cosmology, kwmap,
+                      wiggle=True)
