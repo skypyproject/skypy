@@ -2,6 +2,7 @@ from astropy.utils.data import get_pkg_data_filename
 from collections.abc import Callable
 import pytest
 from skypy.pipeline import load_skypy_yaml
+from astropy import units
 
 
 def test_load_skypy_yaml():
@@ -31,3 +32,12 @@ def test_load_skypy_yaml():
     filename = get_pkg_data_filename('data/bad_module.yml')
     with pytest.raises(ImportError):
         load_skypy_yaml(filename)
+
+
+def test_yaml_quantities():
+    # config with quantities
+    filename = get_pkg_data_filename('data/quantities.yml')
+    config = load_skypy_yaml(filename)
+
+    assert config['42_km'] == units.Quantity('42 km')
+    assert config['1_deg2'] == units.Quantity('1 deg2')

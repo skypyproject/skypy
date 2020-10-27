@@ -7,6 +7,7 @@ def test_schechter_lf():
 
     from pytest import raises
     from skypy.galaxy import schechter_lf
+    from astropy import units
 
     # redshift and magnitude distributions are tested separately
     # only test that output is consistent here
@@ -17,10 +18,10 @@ def test_schechter_lf():
     phi_star = 1e-3
     alpha = -0.5
     m_lim = 30.
-    fsky = 1/41253
+    sky_area = 1.0 * units.deg**2
 
     # sample redshifts and magnitudes
-    z_gal, M_gal = schechter_lf(z, M_star, phi_star, alpha, m_lim, fsky)
+    z_gal, M_gal = schechter_lf(z, M_star, phi_star, alpha, m_lim, sky_area)
 
     # check length
     assert len(z_gal) == len(M_gal)
@@ -31,4 +32,4 @@ def test_schechter_lf():
     # sample s.t. arrays need to be interpolated
     # alpha array not yet supported
     with raises(NotImplementedError):
-        z_gal, M_gal = schechter_lf(z, M_star, phi_star, alpha, m_lim, fsky)
+        z_gal, M_gal = schechter_lf(z, M_star, phi_star, alpha, m_lim, sky_area)
