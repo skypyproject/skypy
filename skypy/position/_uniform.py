@@ -102,7 +102,7 @@ def uniform_in_pixel(nside, ipix, size, nest=False):
     miss = size
     while miss > 0:
         # get the coordinates in a circular aperture around centre
-        sample = uniform_around(centre, area, int(miss*over))
+        sample = uniform_around(centre, area, int(np.ceil(miss*over)))
 
         # get longitude and latitude of the sample
         sample_lon, sample_lat = sample.ra.deg, sample.dec.deg
