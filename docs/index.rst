@@ -13,6 +13,13 @@ This package contains methods for modelling the Universe, galaxies and the Milky
 Getting Started
 ***************
 
+.. toctree::
+   :maxdepth: 1
+
+   examples/abundance_matching.ipynb
+   examples/gravitational_wave_rates.ipynb
+   examples/mccl_galaxies.ipynb
+
 
 .. _user-docs:
 
