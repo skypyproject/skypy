@@ -3,11 +3,11 @@ Power Spectrum (`skypy.power_spectrum`)
 ***************************************
 This module contains methods to model the matter power spectrum.
 
-You can plot the linear power spectrum using CAMB or CLASS from SkyPy.
-
-Here we plot the Eisenstein and
-Hu fitting formula and the non-linear power spectrum, using the Smith
-halofit model. For this we use a config file. 
+SkyPy provides wrappers to a number of external codes for calculating the
+matter power spectrum, including `~skypy.power_spectrum.camb` and
+`~skypy.power_spectrum.classy`. Here we demonstrate calculating the linear
+matter power spectrum using `~skypy.power_spectrum.eisenstein_hu` and the
+non-linear corrections using `~skypy.power_spectrum.halofit_smith`:
 
 .. literalinclude:: examples/power_spectrum.yml
    :language: yaml
@@ -22,11 +22,10 @@ halofit model. For this we use a config file.
     pipeline = Pipeline.read('examples/power_spectrum.yml')
     pipeline.execute()
 
-    # Eisenstein and Hu power spectrum with and without wiggles
+    # Eisenstein and Hu power spectrum and Halofit matter power spectra
     k = pipeline['wavenumber']
     power_EH_w = pipeline['eisenstein_hu_wiggle']
     hf_Smith = pipeline['halofit']
-
 
     plt.loglog(k, power_EH_w, label='Eisenstein & Hu')
     plt.loglog(k, hf_Smith, '--', label='Halofit')
