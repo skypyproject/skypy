@@ -257,3 +257,6 @@ try:
     import_module('camb')
 except ImportError:
     autodoc_mock_imports.append('camb')
+
+# nbsphinx extension to render ipython notebooks
+extensions += ['nbsphinx']
