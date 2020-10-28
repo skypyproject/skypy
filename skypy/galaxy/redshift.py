@@ -7,6 +7,7 @@ models.
 import numpy as np
 import scipy.integrate
 import scipy.special
+from astropy import units
 
 from ..utils import uses_default_cosmology, broadcast_arguments, dependent_argument
 
@@ -77,12 +78,14 @@ def smail(z_median, alpha, beta, size=None):
 @dependent_argument('phi_star', 'redshift')
 @dependent_argument('alpha', 'redshift')
 @broadcast_arguments('redshift', 'M_star', 'phi_star', 'alpha')
-def schechter_lf_redshift(redshift, M_star, phi_star, alpha, m_lim, fsky, cosmology, noise=True):
+@units.quantity_input(sky_area=units.sr)
+def schechter_lf_redshift(redshift, M_star, phi_star, alpha, m_lim, sky_area,
+                          cosmology, noise=True):
     r'''Sample redshifts from Schechter luminosity function.
 
     Sample the redshifts of galaxies following a Schechter luminosity function
     with potentially redshift-dependent parameters, limited by an apparent
-    magnitude `m_lim`, for a fraction `fsky` of the sky.
+    magnitude `m_lim`, for a sky area `sky_area`.
 
     Parameters
     ----------
@@ -101,8 +104,8 @@ def schechter_lf_redshift(redshift, M_star, phi_star, alpha, m_lim, fsky, cosmol
         values for each `redshift`, or a function of redshift.
     m_lim : float
         Limiting apparent magnitude.
-    fsky : array_like
-        Sky fraction over which galaxies are sampled.
+    sky_area : `~astropy.units.Quantity`
+        Sky area over which galaxies are sampled. Must be in units of solid angle.
     cosmology : Cosmology, optional
         Cosmology object to convert apparent to absolute magnitudes. If not
         given, the default cosmology is used.
@@ -123,11 +126,13 @@ def schechter_lf_redshift(redshift, M_star, phi_star, alpha, m_lim, fsky, cosmol
     the sky.
 
     >>> from skypy.galaxy.redshift import schechter_lf_redshift
+    >>> from astropy import units
     >>> z = [0., 5.]
     >>> M_star = -20.5
     >>> phi_star = 3.5e-3
     >>> alpha = -1.3
-    >>> z_gal = schechter_lf_redshift(z, M_star, phi_star, alpha, 22, 1/41253)
+    >>> sky_area = 1*units.deg**2
+    >>> z_gal = schechter_lf_redshift(z, M_star, phi_star, alpha, 22, sky_area)
 
     '''
 
@@ -150,16 +155,17 @@ def schechter_lf_redshift(redshift, M_star, phi_star, alpha, m_lim, fsky, cosmol
 
     # sample redshifts from the comoving density
     return redshifts_from_comoving_density(redshift=redshift, density=density,
-                                           fsky=fsky, cosmology=cosmology, noise=noise)
+                                           sky_area=sky_area, cosmology=cosmology, noise=noise)
 
 
 @uses_default_cosmology
-def redshifts_from_comoving_density(redshift, density, fsky, cosmology, noise=True):
+@units.quantity_input(sky_area=units.sr)
+def redshifts_from_comoving_density(redshift, density, sky_area, cosmology, noise=True):
     r'''Sample redshifts from a comoving density function.
 
     Sample galaxy redshifts such that the resulting distribution matches a past
     lightcone with comoving galaxy number density `density` at redshifts
-    `redshift`. The comoving volume sampled corresponds to a sky fraction `fsky`
+    `redshift`. The comoving volume sampled corresponds to a sky area `sky_area`
     and transverse comoving distance given by the cosmology `cosmology`.
 
     If the `noise` parameter is set to true, the number of galaxies has Poisson
@@ -171,8 +177,8 @@ def redshifts_from_comoving_density(redshift, density, fsky, cosmology, noise=Tr
         Redshifts at which comoving number densities are provided.
     density : array_like
         Comoving galaxy number density at each redshift in Mpc-3.
-    fsky : array_like
-        Sky fraction over which galaxies are sampled.
+    sky_area : `~astropy.units.Quantity`
+        Sky area over which galaxies are sampled. Must be in units of solid angle.
     cosmology : Cosmology, optional
         Cosmology object for conversion to comoving volume. If not given, the
         default cosmology is used.
@@ -191,15 +197,16 @@ def redshifts_from_comoving_density(redshift, density, fsky, cosmology, noise=Tr
     redshift 1 for a survey of 1 square degree = 1/41253 of the sky.
 
     >>> from skypy.galaxy.redshift import redshifts_from_comoving_density
+    >>> from astropy import units
     >>> z_range = np.arange(0, 1.01, 0.1)
-    >>> z_gal = redshifts_from_comoving_density(z_range, 1e-3, 1/41253)
+    >>> sky_area = 1*units.deg**2
+    >>> z_gal = redshifts_from_comoving_density(z_range, 1e-3, sky_area)
 
     '''
 
     # redshift number density
-    dN_dz = cosmology.differential_comoving_volume(redshift).to_value('Mpc3/sr')
+    dN_dz = (cosmology.differential_comoving_volume(redshift) * sky_area).to_value('Mpc3')
     dN_dz *= density
-    dN_dz *= 4*np.pi*fsky
 
     # integrate density to get expected number of galaxies
     N = np.trapz(dN_dz, redshift)

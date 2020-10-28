@@ -127,6 +127,11 @@
             "affiliation": "University of Toronto",
             "name": "Nathaniel Starkman",
             "type": "Other"
+        },
+        {
+            "orcid": "0000-0002-3988-8591",
+            "name": "Jonathan D Harris",
+            "type": "Other"
         }
     ],
     "access_right": "open"

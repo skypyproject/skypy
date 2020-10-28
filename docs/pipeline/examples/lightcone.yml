@@ -10,4 +10,4 @@ tables:
       phi_star: 0.0017
       alpha: -0.5
       m_lim: 25
-      fsky: 1.0e-6
+      sky_area: 0.05 deg2

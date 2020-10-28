@@ -3,7 +3,6 @@
 import numpy as np
 import astropy.utils.data
 import astropy.table
-from astropy import __version__ as astropy_version
 from astropy import units
 
 import os
@@ -20,10 +19,7 @@ except ImportError:
 
 def download_file(url, cache=True):
     '''download_file with some specific settings'''
-    if astropy_version.startswith('3.'):  # pragma: no cover
-        extra_kwargs = {}
-    else:
-        extra_kwargs = {'pkgname': 'skypy'}
+    extra_kwargs = {'pkgname': 'skypy'}
     return astropy.utils.data.download_file(
             url, cache=cache, show_progress=False, **extra_kwargs)
 
