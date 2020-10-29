@@ -292,4 +292,4 @@ class Pipeline:
     def __getitem__(self, label):
         name, _, key = label.partition('.')
         item = self.state[name]
-        return item[key] if key else item
+        return item[key].quantity if key else item
