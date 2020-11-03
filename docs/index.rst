@@ -27,7 +27,7 @@ Packages
    :maxdepth: 1
 
    cluster/index
-   galaxy
+   galaxy/index
    gravitational_wave/index
    halo/index
    position/index
