@@ -10,27 +10,28 @@ the configuration file provided in the `~skypy.examples` directory:
 
 
 .. plot::
-   :include-source: true
+   :include-source: false
 
     from skypy.pipeline import Pipeline
     pipeline = Pipeline.read('examples/merger_rates.yml')
     pipeline.execute()
+    merger = pipeline['merger_rates']
 
     import matplotlib.pyplot as plt
 
     plt.figure()
-    plt.hist(pipeline['ns_ns_rate'], histtype='step', bins=np.logspace(-4,2,50), label='NS-NS')
-    plt.hist(pipeline['ns_bh_rate'], histtype='step', bins=np.logspace(-4,2,50), label='NS-BH')
-    plt.hist(pipeline['bh_bh_rate'], histtype='step', bins=np.logspace(-4,2,50), label='BH-BH')
+    plt.hist(merger['ns_ns_rate'], histtype='step', bins=np.logspace(-4,2,50), label='NS-NS')
+    plt.hist(merger['ns_bh_rate'], histtype='step', bins=np.logspace(-4,2,50), label='NS-BH')
+    plt.hist(merger['bh_bh_rate'], histtype='step', bins=np.logspace(-4,2,50), label='BH-BH')
     plt.legend()
     plt.xscale('log')
     plt.yscale('log')
-    plt.xlabel('$Merger rate, R\,$[yr$^{-1}$]')
+    plt.xlabel('Merger rate, $R\, [year^{-1}$]')
 
     plt.show()
 
 
-‘NS-NS’ means neutron star - neutron star, ‘NS-BH’ is neutron star
+Note: ‘NS-NS’ means neutron star - neutron star, ‘NS-BH’ is neutron star
 - black hole and ‘BH-BH’ is black hole - black hole.
 
 .. automodule:: skypy.gravitational_wave
