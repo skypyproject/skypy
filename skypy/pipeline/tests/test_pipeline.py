@@ -203,12 +203,13 @@ def test_column_quantity():
 
     # Regression test for pull request #356
     # Previously Pipeline.__getitem__ would return column data from tables as
-    # an astropy.table.Column object instead of an astropy.units.Quantity
-    # object. As of astropy version 4.1.0 Column does not support all of the
-    # same class methods as Quantity e.g. to_value. This test ensures that
-    # column data in a Pipeline is accessed as a Quantity and that functions
-    # using methods not supported by Column can be called inside a Pipeline
-    # on column data.
+    # an astropy.table.Column object. However, most functions take either
+    # numpy.ndarray or astropy.units.Quantity objects as arguments. As of
+    # astropy version 4.1.0 Column does not support all of the same class
+    # methods as Quantity e.g. to_value. This test ensures that column data in
+    # a Pipeline is accessed as either an ndarray or Quantity (depending on
+    # units). It also checks that functions using methods not supported by
+    # Column can be called on column data inside a Pipeline.
 
     def value_in_cm(q):
         return q.to_value(unit='cm')
@@ -223,6 +224,7 @@ def test_column_quantity():
     pipeline.execute()
 
     assert isinstance(pipeline['test_table.lengths'], Quantity)
+    assert isinstance(pipeline['test_table.lengths_in_cm'], np.ndarray)
     np.testing.assert_array_less(0, pipeline['test_table.lengths_in_cm'])
     np.testing.assert_array_less(pipeline['test_table.lengths_in_cm'], 100)
 
