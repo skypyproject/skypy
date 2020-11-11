@@ -24,7 +24,7 @@ our `Citation Guidelines`_.
 .. _Power Spectra: https://skypy.readthedocs.io/en/latest/power_spectrum/index.html
 .. _Pipelines: https://skypy.readthedocs.io/en/latest/pipeline/index.html
 .. _SkyPy Documentation: https://skypy.readthedocs.io/en/latest/
-.. _Citation Guidelines: CITATION
+.. _Citation Guidelines: CITATION.rst
 
 
 Getting Started
