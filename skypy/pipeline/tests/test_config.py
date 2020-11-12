@@ -41,3 +41,10 @@ def test_yaml_quantities():
 
     assert config['42_km'] == units.Quantity('42 km')
     assert config['1_deg2'] == units.Quantity('1 deg2')
+
+
+def test_keys_must_be_strings():
+    # config with keys that don't parse as Strings.
+    filename = get_pkg_data_filename('data/numeric_keys.yml')
+    with pytest.raises(ImportError):
+        config = load_skypy_yaml(filename)

@@ -30,7 +30,16 @@ class SkyPyLoader(yaml.SafeLoader):
         '''load the first YAML document from stream'''
         loader = cls(stream)
         try:
-            return loader.get_single_data()
+            single_data = loader.get_single_data()
+
+            keys = single_data.keys() if single_data else {}
+            for key in keys:
+                if not isinstance(key, str):
+                    error_message = f"Invalid key found in config.  {key} is not a string." \
+                                    f"  Either rename this value or wrap it in quotes."
+                    raise ImportError(error_message)
+
+            return single_data
         finally:
             loader.dispose()
 
