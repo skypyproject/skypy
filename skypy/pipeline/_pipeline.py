@@ -5,7 +5,7 @@ and handle their results.
 """
 
 from astropy.cosmology import default_cosmology
-from astropy.table import Table
+from astropy.table import Table, Column
 from copy import copy, deepcopy
 from ._config import load_skypy_yaml
 import networkx
@@ -274,4 +274,7 @@ class Pipeline:
                 item = item[key]
             except KeyError as e:
                 raise KeyError('unknown label: ' + name) from e
-        return item
+        if isinstance(item, Column):
+            return item.data if item.unit is None else item.quantity
+        else:
+            return item
