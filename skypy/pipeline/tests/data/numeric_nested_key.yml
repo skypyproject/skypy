@@ -1,0 +1,4 @@
+tables:
+  test_table_1:
+    10 km: !numpy.random.uniform
+      size: 10

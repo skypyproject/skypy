@@ -1,0 +1,4 @@
+tables:
+  test_table_1:
+    test_column_1: !numpy.random.uniform
+      10: 10
