@@ -32,14 +32,26 @@ class SkyPyLoader(yaml.SafeLoader):
         try:
             single_data = loader.get_single_data()
 
-            keys = single_data.keys() if single_data else {}
-            for key in keys:
-                if not isinstance(key, str):
-                    error_message = f"Invalid key found in config.  {key} is not a string." \
-                                    f"  Either rename this value or wrap it in quotes."
-                    raise ImportError(error_message)
+            def validate_keys(config):
+                for k in config.keys():
+                    if not isinstance(k, str):
+                        raise ValueError(f"Invalid key found in config. {k} is not a string. "
+                                         f"Either rename this value or wrap it in quotes.")
+            
+            from collections.abc import Mapping
+            def validate_config(config):
+                # Check each key at the current depth is a string
+                validate_keys(config)
+                for v in config.values():
+                    # If any values are dictionaries, recurse
+                    if isinstance(v, Mapping):
+                        validate_config(v)
+                    # If any values are tuples (i.e. function calls) validate kwargs
+                    if isinstance(v, tuple) and len(v) > 1 and isinstance(v[1], Mapping):
+                        validate_keys(v[1])
+                return config
 
-            return single_data
+            return validate_config(single_data if single_data else {})
         finally:
             loader.dispose()
 
