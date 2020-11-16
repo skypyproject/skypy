@@ -1,13 +1,13 @@
 import numpy as np
 import pytest
-from astropy.cosmology import default_cosmology, FlatLambdaCDM
+from astropy.cosmology import Planck15, FlatLambdaCDM
 from skypy.power_spectrum import eisenstein_hu
 
 
 def test_eisenstein_hu():
     """ Test Eisenstein & Hu Linear matter power spectrum with
-    and without wiggles using astropy default cosmology"""
-    cosmology = default_cosmology.get()
+    and without wiggles using Planck15 cosmology"""
+    cosmology = Planck15
     A_s = 2.1982e-09
     n_s = 0.969453
     kwmap = 0.02
@@ -31,7 +31,7 @@ def test_eisenstein_hu():
     assert array_output_w.shape == array_shape
     assert array_output_nw.shape == array_shape
 
-    # Test pk against precomputed values for default_cosmology
+    # Test pk against precomputed values for Planck15 cosmology
     wavenumber = np.logspace(-3, 1, num=5, base=10.0)
     pk_eisensteinhu_w = eisenstein_hu(wavenumber, A_s, n_s, cosmology, kwmap,
                                       wiggle=True)

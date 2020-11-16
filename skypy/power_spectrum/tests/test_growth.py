@@ -1,5 +1,5 @@
 import numpy as np
-from astropy.cosmology import FlatLambdaCDM, default_cosmology, Planck15
+from astropy.cosmology import FlatLambdaCDM, Planck15
 from astropy.units import isclose, allclose
 import pytest
 
@@ -46,7 +46,7 @@ def test_carroll():
 def test_growth():
     """
     Test a FlatLambdaCDM cosmology with omega_matter = 1.0
-    and astropy default cosmology
+    and Planck15 cosmology
     """
 
     redshift = np.linspace(0., 10., 101)
@@ -79,21 +79,19 @@ def test_growth():
     assert isclose(Dzprime[0], -1.0),\
         "Derivative of growth function at redshift 0 is not close to -1.0"
 
-    # Test against precomputed values using astropy default cosmology
-    default = default_cosmology.get()
+    # Test against precomputed values using Planck15 cosmology
     zvec = np.linspace(0.0, 1.0, 4)
+    fz_planck15 = growth_factor(zvec, Planck15)
+    Dz_planck15 = growth_function(zvec, Planck15)
+    Dzprime_planck15 = growth_function_derivative(zvec, Planck15)
 
-    fz_default = growth_factor(zvec, default)
-    Dz_default = growth_function(zvec, default)
-    Dzprime_default = growth_function_derivative(zvec, default)
+    precomputed_fz_planck15 = np.array([0.5255848, 0.69412802, 0.80439553,
+                                        0.87179376])
+    precomputed_Dz_planck15 = np.array([0.66328939, 0.55638978, 0.4704842,
+                                        0.40368459])
+    precomputed_Dzprime_planck15 = np.array([-0.34861482, -0.2896543,
+                                             -0.22707323, -0.17596485])
 
-    precomputed_fz_default = np.array([0.5255848, 0.69412802, 0.80439553,
-                                       0.87179376])
-    precomputed_Dz_default = np.array([0.66328939, 0.55638978, 0.4704842,
-                                       0.40368459])
-    precomputed_Dzprime_default = np.array([-0.34861482, -0.2896543,
-                                            -0.22707323, -0.17596485])
-
-    assert allclose(fz_default, precomputed_fz_default)
-    assert allclose(Dz_default, precomputed_Dz_default)
-    assert allclose(Dzprime_default, precomputed_Dzprime_default)
+    assert allclose(fz_planck15, precomputed_fz_planck15)
+    assert allclose(Dz_planck15, precomputed_Dz_planck15)
+    assert allclose(Dzprime_planck15, precomputed_Dzprime_planck15)
