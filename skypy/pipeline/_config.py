@@ -16,7 +16,7 @@ def import_function(qualname):
     module = builtins
     for i, key in enumerate(path[:-1]):
         if not hasattr(module, key):
-            module = import_module('.'.join(path[:i + 1]))
+            module = import_module('.'.join(path[:i+1]))
         else:
             module = getattr(module, key)
     function = getattr(module, path[-1])
@@ -52,7 +52,6 @@ class SkyPyLoader(yaml.SafeLoader):
         loader = cls(stream)
         try:
             single_data = loader.get_single_data()
-
             return validate_config(single_data if single_data else {})
         finally:
             loader.dispose()
