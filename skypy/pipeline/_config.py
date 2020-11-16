@@ -3,6 +3,7 @@ from importlib import import_module
 import yaml
 import re
 from astropy.units import Quantity
+from collections.abc import Mapping
 
 __all__ = [
     'load_skypy_yaml',
@@ -22,6 +23,26 @@ def import_function(qualname):
     return function
 
 
+def validate_keys(config):
+    for k in config.keys():
+        if not isinstance(k, str):
+            raise ValueError(f"Invalid key found in config. {k} is not a string. "
+                             f"Either rename this value or wrap it in quotes.")
+
+
+def validate_config(config):
+    # Check each key at the current depth is a string
+    validate_keys(config)
+    for v in config.values():
+        # If any values are dictionaries, recurse
+        if isinstance(v, Mapping):
+            validate_config(v)
+        # If any values are tuples (i.e. function calls) validate kwargs
+        if isinstance(v, tuple) and len(v) > 1 and isinstance(v[1], Mapping):
+            validate_keys(v[1])
+    return config
+
+
 class SkyPyLoader(yaml.SafeLoader):
     '''custom YAML loader class with SkyPy extensions'''
 
@@ -30,7 +51,8 @@ class SkyPyLoader(yaml.SafeLoader):
         '''load the first YAML document from stream'''
         loader = cls(stream)
         try:
-            return loader.get_single_data()
+            single_data = loader.get_single_data()
+            return validate_config(single_data if single_data else {})
         finally:
             loader.dispose()
 

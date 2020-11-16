@@ -41,3 +41,27 @@ def test_yaml_quantities():
 
     assert config['42_km'] == units.Quantity('42 km')
     assert config['1_deg2'] == units.Quantity('1 deg2')
+
+
+def test_keys_must_be_strings():
+    # config with key that doesn't parse as String.
+    filename = get_pkg_data_filename('data/numeric_key.yml')
+    with pytest.raises(ValueError) as e:
+        load_skypy_yaml(filename)
+    assert("Invalid key found in config" in e.value.args[0])
+
+
+def test_nested_keys_must_be_strings():
+    # config with nested key that doesn't parse as String.
+    filename = get_pkg_data_filename('data/numeric_nested_key.yml')
+    with pytest.raises(ValueError) as e:
+        load_skypy_yaml(filename)
+    assert("Invalid key found in config" in e.value.args[0])
+
+
+def test_kwarg_must_be_strings():
+    # config with function kwarg name that doesn't parse as String.
+    filename = get_pkg_data_filename('data/numeric_kwarg.yml')
+    with pytest.raises(ValueError) as e:
+        load_skypy_yaml(filename)
+    assert("Invalid key found in config" in e.value.args[0])
