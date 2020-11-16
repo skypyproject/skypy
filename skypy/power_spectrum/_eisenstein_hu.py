@@ -46,15 +46,14 @@ def transfer_with_wiggles(wavenumber, A_s, n_s, cosmology, kwmap=0.02):
     Examples
     --------
 
-    This returns the transfer function with wiggles for the Astropy default
+    This returns the transfer function with wiggles for the Planck 2015
     cosmology at a given array of wavenumbers:
 
     >>> import numpy as np
-    >>> from astropy.cosmology import default_cosmology
+    >>> from astropy.cosmology import Planck15
     >>> wavenumber = np.logspace(-3, 1, num=5, base=10.0)
     >>> A_s, n_s = 2.1982e-09, 0.969453
-    >>> cosmology = default_cosmology.get()
-    >>> transfer_with_wiggles(wavenumber, A_s, n_s, cosmology, kwmap=0.02)
+    >>> transfer_with_wiggles(wavenumber, A_s, n_s, Planck15, kwmap=0.02)
     array([9.92144790e-01, 7.78548704e-01, 1.29998169e-01, 4.63863054e-03,
        8.87918075e-05])
 
@@ -183,15 +182,14 @@ def transfer_no_wiggles(wavenumber, A_s, n_s, cosmology):
     Examples
     --------
 
-    This returns the transfer function without wiggles for the Astropy default
+    This returns the transfer function without wiggles for the Planck 2015
     cosmology at a given array of wavenumbers:
 
     >>> import numpy as np
-    >>> from astropy.cosmology import default_cosmology
+    >>> from astropy.cosmology import Planck15
     >>> wavenumber = np.logspace(-3, 1, num=5, base=10.0)
     >>> A_s, n_s = 2.1982e-09, 0.969453
-    >>> cosmology = default_cosmology.get()
-    >>> transfer_no_wiggles(wavenumber, A_s, n_s, cosmology)
+    >>> transfer_no_wiggles(wavenumber, A_s, n_s, Planck15)
     array([9.91959695e-01, 7.84518347e-01, 1.32327555e-01, 4.60773671e-03,
        8.78447096e-05])
 
@@ -266,16 +264,14 @@ def eisenstein_hu(wavenumber, A_s, n_s, cosmology, kwmap=0.02, wiggle=True):
     --------
 
     This example returns the Eisenstein and Hu matter power spectrum with
-    baryon acoustic oscillations for the Astropy default
+    baryon acoustic oscillations for the Planck 2015
     cosmology at a given array of wavenumbers:
 
     >>> import numpy as np
-    >>> from astropy.cosmology import default_cosmology
+    >>> from astropy.cosmology import Planck15
     >>> wavenumber = np.logspace(-3, 1, num=5, base=10.0)
     >>> A_s, n_s = 2.1982e-09, 0.969453
-    >>> cosmology = default_cosmology.get()
-    >>> eisenstein_hu(wavenumber, A_s, n_s, cosmology, kwmap=0.02,
-    ...               wiggle=True)
+    >>> eisenstein_hu(wavenumber, A_s, n_s, Planck15, kwmap=0.02, wiggle=True)
     array([6.47460158e+03, 3.71610099e+04, 9.65702614e+03, 1.14604456e+02,
        3.91399918e-01])
 
