@@ -16,6 +16,13 @@ try:
 except ImportError:
     pass
 
+# this file is only ever imported when speclite is present
+# but without the try/except pytest will fail when doctests are discovered
+try:
+    import speclite.filters
+except ImportError:
+    pass
+
 
 def download_file(url, cache=True):
     '''download_file with some specific settings'''
@@ -94,37 +101,46 @@ def skypy_data_loader(module, name, *tags):
     return spectra
 
 
-def decam_loader(*bands):
-    '''load DECam bandpass filters'''
+def speclite_loader(name, *bands):
+    '''load data from the speclite package'''
 
-    # download DECam filter data
-    filename = download_file(
-            'http://www.ctio.noao.edu/noao/sites/default/files/DECam/STD_BANDPASSES_DR1.fits')
+    # result is spectrum or list of spectra
+    spectra = None
 
-    # load the data file
-    data = astropy.table.Table.read(filename, format='fits')
-
-    # set units
-    data['LAMBDA'].unit = units.angstrom
-
-    # get the spectral axis
-    spectral_axis = data['LAMBDA'].quantity
-
-    # load requested bands
-    throughput = []
+    # load each band sperately
     for band in bands:
-        throughput.append(data[band])
-    throughput = np.squeeze(throughput)*units.dimensionless_unscaled
 
-    # return the bandpasses as Spectrum1D
-    return specutils.Spectrum1D(spectral_axis=spectral_axis, flux=throughput)
+        # get resource filename from name and bands
+        filter_name = f'{name}-{band}'
+
+        # load the filter response as a speclite.FilterResponse object
+        filter_object = speclite.filters.load_filter(filter_name)
+
+        # get the spectral axis as astropy quantity
+        spectral_axis = units.Quantity(filter_object._wavelength, units.angstrom)
+
+        # get throughput
+        throughput = filter_object.response * units.dimensionless_unscaled
+
+        # construct the Spectrum1D
+        spectrum = specutils.Spectrum1D(spectral_axis=spectral_axis, flux=throughput)
+
+        # combine with existing
+        spectra = combine_spectra(spectra, spectrum)
+
+    return spectra
 
 
 spectrum_loaders = [
     # bandpasses
-    ('(Johnson)_(U)?(B)?(V)?', skypy_data_loader, 'bandpasses'),
-    ('(Cousins)_(R)?(I)?', skypy_data_loader, 'bandpasses'),
-    ('DECam_(g)?(r)?(i)?(z)?(Y)?', decam_loader),
+    ('(decam2014)_(u)?(g)?(r)?(i)?(z)?(Y)?', speclite_loader),
+    ('(sdss2010)_(u)?(g)?(r)?(i)?(z)?', speclite_loader),
+    ('(wise2010)_(W1)?(W2)?(W3)?(W4)?', speclite_loader),
+    ('(hsc2017)_(g)?(r)?(i)?(z)?(y)?', speclite_loader),
+    ('(lsst2016)_(u)?(g)?(r)?(i)?(z)?(y)?', speclite_loader),
+    ('(bessell)_(U)?(B)?(V)?(R)?(I)?', speclite_loader),
+    ('(BASS)_(g)?(r)?', speclite_loader),
+    ('(MzLS)_(z)?', speclite_loader),
 
     # spectrum templates
     ('(kcorrect)_((?:raw)?spec(?:_nl)?(?:_nd)?)', skypy_data_loader, 'spectrum_templates'),

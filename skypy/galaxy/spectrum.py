@@ -22,6 +22,13 @@ else:
     HAS_SPECUTILS = True
 
 try:
+    __import__('speclite')
+except ImportError:
+    HAS_SPECLITE = False
+else:
+    HAS_SPECLITE = True
+
+try:
     __import__('skypy-data')
 except ImportError:
     HAS_SKYPY_DATA = False
@@ -341,6 +348,7 @@ def load_spectral_data(name):
     Warnings
     --------
     The :mod:`specutils` package must be installed to use this function.
+    The :mod:`speclite` package must be installed to use this function.
 
     '''
 
