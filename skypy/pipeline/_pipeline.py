@@ -49,9 +49,9 @@ class Pipeline:
         Each step in the pipeline is configured by a dictionary specifying
         a variable name and the associated value.
 
-        A value that is a tuple `(function, args)` specifies that the value will
-        be the result of a function call. The first item is a callable, and the
-        second value specifies the function arguments.
+        A value that is a tuple `(function, args, kwargs)` specifies that the
+        value will be the result of a function call. The first item is a
+        callable, and the second and third items specify the arguments.
 
         If a function argument is a string `$variable_name`, it refers to the
         values of previous step in the pipeline.
@@ -78,7 +78,7 @@ class Pipeline:
         self.cosmology = self.config.pop('cosmology', {})
         self.parameters = self.config.pop('parameters', {})
         self.table_config = self.config.pop('tables', {})
-        default_table = (Table,)
+        default_table = (Table, [], {})
         self.config.update({k: v.pop('.init', default_table)
                             for k, v in self.table_config.items()})
 
@@ -91,7 +91,7 @@ class Pipeline:
         # - add nodes for each variable, table and column
         # - add edges for the table dependencies
         # - keep track where functions need to be called
-        #   functions are tuples (function name, [function args])
+        #   functions are tuples (function, args, kwargs)
         functions = {}
         for job, settings in self.config.items():
             self.dag.add_node(job, skip=False)
@@ -118,10 +118,10 @@ class Pipeline:
 
         # go through functions and add edges for all references
         for job, settings in functions.items():
-            # settings are tuple (function, [args])
-            args = settings[1] if len(settings) > 1 else None
+            # settings are tuple (function, args, kwargs)
+            _, args, kwargs = settings
             # get dependencies from arguments
-            deps = self.get_deps(args)
+            deps = self.get_deps(args) + self.get_deps(kwargs)
             # add edges for dependencies
             for d in deps:
                 # job depends on d
@@ -221,15 +221,9 @@ class Pipeline:
             # recurse lists
             return [self.get_value(v) for v in value]
         elif isinstance(value, tuple):
-            # tuple (function, [args])
-            function = value[0]
-            args = value[1] if len(value) > 1 else []
-            if isinstance(args, dict):
-                return function(**self.get_value(args))
-            elif isinstance(args, list):
-                return function(*self.get_value(args))
-            else:
-                return function(self.get_value(args))
+            # tuple (function, args, kwargs)
+            function, args, kwargs = value
+            return function(*self.get_value(args), **self.get_value(kwargs))
         elif isinstance(value, str) and value[0] == '$':
             # reference
             return self[value[1:]]
@@ -248,7 +242,8 @@ class Pipeline:
             return [args[1:]]
         elif isinstance(args, tuple):
             # recurse on function arguments
-            return self.get_deps(args[1]) if len(args) > 1 else []
+            _, args, kwargs = args
+            return self.get_deps(args) + self.get_deps(kwargs)
         elif isinstance(args, dict):
             # get explicit dependencies
             deps = args.pop('.depends', [])

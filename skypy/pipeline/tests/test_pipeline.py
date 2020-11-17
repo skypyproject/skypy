@@ -15,7 +15,7 @@ from skypy.pipeline import Pipeline
 def test_pipeline():
 
     # Evaluate and store the default astropy cosmology.
-    config = {'test_cosmology': (default_cosmology.get,)}
+    config = {'test_cosmology': (default_cosmology.get, [], {})}
 
     pipeline = Pipeline(config)
     pipeline.execute()
@@ -27,11 +27,11 @@ def test_pipeline():
     string = size*'a'
     config = {'tables': {
                 'test_table': {
-                  'column1': (np.random.uniform, {
+                  'column1': (np.random.uniform, [], {
                       'size': size}),
-                  'column2': (np.random.uniform, {
+                  'column2': (np.random.uniform, [], {
                       'low': '$test_table.column1'}),
-                  'column3': (list, [string])}}}
+                  'column3': (list, [string], {})}}}
 
     pipeline = Pipeline(config)
     pipeline.execute()
@@ -50,7 +50,7 @@ def test_pipeline():
     # Check that the existing output files are modified if overwrite is True
     new_size = 2 * size
     new_string = new_size*'a'
-    config['tables']['test_table']['column1'][1]['size'] = new_size
+    config['tables']['test_table']['column1'][2]['size'] = new_size
     config['tables']['test_table']['column3'][1][0] = new_string
     pipeline = Pipeline(config)
     pipeline.execute()
@@ -60,13 +60,13 @@ def test_pipeline():
 
     # Check for failure if 'column1' requires itself creating a cyclic
     # dependency graph
-    config['tables']['test_table']['column1'] = (list, '$test_table.column1')
+    config['tables']['test_table']['column1'] = (list, ['$test_table.column1'], {})
     with pytest.raises(networkx.NetworkXUnfeasible):
         Pipeline(config).execute()
 
     # Check for failure if 'column1' and 'column2' both require each other
     # creating a cyclic dependency graph
-    config['tables']['test_table']['column1'] = (list, '$test_table.column2')
+    config['tables']['test_table']['column1'] = (list, ['$test_table.column2'], {})
     with pytest.raises(networkx.NetworkXUnfeasible):
         Pipeline(config).execute()
 
@@ -96,11 +96,11 @@ def test_pipeline():
     assert pipeline['test_dict'] == {'a': 'b'}
 
     # Check variables intialised by function
-    config = {'test_func': (list, 'hello world'),
-              'len_of_test_func': (len, '$test_func'),
+    config = {'test_func': (list, ['hello world'], {}),
+              'len_of_test_func': (len, ['$test_func'], {}),
               'nested_references': (sum, [
-                ['$test_func', [' '], '$test_func'], []]),
-              'nested_functions': (list, (range, (len, '$test_func')))}
+                ['$test_func', [' '], '$test_func'], []], {}),
+              'nested_functions': (list, [(range, [(len, ['$test_func'], {})], {})], {})}
     pipeline = Pipeline(config)
     pipeline.execute()
     assert pipeline['test_func'] == list('hello world')
@@ -147,10 +147,10 @@ def test_multi_column_assignment():
     # Test multi-column assignment from 2d arrays and tuples of 1d arrays
     config = {'tables': {
                 'multi_column_test_table': {
-                  'a,b ,c, d': (lambda nrows, ncols: np.ones((nrows, ncols)), [7, 4]),
-                  'e , f,  g': (lambda nrows, ncols: (np.ones(nrows),) * ncols, [7, 3]),
-                  'h': (list, '$multi_column_test_table.a'),
-                  'i': (list, '$multi_column_test_table.f')}}}
+                  'a,b ,c, d': (lambda nrows, ncols: np.ones((nrows, ncols)), [7, 4], {}),
+                  'e , f,  g': (lambda nrows, ncols: (np.ones(nrows),) * ncols, [7, 3], {}),
+                  'h': (list, ['$multi_column_test_table.a'], {}),
+                  'i': (list, ['$multi_column_test_table.f'], {})}}}
 
     pipeline = Pipeline(config)
     pipeline.execute()
@@ -162,8 +162,8 @@ def test_multi_column_assignment_failure(na, nt):
     # Test multi-column assignment failure with too few/many columns
     config = {'tables': {
                 'multi_column_test_table': {
-                  'a,b,c': (lambda nrows, ncols: np.ones((nrows, ncols)), [7, na]),
-                  'd,e,f': (lambda nrows, ncols: (np.ones(nrows),) * ncols, [7, nt])}}}
+                  'a,b,c': (lambda nrows, ncols: np.ones((nrows, ncols)), [7, na], {}),
+                  'd,e,f': (lambda nrows, ncols: (np.ones(nrows),) * ncols, [7, nt], {})}}}
 
     pipeline = Pipeline(config)
     with pytest.raises(ValueError):
@@ -186,8 +186,8 @@ def test_pipeline_cosmology():
     # N.B. astropy cosmology class has not implemented __eq__ for comparison
     H0, Om0 = 70, 0.3
     config = {'parameters': {'H0': H0, 'Om0': Om0},
-              'cosmology': (FlatLambdaCDM, ['$H0', '$Om0']),
-              'test': (return_cosmology, ),
+              'cosmology': (FlatLambdaCDM, ['$H0', '$Om0'], {}),
+              'test': (return_cosmology, [], {}),
               }
     pipeline = Pipeline(config)
     pipeline.execute()
@@ -239,7 +239,7 @@ def test_column_quantity():
         'tables': {
             'test_table': {
                 'lengths': Quantity(np.random.uniform(size=50), unit='m'),
-                'lengths_in_cm': (value_in_cm, '$test_table.lengths')}}}
+                'lengths_in_cm': (value_in_cm, ['$test_table.lengths'], {})}}}
 
     pipeline = Pipeline(config)
     pipeline.execute()
