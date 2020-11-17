@@ -65,7 +65,7 @@ class SkyPyLoader(yaml.SafeLoader):
 
         if isinstance(node, yaml.ScalarNode):
             arg = self.construct_scalar(node)
-            args = [arg] if arg else []
+            args = [arg] if arg != '' else []
             kwargs = {}
         elif isinstance(node, yaml.SequenceNode):
             args = self.construct_sequence(node)
