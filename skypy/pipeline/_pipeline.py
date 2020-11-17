@@ -26,7 +26,7 @@ def infer(function, args, kwargs, context):
     try:
         # inspect the function
         sig = inspect.signature(function)
-    except:
+    except ValueError:
         # not all functions can be inspected
         sig = None
 
