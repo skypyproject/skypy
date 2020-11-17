@@ -38,8 +38,9 @@ def validate_config(config):
         if isinstance(v, Mapping):
             validate_config(v)
         # If any values are tuples (i.e. function calls) validate kwargs
-        if isinstance(v, tuple) and len(v) > 1 and isinstance(v[1], Mapping):
-            validate_keys(v[1])
+        if isinstance(v, tuple):
+            _, _, kwargs = v
+            validate_keys(kwargs)
     return config
 
 
@@ -59,22 +60,26 @@ class SkyPyLoader(yaml.SafeLoader):
     def construct_function(self, name, node):
         '''load function from !function tag
 
-        tags are stored as a tuple `(function, args)`
+        tags are stored as a tuple `(function, args, kwargs)`
         '''
 
         if isinstance(node, yaml.ScalarNode):
-            args = self.construct_scalar(node)
+            arg = self.construct_scalar(node)
+            args = [arg] if arg else []
+            kwargs = {}
         elif isinstance(node, yaml.SequenceNode):
             args = self.construct_sequence(node)
+            kwargs = {}
         elif isinstance(node, yaml.MappingNode):
-            args = self.construct_mapping(node)
+            args = []
+            kwargs = self.construct_mapping(node)
 
         try:
             function = import_function(name)
         except (ModuleNotFoundError, AttributeError) as e:
             raise ImportError(f'{e}\n{node.start_mark}') from e
 
-        return (function,) if args == '' else (function, args)
+        return (function, args, kwargs)
 
     def construct_quantity(self, node):
         value = self.construct_scalar(node)
