@@ -172,15 +172,8 @@ def test_multi_column_assignment_failure(na, nt):
 
 def test_pipeline_cosmology():
 
-    # Define function for testing pipeline cosmology
-    from skypy.utils import uses_default_cosmology
-
-    @uses_default_cosmology
     def return_cosmology(cosmology):
         return cosmology
-
-    # Initial default_cosmology
-    initial_default = default_cosmology.get()
 
     # Test pipeline correctly sets default cosmology from parameters
     # N.B. astropy cosmology class has not implemented __eq__ for comparison
@@ -191,19 +184,12 @@ def test_pipeline_cosmology():
               }
     pipeline = Pipeline(config)
     pipeline.execute()
-    assert type(pipeline['test']) == FlatLambdaCDM
-    assert pipeline['test'].H0.value == H0
-    assert pipeline['test'].Om0 == Om0
+    assert pipeline['test'] is pipeline['cosmology']
 
     # Test pipeline correctly updates cosmology from new parameters
     H0_new, Om0_new = 75, 0.25
     pipeline.execute({'H0': H0_new, 'Om0': Om0_new})
-    assert type(pipeline['test']) == FlatLambdaCDM
-    assert pipeline['test'].H0.value == H0_new
-    assert pipeline['test'].Om0 == Om0_new
-
-    # Check that the astropy default cosmology is unchanged
-    assert default_cosmology.get() == initial_default
+    assert pipeline['test'] is pipeline['cosmology']
 
 
 def test_pipeline_read():
