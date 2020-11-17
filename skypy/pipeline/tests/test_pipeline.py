@@ -175,7 +175,6 @@ def test_pipeline_cosmology():
     # Define function for testing pipeline cosmology
     from skypy.utils import uses_default_cosmology
 
-    @uses_default_cosmology
     def return_cosmology(cosmology):
         return cosmology
 
@@ -201,9 +200,6 @@ def test_pipeline_cosmology():
     assert type(pipeline['test']) == FlatLambdaCDM
     assert pipeline['test'].H0.value == H0_new
     assert pipeline['test'].Om0 == Om0_new
-
-    # Check that the astropy default cosmology is unchanged
-    assert default_cosmology.get() == initial_default
 
 
 def test_pipeline_read():
