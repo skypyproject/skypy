@@ -1,6 +1,7 @@
 import numpy as np
 import pytest
 from scipy.stats import kstest
+from astropy.cosmology import default_cosmology
 
 
 def test_schechter_lf():
@@ -19,9 +20,10 @@ def test_schechter_lf():
     alpha = -0.5
     m_lim = 30.
     sky_area = 1.0 * units.deg**2
+    cosmo = default_cosmology.get()
 
     # sample redshifts and magnitudes
-    z_gal, M_gal = schechter_lf(z, M_star, phi_star, alpha, m_lim, sky_area)
+    z_gal, M_gal = schechter_lf(z, M_star, phi_star, alpha, m_lim, sky_area, cosmo)
 
     # check length
     assert len(z_gal) == len(M_gal)
@@ -32,4 +34,4 @@ def test_schechter_lf():
     # sample s.t. arrays need to be interpolated
     # alpha array not yet supported
     with raises(NotImplementedError):
-        z_gal, M_gal = schechter_lf(z, M_star, phi_star, alpha, m_lim, sky_area)
+        z_gal, M_gal = schechter_lf(z, M_star, phi_star, alpha, m_lim, sky_area, cosmo)

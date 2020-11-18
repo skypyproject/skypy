@@ -26,7 +26,6 @@ tables:
         wavenumber: $wavenumber
         power_spectrum: $power_spectrum
         growth_function: $growth_function
-        cosmology: $cosmology
       subhalo_kwargs:
         alpha: -1.91
         beta: 0.39
