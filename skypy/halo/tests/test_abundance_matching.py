@@ -20,8 +20,7 @@ def test_vale_ostriker():
                    'size': 100,
                    'wavenumber': k,
                    'power_spectrum': Pk,
-                   'growth_function': 0.40368249700456954,
-                   'cosmology': cosmology, }
+                   'growth_function': 0.40368249700456954, }
     subhalo_kwargs = {'alpha': -1.91,
                       'beta': 0.39,
                       'gamma_M': 0.18,
@@ -32,10 +31,9 @@ def test_vale_ostriker():
                      'M_star': -21.07994198,
                      'alpha': -0.5,
                      'm_lim': 35,
-                     'size': 100,
-                     'cosmology': cosmology, }
+                     'size': 100, }
 
-    mass, group, parent, mag = vale_ostriker(halo_kwargs, subhalo_kwargs, galaxy_kwargs)
+    mass, group, parent, mag = vale_ostriker(halo_kwargs, subhalo_kwargs, galaxy_kwargs, cosmology)
 
     # Check monotonic mass-magnitude relation
     np.testing.assert_array_equal(np.argsort(mass)[::-1], np.argsort(mag))
