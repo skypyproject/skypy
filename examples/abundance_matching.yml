@@ -40,3 +40,4 @@ tables:
         alpha: -0.5
         m_lim: 35
         size: 1000
+        cosmology: $cosmology
