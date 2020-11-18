@@ -32,7 +32,8 @@ def test_vale_ostriker():
                      'M_star': -21.07994198,
                      'alpha': -0.5,
                      'm_lim': 35,
-                     'size': 100, }
+                     'size': 100,
+                     'cosmology': cosmology, }
 
     mass, group, parent, mag = vale_ostriker(halo_kwargs, subhalo_kwargs, galaxy_kwargs)
 

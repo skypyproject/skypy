@@ -9,7 +9,7 @@ import scipy.integrate
 import scipy.special
 from astropy import units
 
-from ..utils import uses_default_cosmology, broadcast_arguments, dependent_argument
+from ..utils import broadcast_arguments, dependent_argument
 
 
 __all__ = [
@@ -73,7 +73,6 @@ def smail(z_median, alpha, beta, size=None):
     return g**(1/beta)
 
 
-@uses_default_cosmology
 @dependent_argument('M_star', 'redshift')
 @dependent_argument('phi_star', 'redshift')
 @dependent_argument('alpha', 'redshift')
@@ -127,12 +126,13 @@ def schechter_lf_redshift(redshift, M_star, phi_star, alpha, m_lim, sky_area,
 
     >>> from skypy.galaxy.redshift import schechter_lf_redshift
     >>> from astropy import units
+    >>> from astropy.cosmology import Planck15
     >>> z = [0., 5.]
     >>> M_star = -20.5
     >>> phi_star = 3.5e-3
     >>> alpha = -1.3
     >>> sky_area = 1*units.deg**2
-    >>> z_gal = schechter_lf_redshift(z, M_star, phi_star, alpha, 22, sky_area)
+    >>> z_gal = schechter_lf_redshift(z, M_star, phi_star, alpha, 22, sky_area, Planck15)
 
     '''
 
@@ -158,7 +158,6 @@ def schechter_lf_redshift(redshift, M_star, phi_star, alpha, m_lim, sky_area,
                                            sky_area=sky_area, cosmology=cosmology, noise=noise)
 
 
-@uses_default_cosmology
 @units.quantity_input(sky_area=units.sr)
 def redshifts_from_comoving_density(redshift, density, sky_area, cosmology, noise=True):
     r'''Sample redshifts from a comoving density function.
@@ -198,9 +197,10 @@ def redshifts_from_comoving_density(redshift, density, sky_area, cosmology, nois
 
     >>> from skypy.galaxy.redshift import redshifts_from_comoving_density
     >>> from astropy import units
+    >>> from astropy.cosmology import Planck15
     >>> z_range = np.arange(0, 1.01, 0.1)
     >>> sky_area = 1*units.deg**2
-    >>> z_gal = redshifts_from_comoving_density(z_range, 1e-3, sky_area)
+    >>> z_gal = redshifts_from_comoving_density(z_range, 1e-3, sky_area, Planck15)
 
     '''
 

@@ -5,7 +5,7 @@ r"""Models of galaxy luminosities.
 import numpy as np
 
 from ..utils.random import schechter
-from ..utils import uses_default_cosmology, dependent_argument
+from ..utils import dependent_argument
 
 
 __all__ = [
@@ -59,7 +59,6 @@ def apparent_to_absolute_magnitude(apparent_magnitude, distance_modulus):
     return np.subtract(apparent_magnitude, distance_modulus)
 
 
-@uses_default_cosmology
 def distance_modulus(redshift, cosmology):
     '''Compute the distance modulus.
 
@@ -156,7 +155,6 @@ def absolute_magnitude_from_luminosity(luminosity, zeropoint=None):
     return -2.5*np.log10(luminosity) - zeropoint
 
 
-@uses_default_cosmology
 @dependent_argument('M_star', 'redshift')
 @dependent_argument('alpha', 'redshift')
 def schechter_lf_magnitude(redshift, M_star, alpha, m_lim, cosmology, size=None,
@@ -199,8 +197,9 @@ def schechter_lf_magnitude(redshift, M_star, alpha, m_lim, cosmology, size=None,
 
     >>> import numpy as np
     >>> from skypy.galaxy.luminosity import schechter_lf_magnitude
+    >>> from astropy.cosmology import Planck15
     >>> z = np.random.uniform(4.9, 5.1, size=20)
-    >>> M = schechter_lf_magnitude(z, -20.5, -1.3, 22.0)
+    >>> M = schechter_lf_magnitude(z, -20.5, -1.3, 22.0, Planck15)
 
     '''
 

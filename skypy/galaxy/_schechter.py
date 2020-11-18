@@ -2,7 +2,6 @@
 
 import numpy as np
 
-from ..utils import uses_default_cosmology
 from .redshift import schechter_lf_redshift
 from .luminosity import schechter_lf_magnitude
 from astropy import units
@@ -12,7 +11,6 @@ __all__ = [
 ]
 
 
-@uses_default_cosmology
 @units.quantity_input(sky_area=units.sr)
 def schechter_lf(redshift, M_star, phi_star, alpha, m_lim, sky_area, cosmology, noise=True):
     r'''Sample redshifts and magnitudes from a Schechter luminosity function.
