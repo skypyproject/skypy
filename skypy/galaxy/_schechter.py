@@ -38,9 +38,8 @@ def schechter_lf(redshift, M_star, phi_star, alpha, m_lim, sky_area, cosmology, 
         Limiting apparent magnitude.
     sky_area : `~astropy.units.Quantity`
         Sky area over which galaxies are sampled. Must be in units of solid angle.
-    cosmology : Cosmology, optional
-        Cosmology object to convert apparent to absolute magnitudes. If not
-        given, the default cosmology is used.
+    cosmology : Cosmology
+        Cosmology object to convert apparent to absolute magnitudes.
     noise : bool, optional
         Poisson-sample the number of galaxies. Default is `True`.
 

@@ -66,9 +66,8 @@ def distance_modulus(redshift, cosmology):
     ----------
     redshift : array_like
         Redshift of objects.
-    cosmology : Cosmology, optional
-        The cosmology from which the luminosity distance is taken. If not
-        given, the default cosmology is used.
+    cosmology : Cosmology
+        The cosmology from which the luminosity distance is taken.
 
     Returns
     -------
@@ -176,9 +175,8 @@ def schechter_lf_magnitude(redshift, M_star, alpha, m_lim, cosmology, size=None,
         each galaxy, or a function of galaxy redshift.
     m_lim : float
         Apparent magnitude limit.
-    cosmology : Cosmology, optional
-        Cosmology object for converting apparent and absolute magnitudes. If
-        no cosmology is given, the default cosmology is used.
+    cosmology : Cosmology
+        Cosmology object for converting apparent and absolute magnitudes.
     size : int, optional
         Explicit size for the sampling. If not given, one magnitude is sampled
         for each redshift.

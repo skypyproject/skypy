@@ -105,9 +105,8 @@ def schechter_lf_redshift(redshift, M_star, phi_star, alpha, m_lim, sky_area,
         Limiting apparent magnitude.
     sky_area : `~astropy.units.Quantity`
         Sky area over which galaxies are sampled. Must be in units of solid angle.
-    cosmology : Cosmology, optional
-        Cosmology object to convert apparent to absolute magnitudes. If not
-        given, the default cosmology is used.
+    cosmology : Cosmology
+        Cosmology object to convert apparent to absolute magnitudes.
     noise : bool, optional
         Poisson-sample the number of galaxies. Default is `True`.
 
@@ -178,9 +177,8 @@ def redshifts_from_comoving_density(redshift, density, sky_area, cosmology, nois
         Comoving galaxy number density at each redshift in Mpc-3.
     sky_area : `~astropy.units.Quantity`
         Sky area over which galaxies are sampled. Must be in units of solid angle.
-    cosmology : Cosmology, optional
-        Cosmology object for conversion to comoving volume. If not given, the
-        default cosmology is used.
+    cosmology : Cosmology
+        Cosmology object for conversion to comoving volume.
     noise : bool, optional
         Poisson-sample the number of galaxies. Default is `True`.
 
