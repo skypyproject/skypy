@@ -27,27 +27,12 @@ our `Citation Guidelines`_.
 .. _Citation Guidelines: CITATION
 
 
-Getting Started
----------------
+Installation
+------------
 
-SkyPy is distributed through PyPI_ and conda-forge_. To install SkyPy and its
-dependencies_ using pip_:
-
-.. code:: bash
-
-    $ pip install skypy
-
-To install using conda_:
-
-.. code:: bash
-
-    $ conda install -c conda-forge skypy
-
-The SkyPy library can then be imported from python:
-
-.. code:: python
-
-    >>> import skypy
+SkyPy releases are distributed through PyPI_ and conda-forge_. Instructions for
+installing SkyPy and it's dependencies can be found in the *Installation*
+section of the documentation at http://skypy.readthedocs.io.
 
 SkyPy has a number of optional dependencies which can be installed separately.
 One of these is `skypy-data`_ which contains data such as photometric bandpasses
