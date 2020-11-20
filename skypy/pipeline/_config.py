@@ -82,12 +82,8 @@ class SkyPyLoader(yaml.SafeLoader):
         return (function, args, kwargs)
 
     def construct_lambda(self, node):
-
-        lambda_val = node.value
-
-        assign_lambda_to_temp = 'temp = lambda {}'.format(lambda_val)
-        exec(assign_lambda_to_temp, globals())
-        return temp
+        lambda_val = 'lambda ' + self.construct_scalar(node)
+        return eval(lambda_val, {})
 
     def construct_quantity(self, node):
         value = self.construct_scalar(node)
