@@ -65,3 +65,11 @@ def test_kwarg_must_be_strings():
     with pytest.raises(ValueError) as e:
         load_skypy_yaml(filename)
     assert("Invalid key found in config" in e.value.args[0])
+
+
+def test_lambda_functions():
+    filename = get_pkg_data_filename('data/lambda_function.yml')
+    config = load_skypy_yaml(filename)
+    a = config['a']
+    assert config['tau'](a) == 1. / a
+    assert config['twice'](a) == 1.0

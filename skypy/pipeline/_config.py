@@ -81,6 +81,10 @@ class SkyPyLoader(yaml.SafeLoader):
 
         return (function, args, kwargs)
 
+    def construct_lambda(self, node):
+        lambda_val = 'lambda ' + self.construct_scalar(node)
+        return eval(lambda_val, {})
+
     def construct_quantity(self, node):
         value = self.construct_scalar(node)
         return Quantity(value)
@@ -88,6 +92,9 @@ class SkyPyLoader(yaml.SafeLoader):
 
 # constructor for generic functions
 SkyPyLoader.add_multi_constructor('!', SkyPyLoader.construct_function)
+
+# constructor for lambda functions
+SkyPyLoader.add_constructor('!lambda', SkyPyLoader.construct_lambda)
 
 # constructor for quantities
 SkyPyLoader.add_constructor('!quantity', SkyPyLoader.construct_quantity)
