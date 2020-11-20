@@ -43,7 +43,7 @@ Dependencies
 SkyPy is compatble with Python versions 3.6 or later on Ubuntu, macOS and
 Windows operating systems. It has the following core dependencies:
 
-- `astropy <https://www.astropy.org/>`_
+- `astropy <https://www.astropy.org/>`__
 - `networkx <https://networkx.github.io/>`_
 - `numpy <https://numpy.org/>`_
 - `scipy <https://www.scipy.org/>`_
