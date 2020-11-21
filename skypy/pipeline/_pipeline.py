@@ -7,53 +7,15 @@ and handle their results.
 from astropy.cosmology import default_cosmology
 from astropy.table import Table, Column
 from copy import copy, deepcopy
+from collections.abc import Sequence, Mapping
 from ._config import load_skypy_yaml
+from ._items import Item, Call, Ref
 import networkx
-import inspect
 
 
 __all__ = [
     'Pipeline',
 ]
-
-
-def infer(function, args, kwargs, context):
-    '''infer missing function args and kwargs from context
-
-    TODO: move this into the PipelineFunction() class once it exists
-    '''
-
-    try:
-        # inspect the function
-        sig = inspect.signature(function)
-    except ValueError:
-        # not all functions can be inspected
-        sig = None
-
-    if sig is not None:
-        # inspect the function call for the given args and kwargs
-        given = sig.bind_partial(*args, **kwargs)
-
-        # now go through parameters one by one:
-        # - check if the parameter has an argument given
-        # - if not, check if the parameter has a default argument
-        # - if not, check if the argument can be inferred from context
-        for name, par in sig.parameters.items():
-            if name in given.arguments:
-                pass
-            elif par.default is not par.empty:
-                pass
-            elif name in context:
-                given.arguments[name] = context[name]
-
-        # augment args and kwargs
-        args.clear()
-        args.extend(given.args)
-        kwargs.clear()
-        kwargs.update(given.kwargs)
-
-    # return if successful
-    return True if sig is not None else False
 
 
 class Pipeline:
@@ -89,10 +51,6 @@ class Pipeline:
         Each step in the pipeline is configured by a dictionary specifying
         a variable name and the associated value.
 
-        A value that is a tuple `(function, args, kwargs)` specifies that the
-        value will be the result of a function call. The first item is a
-        callable, and the second and third items specify the arguments.
-
         If a function argument is a string `$variable_name`, it refers to the
         values of previous step in the pipeline.
 
@@ -118,7 +76,7 @@ class Pipeline:
         self.cosmology = self.config.pop('cosmology', None)
         self.parameters = self.config.pop('parameters', {})
         self.table_config = self.config.pop('tables', {})
-        default_table = (Table, [], {})
+        default_table = Call(Table)
         self.config.update({k: v.pop('.init', default_table)
                             for k, v in self.table_config.items()})
 
@@ -133,20 +91,18 @@ class Pipeline:
 
         # use cosmology in global context if given
         if self.cosmology is not None:
-            context['cosmology'] = '$cosmology'
+            context['cosmology'] = Ref('cosmology')
 
         # - add nodes for each variable, table and column
         # - add edges for the table dependencies
-        # - keep track where functions need to be called
-        #   functions are tuples (function, args, kwargs)
-        functions = {}
+        # - keep track where items need to be called
+        items = {}
         for job, settings in self.config.items():
             self.dag.add_node(job, skip=False)
-            if isinstance(settings, tuple):
-                functions[job] = settings
+            if isinstance(settings, Item):
+                items[job] = settings
                 # infer additional function arguments from context
-                function, args, kwargs = settings
-                infer(function, args, kwargs, context)
+                settings.infer(context)
         for table, columns in self.table_config.items():
             table_complete = '.'.join((table, 'complete'))
             self.dag.add_node(table_complete)
@@ -156,11 +112,9 @@ class Pipeline:
                 self.dag.add_node(job, skip=False)
                 self.dag.add_edge(table, job)
                 self.dag.add_edge(job, table_complete)
-                if isinstance(settings, tuple):
-                    functions[job] = settings
-                    # infer additional function arguments from context
-                    function, args, kwargs = settings
-                    infer(function, args, kwargs, context)
+                if isinstance(settings, Item):
+                    items[job] = settings
+                    settings.infer(context)
                 # DAG nodes for individual columns in multi-column assignment
                 names = [n.strip() for n in column.split(',')]
                 if len(names) > 1:
@@ -169,12 +123,10 @@ class Pipeline:
                         self.dag.add_node(subjob)
                         self.dag.add_edge(job, subjob)
 
-        # go through functions and add edges for all references
-        for job, settings in functions.items():
-            # settings are tuple (function, args, kwargs)
-            _, args, kwargs = settings
-            # get dependencies from arguments
-            deps = self.get_deps(args) + self.get_deps(kwargs)
+        # go through items and add edges for all dependencies
+        for job, settings in items.items():
+            # get dependencies from item
+            deps = settings.depend(self)
             # add edges for dependencies
             for d in deps:
                 # job depends on d
@@ -211,7 +163,7 @@ class Pipeline:
 
         # Initialise cosmology from config parameters
         if self.cosmology is not None:
-            self.state['cosmology'] = self.get_value(self.cosmology)
+            self.state['cosmology'] = self.evaluate(self.cosmology)
 
         # go through the jobs in dependency order
         for job in networkx.topological_sort(self.dag):
@@ -221,18 +173,18 @@ class Pipeline:
                 continue
             elif job in self.config:
                 settings = self.config.get(job)
-                self.state[job] = self.get_value(settings)
+                self.state[job] = self.evaluate(settings)
             else:
                 table, column = job.split('.')
                 settings = self.table_config[table][column]
                 names = [n.strip() for n in column.split(',')]
                 if len(names) > 1:
                     # Multi-column assignment
-                    t = Table(self.get_value(settings), names=names)
+                    t = Table(self.evaluate(settings), names=names)
                     self.state[table].add_columns(t.columns)
                 else:
                     # Single column assignment
-                    self.state[table][column] = self.get_value(settings)
+                    self.state[table][column] = self.evaluate(settings)
 
     def write(self, file_format=None, overwrite=False):
         r'''Write pipeline results to disk.
@@ -256,53 +208,48 @@ class Pipeline:
                 filename = '.'.join((table, file_format))
                 self.state[table].write(filename, overwrite=overwrite)
 
-    def get_value(self, value):
-        '''return the value of a field
+    def evaluate(self, value):
+        '''evaluate an item in the pipeline'''
 
-        tuples specify function calls `(function name, function args)`
-        '''
-
-        if isinstance(value, dict):
-            # recurse dicts
-            return {k: self.get_value(v) for k, v in value.items()}
-        elif isinstance(value, list):
+        if isinstance(value, str):
+            # check str before Sequence
+            return value
+        elif isinstance(value, Sequence):
             # recurse lists
-            return [self.get_value(v) for v in value]
-        elif isinstance(value, tuple):
-            # tuple (function, args, kwargs)
-            function, args, kwargs = value
-            return function(*self.get_value(args), **self.get_value(kwargs))
-        elif isinstance(value, str) and value[0] == '$':
-            # reference
-            return self[value[1:]]
+            return [self.evaluate(v) for v in value]
+        elif isinstance(value, Mapping):
+            # recurse dicts
+            return {k: self.evaluate(v) for k, v in value.items()}
+        elif isinstance(value, Item):
+            # evaluate item
+            return value.evaluate(self)
         else:
-            # plain value
+            # everything else return unchanged
             return value
 
-    def get_deps(self, args):
+    def depend(self, args):
         '''get dependencies from function args
 
         returns a list of all references found
         '''
 
-        if isinstance(args, str) and args[0] == '$':
-            # reference
-            return [args[1:]]
-        elif isinstance(args, tuple):
-            # recurse on function arguments
-            _, args, kwargs = args
-            return self.get_deps(args) + self.get_deps(kwargs)
-        elif isinstance(args, dict):
+        if isinstance(args, str):
+            # check str before Sequence
+            return []
+        elif isinstance(args, Sequence):
+            # recurse list
+            return sum([self.depend(a) for a in args], [])
+        elif isinstance(args, Mapping):
             # get explicit dependencies
             deps = args.pop('.depends', [])
             # turn a single value into a list
-            if isinstance(deps, str) or not isinstance(deps, list):
+            if isinstance(deps, str) or not isinstance(deps, Sequence):
                 deps = [deps]
             # recurse remaining kwargs
-            return deps + sum([self.get_deps(a) for a in args.values()], [])
-        elif isinstance(args, list):
-            # recurse args
-            return sum([self.get_deps(a) for a in args], [])
+            return deps + sum([self.depend(a) for a in args.values()], [])
+        elif isinstance(args, Item):
+            # check pipeline item
+            return args.depend(self)
         else:
             # no reference
             return []

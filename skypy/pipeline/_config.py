@@ -4,6 +4,7 @@ import yaml
 import re
 from astropy.units import Quantity
 from collections.abc import Mapping
+from ._items import Ref, Call
 
 __all__ = [
     'load_skypy_yaml',
@@ -37,10 +38,9 @@ def validate_config(config):
         # If any values are dictionaries, recurse
         if isinstance(v, Mapping):
             validate_config(v)
-        # If any values are tuples (i.e. function calls) validate kwargs
-        if isinstance(v, tuple):
-            _, _, kwargs = v
-            validate_keys(kwargs)
+        # If any values are function calls validate kwargs
+        if isinstance(v, Call):
+            validate_keys(v.kwargs)
     return config
 
 
@@ -57,12 +57,17 @@ class SkyPyLoader(yaml.SafeLoader):
         finally:
             loader.dispose()
 
-    def construct_function(self, name, node):
-        '''load function from !function tag
+    def construct_ref(self, node):
+        ref = self.construct_scalar(node)
+        if not isinstance(ref, str):
+            raise TypeError(f'reference must be string\n{node.start_mark}')
+        if ref[:1] == '$':
+            ref = ref[1:]
+        if not ref:
+            raise ValueError(f'empty reference\n{node.start_mark}')
+        return Ref(ref)
 
-        tags are stored as a tuple `(function, args, kwargs)`
-        '''
-
+    def construct_call(self, name, node):
         if isinstance(node, yaml.ScalarNode):
             arg = self.construct_scalar(node)
             args = [arg] if arg != '' else []
@@ -79,15 +84,20 @@ class SkyPyLoader(yaml.SafeLoader):
         except (ModuleNotFoundError, AttributeError) as e:
             raise ImportError(f'{e}\n{node.start_mark}') from e
 
-        return (function, args, kwargs)
+        return Call(function, args, kwargs)
 
     def construct_quantity(self, node):
         value = self.construct_scalar(node)
         return Quantity(value)
 
 
-# constructor for generic functions
-SkyPyLoader.add_multi_constructor('!', SkyPyLoader.construct_function)
+# constructor for references
+SkyPyLoader.add_constructor('!ref', SkyPyLoader.construct_ref)
+# implicitly resolve $references
+SkyPyLoader.add_implicit_resolver('!ref', re.compile(r'\$\w+'), ['$'])
+
+# constructor for generic function calls
+SkyPyLoader.add_multi_constructor('!', SkyPyLoader.construct_call)
 
 # constructor for quantities
 SkyPyLoader.add_constructor('!quantity', SkyPyLoader.construct_quantity)

@@ -1,7 +1,7 @@
 from astropy.utils.data import get_pkg_data_filename
-from collections.abc import Callable
 import pytest
 from skypy.pipeline import load_skypy_yaml
+from skypy.pipeline._items import Call
 from astropy import units
 
 
@@ -17,11 +17,9 @@ def test_load_skypy_yaml():
     assert isinstance(config['test_int'], int)
     assert isinstance(config['test_float'], float)
     assert isinstance(config['test_str'], str)
-    assert isinstance(config['test_func'], tuple)
-    assert isinstance(config['test_cosmology'][0], Callable)
-    assert isinstance(config['test_cosmology'][2], dict)
-    assert isinstance(config['tables']['test_table_1']['test_column_3'][0], Callable)
-    assert isinstance(config['tables']['test_table_1']['test_column_3'][1], list)
+    assert isinstance(config['test_func'], Call)
+    assert isinstance(config['test_cosmology'], Call)
+    assert isinstance(config['tables']['test_table_1']['test_column_3'], Call)
 
     # Bad function
     filename = get_pkg_data_filename('data/bad_function.yml')
