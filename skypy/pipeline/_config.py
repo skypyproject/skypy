@@ -59,8 +59,6 @@ class SkyPyLoader(yaml.SafeLoader):
 
     def construct_ref(self, node):
         ref = self.construct_scalar(node)
-        if not isinstance(ref, str):
-            raise TypeError(f'reference must be string\n{node.start_mark}')
         if ref[:1] == '$':
             ref = ref[1:]
         if not ref:
