@@ -93,8 +93,9 @@ def skypy_data_loader(module, name, *tags):
 
     return spectra
 
+
 def spectrum_template_loader(module, name, *tags):
-    '''load data from the skypy data package'''
+    '''Load kcorrect template spectrum data from the skypy module data'''
 
     # result is spectrum or list of spectra
     spectra = None
