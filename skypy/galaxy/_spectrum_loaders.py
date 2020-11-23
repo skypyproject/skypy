@@ -93,6 +93,39 @@ def skypy_data_loader(module, name, *tags):
 
     return spectra
 
+def spectrum_template_loader(module, name, *tags):
+    '''load data from the skypy data package'''
+
+    # result is spectrum or list of spectra
+    spectra = None
+
+    # load each tag separately
+    for tag in tags:
+
+        # # get resource filename from module, name, and tag
+        filename = resource_filename(f'skypy.data.{module}', f'{name}_{tag}.ecsv')
+
+        # load the data file
+        data = astropy.table.Table.read(filename, format='ascii.ecsv')
+
+        # get the spectral axis
+        spectral_axis = data['spectral_axis'].quantity
+
+        # load all templates
+        flux_unit = data['flux_0'].unit
+        fluxes = []
+        while 'flux_%d' % len(fluxes) in data.colnames:
+            fluxes.append(data['flux_%d' % len(fluxes)].quantity.to_value(flux_unit))
+        fluxes = np.squeeze(fluxes)*flux_unit
+
+        # construct the Spectrum1D
+        spectrum = specutils.Spectrum1D(spectral_axis=spectral_axis, flux=fluxes)
+
+        # combine with existing
+        spectra = combine_spectra(spectra, spectrum)
+
+    return spectra
+
 
 def decam_loader(*bands):
     '''load DECam bandpass filters'''
@@ -127,7 +160,7 @@ spectrum_loaders = [
     ('DECam_(g)?(r)?(i)?(z)?(Y)?', decam_loader),
 
     # spectrum templates
-    ('(kcorrect)_((?:raw)?spec(?:_nl)?(?:_nd)?)', skypy_data_loader, 'spectrum_templates'),
+    ('(kcorrect)_((?:raw)?spec(?:_nl)?(?:_nd)?)', spectrum_template_loader, 'spectrum_templates'),
 
     # catchall file loader
     ('(.*)', file_loader),
