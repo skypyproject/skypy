@@ -1,6 +1,6 @@
 import numpy as np
 import pytest
-from skypy.galaxy.spectrum import HAS_SPECUTILS, HAS_SKYPY_DATA, HAS_SPECLITE
+from skypy.galaxy.spectrum import HAS_SPECUTILS, HAS_SPECLITE
 
 
 def test_broadcast_arguments():
@@ -67,8 +67,8 @@ def test_dependent_argument():
             pass
 
 
-@pytest.mark.skipif(not HAS_SPECUTILS or not HAS_SKYPY_DATA or not HAS_SPECLITE,
-                    reason='test requires specutils and skypy-data')
+@pytest.mark.skipif(not HAS_SPECUTILS or not HAS_SPECLITE,
+                    reason='test requires specutils and speclite')
 def test_spectral_data_input():
 
     from astropy import units

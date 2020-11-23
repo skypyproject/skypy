@@ -49,14 +49,6 @@ The SkyPy library can then be imported from python:
 
     >>> import skypy
 
-SkyPy has a number of optional dependencies which can be installed separately.
-One of these is `skypy-data`_ which contains data such as photometric bandpasses
-required for some calculations in SkyPy. This can be installed with:
-
-.. code:: bash
-
-    $ pip install skypy-data@https://github.com/skypyproject/skypy-data/archive/master.tar.gz
-
 SkyPy also has a driver script that can run simulation pipelines from the
 command line. The `skypyproject/examples`_ repository contains sample
 configuration files that you can clone and run:
@@ -73,7 +65,6 @@ configuration files that you can clone and run:
 .. _conda: https://docs.conda.io/en/latest/
 .. _pytest: https://docs.pytest.org/en/stable/
 .. _skypyproject/examples: https://github.com/skypyproject/examples
-.. _skypy-data: https://github.com/skypyproject/skypy-data
 
 
 Contributing
