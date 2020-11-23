@@ -1,7 +1,7 @@
 import numpy as np
 import scipy.stats
 import pytest
-from skypy.galaxy.spectrum import HAS_SPECUTILS, HAS_SKYPY_DATA
+from skypy.galaxy.spectrum import HAS_SPECUTILS, HAS_SKYPY_DATA, HAS_SPECLITE
 
 
 @pytest.mark.flaky
@@ -228,8 +228,8 @@ def test_stellar_mass_from_reference_band():
     np.testing.assert_allclose(stellar_mass, truth)
 
 
-@pytest.mark.skipif(not HAS_SPECUTILS or not HAS_SKYPY_DATA,
-                    reason='test requires specutils and skypy-data')
+@pytest.mark.skipif(not HAS_SPECUTILS or not HAS_SKYPY_DATA or not HAS_SPECLITE,
+                    reason='test requires specutils, skypy-data and speclite')
 def test_load_spectral_data():
 
     from skypy.galaxy.spectrum import load_spectral_data
@@ -239,18 +239,17 @@ def test_load_spectral_data():
     filename = get_pkg_data_filename('data/spectrum.ecsv')
     load_spectral_data(filename)
 
-    # load skypy data bandpasses
-    load_spectral_data('Johnson_UBV')
-    load_spectral_data('Cousins_RI')
-
     # load skypy data spectrum templates
     load_spectral_data('kcorrect_spec')
 
-    # load DECam bandpasses
-    load_spectral_data('DECam_grizY')
+    # Load speclite bandpasses
+    load_spectral_data('decam2014_ugrizY')
+    load_spectral_data('sdss2010_ugriz')
+    load_spectral_data('wise2010_W1W2W3W4')
+    load_spectral_data('bessell_UBVRI')
 
     # load multiple sources
-    load_spectral_data(['Johnson_B', 'Cousins_R'])
+    load_spectral_data(['BASS_gr', 'MzLS_z'])
 
     # try to load non-string name
     with pytest.raises(TypeError):
