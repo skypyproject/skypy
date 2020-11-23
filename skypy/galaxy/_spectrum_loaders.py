@@ -55,7 +55,7 @@ def file_loader(*filenames):
 
 
 def skypy_data_loader(module, name, *tags):
-    '''load data from the skypy data package'''
+    '''Load skypy module data'''
 
     # result is spectrum or list of spectra
     spectra = None
@@ -63,16 +63,8 @@ def skypy_data_loader(module, name, *tags):
     # load each tag separately
     for tag in tags:
 
-        # get resource filename from module, name, and tag
-        try:
-            filename = resource_filename(f'skypy-data.{module}', f'{name}_{tag}.ecsv')
-        except ModuleNotFoundError as exc:
-            message = str("No module named 'skypy-data'. To install:\n"
-                          "pip install skypy-data@https://github.com/"
-                          "skypyproject/skypy-data/archive/master.tar.gz")
-            raise ModuleNotFoundError(message) from exc
-
-        # load the data file
+        # load from skypy/data
+        filename = resource_filename('skypy', f'data/{module}/{name}_{tag}.ecsv.gz')
         data = astropy.table.Table.read(filename, format='ascii.ecsv')
 
         # get the spectral axis
