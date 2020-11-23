@@ -56,6 +56,7 @@ that enable additional features:
 - `camb <https://camb.info/>`_
 - `classy <https://lesgourg.github.io/class_public/class.html>`_
 - `healpy <https://healpy.readthedocs.io/>`_
+- `speclite <https://speclite.readthedocs.io/>`_
 - `specutils <https://specutils.readthedocs.io/>`_
 
 Testing
