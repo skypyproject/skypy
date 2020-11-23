@@ -94,7 +94,7 @@ def test_spectral_data_input():
     def my_bandpass_function(bandpass):
         pass
 
-    #my_bandpass_function('bessell_B')
+    my_bandpass_function('bessell_B')
 
     with pytest.raises(units.UnitConversionError):
         my_bandpass_function('kcorrect_spec')
