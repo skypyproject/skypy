@@ -46,8 +46,8 @@ Windows operating systems. It has the following core dependencies:
 - `astropy <https://www.astropy.org/>`__
 - `networkx <https://networkx.github.io/>`_
 - `numpy <https://numpy.org/>`_
-- `scipy <https://www.scipy.org/>`_
 - `pyyaml <https://pyyaml.org/>`_
+- `scipy <https://www.scipy.org/>`_
 
 Installing using pip or conda will automatically install or update these core
 dependencies if necessary. SkyPy also has a number of optional dependencies
