@@ -104,8 +104,7 @@ def spectrum_template_loader(module, name, *tags):
     for tag in tags:
 
         # load the data from skypy/data
-        path = astropy.utils.data._find_pkg_data_path(f'data/{module}', 'skypy')
-        filename = os.path.join(path, f'{name}_{tag}.ecsv')
+        filename = resource_filename('skypy', f'data/{module}/{name}_{tag}.ecsv')
         data = astropy.table.Table.read(filename, format='ascii.ecsv')
 
         # get the spectral axis
