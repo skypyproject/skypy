@@ -239,20 +239,13 @@ def test_load_spectral_data():
     filename = get_pkg_data_filename('data/spectrum.ecsv')
     load_spectral_data(filename)
 
-    # load speclite bandpasses
     # load skypy data spectrum templates
     load_spectral_data('kcorrect_spec')
 
-    # load DECam bandpasses
+    # Load speclite bandpasses
     load_spectral_data('decam2014_ugrizY')
-
-    # load SDSS bandpasses
     load_spectral_data('sdss2010_ugriz')
-
-    # load WISE bandpasses
     load_spectral_data('wise2010_W1W2W3W4')
-
-    # load Bessel bandpasses
     load_spectral_data('bessell_UBVRI')
 
     # load multiple sources
