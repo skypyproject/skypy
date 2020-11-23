@@ -24,13 +24,6 @@ except ImportError:
     pass
 
 
-def download_file(url, cache=True):
-    '''download_file with some specific settings'''
-    extra_kwargs = {'pkgname': 'skypy'}
-    return astropy.utils.data.download_file(
-            url, cache=cache, show_progress=False, **extra_kwargs)
-
-
 def combine_spectra(a, b):
     '''combine two spectra'''
     if a is None or b is None:
@@ -117,7 +110,7 @@ def speclite_loader(name, *bands):
         filter_object = speclite.filters.load_filter(filter_name)
 
         # get the spectral axis as astropy quantity
-        spectral_axis = units.Quantity(filter_object._wavelength, units.angstrom)
+        spectral_axis = filter_object.wavelength*speclite.filters.default_wavelength_unit
 
         # get throughput
         throughput = filter_object.response * units.dimensionless_unscaled
