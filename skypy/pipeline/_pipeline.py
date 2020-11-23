@@ -101,7 +101,7 @@ class Pipeline:
             self.dag.add_node(job, skip=False)
             if isinstance(settings, Item):
                 items[job] = settings
-                # infer additional function arguments from context
+                # infer additional item properties from context
                 settings.infer(context)
         for table, columns in self.table_config.items():
             table_complete = '.'.join((table, 'complete'))
@@ -114,6 +114,7 @@ class Pipeline:
                 self.dag.add_edge(job, table_complete)
                 if isinstance(settings, Item):
                     items[job] = settings
+                    # infer additional item properties from context
                     settings.infer(context)
                 # DAG nodes for individual columns in multi-column assignment
                 names = [n.strip() for n in column.split(',')]
@@ -211,10 +212,7 @@ class Pipeline:
     def evaluate(self, value):
         '''evaluate an item in the pipeline'''
 
-        if isinstance(value, str):
-            # check str before Sequence
-            return value
-        elif isinstance(value, Sequence):
+        if isinstance(value, Sequence) and not isinstance(value, str):
             # recurse lists
             return [self.evaluate(v) for v in value]
         elif isinstance(value, Mapping):
@@ -233,10 +231,7 @@ class Pipeline:
         returns a list of all references found
         '''
 
-        if isinstance(args, str):
-            # check str before Sequence
-            return []
-        elif isinstance(args, Sequence):
+        if isinstance(args, Sequence) and not isinstance(args, str):
             # recurse list
             return sum([self.depend(a) for a in args], [])
         elif isinstance(args, Mapping):
