@@ -19,7 +19,7 @@ def test_load_skypy_yaml():
     assert isinstance(config['test_str'], str)
     assert isinstance(config['test_func'], tuple)
     assert isinstance(config['test_cosmology'][0], Callable)
-    assert isinstance(config['test_cosmology'][1], dict)
+    assert isinstance(config['test_cosmology'][2], dict)
     assert isinstance(config['tables']['test_table_1']['test_column_3'][0], Callable)
     assert isinstance(config['tables']['test_table_1']['test_column_3'][1], list)
 

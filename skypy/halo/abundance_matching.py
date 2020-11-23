@@ -23,7 +23,7 @@ __all__ = [
 ]
 
 
-def vale_ostriker(halo_kwargs, subhalo_kwargs, galaxy_kwargs):
+def vale_ostriker(halo_kwargs, subhalo_kwargs, galaxy_kwargs, cosmology):
     """Vale & Ostriker abundance matching.
     Generate matched arrays of (sub)halos masses and galaxy absolute magnitudes
     following the abundance matching model in [1]_.
@@ -37,6 +37,9 @@ def vale_ostriker(halo_kwargs, subhalo_kwargs, galaxy_kwargs):
         and `~skypy.halo.mass.subhalo_mass_sampler`.
     galaxy_kwargs : dict
         Dictionary of keyword arguments for
+        `~skypy.galaxy.luminosity.schechter_lf_magnitude`.
+    cosmology : astropy.cosmology.Cosmology
+        Cosmology argument for `~skypy.halo.mass.press_schechter` and
         `~skypy.galaxy.luminosity.schechter_lf_magnitude`.
 
     Returns
@@ -56,7 +59,7 @@ def vale_ostriker(halo_kwargs, subhalo_kwargs, galaxy_kwargs):
     """
 
     # Sample halo and subhalo masses
-    halo_mass = press_schechter(**halo_kwargs)
+    halo_mass = press_schechter(**halo_kwargs, cosmology=cosmology)
     halo_mass[::-1].sort()  # Sort in-place from high to low for indexing
     n_subhalos = number_subhalos(halo_mass, **subhalo_kwargs)
     sampler_kwargs = {k: v for k, v in subhalo_kwargs.items() if k not in ['gamma_M', 'noise']}
@@ -80,7 +83,7 @@ def vale_ostriker(halo_kwargs, subhalo_kwargs, galaxy_kwargs):
     parent[n_halos:] = False
 
     # Sample galaxy magnitudes
-    magnitude = schechter_lf_magnitude(**galaxy_kwargs)
+    magnitude = schechter_lf_magnitude(**galaxy_kwargs, cosmology=cosmology)
     n_galaxies = len(magnitude)
 
     # Sort halos and galaxies by mass and magnitude

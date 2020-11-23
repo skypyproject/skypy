@@ -10,35 +10,8 @@ Decorators
 
 SkyPy provides a number of convenient decorators to perform common tasks:
 
-- :ref:`uses_default_cosmology`
 - :ref:`broadcast_arguments`
 - :ref:`dependent_argument`
-
-
-.. _uses_default_cosmology:
-
-Use the default cosmology
--------------------------
-
-The `uses_default_cosmology` decorator will check if a `cosmology` argument is
-provided, and if not, use the `astropy.cosmology.default_cosmology` instead.
-
-.. code-block:: python
-
-    from skypy.utils import uses_default_cosmology
-
-    @uses_default_cosmology
-    def a_function_with_cosmology(cosmology):
-        print('the comoving distance at z=1 is', cosmology.comoving_distance(1.))
-
-    # function can now be called without argument
-    a_function_with_cosmology()
-    # output: the comoving distance at z=1 is 3395.9053119753967 Mpc
-
-As shown in the example, the decorated function should treat the `cosmology`
-argument as a non-optional argument. Because the `uses_default_cosmology`
-decorator provides a required argument, it should always be placed above
-decorators which handle arguments.
 
 
 .. _broadcast_arguments:

@@ -3,22 +3,6 @@ import pytest
 from skypy.galaxy.spectrum import HAS_SPECUTILS, HAS_SKYPY_DATA, HAS_SPECLITE
 
 
-def test_uses_default_cosmology():
-
-    from astropy.cosmology import default_cosmology, WMAP9
-
-    from skypy.utils import uses_default_cosmology
-
-    @uses_default_cosmology
-    def function_with_cosmology(cosmology):
-        return cosmology
-
-    assert function_with_cosmology() == default_cosmology.get()
-
-    assert WMAP9 != default_cosmology.get()
-    assert function_with_cosmology(WMAP9) == WMAP9
-
-
 def test_broadcast_arguments():
 
     from pytest import raises
