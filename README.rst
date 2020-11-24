@@ -50,10 +50,6 @@ configuration files that you can clone and run:
 .. _PyPI: https://pypi.org/project/skypy/
 .. _conda-forge: https://anaconda.org/conda-forge/skypy
 .. _Installation: https://skypy.readthedocs.io/en/stable/install.html
-.. _dependencies: setup.cfg
-.. _pip: https://pip.pypa.io/en/stable/
-.. _conda: https://docs.conda.io/en/latest/
-.. _pytest: https://docs.pytest.org/en/stable/
 .. _skypyproject/examples: https://github.com/skypyproject/examples
 
 
