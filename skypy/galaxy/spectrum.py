@@ -22,11 +22,11 @@ else:
     HAS_SPECUTILS = True
 
 try:
-    __import__('skypy-data')
+    __import__('speclite')
 except ImportError:
-    HAS_SKYPY_DATA = False
+    HAS_SPECLITE = False
 else:
-    HAS_SKYPY_DATA = True
+    HAS_SPECLITE = True
 
 
 def dirichlet_coefficients(redshift, alpha0, alpha1, z1=1., weight=None):
@@ -341,6 +341,7 @@ def load_spectral_data(name):
     Warnings
     --------
     The :mod:`specutils` package must be installed to use this function.
+    The :mod:`speclite` package must be installed to use this function.
 
     '''
 
