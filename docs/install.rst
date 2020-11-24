@@ -3,7 +3,7 @@ Installation
 ############
 
 This page outlines how to install one of the officially distributed SkyPy
-releases and it's dependencies, or install and test the latest development
+releases and its dependencies, or install and test the latest development
 version.
 
 From PyPI
@@ -31,11 +31,11 @@ From GitHub
 
 The latest development version of SkyPy can be found on the master branch of
 the `skypyproject/skypy`_ GitHub repository. This and any other branch or tag
-can be installed directly from GitHub using pip:
+can be installed directly from GitHub using a recent version of pip:
 
 .. code:: console
 
-    $ pip install git+https://github.com/skypyproject/skypy@master
+    $ pip install skypy@git+https://github.com/skypyproject/skypy.git@master
 
 Dependencies
 ------------
