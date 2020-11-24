@@ -31,7 +31,7 @@ Installation
 ------------
 
 SkyPy releases are distributed through PyPI_ and conda-forge_. Instructions for
-installing SkyPy and it's dependencies can be found in the *Installation*
+installing SkyPy and its dependencies can be found in the *Installation*
 section of the documentation at http://skypy.readthedocs.io.
 
 
