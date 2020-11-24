@@ -39,7 +39,7 @@ class SkyPyLoader(yaml.SafeLoader):
         for key in mapping:
             if not isinstance(key, str):
                 raise ValueError(f'key "{key}" is of non-string type "{type(key).__name__}"\n'
-                                f'{node.start_mark}')
+                                 f'{node.start_mark}')
         return mapping
 
     def construct_function(self, name, node):
