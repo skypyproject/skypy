@@ -38,7 +38,7 @@ class SkyPyLoader(yaml.SafeLoader):
         mapping = super().construct_mapping(node, deep)
         for key in mapping:
             if not isinstance(key, str):
-                raise TypeError(f'key "{key}" is of non-string type "{type(key).__name__}"\n'
+                raise ValueError(f'key "{key}" is of non-string type "{type(key).__name__}"\n'
                                 f'{node.start_mark}')
         return mapping
 
