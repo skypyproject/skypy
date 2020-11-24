@@ -59,6 +59,12 @@ that enable additional features:
 - `speclite <https://speclite.readthedocs.io/>`_
 - `specutils <https://specutils.readthedocs.io/>`_
 
+To install SkyPy with all optional dependencies using pip:
+
+.. code:: console
+
+    $ pip install skypy[all]
+
 Testing
 -------
 
@@ -76,11 +82,17 @@ command line script:
     $ skypy --version
 
 You may also want to run the unit tests, for example if you have installed the
-development version or you use an unsupported operating system. The tests have
-the following additional dependencies:
+development version or you use an unsupported operating system. The unit tests
+have the following additional dependencies:
 
 - `pytest-astropy <https://github.com/astropy/pytest-astropy>`_
 - `pytest-rerunfailures <https://github.com/pytest-dev/pytest-rerunfailures>`_
+
+which can be installed using pip:
+
+.. code:: console
+
+    $ pip install skypy[test]
 
 and can be run using pytest_:
 
