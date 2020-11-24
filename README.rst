@@ -34,6 +34,10 @@ SkyPy releases are distributed through PyPI_ and conda-forge_. Instructions for
 installing SkyPy and it's dependencies can be found in the *Installation*
 section of the documentation at http://skypy.readthedocs.io.
 
+
+Examples
+--------
+
 SkyPy also has a driver script that can run simulation pipelines from the
 command line. The `skypyproject/examples`_ repository contains sample
 configuration files that you can clone and run:
