@@ -31,8 +31,8 @@ Installation
 ------------
 
 SkyPy releases are distributed through PyPI_ and conda-forge_. Instructions for
-installing SkyPy and its dependencies can be found in the *Installation*
-section of the documentation at http://skypy.readthedocs.io.
+installing SkyPy and its dependencies can be found in the Installation_
+section of the documentation.
 
 
 Examples
@@ -49,6 +49,7 @@ configuration files that you can clone and run:
 
 .. _PyPI: https://pypi.org/project/skypy/
 .. _conda-forge: https://anaconda.org/conda-forge/skypy
+.. _Installation: https://skypy.readthedocs.io/en/stable/install.html
 .. _dependencies: setup.cfg
 .. _pip: https://pip.pypa.io/en/stable/
 .. _conda: https://docs.conda.io/en/latest/
