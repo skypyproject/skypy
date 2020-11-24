@@ -88,13 +88,13 @@ have the following additional dependencies:
 - `pytest-astropy <https://github.com/astropy/pytest-astropy>`_
 - `pytest-rerunfailures <https://github.com/pytest-dev/pytest-rerunfailures>`_
 
-which can be installed using pip:
+The test dependencies can be installed using pip:
 
 .. code:: console
 
     $ pip install skypy[test]
 
-and can be run using pytest_:
+and the unit tests can then be run using pytest_:
 
 .. code:: console
 
