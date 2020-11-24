@@ -28,13 +28,6 @@ except ImportError:
 else:
     HAS_SPECLITE = True
 
-try:
-    __import__('skypy-data')
-except ImportError:
-    HAS_SKYPY_DATA = False
-else:
-    HAS_SKYPY_DATA = True
-
 
 def dirichlet_coefficients(redshift, alpha0, alpha1, z1=1., weight=None):
     r"""Dirichlet-distributed SED coefficients.
