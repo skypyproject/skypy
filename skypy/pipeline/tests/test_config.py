@@ -48,5 +48,5 @@ def test_yaml_quantities():
                                     'numeric_kwarg'])
 def test_keys_must_be_strings(config):
     filename = get_pkg_data_filename(f'data/{config}.yml')
-    with pytest.raises(TypeError, match='key ".*" is of non-string type ".*"'):
+    with pytest.raises(ValueError, match='key ".*" is of non-string type ".*"'):
         load_skypy_yaml(filename)
