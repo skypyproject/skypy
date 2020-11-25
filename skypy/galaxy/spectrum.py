@@ -4,7 +4,9 @@ r"""Galaxy spectrum module.
 
 import numpy as np
 from astropy import units
+from astropy.table import Table
 from ..utils import spectral_data_input
+from pkg_resources import resource_filename
 
 
 __all__ = [
@@ -12,6 +14,7 @@ __all__ = [
     'load_spectral_data',
     'mag_ab',
     'magnitudes_from_templates',
+    'metallicity_from_templates',
 ]
 
 try:
@@ -372,3 +375,30 @@ def load_spectral_data(name):
 
     # run the loader
     return loader(*args, *groups)
+
+
+def metallicity_from_templates(coefficients):
+    r'''Metallicity from template spectra.
+
+    This function calculates the matallicities of galaxies whose spectra are
+    modelled as a linear combination of the kcorrect template spectra [1]_.
+
+    Parameters
+    ----------
+    coefficients : (ng, nt) array_like
+        Array of template coefficients.
+
+    Returns
+    -------
+    metallicity : (ng,) array_like
+        Metallicity of each galaxy.
+
+    References
+    ----------
+    .. [1] M. R. Blanton and S. Roweis, 2007, AJ, 125, 2348
+    '''
+
+    filename = resource_filename('skypy', 'data/spectrum_templates/kcorrect_mets.ecsv.gz')
+    data = Table.read(filename, format='ascii.ecsv')
+    mets = np.array([data[c][0] for c in data.colnames])
+    return np.sum(coefficients * mets, axis=1)
