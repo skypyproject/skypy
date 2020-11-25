@@ -295,3 +295,17 @@ def test_combine_spectra():
 
     aca = combine_spectra(ac, a)
     assert isinstance(aca, SpectrumList)
+
+
+def test_metallicity():
+
+    # Each test galaxy is exactly one of the templates
+    from astropy.table import Table
+    from pkg_resources import resource_filename
+    from skypy.galaxy.spectrum import metallicity_from_templates
+    coefficients = np.diag(np.ones(5))
+    filename = resource_filename('skypy', 'data/spectrum_templates/kcorrect_mets.ecsv.gz')
+    data = Table.read(filename, format='ascii.ecsv')
+    template_mets = [data[c][0] for c in data.colnames]
+    mets = metallicity_from_templates(coefficients)
+    np.testing.assert_allclose(template_mets, mets)
