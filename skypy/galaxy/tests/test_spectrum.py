@@ -306,7 +306,7 @@ def test_star_formation_rate():
     coefficients = np.diag(np.ones(5))
     filename = resource_filename('skypy', 'data/spectrum_templates/kcorrect_sfr.ecsv.gz')
     data = Table.read(filename, format='ascii.ecsv')
-    sft_unit = data['sfr_0'].unit
-    template_sfr = [data[c][0] for c in data.columns if c.startswith('sfr_')]
+    sfr_unit = data['sfr_0'].unit
+    template_sfr = [data[c].quantity.to_value(sfr_unit)[0] for c in data.colnames if c.startswith('sfr_')]
     sfr = star_formation_rate_from_templates(coefficients)
-    np.testing.assert_allclose(template_sfr * sft_unit, sfr)
+    np.testing.assert_allclose(template_sfr, sfr)

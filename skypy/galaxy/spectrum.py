@@ -402,17 +402,13 @@ def star_formation_rate_from_templates(coefficients, stellar_mass=None):
 
     '''
 
-    # kcorrect_sfr contains the star formation rate history. The current star
-    # formation rate is in the first row.
+    # kcorrect_sfr contains the star formation rate history
     filename = resource_filename('skypy', 'data/spectrum_templates/kcorrect_sfr.ecsv.gz')
     data = Table.read(filename, format='ascii.ecsv')
 
-    # Current star formation rates of each template
+    # The current star formation rate of each template is in the first row
     sfr_unit = data['sfr_0'].unit
-    sfr = []
-    while 'sfr_%d' % len(sfr) in data.colnames:
-        sfr.append(data['sfr_%d' % len(sfr)].quantity.to_value(sfr_unit)[0])
-    sfr = np.squeeze(sfr) * sfr_unit
+    sfr = [data[c].quantity.to_value(sfr_unit)[0] for c in data.colnames if c.startswith('sfr_')]
 
     # Sum contributions from each template and scale by stellar mass
     stellar_mass = 1 if stellar_mass is None else stellar_mass
