@@ -14,6 +14,7 @@ __all__ = [
     'load_spectral_data',
     'mag_ab',
     'magnitudes_from_templates',
+    'star_formation_rate_from_templates',
 ]
 
 try:
