@@ -4,7 +4,9 @@ r"""Galaxy spectrum module.
 
 import numpy as np
 from astropy import units
+from astropy.table import Table
 from ..utils import spectral_data_input
+from pkg_resources import resource_filename
 
 
 __all__ = [
@@ -372,3 +374,45 @@ def load_spectral_data(name):
 
     # run the loader
     return loader(*args, *groups)
+
+
+def star_formation_rate_from_templates(coefficients, stellar_mass=None):
+    r'''Star formation rates from template spectra.
+
+    This function calculates star formation rates for galaxies whose
+    spectra are modelled as a linear combination of the kcorrect template
+    spectra [1]_.
+
+    Parameters
+    ----------
+    coefficients : (ng, nt) array_like
+        Array of template coefficients.
+    stellar_mass : (ng,) array_like, optional
+        Optional array of stellar masses for each galaxy in template units.
+
+    Returns
+    -------
+    Star formation rate : (ng,) array_like
+        Star formation rate of each galaxy in template units.
+
+    References
+    ----------
+    .. [1] M. R. Blanton and S. Roweis, 2007, AJ, 125, 2348
+
+    '''
+
+    # kcorrect_sfr contains the star formation rate history. The current star
+    # formation rate is in the first row.
+    filename = resource_filename('skypy', 'data/spectrum_templates/kcorrect_sfr.ecsv.gz')
+    data = Table.read(filename, format='ascii.ecsv')[0]
+
+    # Current star formation rates of each template
+    sfr_unit = data['sfr_0'].unit
+    sfr = []
+    while 'sfr_%d' % len(sfr) in data.colnames:
+        sfr.append(data['sfr_%d' % len(sfr)].quantity.to_value(sfr_unit))
+    sfr = np.squeeze(sfr) * sfr_unit
+
+    # Sum contributions from each template and scale by stellar mass
+    stellar_mass = 1 if stellar_mass is None else stellar_mass
+    return stellar_mass * np.sum(coefficients * sfr, axis=1)
