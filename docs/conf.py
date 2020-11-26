@@ -257,3 +257,10 @@ try:
     import_module('camb')
 except ImportError:
     autodoc_mock_imports.append('camb')
+
+# Sphinx astropy
+extensions += ['sphinx_gallery.gen_gallery',]
+sphinx_gallery_conf = {
+    'examples_dirs': '../examples',  # path to examples scripts
+    'gallery_dirs': 'examples',      # path to gallery generated examples
+}
