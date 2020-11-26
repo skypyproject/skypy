@@ -122,8 +122,9 @@ def dirichlet_coefficients(redshift, alpha0, alpha1, z1=1., weight=None):
     return coeff
 
 
-def mag_ab(spectra, filters, *, redshift=None, coefficients=None, interpolate=1000):
-    r'''Compute absolute AB magnitudes from spectra and filters.
+def mag_ab(spectra, filters, *, redshift=None, coefficients=None,
+           distmod=None, interpolate=1000):
+    r'''Compute AB magnitudes from spectra and filters.
 
     This function takes *emission* spectra and observation filters and computes
     bandpass AB magnitudes [1]_.
@@ -138,6 +139,11 @@ def mag_ab(spectra, filters, *, redshift=None, coefficients=None, interpolate=10
     contracted using a product sum. If the spectra are redshifted, the
     coefficients array can contain axes for each redshift.
 
+    By default, absolute magnitudes are returned. To compute apparent magnitudes
+    instead, provide the `distmod` argument with the distance modulus for each
+    redshift. The distance modulus is applied after redshifts and coefficients
+    and should match the shape of the `redshift` array.
+
     Parameters
     ----------
     spectra : (ns,) `~specutils.Spectrum1D`
@@ -148,14 +154,16 @@ def mag_ab(spectra, filters, *, redshift=None, coefficients=None, interpolate=10
         Optional array of redshifts.
     coefficients : ([nz,] ns,) array_like
         Optional coefficients for combining spectra.
+    distmod : (nz,) array_like, optional
+        Optional distance modulus for each redshift.
     interpolate : int or `False`, optional
         Maximum number of redshifts to compute explicitly. Default is `1000`.
 
     Returns
     -------
     mag_ab : ([nz,] [ns,] nf,) array_like
-        The absolute AB magnitude of each redshift (if given), each spectrum
-        (if not combined), and each filter.
+        The AB magnitude of each redshift (if given), each spectrum (if not
+        combined), and each filter.
 
     References
     ----------
@@ -217,6 +225,10 @@ def mag_ab(spectra, filters, *, redshift=None, coefficients=None, interpolate=10
         kcorr = -2.5*np.log10(1 + redshift)
         m += np.reshape(kcorr, kcorr.shape + (1,)*(nd_s+nd_f))
 
+    # add distance modulus if given
+    if distmod is not None:
+        m += np.reshape(distmod, np.shape(distmod) + (1,)*(nd_s+nd_f))
+
     # done
     return m
 
@@ -265,17 +277,13 @@ def magnitudes_from_templates(coefficients, templates, filters, redshift=None,
 
     # compute AB magnitudes
     magnitudes = mag_ab(templates, filters, redshift=redshift,
-                        coefficients=coefficients, interpolate=resolution)
+                        coefficients=coefficients, distmod=distance_modulus,
+                        interpolate=resolution)
 
     # multiply by stellar mass if given
     if stellar_mass is not None:
         sm = np.reshape(stellar_mass, np.shape(stellar_mass) + (1,)*nd_f)
         magnitudes += -2.5*np.log10(sm)
-
-    # add distance modulus if given
-    if distance_modulus is not None:
-        dm = np.reshape(distance_modulus, np.shape(distance_modulus) + (1,)*nd_f)
-        magnitudes += dm
 
     return magnitudes
 
