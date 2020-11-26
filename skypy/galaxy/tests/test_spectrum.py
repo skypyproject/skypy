@@ -142,7 +142,7 @@ def test_mag_ab_multi():
 
     # 3 Flat Spectra
     # to prevent issues with interpolation, collect all redshifted filt_lam
-    lam = np.union1d([], filt_lam/(1 + z[:, np.newaxis]))
+    lam = np.union1d([], filt_lam.value/(1 + z[:, np.newaxis]))*filt_lam.unit
     A = np.array([[2], [3], [4]])
     flam = A * 0.10885464149979998*units.Unit('erg s-1 cm-2 AA')/lam**2
     spec = Spectrum1D(spectral_axis=lam, flux=flam)
