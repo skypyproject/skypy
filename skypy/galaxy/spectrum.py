@@ -142,8 +142,8 @@ def mag_ab(spectra, filters, *, redshift=None, coefficients=None, interpolate=10
     ----------
     spectra : (ns,) `~specutils.Spectrum1D`
         Emission spectra.
-    filters : (nf,) `~speclite.filters.FilterSequence`
-        Sequence of bandpass filters.
+    filters : `~speclite.filters.FilterResponse` or (nf,) `~speclite.filters.FilterSequence`
+        Single filter or a sequence of filters.
     redshift : (nz,) array_like, optional
         Optional array of redshifts.
     coefficients : ([nz,] ns,) array_like
