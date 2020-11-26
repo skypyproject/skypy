@@ -86,7 +86,7 @@ def test_mag_ab_standard_source():
 
     m = mag_ab(spec, filt)
 
-    assert np.isclose(m, 0, atol=1e-10)
+    assert np.isclose(m, 0)
 
 
 @pytest.mark.skipif(not HAS_SPECUTILS, reason='test requires specutils')
@@ -127,7 +127,7 @@ def test_mag_ab_multi():
     from speclite.filters import FilterResponse
 
     # 5 redshifts
-    z = np.linspace(0, 0, 5)
+    z = np.linspace(0, 1, 5)
 
     # 2 Gaussian bandpasses
     filt_lam = np.logspace(0, 4, 1000) * units.AA
@@ -142,7 +142,10 @@ def test_mag_ab_multi():
 
     # 3 Flat Spectra
     # to prevent issues with interpolation, collect all redshifted filt_lam
-    lam = np.union1d([], filt_lam.value/(1 + z[:, np.newaxis]))*filt_lam.unit
+    lam = []
+    for z_ in z:
+        lam = np.union1d(lam, filt_lam.value/(1+z_))
+    lam = lam*filt_lam.unit
     A = np.array([[2], [3], [4]])
     flam = A * 0.10885464149979998*units.Unit('erg s-1 cm-2 AA')/lam**2
     spec = Spectrum1D(spectral_axis=lam, flux=flam)
@@ -151,7 +154,7 @@ def test_mag_ab_multi():
     magnitudes = mag_ab(spec, filt, redshift=z)
     truth = -2.5 * np.log10(A * (1+z)).T[:, :, np.newaxis]
     assert magnitudes.shape == (5, 3, 2)
-    np.testing.assert_allclose(*np.broadcast_arrays(magnitudes, truth))
+    np.testing.assert_allclose(*np.broadcast_arrays(magnitudes, truth), rtol=1e-4)
 
 
 @pytest.mark.skipif(not HAS_SPECUTILS, reason='test requires specutils')
