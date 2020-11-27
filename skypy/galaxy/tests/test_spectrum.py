@@ -64,11 +64,10 @@ def test_sampling_coefficients():
         dirichlet_coefficients(redshift, [2.5, 2.5], [2.5, 2.5], weight=[1, 2, 3])
 
 
-@pytest.mark.skipif(not HAS_SPECUTILS or not HAS_SPECLITE, reason='test requires specutils and speclite')
+@pytest.mark.skipif(not HAS_SPECLITE, reason='test requires speclite')
 def test_mag_ab_standard_source():
 
     from astropy import units
-    from specutils import Spectrum1D
     from speclite.filters import FilterResponse
     from skypy.galaxy.spectrum import mag_ab
 
@@ -82,18 +81,16 @@ def test_mag_ab_standard_source():
     # test that the AB standard source has zero magnitude
     lam = filt_lam  # same grid to prevent interpolation issues
     flam = 0.10885464149979998*units.Unit('erg s-1 cm-2 AA')/lam**2
-    spec = Spectrum1D(spectral_axis=lam, flux=flam)
 
-    m = mag_ab(spec, 'test-filt')
+    m = mag_ab(lam, flam, 'test-filt')
 
     assert np.isclose(m, 0)
 
 
-@pytest.mark.skipif(not HAS_SPECUTILS, reason='test requires specutils')
+@pytest.mark.skipif(not HAS_SPECLITE, reason='test requires speclite')
 def test_mag_ab_redshift_dependence():
 
     from astropy import units
-    from specutils import Spectrum1D
     from speclite.filters import FilterResponse
     from skypy.galaxy.spectrum import mag_ab
 
@@ -106,24 +103,22 @@ def test_mag_ab_redshift_dependence():
     # create a narrow gaussian source
     lam = np.logspace(-11, 11, 1000)*units.AA
     flam = np.exp(-((lam - 100*units.AA)/(10*units.AA))**2)*units.Unit('erg s-1 cm-2 AA-1')
-    spec = Spectrum1D(spectral_axis=lam, flux=flam)
 
     # array of redshifts
     z = np.linspace(0, 1, 11)
 
     # compute the AB magnitude at different redshifts
-    m = mag_ab(spec, 'test-filt', redshift=z)
+    m = mag_ab(lam, flam, 'test-filt', redshift=z)
 
     # compare with expected redshift dependence
     np.testing.assert_allclose(m, m[0] - 2.5*np.log10(1 + z))
 
 
-@pytest.mark.skipif(not HAS_SPECUTILS, reason='test requires specutils')
+@pytest.mark.skipif(not HAS_SPECLITE, reason='test requires speclite')
 def test_mag_ab_multi():
 
     from astropy import units
     from skypy.galaxy.spectrum import mag_ab
-    from specutils import Spectrum1D
     from speclite.filters import FilterResponse
 
     # 5 redshifts
@@ -148,16 +143,16 @@ def test_mag_ab_multi():
     lam = lam*filt_lam.unit
     A = np.array([[2], [3], [4]])
     flam = A * 0.10885464149979998*units.Unit('erg s-1 cm-2 AA')/lam**2
-    spec = Spectrum1D(spectral_axis=lam, flux=flam)
 
     # Compare calculated magnitudes with truth
-    magnitudes = mag_ab(spec, ['test-filt0', 'test-filt1'], redshift=z)
+    magnitudes = mag_ab(lam, flam, ['test-filt0', 'test-filt1'], redshift=z)
     truth = -2.5 * np.log10(A * (1+z)).T[:, :, np.newaxis]
     assert magnitudes.shape == (5, 3, 2)
     np.testing.assert_allclose(*np.broadcast_arrays(magnitudes, truth), rtol=1e-4)
 
 
-@pytest.mark.skipif(not HAS_SPECUTILS, reason='test requires specutils')
+@pytest.mark.skipif(not HAS_SPECUTILS or not HAS_SPECLITE,
+                    reason='test requires specutils and speclite')
 def test_template_spectra():
 
     from astropy import units
@@ -182,7 +177,7 @@ def test_template_spectra():
     # Each test galaxy is exactly one of the templates
     coefficients = np.eye(3)
     mt = magnitudes_from_templates(coefficients, spec, 'test-filt')
-    m = mag_ab(spec, 'test-filt')
+    m = mag_ab(lam, flam, 'test-filt')
     np.testing.assert_allclose(mt, m)
 
     # Test distance modulus
@@ -205,7 +200,8 @@ def test_template_spectra():
     assert not np.all(m_true == m_interp)
 
 
-@pytest.mark.skipif(not HAS_SPECUTILS, reason='test requires specutils')
+@pytest.mark.skipif(not HAS_SPECUTILS or not HAS_SPECLITE,
+                    reason='test requires specutils and speclite')
 def test_stellar_mass_from_reference_band():
 
     from astropy import units
@@ -229,7 +225,7 @@ def test_stellar_mass_from_reference_band():
     templates = Spectrum1D(spectral_axis=lam, flux=flam)
 
     # Absolute magnitudes for each template
-    Mt = mag_ab(templates, 'test-filt')
+    Mt = mag_ab(lam, flam, 'test-filt')
 
     # Using the identity matrix for the coefficients yields trivial test cases
     coeff = np.eye(3)

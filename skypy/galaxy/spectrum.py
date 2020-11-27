@@ -122,8 +122,8 @@ def dirichlet_coefficients(redshift, alpha0, alpha1, z1=1., weight=None):
     return coeff
 
 
-def mag_ab(spectra, filters, *, redshift=None, coefficients=None, distmod=None,
-           interpolate=1000):
+def mag_ab(wavelength, spectrum, filters, *, redshift=None, coefficients=None,
+           distmod=None, interpolate=1000):
     r'''Compute AB magnitudes from spectra and filters.
 
     This function takes *emission* spectra and observation filters and computes
@@ -150,16 +150,21 @@ def mag_ab(spectra, filters, *, redshift=None, coefficients=None, distmod=None,
 
     Parameters
     ----------
-    spectra : (ns,) `~specutils.Spectrum1D`
-        Emission spectra.
+    wavelength : (nw,) `~astropy.units.Quantity` or array_like
+        Wavelength array of the spectrum.
+    spectrum : ([ns,] nw,) `~astropy.units.Quantity` or array_like
+        Emission spectrum. Can be multidimensional for computing with multiple
+        spectra of the same wavelengths. The last axis is the wavelength axis.
     filters : str or list of str
         Filter specification, loaded filters are array_like of shape (nf,).
     redshift : (nz,) array_like, optional
-        Optional array of redshifts.
-    coefficients : ([nz,] ns,) array_like
-        Optional coefficients for combining spectra.
+        Optional array of redshifts. Can be multidimensional.
+    coefficients : ([nz,] [ns,]) array_like
+        Optional coefficients for combining spectra. Axes must be compatible
+        with all redshift and spectrum dimensions.
     distmod : (nz,) array_like, optional
-        Optional distance modulus for each redshift.
+        Optional distance modulus for each redshift. Shape must be compatible
+        with redshift dimensions.
     interpolate : int or `False`, optional
         Maximum number of redshifts to compute explicitly. Default is `1000`.
 
@@ -183,7 +188,7 @@ def mag_ab(spectra, filters, *, redshift=None, coefficients=None, distmod=None,
         filters = filters[0]
 
     # number of dimensions for each input
-    nd_s = len(np.shape(spectra)[:-1])  # last axis is spectral axis
+    nd_s = len(np.shape(spectrum)[:-1])  # last axis is spectral axis
     nd_f = len(np.shape(filters))
     nd_z = len(np.shape(redshift))
 
@@ -198,7 +203,7 @@ def mag_ab(spectra, filters, *, redshift=None, coefficients=None, distmod=None,
         redshift_ = redshift if redshift is not None else 0
 
     # working array shape
-    m_shape = np.shape(redshift_) + np.shape(spectra)[:-1] + np.shape(filters)
+    m_shape = np.shape(redshift_) + np.shape(spectrum)[:-1] + np.shape(filters)
 
     # compute AB maggies for every redshift, spectrum, and filter
     m = np.empty(m_shape)
@@ -206,7 +211,7 @@ def mag_ab(spectra, filters, *, redshift=None, coefficients=None, distmod=None,
         for j, f in np.ndenumerate(filters):
             # create a shifted filter for redshift
             fs = f.create_shifted(z)
-            m[i+(...,)+j] = fs.get_ab_maggies(spectra.flux, spectra.wavelength)
+            m[i+(...,)+j] = fs.get_ab_maggies(spectrum, wavelength)
 
     # if interpolating, compute the full set of redshifts
     if interpolate:
@@ -288,9 +293,9 @@ def magnitudes_from_templates(coefficients, templates, filters, redshift=None,
         coefficients = (coefficients.T * stellar_mass).T
 
     # compute AB magnitudes
-    magnitudes = mag_ab(templates, filters, redshift=redshift,
-                        coefficients=coefficients, distmod=distance_modulus,
-                        interpolate=resolution)
+    magnitudes = mag_ab(templates.wavelength, templates.flux, filters,
+                        redshift=redshift, coefficients=coefficients,
+                        distmod=distance_modulus, interpolate=resolution)
 
     return magnitudes
 
@@ -322,7 +327,7 @@ def stellar_mass_from_reference_band(coefficients, templates, magnitudes, filter
     '''
 
     # compute AB magnitudes for reference band
-    M = mag_ab(templates, filter, coefficients=coefficients)
+    M = mag_ab(templates.wavelength, templates.flux, filter, coefficients=coefficients)
 
     # compute "stellar mass modulus" from magnitudes
     M -= magnitudes
