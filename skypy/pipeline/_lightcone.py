@@ -67,7 +67,7 @@ class Lightcone:
 
         # Cosmology from pipeline
         if pipeline.cosmology:
-            self.cosmology = pipeline.get_value(pipeline.cosmology)
+            self.cosmology = pipeline.evaluate(pipeline.cosmology)
         else:
             self.cosmology = default_cosmology.get()
 
