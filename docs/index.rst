@@ -13,6 +13,10 @@ This package contains methods for modelling the Universe, galaxies and the Milky
 Getting Started
 ***************
 
+.. toctree::
+   :maxdepth: 1
+
+   install
 
 .. _user-docs:
 

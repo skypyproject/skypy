@@ -27,35 +27,16 @@ our `Citation Guidelines`_.
 .. _Citation Guidelines: CITATION
 
 
-Getting Started
----------------
+Installation
+------------
 
-SkyPy is distributed through PyPI_ and conda-forge_. To install SkyPy and its
-dependencies_ using pip_:
+SkyPy releases are distributed through PyPI_ and conda-forge_. Instructions for
+installing SkyPy and its dependencies can be found in the Installation_
+section of the documentation.
 
-.. code:: bash
 
-    $ pip install skypy
-
-To install using conda_:
-
-.. code:: bash
-
-    $ conda install -c conda-forge skypy
-
-The SkyPy library can then be imported from python:
-
-.. code:: python
-
-    >>> import skypy
-
-SkyPy has a number of optional dependencies which can be installed separately.
-One of these is `skypy-data`_ which contains data such as photometric bandpasses
-required for some calculations in SkyPy. This can be installed with:
-
-.. code:: bash
-
-    $ pip install skypy-data@https://github.com/skypyproject/skypy-data/archive/master.tar.gz
+Examples
+--------
 
 SkyPy also has a driver script that can run simulation pipelines from the
 command line. The `skypyproject/examples`_ repository contains sample
@@ -68,12 +49,8 @@ configuration files that you can clone and run:
 
 .. _PyPI: https://pypi.org/project/skypy/
 .. _conda-forge: https://anaconda.org/conda-forge/skypy
-.. _dependencies: setup.cfg
-.. _pip: https://pip.pypa.io/en/stable/
-.. _conda: https://docs.conda.io/en/latest/
-.. _pytest: https://docs.pytest.org/en/stable/
+.. _Installation: https://skypy.readthedocs.io/en/stable/install.html
 .. _skypyproject/examples: https://github.com/skypyproject/examples
-.. _skypy-data: https://github.com/skypyproject/skypy-data
 
 
 Contributing

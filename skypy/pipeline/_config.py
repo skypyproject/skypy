@@ -3,7 +3,6 @@ from importlib import import_module
 import yaml
 import re
 from astropy.units import Quantity
-from collections.abc import Mapping
 from ._items import Ref, Call
 
 __all__ = [
@@ -24,26 +23,6 @@ def import_function(qualname):
     return function
 
 
-def validate_keys(config):
-    for k in config.keys():
-        if not isinstance(k, str):
-            raise ValueError(f"Invalid key found in config. {k} is not a string. "
-                             f"Either rename this value or wrap it in quotes.")
-
-
-def validate_config(config):
-    # Check each key at the current depth is a string
-    validate_keys(config)
-    for v in config.values():
-        # If any values are dictionaries, recurse
-        if isinstance(v, Mapping):
-            validate_config(v)
-        # If any values are function calls validate kwargs
-        if isinstance(v, Call):
-            validate_keys(v.kwargs)
-    return config
-
-
 class SkyPyLoader(yaml.SafeLoader):
     '''custom YAML loader class with SkyPy extensions'''
 
@@ -52,10 +31,17 @@ class SkyPyLoader(yaml.SafeLoader):
         '''load the first YAML document from stream'''
         loader = cls(stream)
         try:
-            single_data = loader.get_single_data()
-            return validate_config(single_data if single_data else {})
+            return loader.get_single_data()
         finally:
             loader.dispose()
+
+    def construct_mapping(self, node, deep=False):
+        mapping = super().construct_mapping(node, deep)
+        for key in mapping:
+            if not isinstance(key, str):
+                raise ValueError(f'key "{key}" is of non-string type "{type(key).__name__}"\n'
+                                 f'{node.start_mark}')
+        return mapping
 
     def construct_ref(self, node):
         ref = self.construct_scalar(node)

@@ -1,6 +1,6 @@
 import numpy as np
 import pytest
-from skypy.galaxy.spectrum import HAS_SPECUTILS, HAS_SKYPY_DATA
+from skypy.galaxy.spectrum import HAS_SPECUTILS, HAS_SPECLITE
 
 
 def test_broadcast_arguments():
@@ -67,8 +67,8 @@ def test_dependent_argument():
             pass
 
 
-@pytest.mark.skipif(not HAS_SPECUTILS or not HAS_SKYPY_DATA,
-                    reason='test requires specutils and skypy-data')
+@pytest.mark.skipif(not HAS_SPECUTILS or not HAS_SPECLITE,
+                    reason='test requires specutils and speclite')
 def test_spectral_data_input():
 
     from astropy import units
@@ -78,7 +78,7 @@ def test_spectral_data_input():
     def my_bandpass_function(bandpass):
         pass
 
-    my_bandpass_function('Johnson_B')
+    my_bandpass_function('bessell_B')
 
     with pytest.raises(units.UnitConversionError):
         my_bandpass_function('kcorrect_spec')
