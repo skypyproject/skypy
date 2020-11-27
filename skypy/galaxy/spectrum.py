@@ -122,12 +122,16 @@ def dirichlet_coefficients(redshift, alpha0, alpha1, z1=1., weight=None):
     return coeff
 
 
-def mag_ab(spectra, filters, *, redshift=None, coefficients=None,
-           distmod=None, interpolate=1000):
+def mag_ab(spectra, filters, *, redshift=None, coefficients=None, distmod=None,
+           interpolate=1000):
     r'''Compute AB magnitudes from spectra and filters.
 
     This function takes *emission* spectra and observation filters and computes
     bandpass AB magnitudes [1]_.
+
+    The filter specification in the `filters` argument is passed unchanged to
+    `speclite.filters.load_filters`. See there for the syntax, and the list of
+    supported values.
 
     The emission spectra can optionally be redshifted. If the `redshift`
     parameter is given, the output array will have corresponding axes. If the
@@ -148,8 +152,8 @@ def mag_ab(spectra, filters, *, redshift=None, coefficients=None,
     ----------
     spectra : (ns,) `~specutils.Spectrum1D`
         Emission spectra.
-    filters : `~speclite.filters.FilterResponse` or (nf,) `~speclite.filters.FilterSequence`
-        Single filter or a sequence of filters.
+    filters : str or list of str
+        Filter specification, loaded filters are array_like of shape (nf,).
     redshift : (nz,) array_like, optional
         Optional array of redshifts.
     coefficients : ([nz,] ns,) array_like
@@ -170,6 +174,13 @@ def mag_ab(spectra, filters, *, redshift=None, coefficients=None,
     .. [1] M. R. Blanton et al., 2003, AJ, 125, 2348
 
     '''
+
+    # load the filters
+    if np.ndim(filters) == 0:
+        filters = (filters,)
+    filters = speclite.filters.load_filters(*filters)
+    if np.shape(filters) == (1,):
+        filters = filters[0]
 
     # number of dimensions for each input
     nd_s = len(np.shape(spectra)[:-1])  # last axis is spectral axis
@@ -272,18 +283,14 @@ def magnitudes_from_templates(coefficients, templates, filters, redshift=None,
     .. [2] M. R. Blanton and S. Roweis, 2007, AJ, 125, 2348
     '''
 
-    # number of filter dimensions
-    nd_f = len(np.shape(filters))
+    # combine coefficients and stellar masses, if given
+    if stellar_mass is not None:
+        coefficients = (coefficients.T * stellar_mass).T
 
     # compute AB magnitudes
     magnitudes = mag_ab(templates, filters, redshift=redshift,
                         coefficients=coefficients, distmod=distance_modulus,
                         interpolate=resolution)
-
-    # multiply by stellar mass if given
-    if stellar_mass is not None:
-        sm = np.reshape(stellar_mass, np.shape(stellar_mass) + (1,)*nd_f)
-        magnitudes += -2.5*np.log10(sm)
 
     return magnitudes
 

@@ -84,7 +84,7 @@ def test_mag_ab_standard_source():
     flam = 0.10885464149979998*units.Unit('erg s-1 cm-2 AA')/lam**2
     spec = Spectrum1D(spectral_axis=lam, flux=flam)
 
-    m = mag_ab(spec, filt)
+    m = mag_ab(spec, 'test-filt')
 
     assert np.isclose(m, 0)
 
@@ -112,7 +112,7 @@ def test_mag_ab_redshift_dependence():
     z = np.linspace(0, 1, 11)
 
     # compute the AB magnitude at different redshifts
-    m = mag_ab(spec, filt, redshift=z)
+    m = mag_ab(spec, 'test-filt', redshift=z)
 
     # compare with expected redshift dependence
     np.testing.assert_allclose(m, m[0] - 2.5*np.log10(1 + z))
@@ -151,7 +151,7 @@ def test_mag_ab_multi():
     spec = Spectrum1D(spectral_axis=lam, flux=flam)
 
     # Compare calculated magnitudes with truth
-    magnitudes = mag_ab(spec, filt, redshift=z)
+    magnitudes = mag_ab(spec, ['test-filt0', 'test-filt1'], redshift=z)
     truth = -2.5 * np.log10(A * (1+z)).T[:, :, np.newaxis]
     assert magnitudes.shape == (5, 3, 2)
     np.testing.assert_allclose(*np.broadcast_arrays(magnitudes, truth), rtol=1e-4)
@@ -181,26 +181,26 @@ def test_template_spectra():
 
     # Each test galaxy is exactly one of the templates
     coefficients = np.eye(3)
-    mt = magnitudes_from_templates(coefficients, spec, filt)
-    m = mag_ab(spec, filt)
+    mt = magnitudes_from_templates(coefficients, spec, 'test-filt')
+    m = mag_ab(spec, 'test-filt')
     np.testing.assert_allclose(mt, m)
 
     # Test distance modulus
     redshift = np.array([1, 2, 3])
     dm = Planck15.distmod(redshift).value
-    mt = magnitudes_from_templates(coefficients, spec, filt, distance_modulus=dm)
+    mt = magnitudes_from_templates(coefficients, spec, 'test-filt', distance_modulus=dm)
     np.testing.assert_allclose(mt, m + dm)
 
     # Test stellar mass
     sm = np.array([1, 2, 3])
-    mt = magnitudes_from_templates(coefficients, spec, filt, stellar_mass=sm)
+    mt = magnitudes_from_templates(coefficients, spec, 'test-filt', stellar_mass=sm)
     np.testing.assert_allclose(mt, m - 2.5*np.log10(sm))
 
     # Redshift interpolation test; linear interpolation sufficient over a small
     # redshift range at low relative tolerance
     z = np.linspace(0, 0.1, 3)
-    m_true = magnitudes_from_templates(coefficients, spec, filt, redshift=z, resolution=4)
-    m_interp = magnitudes_from_templates(coefficients, spec, filt, redshift=z, resolution=2)
+    m_true = magnitudes_from_templates(coefficients, spec, 'test-filt', redshift=z, resolution=4)
+    m_interp = magnitudes_from_templates(coefficients, spec, 'test-filt', redshift=z, resolution=2)
     np.testing.assert_allclose(m_true, m_interp, rtol=1e-2)
     assert not np.all(m_true == m_interp)
 
@@ -229,20 +229,20 @@ def test_stellar_mass_from_reference_band():
     templates = Spectrum1D(spectral_axis=lam, flux=flam)
 
     # Absolute magnitudes for each template
-    Mt = mag_ab(templates, filt)
+    Mt = mag_ab(templates, 'test-filt')
 
     # Using the identity matrix for the coefficients yields trivial test cases
     coeff = np.eye(3)
 
     # Using the absolute magnitudes of the templates as reference magnitudes
     # should return one solar mass for each template.
-    stellar_mass = stellar_mass_from_reference_band(coeff, templates, Mt, filt)
+    stellar_mass = stellar_mass_from_reference_band(coeff, templates, Mt, 'test-filt')
     truth = 1
     np.testing.assert_allclose(stellar_mass, truth)
 
     # Solution for given magnitudes without template mixing
     Mb = np.array([10, 20, 30])
-    stellar_mass = stellar_mass_from_reference_band(coeff, templates, Mb, filt)
+    stellar_mass = stellar_mass_from_reference_band(coeff, templates, Mb, 'test-filt')
     truth = np.power(10, -0.4*(Mb-Mt))
     np.testing.assert_allclose(stellar_mass, truth)
 
