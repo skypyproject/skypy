@@ -26,14 +26,14 @@ def test_item():
 
 def test_call():
     from skypy.pipeline import Pipeline
-    from skypy.pipeline._items import Call
+    from skypy.pipeline._items import Call, Ref
 
     # set up a mock pipeline
     pipeline = Pipeline({})
 
     # function we will call
     def tester(arg1, arg2, *, kwarg1, kwarg2):
-        return True
+        return arg1, arg2, kwarg1, kwarg2
 
     # invalid construction
     with pytest.raises(TypeError, match='function is not callable'):
@@ -66,4 +66,19 @@ def test_call():
 
     # call should be evaluatable now
     result = call.evaluate(pipeline)
-    assert result == True
+    assert result == (1, 2, 3, 4)
+
+    # set up a call with references
+    call = Call(tester, [Ref('var1'), 2], {'kwarg1': Ref('var3'), 'kwarg2': 4})
+
+    # set up a pipeline with variables and a call that references them
+    pipeline = Pipeline({'var1': 1, 'var3': 3})
+
+    # check dependencies are resolved
+    deps = call.depend(pipeline)
+    assert deps == ['var1', 'var3']
+
+    # execute the pipeline (sets state) and evaluate the call
+    pipeline.execute()
+    result = call.evaluate(pipeline)
+    assert result == (1, 2, 3, 4)
