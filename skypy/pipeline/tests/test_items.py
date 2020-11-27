@@ -17,6 +17,7 @@ def test_item():
     # check `depend` method
     deps = item.depend(pipeline)
     assert isinstance(deps, list)
+    assert len(deps) == 0
 
     # check `evaluate` method
     val = item.evaluate(pipeline)
@@ -49,11 +50,16 @@ def test_call():
     with pytest.raises(TypeError, match=r'tester\(\)'):
         call.evaluate(pipeline)
 
-    # infer required args and kwargs
+    # good construction with arg1 and kwarg1
+    call = Call(tester, [1], {'kwarg1': 3})
+
+    # call still has incomplete args
+    with pytest.raises(TypeError, match=r'tester\(\)'):
+        call.evaluate(pipeline)
+
+    # infer required arg2 and kwarg2 from context
     context = {
-        'arg1': 1,
         'arg2': 2,
-        'kwarg1': 3,
         'kwarg2': 4,
     }
     call.infer(context)
