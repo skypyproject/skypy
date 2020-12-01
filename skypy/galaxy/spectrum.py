@@ -174,6 +174,10 @@ def mag_ab(wavelength, spectrum, filters, *, redshift=None, coefficients=None,
         The AB magnitude of each redshift (if given), each spectrum (if not
         combined), and each filter.
 
+    Warnings
+    --------
+    The :mod:`speclite` package must be installed to use this function.
+
     References
     ----------
     .. [1] M. R. Blanton et al., 2003, AJ, 125, 2348
@@ -198,7 +202,7 @@ def mag_ab(wavelength, spectrum, filters, *, redshift=None, coefficients=None,
 
     # if interpolating, split the redshift range into `interpolate` bits
     if interpolate:
-        redshift_ = np.quantile(redshift, np.linspace(0, 1, interpolate))
+        redshift_ = np.linspace(np.min(redshift), np.max(redshift), interpolate)
     else:
         redshift_ = redshift if redshift is not None else 0
 
