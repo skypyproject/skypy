@@ -4,6 +4,7 @@ r"""Galaxy spectrum module.
 
 import numpy as np
 from astropy import units
+from astropy.io import fits
 from ..utils import spectral_data_input
 
 
@@ -12,6 +13,7 @@ __all__ = [
     'load_spectral_data',
     'mag_ab',
     'magnitudes_from_templates',
+    'kcorrect',
 ]
 
 try:
@@ -400,3 +402,34 @@ def load_spectral_data(name):
 
     # run the loader
     return loader(*args, *groups)
+
+
+def kcorrect(coefficients, filters, redshifts, cosmology, reference_magnitudes=None,
+             reference_filter=None, stellar_mass=None, resolution=1000):
+    '''Galaxy photometry from kcorrect spectrum templates.
+
+    '''
+
+    # kcorrect data
+    filename = resource_filename('skypy', 'data/kcorrect/k_nmf_derived.default.fits')
+    with fits.open(filename) as hdul:
+        spec = hdul[1].data
+        lambda_ = hdul[11].data
+
+    # Magnitudes from templates
+    m = mag_ab(lambda_, spec, filters, redshift=redshift, interpolate=resolution)
+
+    # Distance Modulus
+    distance_modulus = cosmology.distmod(redshifts) if cosmology else 0
+
+    # Mass modulus from reference magnitude or stellar_mass
+    if stellar_mass is None and reference_magnitudes is not None and reference_filter is not None:
+        mass_modulus = reference_magnitudes
+        mass_modulus -= mag_ab(lambda_, spec, filters, coefficients=coefficients, interpolate=resolution)
+    else if stellar_mass is not None and reference_magnitudes is not None and reference_filter is not None:
+        mass_modulus = -2.5 * np.log10(stellar_mass)
+    else:
+        mass_modulus = 0
+
+    # Sum over templates
+    return np.sum(coefficients * m, axis=1) + distance_modulus + mass_modulus
