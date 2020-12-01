@@ -268,8 +268,8 @@ def magnitudes_from_templates(coefficients, templates, filters, redshift=None,
         Array of spectrum coefficients.
     templates : spectral_data
         Template spectra.
-    filters : (nf,) `~speclite.filters.FilterSequence`
-        Sequence of bandpass filters.
+    filters : str or list of str
+        Bandpass filter specification for `~speclite.filters.load_filters`.
     redshift : (ng,) array_like, optional
         Optional array of values for redshifting the source spectrum.
     resolution : integer, optional
@@ -284,7 +284,8 @@ def magnitudes_from_templates(coefficients, templates, filters, redshift=None,
     Returns
     -------
     mag_ab : (ng, nf) array_like
-        The absolute AB magnitude of each object in each filter.
+        The absolute AB magnitude of each object in each filter, where ``nf``
+        is the number of loaded filters.
 
     References
     ----------
@@ -321,8 +322,9 @@ def stellar_mass_from_reference_band(coefficients, templates, magnitudes, filter
         Emission spectra of the templates.
     magnitudes : (ng,) array_like
         The magnitudes to match in the reference bandpass.
-    filter : `~speclite.filters.FilterResponse`
-        A single reference bandpass filter.
+    filter : str
+        A single reference bandpass filter specification for
+        `~speclite.filters.load_filters`.
 
     Returns
     -------
