@@ -42,13 +42,12 @@ def growth_function_carroll(redshift, cosmology):
     --------
 
     This example returns the growth function for a given array of redshifts
-    and for the Astropy default cosmology:
+    and for the Planck 2015 cosmology:
 
     >>> import numpy as np
-    >>> from astropy.cosmology import default_cosmology
+    >>> from astropy.cosmology import Planck15
     >>> redshift = np.array([0, 1, 2])
-    >>> cosmology = default_cosmology.get()
-    >>> growth_function_carroll(redshift, cosmology)
+    >>> growth_function_carroll(redshift, Planck15)
     array([0.781361..., 0.476280..., 0.327549...])
 
     References

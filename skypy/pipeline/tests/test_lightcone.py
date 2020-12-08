@@ -5,6 +5,7 @@ import numpy as np
 import os
 import pytest
 from skypy.pipeline import Lightcone
+from skypy.pipeline._items import Call, Ref
 
 
 def test_lightcone():
@@ -15,8 +16,8 @@ def test_lightcone():
     config = {'lightcone': {'z_min': z_min, 'z_max': z_max, 'n_slice': n_slice},
               'tables':
               {'test_table':
-               {'z1': (np.random.uniform, ['$slice_z_min', '$slice_z_max', nz]),
-                'z2': (np.random.uniform, ['$slice_z_mid', '$slice_z_max', nz])
+               {'z1': Call(np.random.uniform, [Ref('slice_z_min'), Ref('slice_z_max'), nz]),
+                'z2': Call(np.random.uniform, [Ref('slice_z_mid'), Ref('slice_z_max'), nz])
                 }
                }
               }
@@ -42,7 +43,7 @@ def test_lightcone():
 
     # Repeat test with non-default cosmology
     config['parameters'] = {'H0': 70, 'Om0': 0.3}
-    config['cosmology'] = (FlatLambdaCDM, {'H0': '$H0', 'Om0': '$Om0'})
+    config['cosmology'] = Call(FlatLambdaCDM, [], {'H0': Ref('H0'), 'Om0': Ref('Om0')})
     lightcone = Lightcone(config)
     lightcone.execute()
     chi1 = lightcone.cosmology.comoving_distance(lightcone.tables['test_table']['z1'])

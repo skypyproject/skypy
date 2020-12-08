@@ -22,11 +22,11 @@ else:
     HAS_SPECUTILS = True
 
 try:
-    __import__('skypy-data')
+    import speclite
 except ImportError:
-    HAS_SKYPY_DATA = False
+    HAS_SPECLITE = False
 else:
-    HAS_SKYPY_DATA = True
+    HAS_SPECLITE = True
 
 
 def dirichlet_coefficients(redshift, alpha0, alpha1, z1=1., weight=None):
@@ -122,99 +122,139 @@ def dirichlet_coefficients(redshift, alpha0, alpha1, z1=1., weight=None):
     return coeff
 
 
-@spectral_data_input(spectrum=units.Jy,
-                     bandpass=units.dimensionless_unscaled)
-def mag_ab(spectrum, bandpass, redshift=None):
-    r'''Compute absolute AB magnitudes from spectra and bandpasses.
+def mag_ab(wavelength, spectrum, filters, *, redshift=None, coefficients=None,
+           distmod=None, interpolate=1000):
+    r'''Compute AB magnitudes from spectra and filters.
 
-    This function takes *emission* spectra and observation bandpasses and
-    computes the AB magnitudes. The definition of the bandpass AB magnitude is
-    taken from [1]_. The emission spectra can optionally be redshifted and the
-    bandpasses should have dimensionless `flux` units.
+    This function takes *emission* spectra and observation filters and computes
+    bandpass AB magnitudes [1]_.
+
+    The filter specification in the `filters` argument is passed unchanged to
+    `speclite.filters.load_filters`. See there for the syntax, and the list of
+    supported values.
+
+    The emission spectra can optionally be redshifted. If the `redshift`
+    parameter is given, the output array will have corresponding axes. If the
+    `interpolate` parameter is not `False`, at most that number of redshifted
+    spectra are computed, and the remainder is interpolated from the results.
+
+    The spectra can optionally be combined. If the `coefficients` parameter is
+    given, its shape must match `spectra`, and the corresponding axes are
+    contracted using a product sum. If the spectra are redshifted, the
+    coefficients array can contain axes for each redshift.
+
+    By default, absolute magnitudes are returned. To compute apparent magnitudes
+    instead, provide the `distmod` argument with the distance modulus for each
+    redshift. The distance modulus is applied after redshifts and coefficients
+    and should match the shape of the `redshift` array.
 
     Parameters
     ----------
-    spectrum : spectral_data
-        Emission spectra of the sources.
-    bandpass : spectral_data
-        Bandpass filters.
+    wavelength : (nw,) `~astropy.units.Quantity` or array_like
+        Wavelength array of the spectrum.
+    spectrum : ([ns,] nw,) `~astropy.units.Quantity` or array_like
+        Emission spectrum. Can be multidimensional for computing with multiple
+        spectra of the same wavelengths. The last axis is the wavelength axis.
+    filters : str or list of str
+        Filter specification, loaded filters are array_like of shape (nf,).
     redshift : (nz,) array_like, optional
-        Optional array of values for redshifting the source spectra.
+        Optional array of redshifts. Can be multidimensional.
+    coefficients : ([nz,] [ns,]) array_like
+        Optional coefficients for combining spectra. Axes must be compatible
+        with all redshift and spectrum dimensions.
+    distmod : (nz,) array_like, optional
+        Optional distance modulus for each redshift. Shape must be compatible
+        with redshift dimensions.
+    interpolate : int or `False`, optional
+        Maximum number of redshifts to compute explicitly. Default is `1000`.
 
     Returns
     -------
-    mag_ab : (nz, nb, ns) array_like
-        Absolute AB magnitudes.
+    mag_ab : ([nz,] [ns,] nf,) array_like
+        The AB magnitude of each redshift (if given), each spectrum (if not
+        combined), and each filter.
+
+    Warnings
+    --------
+    The :mod:`speclite` package must be installed to use this function.
 
     References
     ----------
     .. [1] M. R. Blanton et al., 2003, AJ, 125, 2348
 
-    Examples
-    --------
-    Get B-band magnitudes for the kcorrect spec templaces using auto-loading
-    of known spectral data:
-    >>> from skypy.galaxy.spectrum import mag_ab
-    >>> mag_B = mag_ab('kcorrect_spec', 'Johnson_B')  # doctest: +SKIP
-
     '''
 
-    # get the spectra and bandpasses
-    spec_lam = spectrum.wavelength.to_value(units.AA, equivalencies=units.spectral())
-    spec_flux = spectrum.flux.to_value('erg s-1 cm-2 AA-1',
-                                       equivalencies=units.spectral_density(spec_lam))
-    band_lam = bandpass.wavelength.to_value(units.AA, equivalencies=units.spectral())
-    band_tx = bandpass.flux.to_value(units.dimensionless_unscaled)
+    # load the filters
+    if np.ndim(filters) == 0:
+        filters = (filters,)
+    filters = speclite.filters.load_filters(*filters)
+    if np.shape(filters) == (1,):
+        filters = filters[0]
 
-    # redshift zero if not given
-    if redshift is None:
-        redshift = 0.
+    # number of dimensions for each input
+    nd_s = len(np.shape(spectrum)[:-1])  # last axis is spectral axis
+    nd_f = len(np.shape(filters))
+    nd_z = len(np.shape(redshift))
 
-    # Array shapes
-    nz_loop = np.atleast_1d(redshift).shape
-    ns_loop = np.atleast_2d(spec_flux).shape[:-1]
-    nb_loop = np.atleast_2d(band_tx).shape[:-1]
-    nz_return = np.shape(redshift)
-    ns_return = spec_flux.shape[:-1]
-    nb_return = band_tx.shape[:-1]
-    loop_shape = (*nz_loop, *nb_loop, *ns_loop)
-    return_shape = (*nz_return, *nb_return, *ns_return)
+    # check if interpolation is necessary
+    if interpolate and np.size(redshift) <= interpolate:
+        interpolate = False
 
-    # allocate magnitude array
-    mag_ab = np.empty(loop_shape, dtype=float)
+    # if interpolating, split the redshift range into `interpolate` bits
+    if interpolate:
+        redshift_ = np.linspace(np.min(redshift), np.max(redshift), interpolate)
+    else:
+        redshift_ = redshift if redshift is not None else 0
 
-    # compute magnitude contribution from band normalisation [denominator of (2)]
-    m_band = -2.5*np.log10(np.trapz(band_tx/band_lam, band_lam))
+    # working array shape
+    m_shape = np.shape(redshift_) + np.shape(spectrum)[:-1] + np.shape(filters)
 
-    # magnitude offset from band and AB definition [constant in (2)]
-    m_offs = -2.4079482426801846 - m_band
+    # compute AB maggies for every redshift, spectrum, and filter
+    m = np.empty(m_shape)
+    for i, z in np.ndenumerate(redshift_):
+        for j, f in np.ndenumerate(filters):
+            # create a shifted filter for redshift
+            fs = f.create_shifted(z)
+            m[i+(...,)+j] = fs.get_ab_maggies(spectrum, wavelength)
 
-    # compute flux integrand at emitted wavelengths
-    spec_intg = spec_lam*spec_flux
+    # if interpolating, compute the full set of redshifts
+    if interpolate:
+        # diy interpolation keeps memory use to a minimum
+        dm = np.diff(m, axis=0, append=m[-1:])
+        u, n = np.modf(np.interp(redshift, redshift_, np.arange(redshift_.size)))
+        n = n.astype(int)
+        u = u.reshape(u.shape + (1,)*(nd_s+nd_f))
+        m = np.ascontiguousarray(m[n])
+        m += u*dm[n]
+        del(dm, n, u)
 
-    # go through redshifts ...
-    for i, z in enumerate(np.atleast_1d(redshift)):
+    # combine spectra if asked to
+    if coefficients is not None:
+        # contraction over spectrum axes (`nd_z` to `nd_z+nd_s`)
+        c = np.reshape(coefficients, np.shape(coefficients) + (1,)*nd_f)
+        m = np.sum(m*c, axis=tuple(range(nd_z, nd_z+nd_s)))
+        # no spectrum axes left
+        nd_s = 0
 
-        # observed wavelength of spectra
-        obs_lam = (1 + z)*spec_lam
+    # convert maggies to magnitudes
+    np.log10(m, out=m)
+    m *= -2.5
 
-        for j, b in enumerate(np.atleast_2d(band_tx)):
+    # apply the redshift K-correction if necessary
+    if redshift is not None:
+        kcorr = -2.5*np.log10(1 + redshift)
+        m += np.reshape(kcorr, kcorr.shape + (1,)*(nd_s+nd_f))
 
-            # interpolate band to get transmission at observed wavelengths
-            obs_tx = np.interp(obs_lam, band_lam, b, left=0, right=0)
+    # add distance modulus if given
+    if distmod is not None:
+        m += np.reshape(distmod, np.shape(distmod) + (1,)*(nd_s+nd_f))
 
-            # compute magnitude contribution from flux [numerator of (2)]
-            mag_ab[i, j, :] = -2.5*np.log10(np.trapz(spec_intg*obs_tx, obs_lam))
-
-    # combine AB magnitude [all of (2)]
-    mag_ab += np.atleast_1d(m_offs)[:, np.newaxis]
-
-    return mag_ab.item() if not return_shape else mag_ab.reshape(return_shape)
+    # done
+    return m
 
 
-@spectral_data_input(templates=units.Jy,
-                     bandpass=units.dimensionless_unscaled)
-def magnitudes_from_templates(coefficients, templates, bandpass, redshift=None,
+@spectral_data_input(templates=units.Jy)
+def magnitudes_from_templates(coefficients, templates, filters, redshift=None,
                               resolution=1000, stellar_mass=None, distance_modulus=None):
     r'''Compute AB magnitudes from template spectra.
 
@@ -228,8 +268,8 @@ def magnitudes_from_templates(coefficients, templates, bandpass, redshift=None,
         Array of spectrum coefficients.
     templates : spectral_data
         Template spectra.
-    bandpass : spectral_data
-        Bandpass filters.
+    filters : str or list of str
+        Bandpass filter specification for `~speclite.filters.load_filters`.
     redshift : (ng,) array_like, optional
         Optional array of values for redshifting the source spectrum.
     resolution : integer, optional
@@ -243,8 +283,9 @@ def magnitudes_from_templates(coefficients, templates, bandpass, redshift=None,
 
     Returns
     -------
-    mag_ab : (ng, nb) array_like
-        The absolute AB magnitude of each object.
+    mag_ab : (ng, nf) array_like
+        The absolute AB magnitude of each object in each filter, where ``nf``
+        is the number of loaded filters.
 
     References
     ----------
@@ -252,46 +293,24 @@ def magnitudes_from_templates(coefficients, templates, bandpass, redshift=None,
     .. [2] M. R. Blanton and S. Roweis, 2007, AJ, 125, 2348
     '''
 
-    # Array shapes
-    nz_loop = np.atleast_1d(redshift).shape[0]
-    nb_loop = np.atleast_2d(bandpass.flux).shape[0]
-    nt_loop = np.atleast_2d(templates.flux).shape[0]
-    ng_return = coefficients.shape[:-1]
-    nb_return = bandpass.flux.shape[:-1]
-    M_z_shape = (resolution, nb_loop, nt_loop)
-    M_shape = (nz_loop, nb_loop, nt_loop)
-    return_shape = (*ng_return, *nb_return)
+    # combine coefficients and stellar masses, if given
+    if stellar_mass is not None:
+        coefficients = (coefficients.T * stellar_mass).T
 
-    # Interpolation flag
-    interpolate = np.size(redshift) > resolution
+    # compute AB magnitudes
+    magnitudes = mag_ab(templates.wavelength, templates.flux, filters,
+                        redshift=redshift, coefficients=coefficients,
+                        distmod=distance_modulus, interpolate=resolution)
 
-    if interpolate:
-        z = np.linspace(np.min(redshift), np.max(redshift), resolution)
-        M_z = mag_ab(templates, bandpass, z).reshape(M_z_shape)
-        M = np.empty(M_shape, dtype=float)
-        for b in range(nb_loop):
-            for t in range(nt_loop):
-                M[:, b, t] = np.interp(redshift, z, M_z[:, b, t])
-    else:
-        M = mag_ab(templates, bandpass, redshift).reshape(M_shape)
-
-    stellar_mass = 1 if stellar_mass is None else stellar_mass
-    distance_modulus = 0 if distance_modulus is None else distance_modulus
-
-    flux = np.sum(coefficients[:, np.newaxis, :] * np.power(10, -0.4*M), axis=2)
-    flux *= np.atleast_1d(stellar_mass)[:, np.newaxis]
-    magnitudes = -2.5 * np.log10(flux) + np.atleast_1d(distance_modulus)[:, np.newaxis]
-
-    return magnitudes.item() if not return_shape else magnitudes.reshape(return_shape)
+    return magnitudes
 
 
-@spectral_data_input(templates=units.Jy,
-                     bandpass=units.dimensionless_unscaled)
-def stellar_mass_from_reference_band(coefficients, templates, magnitudes, bandpass):
-    r'''Compute stellar mass from absolute magnitudes in a reference band.
+@spectral_data_input(templates=units.Jy)
+def stellar_mass_from_reference_band(coefficients, templates, magnitudes, filter):
+    r'''Compute stellar mass from absolute magnitudes in a reference filter.
 
     This function takes composite spectra for a set of galaxies defined by
-    template fluxes *per solar mass* and multiplicative coefficients and
+    template fluxes *per unit stellar mass* and multiplicative coefficients and
     calculates the stellar mass required to match given absolute magnitudes for
     a given bandpass filter in the rest frame.
 
@@ -303,8 +322,9 @@ def stellar_mass_from_reference_band(coefficients, templates, magnitudes, bandpa
         Emission spectra of the templates.
     magnitudes : (ng,) array_like
         The magnitudes to match in the reference bandpass.
-    bandpass : spectral_data
-        A single reference bandpass filter.
+    filter : str
+        A single reference bandpass filter specification for
+        `~speclite.filters.load_filters`.
 
     Returns
     -------
@@ -312,9 +332,17 @@ def stellar_mass_from_reference_band(coefficients, templates, magnitudes, bandpa
         Stellar mass of each galaxy in template units.
     '''
 
-    flux = np.power(10, -0.4 * mag_ab(templates, bandpass))
-    stellar_mass = np.power(10, -0.4*magnitudes) / np.sum(coefficients * flux, axis=1)
-    return stellar_mass
+    # compute AB magnitudes for reference band
+    M = mag_ab(templates.wavelength, templates.flux, filter, coefficients=coefficients)
+
+    # compute "stellar mass modulus" from magnitudes
+    M -= magnitudes
+
+    # turn into stellar mass
+    M *= 0.4
+    np.power(10., M, out=M)
+
+    return M
 
 
 def load_spectral_data(name):
@@ -341,6 +369,7 @@ def load_spectral_data(name):
     Warnings
     --------
     The :mod:`specutils` package must be installed to use this function.
+    The :mod:`speclite` package must be installed to use this function.
 
     '''
 

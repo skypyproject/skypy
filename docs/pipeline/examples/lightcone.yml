@@ -2,6 +2,7 @@ lightcone:
   z_min: 0.8
   z_max: 1.2
   n_slice: 4
+cosmology: !astropy.cosmology.default_cosmology.get
 tables:
   galaxies:
     redshift: !skypy.galaxy.redshift.schechter_lf_redshift

@@ -70,20 +70,6 @@ def dependent_argument(dependent_arg, *independent_args):
     return decorator
 
 
-def uses_default_cosmology(function):
-    '''Decorator to use the Astropy default cosmology if none is given.'''
-    sig = signature(function)
-
-    @wraps(function)
-    def wrapper(*args, **kwargs):
-        given = sig.bind_partial(*args, **kwargs)
-        if 'cosmology' not in given.arguments:
-            given.arguments['cosmology'] = default_cosmology.get()
-        return function(*given.args, **given.kwargs)
-
-    return wrapper
-
-
 def spectral_data_input(**parameters):
     '''Decorator to load spectral data automatically and validate units.
 

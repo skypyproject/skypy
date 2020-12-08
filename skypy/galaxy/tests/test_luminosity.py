@@ -24,7 +24,7 @@ def test_magnitude_functions():
     DM = cosmo.distmod(z).value
 
     # compare with function
-    np.testing.assert_allclose(distance_modulus(z), DM)
+    np.testing.assert_allclose(distance_modulus(z, cosmo), DM)
 
     # compute apparent magnitudes
     m = absolute_to_apparent_magnitude(M, DM)

@@ -5,9 +5,11 @@ and handle their results.
 """
 
 from astropy.cosmology import default_cosmology
-from astropy.table import Table
+from astropy.table import Table, Column
 from copy import copy, deepcopy
+from collections.abc import Sequence, Mapping
 from ._config import load_skypy_yaml
+from ._items import Item, Call, Ref
 import networkx
 
 
@@ -49,10 +51,6 @@ class Pipeline:
         Each step in the pipeline is configured by a dictionary specifying
         a variable name and the associated value.
 
-        A value that is a tuple `(function, args)` specifies that the value will
-        be the result of a function call. The first item is a callable, and the
-        second value specifies the function arguments.
-
         If a function argument is a string `$variable_name`, it refers to the
         values of previous step in the pipeline.
 
@@ -75,10 +73,10 @@ class Pipeline:
         # config contains settings for all variables and table initialisation
         # table_config contains settings for all table columns
         self.config = deepcopy(configuration)
-        self.cosmology = self.config.pop('cosmology', {})
+        self.cosmology = self.config.pop('cosmology', None)
         self.parameters = self.config.pop('parameters', {})
         self.table_config = self.config.pop('tables', {})
-        default_table = (Table,)
+        default_table = Call(Table)
         self.config.update({k: v.pop('.init', default_table)
                             for k, v in self.table_config.items()})
 
@@ -88,36 +86,36 @@ class Pipeline:
         # Create a Directed Acyclic Graph of all jobs and dependencies
         self.dag = networkx.DiGraph()
 
-        # Jobs that do not call a function but require entries in the DAG
-        # for the purpose of maintaining dependencies
-        self.skip_jobs = set()
+        # context for function calls
+        context = {}
 
-        # - add nodes for each parameter, variable, table and column
+        # use cosmology in global context if given
+        if self.cosmology is not None:
+            context['cosmology'] = Ref('cosmology')
+
+        # - add nodes for each variable, table and column
         # - add edges for the table dependencies
-        # - keep track where functions need to be called
-        #   functions are tuples (function name, [function args])
-        functions = {}
-        for job in self.parameters:
-            self.dag.add_node(job)
-            self.skip_jobs.add(job)
-        self.dag.add_node('cosmology')
-        self.skip_jobs.add('cosmology')
+        # - keep track where items need to be called
+        items = {}
         for job, settings in self.config.items():
-            self.dag.add_node(job)
-            if isinstance(settings, tuple):
-                functions[job] = settings
+            self.dag.add_node(job, skip=False)
+            if isinstance(settings, Item):
+                items[job] = settings
+                # infer additional item properties from context
+                settings.infer(context)
         for table, columns in self.table_config.items():
             table_complete = '.'.join((table, 'complete'))
             self.dag.add_node(table_complete)
             self.dag.add_edge(table, table_complete)
-            self.skip_jobs.add(table_complete)
             for column, settings in columns.items():
                 job = '.'.join((table, column))
-                self.dag.add_node(job)
+                self.dag.add_node(job, skip=False)
                 self.dag.add_edge(table, job)
                 self.dag.add_edge(job, table_complete)
-                if isinstance(settings, tuple):
-                    functions[job] = settings
+                if isinstance(settings, Item):
+                    items[job] = settings
+                    # infer additional item properties from context
+                    settings.infer(context)
                 # DAG nodes for individual columns in multi-column assignment
                 names = [n.strip() for n in column.split(',')]
                 if len(names) > 1:
@@ -125,20 +123,20 @@ class Pipeline:
                         subjob = '.'.join((table, name))
                         self.dag.add_node(subjob)
                         self.dag.add_edge(job, subjob)
-                        self.skip_jobs.add(subjob)
 
-        # go through functions and add edges for all references
-        for job, settings in functions.items():
-            # settings are tuple (function, [args])
-            args = settings[1] if len(settings) > 1 else None
-            # get dependencies from arguments
-            deps = self.get_deps(args)
+        # go through items and add edges for all dependencies
+        for job, settings in items.items():
+            # get dependencies from item
+            deps = settings.depend(self)
             # add edges for dependencies
             for d in deps:
-                if self.dag.has_node(d):
-                    self.dag.add_edge(d, job)
-                else:
-                    raise KeyError(d)
+                # job depends on d
+                self.dag.add_edge(d, job)
+                # recurse dependencies such that d = 'a.b.c' -> 'a.b' -> 'a'
+                c = d.rpartition('.')[0]
+                while c:
+                    self.dag.add_edge(c, d)
+                    c, d = c.rpartition('.')[0], c
 
     def execute(self, parameters={}):
         r'''Run a pipeline.
@@ -164,33 +162,30 @@ class Pipeline:
         # initialise state object
         self.state = copy(self.parameters)
 
-        # Initialise cosmology from config parameters or use astropy default
-        if self.cosmology:
-            self.state['cosmology'] = self.get_value(self.cosmology)
-        else:
-            self.state['cosmology'] = default_cosmology.get()
+        # Initialise cosmology from config parameters
+        if self.cosmology is not None:
+            self.state['cosmology'] = self.evaluate(self.cosmology)
 
-        # Execute pipeline setting state cosmology as the default
-        with default_cosmology.set(self.state['cosmology']):
-
-            # go through the jobs in dependency order
-            for job in networkx.topological_sort(self.dag):
-                if job in self.skip_jobs:
-                    continue
-                elif job in self.config:
-                    settings = self.config.get(job)
-                    self.state[job] = self.get_value(settings)
+        # go through the jobs in dependency order
+        for job in networkx.topological_sort(self.dag):
+            node = self.dag.nodes[job]
+            skip = node.get('skip', True)
+            if skip:
+                continue
+            elif job in self.config:
+                settings = self.config.get(job)
+                self.state[job] = self.evaluate(settings)
+            else:
+                table, column = job.split('.')
+                settings = self.table_config[table][column]
+                names = [n.strip() for n in column.split(',')]
+                if len(names) > 1:
+                    # Multi-column assignment
+                    t = Table(self.evaluate(settings), names=names)
+                    self.state[table].add_columns(t.columns)
                 else:
-                    table, column = job.split('.')
-                    settings = self.table_config[table][column]
-                    names = [n.strip() for n in column.split(',')]
-                    if len(names) > 1:
-                        # Multi-column assignment
-                        t = Table(self.get_value(settings), names=names)
-                        self.state[table].add_columns(t.columns)
-                    else:
-                        # Single column assignment
-                        self.state[table][column] = self.get_value(settings)
+                    # Single column assignment
+                    self.state[table][column] = self.evaluate(settings)
 
     def write(self, file_format=None, overwrite=False):
         r'''Write pipeline results to disk.
@@ -214,82 +209,57 @@ class Pipeline:
                 filename = '.'.join((table, file_format))
                 self.state[table].write(filename, overwrite=overwrite)
 
-    def get_value(self, value):
-        '''return the value of a field
+    def evaluate(self, value):
+        '''evaluate an item in the pipeline'''
 
-        tuples specify function calls `(function name, function args)`
-        '''
-
-        # check if not function
-        if not isinstance(value, tuple):
-            # check for reference
-            if isinstance(value, str) and value[0] == '$':
-                return self[value[1:]]
-            else:
-                # plain value
-                return value
-
-        # value is tuple (function, [args])
-        function = value[0]
-        args = value[1] if len(value) > 1 else []
-
-        # Parse arguments
-        parsed_args = self.get_args(args)
-
-        # Call function
-        if isinstance(args, dict):
-            result = function(**parsed_args)
-        elif isinstance(args, list):
-            result = function(*parsed_args)
+        if isinstance(value, Sequence) and not isinstance(value, str):
+            # recurse lists
+            return [self.evaluate(v) for v in value]
+        elif isinstance(value, Mapping):
+            # recurse dicts
+            return {k: self.evaluate(v) for k, v in value.items()}
+        elif isinstance(value, Item):
+            # evaluate item
+            return value.evaluate(self)
         else:
-            result = function(parsed_args)
+            # everything else return unchanged
+            return value
 
-        return result
-
-    def get_args(self, args):
-        '''parse function arguments
-
-        strings beginning with `$` are references to other fields
-        '''
-
-        if isinstance(args, dict):
-            # recurse kwargs
-            return {k: self.get_args(v) for k, v in args.items()}
-        elif isinstance(args, list):
-            # recurse args
-            return [self.get_args(a) for a in args]
-        else:
-            # return value
-            return self.get_value(args)
-
-    def get_deps(self, args):
+    def depend(self, args):
         '''get dependencies from function args
 
         returns a list of all references found
         '''
 
-        if isinstance(args, str) and args[0] == '$':
-            # reference
-            return [args[1:]]
-        elif isinstance(args, tuple):
-            # recurse on function arguments
-            return self.get_deps(args[1]) if len(args) > 1 else []
-        elif isinstance(args, dict):
+        if isinstance(args, Sequence) and not isinstance(args, str):
+            # recurse list
+            return sum([self.depend(a) for a in args], [])
+        elif isinstance(args, Mapping):
             # get explicit dependencies
             deps = args.pop('.depends', [])
             # turn a single value into a list
-            if isinstance(deps, str) or not isinstance(deps, list):
+            if isinstance(deps, str) or not isinstance(deps, Sequence):
                 deps = [deps]
             # recurse remaining kwargs
-            return deps + sum([self.get_deps(a) for a in args.values()], [])
-        elif isinstance(args, list):
-            # recurse args
-            return sum([self.get_deps(a) for a in args], [])
+            return deps + sum([self.depend(a) for a in args.values()], [])
+        elif isinstance(args, Item):
+            # check pipeline item
+            return args.depend(self)
         else:
             # no reference
             return []
 
     def __getitem__(self, label):
-        name, _, key = label.partition('.')
-        item = self.state[name]
-        return item[key] if key else item
+        item = self.state
+        name = None
+        while label:
+            key, _, label = label.partition('.')
+            name = f'{name}.{key}' if name else key
+            try:
+                item = item[key]
+            except KeyError as e:
+                raise KeyError('unknown label: ' + name) from e
+        if isinstance(item, Column):
+            return item.data if item.unit is None else item.quantity
+        else:
+            return item

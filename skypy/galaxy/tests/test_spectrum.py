@@ -1,7 +1,7 @@
 import numpy as np
 import scipy.stats
 import pytest
-from skypy.galaxy.spectrum import HAS_SPECUTILS, HAS_SKYPY_DATA
+from skypy.galaxy.spectrum import HAS_SPECUTILS, HAS_SPECLITE
 
 
 @pytest.mark.flaky
@@ -64,172 +64,187 @@ def test_sampling_coefficients():
         dirichlet_coefficients(redshift, [2.5, 2.5], [2.5, 2.5], weight=[1, 2, 3])
 
 
-@pytest.mark.skipif(not HAS_SPECUTILS, reason='test requires specutils')
+@pytest.mark.skipif(not HAS_SPECLITE, reason='test requires speclite')
 def test_mag_ab_standard_source():
 
     from astropy import units
-    from specutils import Spectrum1D
+    from speclite.filters import FilterResponse
     from skypy.galaxy.spectrum import mag_ab
 
-    # create a bandpass
-    bp_lam = np.logspace(0, 4, 1000)*units.AA
-    bp_tx = np.exp(-((bp_lam - 1000*units.AA)/(100*units.AA))**2)*units.dimensionless_unscaled
-    bp = Spectrum1D(spectral_axis=bp_lam, flux=bp_tx)
+    # create a filter
+    filt_lam = np.logspace(0, 4, 1000)*units.AA
+    filt_tx = np.exp(-((filt_lam - 1000*units.AA)/(100*units.AA))**2)
+    filt_tx[[0, -1]] = 0
+    filt = FilterResponse(wavelength=filt_lam, response=filt_tx,
+                          meta=dict(group_name='test', band_name='filt'))
 
     # test that the AB standard source has zero magnitude
-    lam = np.logspace(0, 4, 1000)*units.AA
-    flam = 0.10884806248538730623*units.Unit('erg s-1 cm-2 AA')/lam**2
-    spec = Spectrum1D(spectral_axis=lam, flux=flam)
+    lam = filt_lam  # same grid to prevent interpolation issues
+    flam = 0.10885464149979998*units.Unit('erg s-1 cm-2 AA')/lam**2
 
-    m = mag_ab(spec, bp)
+    m = mag_ab(lam, flam, 'test-filt')
 
     assert np.isclose(m, 0)
 
 
-@pytest.mark.skipif(not HAS_SPECUTILS, reason='test requires specutils')
+@pytest.mark.skipif(not HAS_SPECLITE, reason='test requires speclite')
 def test_mag_ab_redshift_dependence():
 
     from astropy import units
-    from specutils import Spectrum1D
+    from speclite.filters import FilterResponse
     from skypy.galaxy.spectrum import mag_ab
 
     # make a wide tophat bandpass
-    bp_lam = np.logspace(-10, 10, 3)*units.AA
-    bp_tx = np.ones(3)*units.dimensionless_unscaled
-    bp = Spectrum1D(spectral_axis=bp_lam, flux=bp_tx)
+    filt_lam = [1.0e-10, 1.1e-10, 1.0e0, 0.9e10, 1.0e10]
+    filt_tx = [0., 1., 1., 1., 0.]
+    filt = FilterResponse(wavelength=filt_lam, response=filt_tx,
+                          meta=dict(group_name='test', band_name='filt'))
 
     # create a narrow gaussian source
-    lam = np.logspace(0, 3, 1000)*units.AA
+    lam = np.logspace(-11, 11, 1000)*units.AA
     flam = np.exp(-((lam - 100*units.AA)/(10*units.AA))**2)*units.Unit('erg s-1 cm-2 AA-1')
-    spec = Spectrum1D(spectral_axis=lam, flux=flam)
 
     # array of redshifts
     z = np.linspace(0, 1, 11)
 
     # compute the AB magnitude at different redshifts
-    m = mag_ab(spec, bp, z)
+    m = mag_ab(lam, flam, 'test-filt', redshift=z)
 
     # compare with expected redshift dependence
     np.testing.assert_allclose(m, m[0] - 2.5*np.log10(1 + z))
 
 
-@pytest.mark.skipif(not HAS_SPECUTILS, reason='test requires specutils')
+@pytest.mark.skipif(not HAS_SPECLITE, reason='test requires speclite')
 def test_mag_ab_multi():
 
     from astropy import units
     from skypy.galaxy.spectrum import mag_ab
-    from specutils import Spectrum1D
+    from speclite.filters import FilterResponse
 
     # 5 redshifts
     z = np.linspace(0, 1, 5)
 
     # 2 Gaussian bandpasses
-    bp_lam = np.logspace(0, 4, 1000) * units.AA
-    bp_mean = np.array([[1000], [2000]]) * units.AA
-    bp_width = np.array([[100], [10]]) * units.AA
-    bp_tx = np.exp(-((bp_lam-bp_mean)/bp_width)**2)*units.dimensionless_unscaled
-    bp = Spectrum1D(spectral_axis=bp_lam, flux=bp_tx)
+    filt_lam = np.logspace(0, 4, 1000) * units.AA
+    filt_mean = np.array([[1000], [2000]]) * units.AA
+    filt_width = np.array([[100], [10]]) * units.AA
+    filt_tx = np.exp(-((filt_lam-filt_mean)/filt_width)**2)
+    filt_tx[:, [0, -1]] = 0
+    filt = [FilterResponse(wavelength=filt_lam, response=filt_tx[0],
+                           meta=dict(group_name='test', band_name='filt0')),
+            FilterResponse(wavelength=filt_lam, response=filt_tx[1],
+                           meta=dict(group_name='test', band_name='filt1'))]
 
     # 3 Flat Spectra
-    lam = np.logspace(0, 4, 1000)*units.AA
+    # to prevent issues with interpolation, collect all redshifted filt_lam
+    lam = []
+    for z_ in z:
+        lam = np.union1d(lam, filt_lam.value/(1+z_))
+    lam = lam*filt_lam.unit
     A = np.array([[2], [3], [4]])
-    flam = A * 0.10884806248538730623*units.Unit('erg s-1 cm-2 AA')/lam**2
-    spec = Spectrum1D(spectral_axis=lam, flux=flam)
+    flam = A * 0.10885464149979998*units.Unit('erg s-1 cm-2 AA')/lam**2
 
     # Compare calculated magnitudes with truth
-    magnitudes = mag_ab(spec, bp, z)
-    truth = -2.5 * np.log10(A * (1+z)).T[:, np.newaxis, :]
-    assert magnitudes.shape == (5, 2, 3)
-    np.testing.assert_allclose(*np.broadcast_arrays(magnitudes, truth))
+    magnitudes = mag_ab(lam, flam, ['test-filt0', 'test-filt1'], redshift=z)
+    truth = -2.5 * np.log10(A * (1+z)).T[:, :, np.newaxis]
+    assert magnitudes.shape == (5, 3, 2)
+    np.testing.assert_allclose(*np.broadcast_arrays(magnitudes, truth), rtol=1e-4)
 
 
-@pytest.mark.skipif(not HAS_SPECUTILS, reason='test requires specutils')
+@pytest.mark.skipif(not HAS_SPECUTILS or not HAS_SPECLITE,
+                    reason='test requires specutils and speclite')
 def test_template_spectra():
 
     from astropy import units
     from skypy.galaxy.spectrum import mag_ab, magnitudes_from_templates
     from astropy.cosmology import Planck15
     from specutils import Spectrum1D
+    from speclite.filters import FilterResponse
 
     # 3 Flat Templates
-    lam = np.logspace(0, 4, 1000)*units.AA
+    lam = np.logspace(-1, 4, 1000)*units.AA
     A = np.array([[2], [3], [4]])
-    flam = A * 0.10884806248538730623*units.Unit('erg s-1 cm-2 AA')/lam**2
+    flam = A * 0.10885464149979998*units.Unit('erg s-1 cm-2 AA')/lam**2
     spec = Spectrum1D(spectral_axis=lam, flux=flam)
 
     # Gaussian bandpass
-    bp_lam = np.logspace(0, 4, 1000)*units.AA
-    bp_tx = np.exp(-((bp_lam - 1000*units.AA)/(100*units.AA))**2)*units.dimensionless_unscaled
-    bp = Spectrum1D(spectral_axis=bp_lam, flux=bp_tx)
+    filt_lam = np.logspace(0, 4, 1000)*units.AA
+    filt_tx = np.exp(-((filt_lam - 1000*units.AA)/(100*units.AA))**2)
+    filt_tx[[0, -1]] = 0
+    filt = FilterResponse(wavelength=filt_lam, response=filt_tx,
+                          meta=dict(group_name='test', band_name='filt'))
 
     # Each test galaxy is exactly one of the templates
-    coefficients = np.diag(np.ones(3))
-    mt = magnitudes_from_templates(coefficients, spec, bp)
-    m = mag_ab(spec, bp)
+    coefficients = np.eye(3)
+    mt = magnitudes_from_templates(coefficients, spec, 'test-filt')
+    m = mag_ab(lam, flam, 'test-filt')
     np.testing.assert_allclose(mt, m)
 
     # Test distance modulus
     redshift = np.array([1, 2, 3])
     dm = Planck15.distmod(redshift).value
-    mt = magnitudes_from_templates(coefficients, spec, bp, distance_modulus=dm)
+    mt = magnitudes_from_templates(coefficients, spec, 'test-filt', distance_modulus=dm)
     np.testing.assert_allclose(mt, m + dm)
 
     # Test stellar mass
     sm = np.array([1, 2, 3])
-    mt = magnitudes_from_templates(coefficients, spec, bp, stellar_mass=sm)
+    mt = magnitudes_from_templates(coefficients, spec, 'test-filt', stellar_mass=sm)
     np.testing.assert_allclose(mt, m - 2.5*np.log10(sm))
 
     # Redshift interpolation test; linear interpolation sufficient over a small
     # redshift range at low relative tolerance
     z = np.linspace(0, 0.1, 3)
-    m_true = magnitudes_from_templates(coefficients, spec, bp, redshift=z, resolution=4)
-    m_interp = magnitudes_from_templates(coefficients, spec, bp, redshift=z, resolution=2)
+    m_true = magnitudes_from_templates(coefficients, spec, 'test-filt', redshift=z, resolution=4)
+    m_interp = magnitudes_from_templates(coefficients, spec, 'test-filt', redshift=z, resolution=2)
     np.testing.assert_allclose(m_true, m_interp, rtol=1e-2)
-    with pytest.raises(AssertionError):
-        np.testing.assert_allclose(m_true, m_interp, rtol=1e-5)
+    assert not np.all(m_true == m_interp)
 
 
-@pytest.mark.skipif(not HAS_SPECUTILS, reason='test requires specutils')
+@pytest.mark.skipif(not HAS_SPECUTILS or not HAS_SPECLITE,
+                    reason='test requires specutils and speclite')
 def test_stellar_mass_from_reference_band():
 
     from astropy import units
     from skypy.galaxy.spectrum import mag_ab, stellar_mass_from_reference_band
     from specutils import Spectrum1D
+    from speclite.filters import FilterResponse
 
     # Gaussian bandpass
-    bp_lam = np.logspace(0, 4, 1000) * units.AA
-    bp_mean = 1000 * units.AA
-    bp_width = 100 * units.AA
-    bp_tx = np.exp(-((bp_lam-bp_mean)/bp_width)**2)*units.dimensionless_unscaled
-    band = Spectrum1D(spectral_axis=bp_lam, flux=bp_tx)
+    filt_lam = np.logspace(0, 4, 1000) * units.AA
+    filt_mean = 1000 * units.AA
+    filt_width = 100 * units.AA
+    filt_tx = np.exp(-((filt_lam-filt_mean)/filt_width)**2)
+    filt_tx[[0, -1]] = 0
+    filt = FilterResponse(wavelength=filt_lam, response=filt_tx,
+                          meta=dict(group_name='test', band_name='filt'))
 
     # 3 Flat template spectra
-    lam = np.logspace(0, 4, 1000)*units.AA
+    lam = np.logspace(-1, 4, 1000)*units.AA
     A = np.array([[2], [3], [4]])
-    flam = A * 0.10884806248538730623*units.Unit('erg s-1 cm-2 AA')/lam**2
+    flam = A * 0.10885464149979998*units.Unit('erg s-1 cm-2 AA')/lam**2
     templates = Spectrum1D(spectral_axis=lam, flux=flam)
 
     # Absolute magnitudes for each template
-    Mt = mag_ab(templates, band)
+    Mt = mag_ab(lam, flam, 'test-filt')
 
     # Using the identity matrix for the coefficients yields trivial test cases
-    coeff = np.diag(np.ones(3))
+    coeff = np.eye(3)
 
     # Using the absolute magnitudes of the templates as reference magnitudes
     # should return one solar mass for each template.
-    stellar_mass = stellar_mass_from_reference_band(coeff, templates, Mt, band)
+    stellar_mass = stellar_mass_from_reference_band(coeff, templates, Mt, 'test-filt')
     truth = 1
     np.testing.assert_allclose(stellar_mass, truth)
 
     # Solution for given magnitudes without template mixing
     Mb = np.array([10, 20, 30])
-    stellar_mass = stellar_mass_from_reference_band(coeff, templates, Mb, band)
+    stellar_mass = stellar_mass_from_reference_band(coeff, templates, Mb, 'test-filt')
     truth = np.power(10, -0.4*(Mb-Mt))
     np.testing.assert_allclose(stellar_mass, truth)
 
 
-@pytest.mark.skipif(not HAS_SPECUTILS or not HAS_SKYPY_DATA,
-                    reason='test requires specutils and skypy-data')
+@pytest.mark.skipif(not HAS_SPECUTILS or not HAS_SPECLITE,
+                    reason='test requires specutils and speclite')
 def test_load_spectral_data():
 
     from skypy.galaxy.spectrum import load_spectral_data
@@ -239,18 +254,17 @@ def test_load_spectral_data():
     filename = get_pkg_data_filename('data/spectrum.ecsv')
     load_spectral_data(filename)
 
-    # load skypy data bandpasses
-    load_spectral_data('Johnson_UBV')
-    load_spectral_data('Cousins_RI')
-
     # load skypy data spectrum templates
     load_spectral_data('kcorrect_spec')
 
-    # load DECam bandpasses
-    load_spectral_data('DECam_grizY')
+    # Load speclite bandpasses
+    load_spectral_data('decam2014_ugrizY')
+    load_spectral_data('sdss2010_ugriz')
+    load_spectral_data('wise2010_W1W2W3W4')
+    load_spectral_data('bessell_UBVRI')
 
     # load multiple sources
-    load_spectral_data(['Johnson_B', 'Cousins_R'])
+    load_spectral_data(['BASS_gr', 'MzLS_z'])
 
     # try to load non-string name
     with pytest.raises(TypeError):
