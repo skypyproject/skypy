@@ -13,8 +13,8 @@ __all__ = [
     'dirichlet_coefficients',
     'load_spectral_data',
     'mag_ab',
-    'magnitudes_from_templates',
-    'kcorrect',
+    'kcorrect_absolute_magnitudes',
+    'kcorrect_apparent_magnitudes',
 ]
 
 try:
@@ -256,33 +256,21 @@ def mag_ab(wavelength, spectrum, filters, *, redshift=None, coefficients=None,
     return m
 
 
-@spectral_data_input(templates=units.Jy)
-def magnitudes_from_templates(coefficients, templates, filters, redshift=None,
-                              resolution=1000, stellar_mass=None, distance_modulus=None):
-    r'''Compute AB magnitudes from template spectra.
+def kcorrect_absolute_magnitudes(coefficients, filters, stellar_mass=None):
+    '''Galaxy AB absolute magnitudes from kcorrect template spectra.
 
-    This function calculates photometric AB magnitudes for objects whose
-    spectra are modelled as a linear combination of template spectra following
-    [1]_ and [2]_.
+    This function calculates photometric AB absolute magnitudes for galaxies
+    whose spectra are modelled as a linear combination of the kcorrect template
+    spectra from [1]_ and [2]_.
 
     Parameters
     ----------
     coefficients : (ng, nt) array_like
         Array of spectrum coefficients.
-    templates : spectral_data
-        Template spectra.
     filters : str or list of str
         Bandpass filter specification for `~speclite.filters.load_filters`.
-    redshift : (ng,) array_like, optional
-        Optional array of values for redshifting the source spectrum.
-    resolution : integer, optional
-        Redshift resolution for intepolating magnitudes. Default is 1000. If
-        the number of objects is less than resolution their magnitudes are
-        calculated directly without interpolation.
     stellar_mass : (ng,) array_like, optional
         Optional array of stellar masses for each galaxy in template units.
-    distance_modulus : (ng,) array_like, optional
-        Optional array of distance moduli for each galaxy.
 
     Returns
     -------
@@ -296,16 +284,72 @@ def magnitudes_from_templates(coefficients, templates, filters, redshift=None,
     .. [2] M. R. Blanton and S. Roweis, 2007, AJ, 125, 2348
     '''
 
-    # combine coefficients and stellar masses, if given
-    if stellar_mass is not None:
-        coefficients = (coefficients.T * stellar_mass).T
+    # kcorrect data
+    filename = resource_filename('skypy', 'data/kcorrect/k_nmf_derived.default.fits')
+    with fits.open(filename) as hdul:
+        spec = hdul[1].data * units.Unit('erg s-1 cm-2 angstrom-1')
+        lambda_ = hdul[11].data * units.Unit('angstrom')
 
-    # compute AB magnitudes
-    magnitudes = mag_ab(templates.wavelength, templates.flux, filters,
-                        redshift=redshift, coefficients=coefficients,
-                        distmod=distance_modulus, interpolate=resolution)
+    # Magnitudes from templates
+    magnitudes = mag_ab(lambda_, spec, filters, coefficients=coefficients)
 
-    return magnitudes
+    mass_modulus = 0 if stellar_mass is None else -2.5 * np.log10(stellar_mass)
+
+    return magnitudes + mass_modulus
+
+
+def kcorrect_apparent_magnitudes(coefficients, redshifts, filters, cosmology,
+                                 *, stellar_mass=None, resolution=1000):
+    '''Galaxy AB apparent magnitudes from kcorrect template spectra.
+
+    This function calculates photometric AB apparent magnitudes for galaxies
+    whose spectra are modelled as a linear combination of the kcorrect template
+    spectra from [1]_ and [2]_.
+
+    Parameters
+    ----------
+    coefficients : (ng, nt) array_like
+        Array of spectrum coefficients.
+    redshifts : (ng,) array_like
+        Array of redshifts for each galaxy used to calculte the distance
+        modulus and k-correction.
+    filters : str or list of str
+        Bandpass filter specification for `~speclite.filters.load_filters`.
+    cosmology : Cosmology
+        Astropy Cosmology object to calculate distance modulus.
+    stellar_mass : (ng,) array_like, optional
+        Optional array of stellar masses for each galaxy in template units.
+    resolution : integer, optional
+        Redshift resolution for intepolating magnitudes. Default is 1000. If
+        the number of objects is less than resolution their magnitudes are
+        calculated directly without interpolation.
+
+    Returns
+    -------
+    mag_ab : (ng, nf) array_like
+        The absolute AB magnitude of each object in each filter, where ``nf``
+        is the number of loaded filters.
+
+    References
+    ----------
+    .. [1] M. R. Blanton et al., 2003, AJ, 125, 2348
+    .. [2] M. R. Blanton and S. Roweis, 2007, AJ, 125, 2348
+    '''
+
+    # kcorrect data
+    filename = resource_filename('skypy', 'data/kcorrect/k_nmf_derived.default.fits')
+    with fits.open(filename) as hdul:
+        spec = hdul[1].data * units.Unit('erg s-1 cm-2 angstrom-1')
+        lambda_ = hdul[11].data * units.Unit('angstrom')
+
+    # Magnitudes from templates
+    magnitudes = mag_ab(lambda_, spec, filters, redshift=redshifts,
+                        coefficients=coefficients, interpolate=resolution)
+
+    distance_modulus = cosmology.distmod(redshifts).value
+    mass_modulus = 0 if stellar_mass is None else -2.5 * np.log10(stellar_mass)
+
+    return magnitudes + distance_modulus + mass_modulus
 
 
 @spectral_data_input(templates=units.Jy)
@@ -403,34 +447,3 @@ def load_spectral_data(name):
 
     # run the loader
     return loader(*args, *groups)
-
-
-def kcorrect(coefficients, filters, redshifts, cosmology, reference_magnitudes=None,
-             reference_filter=None, stellar_mass=None, resolution=1000):
-    '''Galaxy photometry from kcorrect spectrum templates.
-
-    '''
-
-    # kcorrect data
-    filename = resource_filename('skypy', 'data/kcorrect/k_nmf_derived.default.fits')
-    with fits.open(filename) as hdul:
-        spec = hdul[1].data
-        lambda_ = hdul[11].data
-
-    # Magnitudes from templates
-    m = mag_ab(lambda_, spec, filters, redshift=redshifts, interpolate=resolution)
-
-    # Distance Modulus
-    distance_modulus = cosmology.distmod(redshifts) if cosmology else 0
-
-    # Mass modulus from reference magnitude or stellar_mass
-    if stellar_mass is None and reference_magnitudes is not None and reference_filter is not None:
-        mass_modulus = reference_magnitudes
-        mass_modulus -= mag_ab(lambda_, spec, filters, coefficients=coefficients, interpolate=resolution)
-    elif stellar_mass is not None and reference_magnitudes is not None and reference_filter is not None:
-        mass_modulus = -2.5 * np.log10(stellar_mass)
-    else:
-        mass_modulus = 0
-
-    # Sum over templates
-    return np.sum(coefficients * m, axis=1) + distance_modulus + mass_modulus
