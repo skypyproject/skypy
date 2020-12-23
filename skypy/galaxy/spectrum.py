@@ -15,6 +15,7 @@ __all__ = [
     'mag_ab',
     'kcorrect_absolute_magnitudes',
     'kcorrect_apparent_magnitudes',
+    'kcorrect_stellar_mass',
 ]
 
 try:
@@ -25,7 +26,7 @@ else:
     HAS_SPECUTILS = True
 
 try:
-    import speclite
+    import speclite.filters
 except ImportError:
     HAS_SPECLITE = False
 else:
@@ -352,8 +353,7 @@ def kcorrect_apparent_magnitudes(coefficients, redshifts, filters, cosmology,
     return magnitudes + distance_modulus + mass_modulus
 
 
-@spectral_data_input(templates=units.Jy)
-def stellar_mass_from_reference_band(coefficients, templates, magnitudes, filter):
+def kcorrect_stellar_mass(coefficients, magnitudes, filter):
     r'''Compute stellar mass from absolute magnitudes in a reference filter.
 
     This function takes composite spectra for a set of galaxies defined by
@@ -365,8 +365,6 @@ def stellar_mass_from_reference_band(coefficients, templates, magnitudes, filter
     ----------
     coefficients : (ng, nt) array_like
         Array of template coefficients.
-    templates : (nt,) spectral_data
-        Emission spectra of the templates.
     magnitudes : (ng,) array_like
         The magnitudes to match in the reference bandpass.
     filter : str
@@ -379,17 +377,14 @@ def stellar_mass_from_reference_band(coefficients, templates, magnitudes, filter
         Stellar mass of each galaxy in template units.
     '''
 
-    # compute AB magnitudes for reference band
-    M = mag_ab(templates.wavelength, templates.flux, filter, coefficients=coefficients)
+    # kcorrect data
+    filename = resource_filename('skypy', 'data/kcorrect/k_nmf_derived.default.fits')
+    with fits.open(filename) as hdul:
+        spec = hdul[1].data * units.Unit('erg s-1 cm-2 angstrom-1')
+        lambda_ = hdul[11].data * units.Unit('angstrom')
 
-    # compute "stellar mass modulus" from magnitudes
-    M -= magnitudes
-
-    # turn into stellar mass
-    M *= 0.4
-    np.power(10., M, out=M)
-
-    return M
+    fluxes = speclite.filters.load_filter(filter).get_ab_maggies(spec, lambda_)
+    return 10**(-0.4*magnitudes) / np.sum(coefficients * fluxes, axis=-1)
 
 
 def load_spectral_data(name):
