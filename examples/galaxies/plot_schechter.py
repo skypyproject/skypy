@@ -17,14 +17,17 @@ luminosity function as implemented in SkyPy.
 #
 # .. math::
 #
-#    \phi(L) = \frac{{\rm d}N}{{\rm d}L{\rm d}V} = \phi_*\left(\frac{L}{L_*}\right)^\alpha{\rm exp}\left[-\frac{L}{L_*}\right]
+#    \phi(L) = \frac{{\rm d}N}{{\rm d}L{\rm d}V} =
+#    \phi_*\left(\frac{L}{L_*}\right)^\alpha{\rm exp}\left[-\frac{L}{L_*}\right]
 #
 # In SkyPy we reparameterise this distribution in terms of the absolute
 # magnitude :math:`M` of each galaxy:
 #
 # .. math::
 #
-#    \phi(M) = \frac{{\rm d}N}{{\rm d}M{\rm d}V} = \frac{2}{5}{\rm log}(10)\phi_*10^{\frac{2}{5}(M_*-M)(\alpha+1)}{\rm exp}\left[-10^{\frac{2}{5}(M_*-M)}\right]
+#    \phi(M) = \frac{{\rm d}N}{{\rm d}M{\rm d}V} =
+#    \frac{2}{5}{\rm log}(10)\phi_*10^{\frac{2}{5}(M_*-M)(\alpha+1)}
+#    {\rm exp}\left[-10^{\frac{2}{5}(M_*-M)}\right]
 #
 # In general, :math:`\phi_*`, :math:`M_*` and :math:`\alpha` can be redshift
 # dependent, resulting in a joint redshift-magnitude distribution
@@ -40,7 +43,9 @@ luminosity function as implemented in SkyPy.
 
 from astropy.cosmology import FlatLambdaCDM
 from astropy.modeling.models import Linear1D, Exponential1D
+from astropy.table import Table
 from astropy.units import Quantity
+from matplotlib import pyplot as plt
 import numpy as np
 from skypy.galaxy import schechter_lf
 
@@ -61,9 +66,6 @@ redshift, magnitude = schechter_lf(z_range, m_star, phi_star, alpha,
 # redshift slices to the observed B-band magnitude distribution of
 # star-forming galaxies in the ALHAMBRA survey and the median-redshift
 # model from López-Sanjuan et al. 2017.
-
-from matplotlib import pyplot as plt
-from astropy.table import Table
 
 data = Table.read("lopez_sanjuan+17_B1.ecsv", format='ascii.ecsv')
 fig, ((a1, a2), (a3, a4)) = plt.subplots(nrows=2, ncols=2, constrained_layout=True)
