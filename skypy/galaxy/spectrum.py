@@ -216,7 +216,7 @@ def ab_maggies_redshift(wavelength, spectrum, filters, redshift, interpolate=100
         del(dm, n, u)
 
     # K-correction
-    return m * np.reshape((1 + redshift), redshift.shape + (1,)*(nd_s+nd_f))
+    return m * np.reshape((1 + redshift), np.shape(redshift) + (1,)*(nd_s+nd_f))
 
 
 def kcorrect_absolute_magnitudes(coefficients, filters, stellar_mass=None):

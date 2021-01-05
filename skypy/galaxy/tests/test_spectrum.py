@@ -65,40 +65,40 @@ def test_sampling_coefficients():
 
 
 @pytest.mark.skipif(not HAS_SPECLITE, reason='test requires speclite')
-def test_mag_ab_standard_source():
+def test_ab_maggies_standard_source():
 
     from astropy import units
     from speclite.filters import FilterResponse
-    from skypy.galaxy.spectrum import mag_ab
+    from skypy.galaxy.spectrum import ab_maggies_redshift
 
     # create a filter
     filt_lam = np.logspace(0, 4, 1000)*units.AA
     filt_tx = np.exp(-((filt_lam - 1000*units.AA)/(100*units.AA))**2)
     filt_tx[[0, -1]] = 0
-    filt = FilterResponse(wavelength=filt_lam, response=filt_tx,
-                          meta=dict(group_name='test', band_name='filt'))
+    FilterResponse(wavelength=filt_lam, response=filt_tx,
+                   meta=dict(group_name='test', band_name='filt'))
 
     # test that the AB standard source has zero magnitude
     lam = filt_lam  # same grid to prevent interpolation issues
     flam = 0.10885464149979998*units.Unit('erg s-1 cm-2 AA')/lam**2
 
-    m = mag_ab(lam, flam, 'test-filt')
+    m = ab_maggies_redshift(lam, flam, 'test-filt', 0)
 
-    assert np.isclose(m, 0)
+    assert np.isclose(m, 1.0)
 
 
 @pytest.mark.skipif(not HAS_SPECLITE, reason='test requires speclite')
-def test_mag_ab_redshift_dependence():
+def test_ab_maggies_redshift_dependence():
 
     from astropy import units
     from speclite.filters import FilterResponse
-    from skypy.galaxy.spectrum import mag_ab
+    from skypy.galaxy.spectrum import ab_maggies_redshift
 
     # make a wide tophat bandpass
     filt_lam = [1.0e-10, 1.1e-10, 1.0e0, 0.9e10, 1.0e10]
     filt_tx = [0., 1., 1., 1., 0.]
-    filt = FilterResponse(wavelength=filt_lam, response=filt_tx,
-                          meta=dict(group_name='test', band_name='filt'))
+    FilterResponse(wavelength=filt_lam, response=filt_tx,
+                   meta=dict(group_name='test', band_name='filt'))
 
     # create a narrow gaussian source
     lam = np.logspace(-11, 11, 1000)*units.AA
@@ -108,17 +108,17 @@ def test_mag_ab_redshift_dependence():
     z = np.linspace(0, 1, 11)
 
     # compute the AB magnitude at different redshifts
-    m = mag_ab(lam, flam, 'test-filt', redshift=z)
+    m = ab_maggies_redshift(lam, flam, 'test-filt', z)
 
     # compare with expected redshift dependence
-    np.testing.assert_allclose(m, m[0] - 2.5*np.log10(1 + z))
+    np.testing.assert_allclose(m, m[0] * (1 + z))
 
 
 @pytest.mark.skipif(not HAS_SPECLITE, reason='test requires speclite')
-def test_mag_ab_multi():
+def test_ab_maggies_redshift_multi():
 
     from astropy import units
-    from skypy.galaxy.spectrum import mag_ab
+    from skypy.galaxy.spectrum import ab_maggies_redshift
     from speclite.filters import FilterResponse
 
     # 5 redshifts
@@ -130,10 +130,10 @@ def test_mag_ab_multi():
     filt_width = np.array([[100], [10]]) * units.AA
     filt_tx = np.exp(-((filt_lam-filt_mean)/filt_width)**2)
     filt_tx[:, [0, -1]] = 0
-    filt = [FilterResponse(wavelength=filt_lam, response=filt_tx[0],
-                           meta=dict(group_name='test', band_name='filt0')),
-            FilterResponse(wavelength=filt_lam, response=filt_tx[1],
-                           meta=dict(group_name='test', band_name='filt1'))]
+    FilterResponse(wavelength=filt_lam, response=filt_tx[0],
+                   meta=dict(group_name='test', band_name='filt0'))
+    FilterResponse(wavelength=filt_lam, response=filt_tx[1],
+                   meta=dict(group_name='test', band_name='filt1'))
 
     # 3 Flat Spectra
     # to prevent issues with interpolation, collect all redshifted filt_lam
@@ -145,8 +145,8 @@ def test_mag_ab_multi():
     flam = A * 0.10885464149979998*units.Unit('erg s-1 cm-2 AA')/lam**2
 
     # Compare calculated magnitudes with truth
-    magnitudes = mag_ab(lam, flam, ['test-filt0', 'test-filt1'], redshift=z)
-    truth = -2.5 * np.log10(A * (1+z)).T[:, :, np.newaxis]
+    magnitudes = ab_maggies_redshift(lam, flam, ['test-filt0', 'test-filt1'], z)
+    truth = (A * (1+z)).T[:, :, np.newaxis]
     assert magnitudes.shape == (5, 3, 2)
     np.testing.assert_allclose(*np.broadcast_arrays(magnitudes, truth), rtol=1e-4)
 
