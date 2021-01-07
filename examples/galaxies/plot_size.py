@@ -39,26 +39,25 @@ rlate = np.power(10, -0.4 * alpha * mag + (beta - alpha) *
 rearly = np.power(10, -0.4 * a * mag + (a - a) *
                   np.log10(1 + np.power(10, -0.4 * (mag - M0))) + b)
 
-plt.plot(np.flip(mag), slate, 'r.', label='Late')
-plt.plot(np.flip(mag), searly, 'b.', label='Early')
-
-plt.plot(np.flip(mag), rlate, 'r--')
-plt.plot(np.flip(mag), rearly, 'b--')
-
-plt.yscale('log')
-plt.xlabel('M')
-plt.ylabel('R (kpc)')
-
-plt.legend(frameon=False)
-plt.show()
-
 # Variance
 sigma_lnR = sigma2 + (sigma1 - sigma2) / (1.0 + np.power(10, -0.8 * (mag - M0)))
 
-plt.plot(np.flip(mag), sigma_lnR)
+fig, (ax0, ax1) = plt.subplots(ncols=2, constrained_layout=True, figsize=(10,4))
+ax0.plot(np.flip(mag), slate, 'r.', label='Late')
+ax0.plot(np.flip(mag), searly, 'b.', label='Early')
 
-plt.xlabel('M')
-plt.ylabel(r'$\sigma_{lnR}$ (kpc)')
+ax0.plot(np.flip(mag), rlate, 'r--')
+ax0.plot(np.flip(mag), rearly, 'b--')
+
+ax0.set_yscale('log')
+ax0.set_xlabel('M')
+ax0.set_ylabel('R (kpc)')
+ax0.legend(frameon=False)
+
+ax1.plot(np.flip(mag), sigma_lnR)
+
+ax1.set_xlabel('M')
+ax1.set_ylabel(r'$\sigma_{lnR}$ (kpc)')
 
 plt.show()
 
