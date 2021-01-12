@@ -8,7 +8,6 @@ This package contains methods for modelling the Universe, galaxies and the Milky
 Way. Also included are methods for generating observed data.
 
 * Galaxy_ morphology, luminosity and redshift distributions
-* Halo_ and subhalo mass distributions
 * `Power Spectra`_ using CAMB and Halofit
 * Pipelines_ to generate populations of astronomical objects
 
@@ -18,7 +17,6 @@ If you use SkyPy for work or research presented in a publication please follow
 our `Citation Guidelines`_.
 
 .. _Galaxy: https://skypy.readthedocs.io/en/latest/galaxy.html
-.. _Halo: https://skypy.readthedocs.io/en/latest/halo/index.html
 .. _Power Spectra: https://skypy.readthedocs.io/en/latest/power_spectrum/index.html
 .. _Pipelines: https://skypy.readthedocs.io/en/latest/pipeline/index.html
 .. _SkyPy Documentation: https://skypy.readthedocs.io/en/latest/
