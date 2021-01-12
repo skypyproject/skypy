@@ -31,7 +31,6 @@ Packages
 .. toctree::
    :maxdepth: 1
 
-   cluster/index
    galaxy
    halo/index
    position/index
