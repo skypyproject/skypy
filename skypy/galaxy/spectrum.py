@@ -13,6 +13,8 @@ __all__ = [
     'dirichlet_coefficients',
     'load_spectral_data',
     'ab_maggies_redshift',
+    'template_absolute_magnitudes',
+    'template_apparent_magnitudes',
     'kcorrect_absolute_magnitudes',
     'kcorrect_apparent_magnitudes',
     'kcorrect_stellar_mass',
@@ -219,6 +221,26 @@ def ab_maggies_redshift(wavelength, spectrum, filters, redshift, interpolate=100
     return m * np.reshape((1 + redshift), np.shape(redshift) + (1,)*(nd_s+nd_f))
 
 
+def template_absolute_magnitudes(lambda_, spec, coefficients, filters, stellar_mass=None):
+
+    flux = ab_maggies_redshift(lambda_, spec, filters, 0)
+    flux = np.sum((coefficients.T * flux.T).T, axis=1)
+    mass_modulus = 0 if stellar_mass is None else -2.5 * np.log10(stellar_mass)
+
+    return (-2.5*np.log10(flux).T + mass_modulus).T
+
+
+def template_apparent_magnitudes(lambda_, spec, coefficients, redshift, filters, cosmology,
+                                 *, stellar_mass=None, resolution=1000):
+
+    flux = ab_maggies_redshift(lambda_, spec, filters, redshift, resolution)
+    flux = np.sum((coefficients.T * flux.T).T, axis=1)
+    distance_modulus = cosmology.distmod(redshift).value
+    mass_modulus = 0 if stellar_mass is None else -2.5 * np.log10(stellar_mass)
+
+    return (-2.5*np.log10(flux).T + distance_modulus + mass_modulus).T
+
+
 def kcorrect_absolute_magnitudes(coefficients, filters, stellar_mass=None):
     '''Galaxy AB absolute magnitudes from kcorrect template spectra.
 
@@ -253,11 +275,7 @@ def kcorrect_absolute_magnitudes(coefficients, filters, stellar_mass=None):
         spec = hdul[1].data * units.Unit('erg s-1 cm-2 angstrom-1')
         lambda_ = hdul[11].data * units.Unit('angstrom')
 
-    flux = ab_maggies_redshift(lambda_, spec, filters, 0)
-    flux = np.sum((coefficients.T * flux.T).T, axis=1)
-    mass_modulus = 0 if stellar_mass is None else -2.5 * np.log10(stellar_mass)
-
-    return (-2.5*np.log10(flux).T + mass_modulus).T
+    return template_absolute_magnitudes(lambda_, spec, coefficients, filters, stellar_mass)
 
 
 def kcorrect_apparent_magnitudes(coefficients, redshift, filters, cosmology,
@@ -304,12 +322,8 @@ def kcorrect_apparent_magnitudes(coefficients, redshift, filters, cosmology,
         spec = hdul[1].data * units.Unit('erg s-1 cm-2 angstrom-1')
         lambda_ = hdul[11].data * units.Unit('angstrom')
 
-    flux = ab_maggies_redshift(lambda_, spec, filters, redshift, resolution)
-    flux = np.sum((coefficients.T * flux.T).T, axis=1)
-    distance_modulus = cosmology.distmod(redshift).value
-    mass_modulus = 0 if stellar_mass is None else -2.5 * np.log10(stellar_mass)
-
-    return (-2.5*np.log10(flux).T + distance_modulus + mass_modulus).T
+    return template_apparent_magnitudes(lambda_, spec, coefficients, redshift, filters,
+                                        cosmology, stellar_mass, resolution)
 
 
 def kcorrect_stellar_mass(coefficients, magnitudes, filter):
