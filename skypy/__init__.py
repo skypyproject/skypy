@@ -16,4 +16,3 @@ __all__ = []
 
 from . import galaxy  # noqa
 from . import pipeline  # noqa
-from . import power_spectrum  # noqa
