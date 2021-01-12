@@ -32,7 +32,6 @@ Packages
    :maxdepth: 1
 
    galaxy
-   halo/index
    power_spectrum/index
    utils/index
 
