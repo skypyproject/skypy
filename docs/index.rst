@@ -33,7 +33,6 @@ Packages
 
    galaxy
    halo/index
-   position/index
    power_spectrum/index
    utils/index
 
