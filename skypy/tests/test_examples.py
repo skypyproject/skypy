@@ -1,4 +1,4 @@
-from skypy.pipeline import load_skypy_yaml, Lightcone, Pipeline
+from skypy.pipeline import load_skypy_yaml, Pipeline
 
 
 def test_mccl_galaxies():
