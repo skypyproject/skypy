@@ -32,7 +32,6 @@ Packages
    :maxdepth: 1
 
    galaxy
-   power_spectrum/index
    utils/index
 
 Pipeline
