@@ -33,7 +33,6 @@ Packages
 
    cluster/index
    galaxy
-   gravitational_wave/index
    halo/index
    position/index
    power_spectrum/index
