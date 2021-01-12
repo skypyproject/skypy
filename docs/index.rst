@@ -35,7 +35,6 @@ Packages
    halo/index
    position/index
    power_spectrum/index
-   supernova/index
    utils/index
 
 Pipeline
