@@ -9,14 +9,6 @@ def test_abundance_matching():
     assert len(lightcone.tables) > 0
 
 
-def test_gravitational_wave_rates():
-    config = load_skypy_yaml("../../examples/gravitational_wave_rates.yml")
-    pipeline = Pipeline(config)
-    pipeline.execute()
-
-    assert len(pipeline.state) > 0
-
-
 def test_mccl_galaxies():
     config = load_skypy_yaml("../../examples/mccl_galaxies.yml")
     pipeline = Pipeline(config)
