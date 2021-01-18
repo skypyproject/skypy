@@ -35,9 +35,12 @@ slate = size.late_type_lognormal(m, alpha, beta, gamma, M0, sigma1, sigma2)
 searly = size.early_type_lognormal(m, a, b, M0, sigma1, sigma2)
 
 
-# Split data: c < 2.86 late type, c < 2.86 early type
-plt.scatter(M_r[c < 2.86], np.log10(R50_r_phys[c < 2.86]), color='lightskyblue', marker='+', alpha=0.01)
-plt.scatter(M_r[c > 2.86], np.log10(R50_r_phys[c > 2.86]), color='coral',  marker='+', alpha=0.01)
+# Split data: c < 2.86 late type, c > 2.86 early type
+M_r_late, R50_r_phys_late = M_r[c < 2.86], np.log10(R50_r_phys[c < 2.86])
+M_r_early, R50_r_phys_early = M_r[c > 2.86], np.log10(R50_r_phys[c > 2.86])
+
+plt.scatter(M_r_late, R50_r_phys_late, color='lightskyblue', marker='+', alpha=0.01)
+plt.scatter(M_r_early, R50_r_phys_early, color='coral',  marker='+', alpha=0.01)
 
 plt.plot(m, np.log10(slate.value), 'b', label='SkyPy Late')
 plt.plot(m, np.log10(searly.value), 'r', label='SkyPy Early')
