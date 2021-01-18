@@ -129,10 +129,10 @@ def dirichlet_coefficients(redshift, alpha0, alpha1, z1=1., weight=None):
 
 
 def ab_maggies_redshift(wavelength, spectrum, filters, redshift, interpolate=1000):
-    r'''Compute AB magnitudes from spectra and filters.
+    r'''Compute AB fluxes from spectra and filters.
 
     This function takes *emission* spectra and observation filters and computes
-    bandpass AB magnitudes [1]_.
+    bandpass AB fluxes in units of maggies [1]_.
 
     The filter specification in the `filters` argument is passed unchanged to
     `speclite.filters.load_filters`. See there for the syntax, and the list of
@@ -159,9 +159,8 @@ def ab_maggies_redshift(wavelength, spectrum, filters, redshift, interpolate=100
 
     Returns
     -------
-    mag_ab : ([nz,] [ns,] nf,) array_like
-        The AB magnitude of each redshift (if given), each spectrum (if not
-        combined), and each filter.
+    flux : ([nz,] [ns,] nf,) array_like
+        The AB flux of each redshift (if given), each spectrum, and each filter.
 
     Warnings
     --------
