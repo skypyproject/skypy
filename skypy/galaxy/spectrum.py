@@ -12,9 +12,7 @@ from ..utils import spectral_data_input
 __all__ = [
     'dirichlet_coefficients',
     'load_spectral_data',
-    'ab_maggies_redshift',
-    'template_absolute_magnitudes',
-    'template_apparent_magnitudes',
+    'mag_ab',
     'kcorrect_absolute_magnitudes',
     'kcorrect_apparent_magnitudes',
     'kcorrect_stellar_mass',
@@ -128,11 +126,12 @@ def dirichlet_coefficients(redshift, alpha0, alpha1, z1=1., weight=None):
     return coeff
 
 
-def ab_maggies_redshift(wavelength, spectrum, filters, redshift, interpolate=1000):
-    r'''Compute AB fluxes from spectra and filters.
+def mag_ab(wavelength, spectrum, filters, *, redshift=None, coefficients=None,
+           distmod=None, interpolate=1000):
+    r'''Compute AB magnitudes from spectra and filters.
 
     This function takes *emission* spectra and observation filters and computes
-    bandpass AB fluxes in units of maggies [1]_.
+    bandpass AB magnitudes [1]_.
 
     The filter specification in the `filters` argument is passed unchanged to
     `speclite.filters.load_filters`. See there for the syntax, and the list of
@@ -143,6 +142,16 @@ def ab_maggies_redshift(wavelength, spectrum, filters, redshift, interpolate=100
     `interpolate` parameter is not `False`, at most that number of redshifted
     spectra are computed, and the remainder is interpolated from the results.
 
+    The spectra can optionally be combined. If the `coefficients` parameter is
+    given, its shape must match `spectra`, and the corresponding axes are
+    contracted using a product sum. If the spectra are redshifted, the
+    coefficients array can contain axes for each redshift.
+
+    By default, absolute magnitudes are returned. To compute apparent magnitudes
+    instead, provide the `distmod` argument with the distance modulus for each
+    redshift. The distance modulus is applied after redshifts and coefficients
+    and should match the shape of the `redshift` array.
+
     Parameters
     ----------
     wavelength : (nw,) `~astropy.units.Quantity` or array_like
@@ -152,15 +161,22 @@ def ab_maggies_redshift(wavelength, spectrum, filters, redshift, interpolate=100
         spectra of the same wavelengths. The last axis is the wavelength axis.
     filters : str or list of str
         Filter specification, loaded filters are array_like of shape (nf,).
-    redshift : (nz,) array_like
-        Array of redshifts. Can be multidimensional.
+    redshift : (nz,) array_like, optional
+        Optional array of redshifts. Can be multidimensional.
+    coefficients : ([nz,] [ns,]) array_like
+        Optional coefficients for combining spectra. Axes must be compatible
+        with all redshift and spectrum dimensions.
+    distmod : (nz,) array_like, optional
+        Optional distance modulus for each redshift. Shape must be compatible
+        with redshift dimensions.
     interpolate : int or `False`, optional
         Maximum number of redshifts to compute explicitly. Default is `1000`.
 
     Returns
     -------
-    flux : ([nz,] [ns,] nf,) array_like
-        The AB flux of each redshift (if given), each spectrum, and each filter.
+    mag_ab : ([nz,] [ns,] nf,) array_like
+        The AB magnitude of each redshift (if given), each spectrum (if not
+        combined), and each filter.
 
     Warnings
     --------
@@ -216,86 +232,32 @@ def ab_maggies_redshift(wavelength, spectrum, filters, redshift, interpolate=100
         m += u*dm[n]
         del(dm, n, u)
 
-    # K-correction
-    return m * np.reshape((1 + redshift), np.shape(redshift) + (1,)*(nd_s+nd_f))
+    # combine spectra if asked to
+    if coefficients is not None:
+        # contraction over spectrum axes (`nd_z` to `nd_z+nd_s`)
+        if nd_z == 0:
+            m = np.matmul(coefficients, m)
+        else:
+            c = np.reshape(coefficients, np.shape(coefficients) + (1,)*nd_f)
+            m = np.sum(m*c, axis=tuple(range(nd_z, nd_z+nd_s)))
+        # no spectrum axes left
+        nd_s = 0
 
+    # convert maggies to magnitudes
+    np.log10(m, out=m)
+    m *= -2.5
 
-def template_absolute_magnitudes(wavelength, templates, coefficients, filters, stellar_mass=None):
-    '''Galaxy AB absolute magnitudes from template spectra.
+    # apply the redshift K-correction if necessary
+    if redshift is not None:
+        kcorr = -2.5*np.log10(1 + redshift)
+        m += np.reshape(kcorr, kcorr.shape + (1,)*(nd_s+nd_f))
 
-    This function calculates photometric AB absolute magnitudes for galaxies
-    whose spectra are modelled as a linear combination of a set of template
-    spectra.
+    # add distance modulus if given
+    if distmod is not None:
+        m += np.reshape(distmod, np.shape(distmod) + (1,)*(nd_s+nd_f))
 
-    Parameters
-    ----------
-    wavelength : (nw,) `~astropy.units.Quantity` or array_like
-        Wavelength array of the spectra.
-    templates : (nt, nw,) `~astropy.units.Quantity` or array_like
-        Emission spectra of the template set.
-    coefficients : (ng, nt) array_like
-        Array of spectrum coefficients.
-    filters : (nf,) str or list of str
-        Bandpass filter specification for `~speclite.filters.load_filters`.
-    stellar_mass : (ng,) array_like, optional
-        Optional array of stellar masses for each galaxy in template units.
-
-    Returns
-    -------
-    magnitudes : (ng, nf) array_like
-        The absolute AB magnitude of each object in each filter, where ``nf``
-        is the number of loaded filters.
-    '''
-
-    flux = ab_maggies_redshift(wavelength, templates, filters, 0)
-    flux = np.matmul(coefficients, flux)
-    mass_modulus = 0 if stellar_mass is None else -2.5 * np.log10(stellar_mass)
-
-    return (-2.5*np.log10(flux).T + mass_modulus).T
-
-
-def template_apparent_magnitudes(wavelength, templates, coefficients, redshift, filters,
-                                 cosmology, *, stellar_mass=None, resolution=1000):
-    '''Galaxy AB apparent magnitudes from template spectra.
-
-    This function calculates photometric AB apparent magnitudes for galaxies
-    whose spectra are modelled as a linear combination of a set of template
-    spectra.
-
-    Parameters
-    ----------
-    wavelength : (nw,) `~astropy.units.Quantity` or array_like
-        Wavelength array of the spectra.
-    templates : (nt, nw,) `~astropy.units.Quantity` or array_like
-        Emission spectra of the template set.
-    coefficients : (ng, nt) array_like
-        Array of spectrum coefficients.
-    redshifts : (ng,) array_like
-        Array of redshifts for each galaxy used to calculte the distance
-        modulus and k-correction.
-    filters : (nf,) str or list of str
-        Bandpass filter specification for `~speclite.filters.load_filters`.
-    cosmology : Cosmology
-        Astropy Cosmology object to calculate distance modulus.
-    stellar_mass : (ng,) array_like, optional
-        Optional array of stellar masses for each galaxy in template units.
-    resolution : integer, optional
-        Redshift resolution for intepolating magnitudes. Default is 1000. If
-        the number of objects is less than resolution their magnitudes are
-        calculated directly without interpolation.
-
-    Returns
-    -------
-    magnitudes : (ng, nf) array_like
-        The apparent AB magnitude of each object in each filter.
-    '''
-
-    flux = ab_maggies_redshift(wavelength, templates, filters, redshift, resolution)
-    flux = np.sum((coefficients.T * flux.T).T, axis=1)
-    distance_modulus = cosmology.distmod(redshift).value
-    mass_modulus = 0 if stellar_mass is None else -2.5 * np.log10(stellar_mass)
-
-    return (-2.5*np.log10(flux).T + distance_modulus + mass_modulus).T
+    # done
+    return m
 
 
 def kcorrect_absolute_magnitudes(coefficients, filters, stellar_mass=None):
@@ -332,7 +294,8 @@ def kcorrect_absolute_magnitudes(coefficients, filters, stellar_mass=None):
         spec = hdul[1].data * units.Unit('erg s-1 cm-2 angstrom-1')
         lambda_ = hdul[11].data * units.Unit('angstrom')
 
-    return template_absolute_magnitudes(lambda_, spec, coefficients, filters, stellar_mass)
+    mass_modulus = -2.5*np.log10(stellar_mass) if stellar_mass is not None else 0
+    return mag_ab(lambda_, spec, filters, coefficients=coefficients) + mass_modulus
 
 
 def kcorrect_apparent_magnitudes(coefficients, redshift, filters, cosmology,
@@ -379,8 +342,10 @@ def kcorrect_apparent_magnitudes(coefficients, redshift, filters, cosmology,
         spec = hdul[1].data * units.Unit('erg s-1 cm-2 angstrom-1')
         lambda_ = hdul[11].data * units.Unit('angstrom')
 
-    return template_apparent_magnitudes(lambda_, spec, coefficients, redshift, filters, cosmology,
-                                        stellar_mass=stellar_mass, resolution=resolution)
+    distmod = cosmology.distmod(redshift).value
+    mass_modulus = -2.5*np.log10(stellar_mass) if stellar_mass is not None else 0
+    return mag_ab(lambda_, spec, filters, redshift=redshift, coefficients=coefficients,
+                  distmod=distmod, interpolate=resolution) + mass_modulus
 
 
 def kcorrect_stellar_mass(coefficients, magnitudes, filter):

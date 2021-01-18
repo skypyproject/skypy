@@ -65,11 +65,11 @@ def test_sampling_coefficients():
 
 
 @pytest.mark.skipif(not HAS_SPECLITE, reason='test requires speclite')
-def test_ab_maggies_standard_source():
+def test_mag_ab_standard_source():
 
     from astropy import units
     from speclite.filters import FilterResponse
-    from skypy.galaxy.spectrum import ab_maggies_redshift
+    from skypy.galaxy.spectrum import mag_ab
 
     # create a filter
     filt_lam = np.logspace(0, 4, 1000)*units.AA
@@ -82,17 +82,17 @@ def test_ab_maggies_standard_source():
     lam = filt_lam  # same grid to prevent interpolation issues
     flam = 0.10885464149979998*units.Unit('erg s-1 cm-2 AA')/lam**2
 
-    m = ab_maggies_redshift(lam, flam, 'test-filt', 0)
+    m = mag_ab(lam, flam, 'test-filt')
 
-    assert np.isclose(m, 1.0)
+    assert np.isclose(m, 0)
 
 
 @pytest.mark.skipif(not HAS_SPECLITE, reason='test requires speclite')
-def test_ab_maggies_redshift_dependence():
+def test_mag_ab_redshift_dependence():
 
     from astropy import units
     from speclite.filters import FilterResponse
-    from skypy.galaxy.spectrum import ab_maggies_redshift
+    from skypy.galaxy.spectrum import mag_ab
 
     # make a wide tophat bandpass
     filt_lam = [1.0e-10, 1.1e-10, 1.0e0, 0.9e10, 1.0e10]
@@ -108,17 +108,17 @@ def test_ab_maggies_redshift_dependence():
     z = np.linspace(0, 1, 11)
 
     # compute the AB magnitude at different redshifts
-    m = ab_maggies_redshift(lam, flam, 'test-filt', z)
+    m = mag_ab(lam, flam, 'test-filt', redshift=z)
 
     # compare with expected redshift dependence
-    np.testing.assert_allclose(m, m[0] * (1 + z))
+    np.testing.assert_allclose(m, m[0] - 2.5*np.log10(1 + z))
 
 
 @pytest.mark.skipif(not HAS_SPECLITE, reason='test requires speclite')
-def test_ab_maggies_redshift_multi():
+def test_mag_ab_multi():
 
     from astropy import units
-    from skypy.galaxy.spectrum import ab_maggies_redshift
+    from skypy.galaxy.spectrum import mag_ab
     from speclite.filters import FilterResponse
 
     # 5 redshifts
@@ -145,8 +145,8 @@ def test_ab_maggies_redshift_multi():
     flam = A * 0.10885464149979998*units.Unit('erg s-1 cm-2 AA')/lam**2
 
     # Compare calculated magnitudes with truth
-    magnitudes = ab_maggies_redshift(lam, flam, ['test-filt0', 'test-filt1'], z)
-    truth = (A * (1+z)).T[:, :, np.newaxis]
+    magnitudes = mag_ab(lam, flam, ['test-filt0', 'test-filt1'], redshift=z)
+    truth = -2.5 * np.log10(A * (1+z)).T[:, :, np.newaxis]
     assert magnitudes.shape == (5, 3, 2)
     np.testing.assert_allclose(*np.broadcast_arrays(magnitudes, truth), rtol=1e-4)
 
@@ -156,7 +156,7 @@ def test_ab_maggies_redshift_multi():
 def test_template_spectra():
 
     from astropy import units
-    from skypy.galaxy.spectrum import ab_maggies_redshift, template_absolute_magnitudes, template_apparent_magnitudes
+    from skypy.galaxy.spectrum import mag_ab
     from astropy.cosmology import Planck15
     from speclite.filters import FilterResponse
 
@@ -174,29 +174,22 @@ def test_template_spectra():
 
     # Each test galaxy is exactly one of the templates
     coefficients = np.eye(3)
+    mt = mag_ab(lam, flam, 'test-filt', coefficients=coefficients)
+    m = mag_ab(lam, flam, 'test-filt')
+    np.testing.assert_allclose(mt, m)
 
-    # Absolute Magnitudes
-    mt = ab_maggies_redshift(lam, flam, 'test-filt', 0)
-    m = template_absolute_magnitudes(lam, flam, coefficients, 'test-filt')
-    np.testing.assert_allclose(-2.5*np.log10(mt), m)
-
-    # Apparent Magnitudes
+    # Test distance modulus
     redshift = np.array([1, 2, 3])
     dm = Planck15.distmod(redshift).value
-    mt = template_apparent_magnitudes(lam, flam, coefficients, redshift, 'test-filt', Planck15)
-    np.testing.assert_allclose(mt, m - 2.5*np.log10(1+redshift) + dm)
-
-    # Test stellar mass
-    sm = np.array([1, 2, 3])
-    mt = template_absolute_magnitudes(lam, flam, coefficients, 'test-filt', stellar_mass=sm)
-    np.testing.assert_allclose(mt, m - 2.5*np.log10(sm))
+    mt = mag_ab(lam, flam, 'test-filt', coefficients=coefficients, distmod=dm)
+    np.testing.assert_allclose(mt, m + dm)
 
     # Redshift interpolation test; linear interpolation sufficient over a small
     # redshift range at low relative tolerance
     z = np.linspace(0.1, 0.2, 3)
-    m_true = template_apparent_magnitudes(lam, flam, coefficients, z, 'test-filt', Planck15, resolution=4)
-    m_interp = template_apparent_magnitudes(lam, flam, coefficients, z, 'test-filt', Planck15, resolution=2)
-    np.testing.assert_allclose(m_true, m_interp, rtol=1e-7)
+    m_true = mag_ab(lam, flam, 'test-filt', redshift=z, coefficients=coefficients, interpolate=4)
+    m_interp = mag_ab(lam, flam, 'test-filt', redshift=z, coefficients=coefficients, interpolate=2)
+    np.testing.assert_allclose(m_true, m_interp, rtol=1e-5)
     assert not np.all(m_true == m_interp)
 
 
@@ -249,7 +242,7 @@ def test_kcorrect_stellar_mass():
     from astropy import units
     from astropy.io import fits
     from pkg_resources import resource_filename
-    from skypy.galaxy.spectrum import ab_maggies_redshift, kcorrect_stellar_mass
+    from skypy.galaxy.spectrum import mag_ab, kcorrect_stellar_mass
     from speclite.filters import FilterResponse
 
     # Gaussian bandpass
@@ -266,7 +259,7 @@ def test_kcorrect_stellar_mass():
     with fits.open(filename) as hdul:
         flam = hdul[1].data * units.Unit('erg s-1 cm-2 angstrom-1')
         lam = hdul[11].data * units.Unit('angstrom')
-    Mt = -2.5 * np.log10(ab_maggies_redshift(lam, flam, 'test-filt', 0))
+    Mt = mag_ab(lam, flam, 'test-filt')
 
     # Using the identity matrix for the coefficients yields trivial test cases
     coeff = np.eye(5)
