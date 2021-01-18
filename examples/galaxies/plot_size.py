@@ -43,7 +43,10 @@ in SkyPy.
 #    p(R) = \frac{1}{\sigma R \sqrt{2 \pi}}e^{- \frac{(ln R - \mu)^2}{2 \sigma^2}}
 #
 # with mean :math:`\mu = 0` and standard deviation :math:`\sigma`, and an amplitude
-# :math:`\bar{R}` given by the Shen et al. 2003 model [1]_ (c.f. equations above).
+# :math:`\bar{R}` given by the Shen et al. 2003 model:
+# :func:`skypy.galaxy.size.early_type_lognormal()` and
+# :func:`skypy.galaxy.size.late_type_lognormal()`
+# (c.f. equations above).
 #
 # In this example, the values of the fitting parameters
 # are taken from the model in Shen et al. 2003 [1]_.
