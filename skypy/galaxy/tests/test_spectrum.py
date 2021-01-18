@@ -202,43 +202,42 @@ def test_template_spectra():
 
 @pytest.mark.skipif(not HAS_SPECUTILS or not HAS_SPECLITE,
                     reason='test requires specutils and speclite')
-def test_stellar_mass_from_reference_band():
+def test_kcorrect_stellar_mass():
 
     from astropy import units
-    from skypy.galaxy.spectrum import mag_ab, stellar_mass_from_reference_band
-    from specutils import Spectrum1D
+    from astropy.io import fits
+    from pkg_resources import resource_filename
+    from skypy.galaxy.spectrum import ab_maggies_redshift, kcorrect_stellar_mass
     from speclite.filters import FilterResponse
 
     # Gaussian bandpass
-    filt_lam = np.logspace(0, 4, 1000) * units.AA
-    filt_mean = 1000 * units.AA
+    filt_lam = np.logspace(3, 4, 1000) * units.AA
+    filt_mean = 5000 * units.AA
     filt_width = 100 * units.AA
     filt_tx = np.exp(-((filt_lam-filt_mean)/filt_width)**2)
     filt_tx[[0, -1]] = 0
-    filt = FilterResponse(wavelength=filt_lam, response=filt_tx,
-                          meta=dict(group_name='test', band_name='filt'))
+    FilterResponse(wavelength=filt_lam, response=filt_tx,
+                   meta=dict(group_name='test', band_name='filt'))
 
-    # 3 Flat template spectra
-    lam = np.logspace(-1, 4, 1000)*units.AA
-    A = np.array([[2], [3], [4]])
-    flam = A * 0.10885464149979998*units.Unit('erg s-1 cm-2 AA')/lam**2
-    templates = Spectrum1D(spectral_axis=lam, flux=flam)
-
-    # Absolute magnitudes for each template
-    Mt = mag_ab(lam, flam, 'test-filt')
+    # Absolute magnitudes for each kcorrect template
+    filename = resource_filename('skypy', 'data/kcorrect/k_nmf_derived.default.fits')
+    with fits.open(filename) as hdul:
+        flam = hdul[1].data * units.Unit('erg s-1 cm-2 angstrom-1')
+        lam = hdul[11].data * units.Unit('angstrom')
+    Mt = -2.5 * np.log10(ab_maggies_redshift(lam, flam, 'test-filt', 0))
 
     # Using the identity matrix for the coefficients yields trivial test cases
-    coeff = np.eye(3)
+    coeff = np.eye(5)
 
     # Using the absolute magnitudes of the templates as reference magnitudes
     # should return one solar mass for each template.
-    stellar_mass = stellar_mass_from_reference_band(coeff, templates, Mt, 'test-filt')
+    stellar_mass = kcorrect_stellar_mass(coeff, Mt, 'test-filt')
     truth = 1
     np.testing.assert_allclose(stellar_mass, truth)
 
     # Solution for given magnitudes without template mixing
-    Mb = np.array([10, 20, 30])
-    stellar_mass = stellar_mass_from_reference_band(coeff, templates, Mb, 'test-filt')
+    Mb = np.array([10, 20, 30, 40, 50])
+    stellar_mass = kcorrect_stellar_mass(coeff, Mb, 'test-filt')
     truth = np.power(10, -0.4*(Mb-Mt))
     np.testing.assert_allclose(stellar_mass, truth)
 
