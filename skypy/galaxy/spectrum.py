@@ -221,19 +221,77 @@ def ab_maggies_redshift(wavelength, spectrum, filters, redshift, interpolate=100
     return m * np.reshape((1 + redshift), np.shape(redshift) + (1,)*(nd_s+nd_f))
 
 
-def template_absolute_magnitudes(lambda_, spec, coefficients, filters, stellar_mass=None):
+def template_absolute_magnitudes(wavelength, templates, coefficients, filters, stellar_mass=None):
+    '''Galaxy AB absolute magnitudes from template spectra.
 
-    flux = ab_maggies_redshift(lambda_, spec, filters, 0)
+    This function calculates photometric AB absolute magnitudes for galaxies
+    whose spectra are modelled as a linear combination of a set of template
+    spectra.
+
+    Parameters
+    ----------
+    wavelength : (nw,) `~astropy.units.Quantity` or array_like
+        Wavelength array of the spectra.
+    templates : (nt, nw,) `~astropy.units.Quantity` or array_like
+        Emission spectra of the template set.
+    coefficients : (ng, nt) array_like
+        Array of spectrum coefficients.
+    filters : (nf,) str or list of str
+        Bandpass filter specification for `~speclite.filters.load_filters`.
+    stellar_mass : (ng,) array_like, optional
+        Optional array of stellar masses for each galaxy in template units.
+
+    Returns
+    -------
+    magnitudes : (ng, nf) array_like
+        The absolute AB magnitude of each object in each filter, where ``nf``
+        is the number of loaded filters.
+    '''
+
+    flux = ab_maggies_redshift(wavelength, templates, filters, 0)
     flux = np.sum((coefficients.T * flux.T).T, axis=1)
     mass_modulus = 0 if stellar_mass is None else -2.5 * np.log10(stellar_mass)
 
     return (-2.5*np.log10(flux).T + mass_modulus).T
 
 
-def template_apparent_magnitudes(lambda_, spec, coefficients, redshift, filters, cosmology,
-                                 *, stellar_mass=None, resolution=1000):
+def template_apparent_magnitudes(wavelength, templates, coefficients, redshift, filters,
+                                 cosmology, *, stellar_mass=None, resolution=1000):
+    '''Galaxy AB apparent magnitudes from template spectra.
 
-    flux = ab_maggies_redshift(lambda_, spec, filters, redshift, resolution)
+    This function calculates photometric AB apparent magnitudes for galaxies
+    whose spectra are modelled as a linear combination of a set of template
+    spectra.
+
+    Parameters
+    ----------
+    wavelength : (nw,) `~astropy.units.Quantity` or array_like
+        Wavelength array of the spectra.
+    templates : (nt, nw,) `~astropy.units.Quantity` or array_like
+        Emission spectra of the template set.
+    coefficients : (ng, nt) array_like
+        Array of spectrum coefficients.
+    redshifts : (ng,) array_like
+        Array of redshifts for each galaxy used to calculte the distance
+        modulus and k-correction.
+    filters : (nf,) str or list of str
+        Bandpass filter specification for `~speclite.filters.load_filters`.
+    cosmology : Cosmology
+        Astropy Cosmology object to calculate distance modulus.
+    stellar_mass : (ng,) array_like, optional
+        Optional array of stellar masses for each galaxy in template units.
+    resolution : integer, optional
+        Redshift resolution for intepolating magnitudes. Default is 1000. If
+        the number of objects is less than resolution their magnitudes are
+        calculated directly without interpolation.
+
+    Returns
+    -------
+    magnitudes : (ng, nf) array_like
+        The apparent AB magnitude of each object in each filter.
+    '''
+
+    flux = ab_maggies_redshift(wavelength, templates, filters, redshift, resolution)
     flux = np.sum((coefficients.T * flux.T).T, axis=1)
     distance_modulus = cosmology.distmod(redshift).value
     mass_modulus = 0 if stellar_mass is None else -2.5 * np.log10(stellar_mass)
