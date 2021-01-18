@@ -234,6 +234,25 @@ def test_kcorrect_magnitudes():
     with pytest.raises(ValueError):
         mB = kcorrect_apparent_magnitudes(coeff_bad, z, multiple_filters, Planck15)
 
+    # Test stellar_mass parameter
+    sm = [10, 20, 30, 40, 50, 60, 70]
+
+    MB = kcorrect_absolute_magnitudes(coeff, 'bessell-B')
+    MB_s = kcorrect_absolute_magnitudes(coeff, 'bessell-B', stellar_mass=sm)
+    np.testing.assert_allclose(MB_s, MB - 2.5*np.log10(sm))
+
+    MB = kcorrect_absolute_magnitudes(coeff, multiple_filters)
+    MB_s = kcorrect_absolute_magnitudes(coeff, multiple_filters, stellar_mass=sm)
+    np.testing.assert_allclose(MB_s, MB - 2.5*np.log10(sm)[:, np.newaxis])
+
+    mB = kcorrect_apparent_magnitudes(coeff, z, 'bessell-B', Planck15)
+    mB_s = kcorrect_apparent_magnitudes(coeff, z, 'bessell-B', Planck15, stellar_mass=sm)
+    np.testing.assert_allclose(mB_s, mB - 2.5*np.log10(sm))
+
+    mB = kcorrect_apparent_magnitudes(coeff, z, multiple_filters, Planck15)
+    mB_s = kcorrect_apparent_magnitudes(coeff, z, multiple_filters, Planck15, stellar_mass=sm)
+    np.testing.assert_allclose(mB_s, mB - 2.5*np.log10(sm)[:, np.newaxis])
+
 
 @pytest.mark.skipif(not HAS_SPECUTILS or not HAS_SPECLITE,
                     reason='test requires specutils and speclite')

@@ -295,7 +295,7 @@ def kcorrect_absolute_magnitudes(coefficients, filters, stellar_mass=None):
         lambda_ = hdul[11].data * units.Unit('angstrom')
 
     mass_modulus = -2.5*np.log10(stellar_mass) if stellar_mass is not None else 0
-    return mag_ab(lambda_, spec, filters, coefficients=coefficients) + mass_modulus
+    return (mag_ab(lambda_, spec, filters, coefficients=coefficients).T + mass_modulus).T
 
 
 def kcorrect_apparent_magnitudes(coefficients, redshift, filters, cosmology,
@@ -344,8 +344,8 @@ def kcorrect_apparent_magnitudes(coefficients, redshift, filters, cosmology,
 
     distmod = cosmology.distmod(redshift).value
     mass_modulus = -2.5*np.log10(stellar_mass) if stellar_mass is not None else 0
-    return mag_ab(lambda_, spec, filters, redshift=redshift, coefficients=coefficients,
-                  distmod=distmod, interpolate=resolution) + mass_modulus
+    return (mag_ab(lambda_, spec, filters, redshift=redshift, coefficients=coefficients,
+                   distmod=distmod, interpolate=resolution).T + mass_modulus).T
 
 
 def kcorrect_stellar_mass(coefficients, magnitudes, filter):
