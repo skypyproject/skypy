@@ -156,14 +156,20 @@ def test_mag_ab_multi():
 def test_template_spectra():
 
     from astropy import units
-    from skypy.galaxy.spectrum import mag_ab
+    from skypy.galaxy.spectrum import mag_ab, GalaxyTemplateBase
     from astropy.cosmology import Planck15
     from speclite.filters import FilterResponse
 
-    # 3 Flat Templates
-    lam = np.logspace(-1, 4, 1000)*units.AA
-    A = np.array([[2], [3], [4]])
-    flam = A * 0.10885464149979998*units.Unit('erg s-1 cm-2 AA')/lam**2
+    class TestTemplates(GalaxyTemplateBase):
+        '''Three flat templates'''
+        @classmethod
+        def template_data(cls):
+            lam = np.logspace(-1, 4, 1000)*units.AA
+            A = np.array([[2], [3], [4]])
+            flam = A * 0.10885464149979998*units.Unit('erg s-1 cm-2 AA')/lam**2
+            return lam, flam
+
+    lam, flam = TestTemplates.template_data()
 
     # Gaussian bandpass
     filt_lam = np.logspace(0, 4, 1000)*units.AA
@@ -174,21 +180,23 @@ def test_template_spectra():
 
     # Each test galaxy is exactly one of the templates
     coefficients = np.eye(3)
-    mt = mag_ab(lam, flam, 'test-filt', coefficients=coefficients)
+
+    # Test absolute magnitudes
+    mt = TestTemplates.absolute_magnitudes(coefficients, 'test-filt')
     m = mag_ab(lam, flam, 'test-filt')
     np.testing.assert_allclose(mt, m)
 
-    # Test distance modulus
+    # Test apparent magnitudes
     redshift = np.array([1, 2, 3])
     dm = Planck15.distmod(redshift).value
-    mt = mag_ab(lam, flam, 'test-filt', coefficients=coefficients, distmod=dm)
-    np.testing.assert_allclose(mt, m + dm)
+    mt = TestTemplates.apparent_magnitudes(coefficients, redshift, 'test-filt', Planck15)
+    np.testing.assert_allclose(mt, m - 2.5*np.log10(1+redshift) + dm)
 
     # Redshift interpolation test; linear interpolation sufficient over a small
     # redshift range at low relative tolerance
     z = np.linspace(0.1, 0.2, 3)
-    m_true = mag_ab(lam, flam, 'test-filt', redshift=z, coefficients=coefficients, interpolate=4)
-    m_interp = mag_ab(lam, flam, 'test-filt', redshift=z, coefficients=coefficients, interpolate=2)
+    m_true = TestTemplates.apparent_magnitudes(coefficients, z, 'test-filt', Planck15, resolution=4)
+    m_interp = TestTemplates.apparent_magnitudes(coefficients, z, 'test-filt', Planck15, resolution=2)
     np.testing.assert_allclose(m_true, m_interp, rtol=1e-5)
     assert not np.all(m_true == m_interp)
 
@@ -197,7 +205,7 @@ def test_template_spectra():
 def test_kcorrect_magnitudes():
 
     from astropy.cosmology import Planck15
-    from skypy.galaxy.spectrum import kcorrect_absolute_magnitudes, kcorrect_apparent_magnitudes
+    from skypy.galaxy.spectrum import kcorrect
 
     # Test returned array shapes with single and multiple filters
     ng, nt = 7, 5
@@ -206,16 +214,16 @@ def test_kcorrect_magnitudes():
     nf = len(multiple_filters)
     z = np.linspace(1, 2, ng)
 
-    MB = kcorrect_absolute_magnitudes(coeff, 'bessell-B')
+    MB = kcorrect.absolute_magnitudes(coeff, 'bessell-B')
     assert np.shape(MB) == (ng,)
 
-    MB = kcorrect_absolute_magnitudes(coeff, multiple_filters)
+    MB = kcorrect.absolute_magnitudes(coeff, multiple_filters)
     assert np.shape(MB) == (ng, nf)
 
-    mB = kcorrect_apparent_magnitudes(coeff, z, 'bessell-B', Planck15)
+    mB = kcorrect.apparent_magnitudes(coeff, z, 'bessell-B', Planck15)
     assert np.shape(mB) == (ng,)
 
-    mB = kcorrect_apparent_magnitudes(coeff, z, multiple_filters, Planck15)
+    mB = kcorrect.apparent_magnitudes(coeff, z, multiple_filters, Planck15)
     assert np.shape(mB) == (ng, nf)
 
     # Test wrong number of coefficients
@@ -223,34 +231,34 @@ def test_kcorrect_magnitudes():
     coeff_bad = np.ones((ng, nt_bad))
 
     with pytest.raises(ValueError):
-        MB = kcorrect_absolute_magnitudes(coeff_bad, 'bessell-B')
+        MB = kcorrect.absolute_magnitudes(coeff_bad, 'bessell-B')
 
     with pytest.raises(ValueError):
-        MB = kcorrect_absolute_magnitudes(coeff_bad, multiple_filters)
+        MB = kcorrect.absolute_magnitudes(coeff_bad, multiple_filters)
 
     with pytest.raises(ValueError):
-        mB = kcorrect_apparent_magnitudes(coeff_bad, z, 'bessell-B', Planck15)
+        mB = kcorrect.apparent_magnitudes(coeff_bad, z, 'bessell-B', Planck15)
 
     with pytest.raises(ValueError):
-        mB = kcorrect_apparent_magnitudes(coeff_bad, z, multiple_filters, Planck15)
+        mB = kcorrect.apparent_magnitudes(coeff_bad, z, multiple_filters, Planck15)
 
     # Test stellar_mass parameter
     sm = [10, 20, 30, 40, 50, 60, 70]
 
-    MB = kcorrect_absolute_magnitudes(coeff, 'bessell-B')
-    MB_s = kcorrect_absolute_magnitudes(coeff, 'bessell-B', stellar_mass=sm)
+    MB = kcorrect.absolute_magnitudes(coeff, 'bessell-B')
+    MB_s = kcorrect.absolute_magnitudes(coeff, 'bessell-B', stellar_mass=sm)
     np.testing.assert_allclose(MB_s, MB - 2.5*np.log10(sm))
 
-    MB = kcorrect_absolute_magnitudes(coeff, multiple_filters)
-    MB_s = kcorrect_absolute_magnitudes(coeff, multiple_filters, stellar_mass=sm)
+    MB = kcorrect.absolute_magnitudes(coeff, multiple_filters)
+    MB_s = kcorrect.absolute_magnitudes(coeff, multiple_filters, stellar_mass=sm)
     np.testing.assert_allclose(MB_s, MB - 2.5*np.log10(sm)[:, np.newaxis])
 
-    mB = kcorrect_apparent_magnitudes(coeff, z, 'bessell-B', Planck15)
-    mB_s = kcorrect_apparent_magnitudes(coeff, z, 'bessell-B', Planck15, stellar_mass=sm)
+    mB = kcorrect.apparent_magnitudes(coeff, z, 'bessell-B', Planck15)
+    mB_s = kcorrect.apparent_magnitudes(coeff, z, 'bessell-B', Planck15, stellar_mass=sm)
     np.testing.assert_allclose(mB_s, mB - 2.5*np.log10(sm))
 
-    mB = kcorrect_apparent_magnitudes(coeff, z, multiple_filters, Planck15)
-    mB_s = kcorrect_apparent_magnitudes(coeff, z, multiple_filters, Planck15, stellar_mass=sm)
+    mB = kcorrect.apparent_magnitudes(coeff, z, multiple_filters, Planck15)
+    mB_s = kcorrect.apparent_magnitudes(coeff, z, multiple_filters, Planck15, stellar_mass=sm)
     np.testing.assert_allclose(mB_s, mB - 2.5*np.log10(sm)[:, np.newaxis])
 
 
@@ -259,9 +267,7 @@ def test_kcorrect_magnitudes():
 def test_kcorrect_stellar_mass():
 
     from astropy import units
-    from astropy.io import fits
-    from pkg_resources import resource_filename
-    from skypy.galaxy.spectrum import mag_ab, kcorrect_stellar_mass
+    from skypy.galaxy.spectrum import kcorrect
     from speclite.filters import FilterResponse
 
     # Gaussian bandpass
@@ -273,25 +279,19 @@ def test_kcorrect_stellar_mass():
     FilterResponse(wavelength=filt_lam, response=filt_tx,
                    meta=dict(group_name='test', band_name='filt'))
 
-    # Absolute magnitudes for each kcorrect template
-    filename = resource_filename('skypy', 'data/kcorrect/k_nmf_derived.default.fits')
-    with fits.open(filename) as hdul:
-        flam = hdul[1].data * units.Unit('erg s-1 cm-2 angstrom-1')
-        lam = hdul[11].data * units.Unit('angstrom')
-    Mt = mag_ab(lam, flam, 'test-filt')
-
     # Using the identity matrix for the coefficients yields trivial test cases
     coeff = np.eye(5)
+    Mt = kcorrect.absolute_magnitudes(coeff, 'test-filt')
 
     # Using the absolute magnitudes of the templates as reference magnitudes
     # should return one solar mass for each template.
-    stellar_mass = kcorrect_stellar_mass(coeff, Mt, 'test-filt')
+    stellar_mass = kcorrect.stellar_mass(coeff, Mt, 'test-filt')
     truth = 1
     np.testing.assert_allclose(stellar_mass, truth)
 
     # Solution for given magnitudes without template mixing
     Mb = np.array([10, 20, 30, 40, 50])
-    stellar_mass = kcorrect_stellar_mass(coeff, Mb, 'test-filt')
+    stellar_mass = kcorrect.stellar_mass(coeff, Mb, 'test-filt')
     truth = np.power(10, -0.4*(Mb-Mt))
     np.testing.assert_allclose(stellar_mass, truth)
 

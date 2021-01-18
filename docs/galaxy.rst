@@ -80,9 +80,8 @@ The following models are found in the `skypy.galaxy.spectrum` package.
    dirichlet_coefficients
    load_spectral_data
    mag_ab
-   kcorrect_absolute_magnitudes
-   kcorrect_apparent_magnitudes
-   kcorrect_stellar_mass
+   GalaxyTemplateBase
+   kcorrect
 
 
 Stellar mass
