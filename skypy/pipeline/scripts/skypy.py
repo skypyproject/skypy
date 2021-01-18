@@ -2,7 +2,7 @@
 
 import argparse
 from skypy import __version__ as skypy_version
-from skypy.pipeline import Lightcone, Pipeline, load_skypy_yaml
+from skypy.pipeline import Pipeline, load_skypy_yaml
 import sys
 
 
@@ -23,10 +23,7 @@ def main(args=None):
     args = parser.parse_args(args or ['--help'])
     config = load_skypy_yaml(args.config)
 
-    if 'lightcone' in config:
-        pipeline = Lightcone(config)
-    else:
-        pipeline = Pipeline(config)
+    pipeline = Pipeline(config)
     pipeline.execute()
     pipeline.write(file_format=args.format, overwrite=args.overwrite)
     return(0)

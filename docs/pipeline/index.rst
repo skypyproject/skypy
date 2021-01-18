@@ -114,62 +114,6 @@ changed for individual executions of the pipeline:
     plt.xlabel('redshift')
 
 
-Lightcone Simulations
-=====================
-
-The `~skypy.pipeline.Lightcone` class can be used to simulate a cosmological
-volume by subdiving it into a number of redshift slices and then running a
-pipeline for each slice. A typical config file would be:
-
-.. literalinclude:: examples/lightcone.yml
-   :language: yaml
-   :caption:
-
-This simulates between redshift 0.8 and 1.2 in four slices. The slices are
-determined by dividing the simulation volume into equally spaced comoving
-distance slices. For each slice the lightcone defines three additional
-parameters that can be referenced within the pipeline:
-
-- `slice_z_min` : The minimum redshift of the slice
-- `slice_z_max` : The maximum redshift of the slice
-- `slice_z_mid` : The redshift of the comoving distance midpoint of the slice.
-
-The redshifts of each galaxy in this simulated lightcone are shown below
-colour-coded by the slice that they were sampled in.
-
-.. plot::
-  :include-source: false
-
-    from astropy.cosmology import default_cosmology
-    import matplotlib.pyplot as plt
-    import numpy as np
-    from skypy.pipeline import Lightcone, load_skypy_yaml
-
-    # Run Lightcone
-    config = load_skypy_yaml('examples/lightcone.yml')
-    lightcone = Lightcone(config)
-    lightcone.execute()
-
-    # Lightcone outputs
-    z = lightcone.tables['galaxies']['redshift']
-    chi = default_cosmology.get().comoving_distance(z)
-    ids = np.arange(len(z))
-
-    # Redshift slices
-    chi_min = default_cosmology.get().comoving_distance(lightcone.lightcone_config['z_min'])
-    chi_max = default_cosmology.get().comoving_distance(lightcone.lightcone_config['z_max'])
-    n_slice = lightcone.lightcone_config['n_slice']
-    bounds = np.linspace(chi_min, chi_max, n_slice + 1)
-
-    # Plotting
-    colors = ['red', 'orange', 'green', 'blue']
-    for i, c, l, h in zip(np.arange(n_slice), colors, bounds[:-1], bounds[1:]):
-      mask = np.logical_and(chi > l, chi < h)
-      plt.scatter(ids[mask], z[mask], marker='+', label=f'Slice {i+1}', color=c)
-    plt.xlabel('Galaxy ID')
-    plt.ylabel('Redshift')
-    plt.legend()
-
 Reference/API
 =============
 

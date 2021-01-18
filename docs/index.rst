@@ -31,13 +31,7 @@ Packages
 .. toctree::
    :maxdepth: 1
 
-   cluster/index
    galaxy
-   gravitational_wave/index
-   halo/index
-   position/index
-   power_spectrum/index
-   supernova/index
    utils/index
 
 Pipeline
