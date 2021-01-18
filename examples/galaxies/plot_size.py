@@ -43,7 +43,7 @@ in SkyPy.
 #
 # and the conditions :math:`c < 2.86` for late-type and :math:`c > 2.86` for
 # early-type galaxies. The values of the parameters :math:`{\alpha, \beta, \gamma}`
-# and :math:`\{a, b\}`, as well as :math:`M_0`,
+# and :math:`{a, b}`, as well as :math:`M_0`,
 # are taken from the model in Shen et al. 2003 [1]_.
 
 import numpy as np
