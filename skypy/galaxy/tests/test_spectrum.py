@@ -200,6 +200,31 @@ def test_template_spectra():
     assert not np.all(m_true == m_interp)
 
 
+@pytest.mark.skipif(not HAS_SPECLITE, reason='test requires speclite')
+def test_kcorrect_magnitudes():
+
+    from astropy.cosmology import Planck15
+    from skypy.galaxy.spectrum import kcorrect_absolute_magnitudes, kcorrect_apparent_magnitudes
+
+    ng, nt = 7, 5
+    coeff = np.ones((ng, nt))
+    multiple_filters = ['decam2014-g', 'decam2014-r']
+    nf = len(multiple_filters)
+    z = np.linspace(1, 2, ng)
+
+    MB = kcorrect_absolute_magnitudes(coeff, 'bessell-B')
+    assert np.shape(MB) == (ng,)
+
+    MB = kcorrect_absolute_magnitudes(coeff, multiple_filters)
+    assert np.shape(MB) == (ng, nf)
+
+    mB = kcorrect_apparent_magnitudes(coeff, 'bessell-B', z, Planck15)
+    assert np.shape(mB) == (ng,)
+
+    mB = kcorrect_apparent_magnitudes(coeff, multiple_filters, z, Planck15)
+    assert np.shape(mB) == (ng, nf)
+
+
 @pytest.mark.skipif(not HAS_SPECUTILS or not HAS_SPECLITE,
                     reason='test requires specutils and speclite')
 def test_kcorrect_stellar_mass():
