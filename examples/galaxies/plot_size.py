@@ -12,8 +12,39 @@ in SkyPy.
 # Galaxy sizes
 # ------------
 #
-# Add some notes here. We are trying to reporduce figure 6 in
-# reference [1]_ and use data from SDSS.
+# According to Shen et al. 2003 [1]_, the observed size of galaxies
+# and the absolute magnitudes follow simple analytic formulae. For early-type
+# galaxies, the relation (14) reads
+#
+# .. math::
+#
+#    log (R/kpc) = -0.4aM + b,
+#
+# with :math:`a` and :math:`b` fitting constants. Likewise, for late-type galaxies
+# the formula (15) reads
+#
+# .. math::
+#
+#    log (R/kpc) = -0.4\alpha M + (\beta - \alpha) log \left[1 + 10^{-0.4(M - M_0)} \right] + \gamma
+#
+# with a dispersion given by equation 16. :math:`\alpha`, :math:`\beta`, :math:`\gamma` and
+# :math:`M_0` are fitting parameters.
+#
+# In this example, we reproduce figure 4 in reference [1]_ and use SDSS data [2]_.
+# We obtain the SDSS DR7 sample via `astroquery.sdss` and select the Petrosian
+# :math:`R_{50}` and :math:`R_{90}` radii for the r-band magnitudes and redshifts
+# of 50000 objects. We then convert radii into physical size for a Planck15
+# cosmology. Finally we split the SDSS sample
+# using the concentration index, :math:`c`:
+#
+# .. math::
+#
+#    c \equiv R_{90} / R_{50}
+#
+# and the conditions :math:`c < 2.86` for late-type and :math:`c > 2.86` for
+# early-type galaxies. The values of the parameters :math:`{\alpha, \beta, \gamma}`
+# and :math:`\{a, b\}`, as well as :math:`M_0`,
+# are taken from the model in Shen et al. 2003 [1]_.
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -35,21 +66,21 @@ slate = size.late_type_lognormal(m, alpha, beta, gamma, M0, sigma1, sigma2)
 searly = size.early_type_lognormal(m, a, b, M0, sigma1, sigma2)
 
 
-# Split data: c < 2.86 late type, c > 2.86 early type
+# Split the sample
 M_r_late, R50_r_phys_late = M_r[c < 2.86], np.log10(R50_r_phys[c < 2.86])
 M_r_early, R50_r_phys_early = M_r[c > 2.86], np.log10(R50_r_phys[c > 2.86])
 
+# Plot
 plt.scatter(M_r_late, R50_r_phys_late, color='lightskyblue', marker='+', alpha=0.01)
 plt.scatter(M_r_early, R50_r_phys_early, color='coral',  marker='+', alpha=0.01)
-
 plt.plot(m, np.log10(slate.value), 'b', label='SkyPy Late')
 plt.plot(m, np.log10(searly.value), 'r', label='SkyPy Early')
 
-# plt.yscale('log')
+plt.ylim(-1.5, 1.5)
 plt.xlabel('$M$')
 plt.ylabel('$R_{50,r}$ (kpc)')
-plt.legend(frameon=False)
 plt.title("SDSS data release 7")
+plt.legend(frameon=False)
 
 plt.show()
 
@@ -62,3 +93,4 @@ plt.show()
 #   Brinkmann, I. Csabai, `Mon. Not. Roy. Astron. Soc. 343, 978 (2003)`_
 #
 # .. _Mon. Not. Roy. Astron. Soc. 343, 978 (2003): https://arxiv.org/pdf/astro-ph/0301527.pdf
+# .. [2] https://www.sdss.org
