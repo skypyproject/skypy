@@ -19,45 +19,34 @@ import numpy as np
 import matplotlib.pyplot as plt
 from skypy.galaxy import size
 
-mag = np.linspace(-16, -24)
 
-# Parameters for the late-type galaxies
-alpha, beta, gamma, M0 = 0.21, 0.53, -1.31, -20.52
-sigma1, sigma2 = 0.48, 0.25
+# Load SDSS data release 7
+R50_r_phys, c, M_r = np.genfromtxt('SDSS_DR7.csv', delimiter=',')
 
-# Parameters for the early-tyoe galaxies
-a, b, M0 = 0.6, -4.63, -20.52
-sigma1, sigma2 = 0.48, 0.25
+# Parameters for the late-type and early-type galaxies
+alpha, beta, gamma = 0.21, 0.53, -1.31
+a, b = 0.6, -4.63
+M0 = -20.52
+sigma1, sigma2 = 0., 0.
 
 # Size
-slate = size.late_type_lognormal(mag, alpha, beta, gamma, M0, sigma1, sigma2)
-searly = size.early_type_lognormal(mag, a, b, M0, sigma1, sigma2)
+m = np.linspace(-16, -24, 100)
+slate = size.late_type_lognormal(m, alpha, beta, gamma, M0, sigma1, sigma2)
+searly = size.early_type_lognormal(m, a, b, M0, sigma1, sigma2)
 
-# Mean radius
-rlate = np.power(10, -0.4 * alpha * mag + (beta - alpha) *
-                 np.log10(1 + np.power(10, -0.4 * (mag - M0))) + gamma)
-rearly = np.power(10, -0.4 * a * mag + (a - a) *
-                  np.log10(1 + np.power(10, -0.4 * (mag - M0))) + b)
 
-# Variance
-sigma_lnR = sigma2 + (sigma1 - sigma2) / (1.0 + np.power(10, -0.8 * (mag - M0)))
+# Split data: c < 2.86 late type, c < 2.86 early type
+plt.scatter(M_r[c < 2.86], np.log10(R50_r_phys[c < 2.86]), color='lightskyblue', marker='+', alpha=0.01)
+plt.scatter(M_r[c > 2.86], np.log10(R50_r_phys[c > 2.86]), color='coral',  marker='+', alpha=0.01)
 
-fig, (ax0, ax1) = plt.subplots(ncols=2, constrained_layout=True, figsize=(10,4))
-ax0.plot(np.flip(mag), slate, 'r.', label='Late')
-ax0.plot(np.flip(mag), searly, 'b.', label='Early')
+plt.plot(m, np.log10(slate.value), 'b', label='SkyPy Late')
+plt.plot(m, np.log10(searly.value), 'r', label='SkyPy Early')
 
-ax0.plot(np.flip(mag), rlate, 'r--')
-ax0.plot(np.flip(mag), rearly, 'b--')
-
-ax0.set_yscale('log')
-ax0.set_xlabel('M')
-ax0.set_ylabel('R (kpc)')
-ax0.legend(frameon=False)
-
-ax1.plot(np.flip(mag), sigma_lnR)
-
-ax1.set_xlabel('M')
-ax1.set_ylabel(r'$\sigma_{lnR}$ (kpc)')
+# plt.yscale('log')
+plt.xlabel('$M$')
+plt.ylabel('$R_{50,r}$ (kpc)')
+plt.legend(frameon=False)
+plt.title("SDSS data release 7")
 
 plt.show()
 
