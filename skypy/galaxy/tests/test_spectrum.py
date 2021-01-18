@@ -225,6 +225,22 @@ def test_kcorrect_magnitudes():
     mB = kcorrect_apparent_magnitudes(coeff, z, multiple_filters, Planck15)
     assert np.shape(mB) == (ng, nf)
 
+    # Test wrong number of coefficients
+    nt_bad = 3
+    coeff_bad = np.ones((ng, nt_bad))
+
+    with pytest.raises(ValueError):
+        MB = kcorrect_absolute_magnitudes(coeff_bad, 'bessell-B')
+
+    with pytest.raises(ValueError):
+        MB = kcorrect_absolute_magnitudes(coeff_bad, multiple_filters)
+
+    with pytest.raises(ValueError):
+        mB = kcorrect_apparent_magnitudes(coeff_bad, z, 'bessell-B', Planck15)
+
+    with pytest.raises(ValueError):
+        mB = kcorrect_apparent_magnitudes(coeff_bad, z, multiple_filters, Planck15)
+
 
 @pytest.mark.skipif(not HAS_SPECUTILS or not HAS_SPECLITE,
                     reason='test requires specutils and speclite')
