@@ -206,6 +206,7 @@ def test_kcorrect_magnitudes():
     from astropy.cosmology import Planck15
     from skypy.galaxy.spectrum import kcorrect_absolute_magnitudes, kcorrect_apparent_magnitudes
 
+    # Test returned array shapes with single and multiple filters
     ng, nt = 7, 5
     coeff = np.ones((ng, nt))
     multiple_filters = ['decam2014-g', 'decam2014-r']
@@ -218,10 +219,10 @@ def test_kcorrect_magnitudes():
     MB = kcorrect_absolute_magnitudes(coeff, multiple_filters)
     assert np.shape(MB) == (ng, nf)
 
-    mB = kcorrect_apparent_magnitudes(coeff, 'bessell-B', z, Planck15)
+    mB = kcorrect_apparent_magnitudes(coeff, z, 'bessell-B', Planck15)
     assert np.shape(mB) == (ng,)
 
-    mB = kcorrect_apparent_magnitudes(coeff, multiple_filters, z, Planck15)
+    mB = kcorrect_apparent_magnitudes(coeff, z, multiple_filters, Planck15)
     assert np.shape(mB) == (ng, nf)
 
 
