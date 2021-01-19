@@ -7,13 +7,15 @@ from astropy import units
 from astropy.io import fits
 from pkg_resources import resource_filename
 from ..utils import spectral_data_input
+from abc import ABCMeta, abstractmethod
 
 
 __all__ = [
     'dirichlet_coefficients',
     'load_spectral_data',
     'mag_ab',
-    'GalaxyTemplateBase',
+    'SpectrumTemplates',
+    'KCorrectTemplates',
     'kcorrect',
 ]
 
@@ -259,24 +261,15 @@ def mag_ab(wavelength, spectrum, filters, *, redshift=None, coefficients=None,
     return m
 
 
-class GalaxyTemplateBase(object):
+class SpectrumTemplates(metaclass=ABCMeta):
     '''Base class for composite galaxy spectra from a set of basis templates'''
 
-    @classmethod
-    def template_data(cls):
-        '''Template data
+    @abstractmethod
+    def __init__(self):
+        self.wavelength = None
+        self.templates = None
 
-        Returns
-        -------
-        wavelength : (nw,) `~astropy.units.Quantity` or array_like
-            Wavelength array of the templates.
-        templates : (ns, nw) `~astropy.units.Quantity` or array_like
-            Emission spectra of the tempaltes.
-        '''
-        raise NotImplementedError
-
-    @classmethod
-    def absolute_magnitudes(cls, coefficients, filters, stellar_mass=None):
+    def absolute_magnitudes(self, coefficients, filters, stellar_mass=None):
         '''Galaxy AB absolute magnitudes from template spectra.
 
         This function calculates photometric AB absolute magnitudes for
@@ -298,13 +291,11 @@ class GalaxyTemplateBase(object):
             The absolute AB magnitude of each object in each filter, where
             ``nf`` is the number of loaded filters.
         '''
-        wavelength, templates = cls.template_data()
         mass_modulus = -2.5*np.log10(stellar_mass) if stellar_mass is not None else 0
-        M = mag_ab(wavelength, templates, filters, coefficients=coefficients)
+        M = mag_ab(self.wavelength, self.templates, filters, coefficients=coefficients)
         return (M.T + mass_modulus).T
 
-    @classmethod
-    def apparent_magnitudes(cls, coefficients, redshift, filters, cosmology, *,
+    def apparent_magnitudes(self, coefficients, redshift, filters, cosmology, *,
                             stellar_mass=None, resolution=1000):
         '''Galaxy AB apparent magnitudes from template spectra.
 
@@ -336,15 +327,14 @@ class GalaxyTemplateBase(object):
             The apparent AB magnitude of each object in each filter, where
             ``nf`` is the number of loaded filters.
         '''
-        wavelength, templates = cls.template_data()
         distmod = cosmology.distmod(redshift).value
         mass_modulus = -2.5*np.log10(stellar_mass) if stellar_mass is not None else 0
-        m = mag_ab(wavelength, templates, filters, redshift=redshift,
+        m = mag_ab(self.wavelength, self.templates, filters, redshift=redshift,
                    coefficients=coefficients, distmod=distmod, interpolate=resolution)
         return (m.T + mass_modulus).T
 
 
-class kcorrect(GalaxyTemplateBase):
+class KCorrectTemplates(SpectrumTemplates):
     '''Galaxy spectra from kcorrect templates.
 
     Class for modeling galaxy spectra as a linear combination of the five
@@ -355,25 +345,13 @@ class kcorrect(GalaxyTemplateBase):
     .. [1] M. R. Blanton and S. Roweis, 2007, AJ, 125, 2348
     '''
 
-    @classmethod
-    def template_data(cls):
-        '''kcorrect template data
-
-        Returns
-        -------
-        wavelength : (nw,) `~astropy.units.Quantity` or array_like
-            Wavelength array of the templates.
-        templates : (ns, nw) `~astropy.units.Quantity` or array_like
-            Emission spectra of the tempaltes.
-        '''
+    def __init__(self, hdu=1):
         filename = resource_filename('skypy', 'data/kcorrect/k_nmf_derived.default.fits')
         with fits.open(filename) as hdul:
-            templates = hdul[1].data * units.Unit('erg s-1 cm-2 angstrom-1')
-            wavelength = hdul[11].data * units.Unit('angstrom')
-        return wavelength, templates
+            self.templates = hdul[hdu].data * units.Unit('erg s-1 cm-2 angstrom-1')
+            self.wavelength = hdul[11].data * units.Unit('angstrom')
 
-    @classmethod
-    def stellar_mass(cls, coefficients, magnitudes, filter):
+    def stellar_mass(self, coefficients, magnitudes, filter):
         r'''Compute stellar mass from absolute magnitudes in a reference filter.
 
         This function takes composite spectra for a set of galaxies defined by
@@ -396,8 +374,12 @@ class kcorrect(GalaxyTemplateBase):
         stellar_mass : (ng,) array_like
             Stellar mass of each galaxy in template units.
         '''
-        Mt = cls.absolute_magnitudes(coefficients, filter)
+        Mt = self.absolute_magnitudes(coefficients, filter)
         return np.power(10, 0.4*(Mt-magnitudes))
+
+
+kcorrect = KCorrectTemplates(hdu=1)
+kcorrect.__doc__ = '''Galaxy spectra from kcorrect smoothed templates.'''
 
 
 def load_spectral_data(name):

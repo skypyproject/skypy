@@ -156,20 +156,20 @@ def test_mag_ab_multi():
 def test_template_spectra():
 
     from astropy import units
-    from skypy.galaxy.spectrum import mag_ab, GalaxyTemplateBase
+    from skypy.galaxy.spectrum import mag_ab, SpectrumTemplates
     from astropy.cosmology import Planck15
     from speclite.filters import FilterResponse
 
-    class TestTemplates(GalaxyTemplateBase):
+    class TestTemplates(SpectrumTemplates):
         '''Three flat templates'''
-        @classmethod
-        def template_data(cls):
-            lam = np.logspace(-1, 4, 1000)*units.AA
-            A = np.array([[2], [3], [4]])
-            flam = A * 0.10885464149979998*units.Unit('erg s-1 cm-2 AA')/lam**2
-            return lam, flam
 
-    lam, flam = TestTemplates.template_data()
+        def __init__(self):
+            self.wavelength = np.logspace(-1, 4, 1000)*units.AA
+            A = np.array([[2], [3], [4]]) * 0.10885464149979998
+            self.templates = A * units.Unit('erg s-1 cm-2 AA') / self.wavelength**2
+
+    test_templates = TestTemplates()
+    lam, flam = test_templates.wavelength, test_templates.templates
 
     # Gaussian bandpass
     filt_lam = np.logspace(0, 4, 1000)*units.AA
@@ -182,21 +182,23 @@ def test_template_spectra():
     coefficients = np.eye(3)
 
     # Test absolute magnitudes
-    mt = TestTemplates.absolute_magnitudes(coefficients, 'test-filt')
+    mt = test_templates.absolute_magnitudes(coefficients, 'test-filt')
     m = mag_ab(lam, flam, 'test-filt')
     np.testing.assert_allclose(mt, m)
 
     # Test apparent magnitudes
     redshift = np.array([1, 2, 3])
     dm = Planck15.distmod(redshift).value
-    mt = TestTemplates.apparent_magnitudes(coefficients, redshift, 'test-filt', Planck15)
+    mt = test_templates.apparent_magnitudes(coefficients, redshift, 'test-filt', Planck15)
     np.testing.assert_allclose(mt, m - 2.5*np.log10(1+redshift) + dm)
 
     # Redshift interpolation test; linear interpolation sufficient over a small
     # redshift range at low relative tolerance
     z = np.linspace(0.1, 0.2, 3)
-    m_true = TestTemplates.apparent_magnitudes(coefficients, z, 'test-filt', Planck15, resolution=4)
-    m_interp = TestTemplates.apparent_magnitudes(coefficients, z, 'test-filt', Planck15, resolution=2)
+    m_true = test_templates.apparent_magnitudes(coefficients, z, 'test-filt',
+                                                Planck15, resolution=4)
+    m_interp = test_templates.apparent_magnitudes(coefficients, z, 'test-filt',
+                                                  Planck15, resolution=2)
     np.testing.assert_allclose(m_true, m_interp, rtol=1e-5)
     assert not np.all(m_true == m_interp)
 
