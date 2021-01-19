@@ -266,8 +266,7 @@ class SpectrumTemplates(metaclass=ABCMeta):
 
     @abstractmethod
     def __init__(self):
-        self.wavelength = None
-        self.templates = None
+        raise NotImplementedError
 
     def absolute_magnitudes(self, coefficients, filters, stellar_mass=None):
         '''Galaxy AB absolute magnitudes from template spectra.
