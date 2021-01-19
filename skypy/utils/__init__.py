@@ -7,10 +7,9 @@ __all__ = []
 from . import random
 from . import special
 
-from ._decorators import broadcast_arguments, dependent_argument, spectral_data_input
+from ._decorators import broadcast_arguments, dependent_argument
 
 __all__ += [
     'broadcast_arguments',
     'dependent_argument',
-    'spectral_data_input',
 ]

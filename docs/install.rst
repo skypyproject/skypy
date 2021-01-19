@@ -57,7 +57,6 @@ that enable additional features:
 - `classy <https://lesgourg.github.io/class_public/class.html>`_
 - `healpy <https://healpy.readthedocs.io/>`_
 - `speclite <https://speclite.readthedocs.io/>`_
-- `specutils <https://specutils.readthedocs.io/>`_
 
 To install SkyPy with all optional dependencies using pip:
 

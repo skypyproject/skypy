@@ -205,7 +205,6 @@ github_issues_url = 'https://github.com/{0}/issues/'.format(setup_cfg['github_pr
 # -----------------------------------------------------------------------------
 
 intersphinx_mapping.update({
-    'specutils': ('https://specutils.readthedocs.io/en/stable/', None),
     'speclite': ('https://speclite.readthedocs.io/en/latest/', None),
 })
 
