@@ -340,6 +340,8 @@ class KCorrectTemplates(SpectrumTemplates):
         with fits.open(filename) as hdul:
             self.templates = hdul[hdu].data * units.Unit('erg s-1 cm-2 angstrom-1')
             self.wavelength = hdul[11].data * units.Unit('angstrom')
+            self.mremain = hdul[17].data
+            self.mets = hdul[18].data
 
     def stellar_mass(self, coefficients, magnitudes, filter):
         r'''Compute stellar mass from absolute magnitudes in a reference filter.
@@ -366,6 +368,29 @@ class KCorrectTemplates(SpectrumTemplates):
         '''
         Mt = self.absolute_magnitudes(coefficients, filter)
         return np.power(10, 0.4*(Mt-magnitudes))
+
+    def metallicity(self, coefficients):
+        r'''Galaxy metallicities from kcorrect templates.
+
+        This function calculates the matallicities of galaxies modelled as a
+        linear combination of the kcorrect templates [1]_.
+
+        Parameters
+        ----------
+        coefficients : (ng, 5) array_like
+            Array of template coefficients.
+
+        Returns
+        -------
+        metallicity : (ng,) array_like
+            Metallicity of each galaxy.
+
+        References
+        ----------
+        .. [1] M. R. Blanton and S. Roweis, 2007, AJ, 125, 2348
+        '''
+
+        return np.sum(coefficients * self.mremain * self.mets) / np.sum(coefficients * self.mremain)
 
 
 kcorrect = KCorrectTemplates(hdu=1)

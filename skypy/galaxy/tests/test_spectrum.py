@@ -294,3 +294,13 @@ def test_kcorrect_stellar_mass():
     stellar_mass = kcorrect.stellar_mass(coeff, Mb, 'test-filt')
     truth = np.power(10, -0.4*(Mb-Mt))
     np.testing.assert_allclose(stellar_mass, truth)
+
+def test_kcorrect_metallicity():
+
+    from skypy.galaxy.spectrum import kcorrect
+
+    # Each test galaxy is exactly one of the templates
+    coefficients = np.diag(np.ones(5))
+    mets = kcorrect.metallicity(coefficients)
+    truth = np.sum(kcorrect.mremain * kcorrect.mets) / np.sum(kcorrect.mremain)
+    np.testing.assert_allclose(mets, truth)
