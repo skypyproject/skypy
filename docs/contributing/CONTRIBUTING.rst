@@ -21,7 +21,7 @@ Next *clone* your fork. Cloning creates a local copy of the repository on your c
    git clone https://github.com/<your-account>/skypy.git
 
 
-Finally add the `skypyproject` repository as a *remote*. This will allow you to fetch changes made to the codebase. To add the `skypyproject` remote:
+Finally add the ``skypyproject`` repository as a *remote*. This will allow you to fetch changes made to the codebase. To add the ``skypyproject`` remote:
 
 ::
 
@@ -32,7 +32,7 @@ Finally add the `skypyproject` repository as a *remote*. This will allow you to 
 Create a branch for your new feature
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Create a *branch* off the `skypyproject` master branch. Working on unique branches for each new feature simplifies the development, review and merge processes by maintining logical separation. To create a feature branch:
+Create a *branch* off the ``skypyproject`` master branch. Working on unique branches for each new feature simplifies the development, review and merge processes by maintining logical separation. To create a feature branch:
 
 ::
 
@@ -73,8 +73,8 @@ When you feel that work on your new feature is complete, you should create a *Pu
   1. Go to `SkyPy Pull Requests <https://github.com/skypyproject/skypy/pulls>`_
   2. Click the green **New pull request** button
   3. Click **compare across forks**
-  4. Confirm that the base fork is `skypyproject/skypy` and the base branch is `master`
-  5. Confirm the head fork is `<your-account>/skypy` and the compare branch is `<your-branch-name>`
+  4. Confirm that the base fork is ``skypyproject/skypy`` and the base branch is ```master``
+  5. Confirm the head fork is ``<your-account>/skypy`` and the compare branch is ```<your-branch-name>``
   6. Give your pull request a title and fill out the the template for the description
   7. Click the green **Create pull request** button
 
@@ -83,31 +83,33 @@ Status checks
 
 A series of automated checks will be run on your pull request, some of which will be required to pass before it can be merged into the main codebase:
 
-  - `Tests` (Required) runs the `unit-tests`_ [unit tests](#unit-tests) in four predefined environments; `latest supported versions`, `oldest supported versions`, `macOS latest supported` and `Windows latest supported`. Click "Details" to view the output including any failures.
-  - `codeclimate` (Required) runs `pycodestyle <https://pycodestyle.pycqa.org/en/latest/>`_ to check that your code conforms to the `PEP 8 <https://www.python.org/dev/peps/pep-0008/>`_ style guidelines. Click "Details" to view any errors.
-  - `codecov` reports the test coverage for your pull request; you should aim for `codecov/patch — 100.00%`. Click "Details" to view coverage data.
-  - `docs` (Required) builds the [documentation](#docstrings) on `readthedocs <https://readthedocs.org/>`_. Click "Details" to view the documentation or the failed build log.
+  - ``Tests`` (Required) runs the `unit-tests`_ in four predefined environments; `latest supported versions`, `oldest supported versions`, `macOS latest supported` and `Windows latest supported`. Click "Details" to view the output including any failures.
+  - ``codeclimate`` (Required) runs `pycodestyle <https://pycodestyle.pycqa.org/en/latest/>`_ to check that your code conforms to the `PEP 8 <https://www.python.org/dev/peps/pep-0008/>`_ style guidelines. Click "Details" to view any errors.
+  - ``codecov`` reports the test coverage for your pull request; you should aim for `codecov/patch — 100.00%`. Click "Details" to view coverage data.
+  - ``docs`` (Required) builds the `docstrings`_ on `readthedocs <https://readthedocs.org/>`_. Click "Details" to view the documentation or the failed build log.
 
 Updating your branch
 ^^^^^^^^^^^^^^^^^^^^
 
-As you work on your feature, new commits might be made to the `skypyproject` master branch. You will need to update your branch with these new commits before your pull request can be accepted. You can achieve this in a few different ways:
+As you work on your feature, new commits might be made to the ``skypyproject`` master branch. You will need to update your branch with these new commits before your pull request can be accepted. You can achieve this in a few different ways:
 
   - If your pull request has no conflicts, click **Update branch**
   - If your pull request has conflicts, click **Resolve conflicts**, manually resolve the conflicts and click **Mark as resolved**
-  - *merge* the `skypyproject` master branch from the command line:
-    ```bash
-    git fetch skypyproject
-    git merge skypyproject/master
-    ```
-  - *rebase* your feature branch onto the `skypyproject` master branch from the command line:
-::
+  - *merge* the ``skypyproject`` master branch from the command line:
 
-    git fetch skypyproject
-    git rebase skypyproject/master
+    ::
+
+        git fetch skypyproject
+        git merge skypyproject/master
+
+  - *rebase* your feature branch onto the ``skypyproject`` master branch from the command line:
+    ::
+
+        git fetch skypyproject
+        git rebase skypyproject/master
 
 
-**Warning**: It is bad practice to *rebase* commits that have already been pushed to a remote such as your fork. Rebasing creates new copies of your commits that can cause the local and remote branches to diverge. `git push --force` will **overwrite** the remote branch with your newly rebased local branch. This is strongly discouraged, particularly when working on a shared branch where you could erase a collaborators commits.
+**Warning**: It is bad practice to *rebase* commits that have already been pushed to a remote such as your fork. Rebasing creates new copies of your commits that can cause the local and remote branches to diverge. ``git push --force`` will **overwrite** the remote branch with your newly rebased local branch. This is strongly discouraged, particularly when working on a shared branch where you could erase a collaborators commits.
 
 For more information about resolving conflicts see the GitHub guides:
   - `Resolving a merge conflict on GitHub <https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/resolving-a-merge-conflict-on-github>`_
@@ -136,14 +138,14 @@ General Guidelines
 Unit Tests
 ^^^^^^^^^^
 
-Pull requests will require existing unit tests to pass before they can be merged. Additionally, new unit tests should be written for all new public methods and functions. Unit tests for each submodule are contained in subdirectories called `tests` and you can run them locally using `pytest`. For more information see the `Astropy Testing Guidelines <https://docs.astropy.org/en/stable/development/testguide.html>`_.
+Pull requests will require existing unit tests to pass before they can be merged. Additionally, new unit tests should be written for all new public methods and functions. Unit tests for each submodule are contained in subdirectories called ``tests`` and you can run them locally using ``pytest``. For more information see the `Astropy Testing Guidelines <https://docs.astropy.org/en/stable/development/testguide.html>`_.
 
-If your unit tests check the statistical distribution of a random sample, the test outcome itself is a random variable, and the test will fail from time to time. Please mark such tests with the `@pytest.mark.flaky` decorator, so that they will be automatically tried again on failure. To prevent non-random test failures from being run multiple times, please isolate random statistical tests and deterministic tests in their own test cases.
+If your unit tests check the statistical distribution of a random sample, the test outcome itself is a random variable, and the test will fail from time to time. Please mark such tests with the ``@pytest.mark.flaky`` decorator, so that they will be automatically tried again on failure. To prevent non-random test failures from being run multiple times, please isolate random statistical tests and deterministic tests in their own test cases.
 
 Docstrings
 ^^^^^^^^^^
 
-All public classes, methods and functions require docstrings. You can build documentation locally by installing `sphinx-astropy <https://github.com/astropy/sphinx-astropy>`_ and calling `make html` in the `docs` subdirectory. Docstrings should include the following sections:
+All public classes, methods and functions require docstrings. You can build documentation locally by installing `sphinx-astropy <https://github.com/astropy/sphinx-astropy>`_ and calling ``make html`` in the ``docs`` subdirectory. Docstrings should include the following sections:
 
   - Description
   - Parameters
