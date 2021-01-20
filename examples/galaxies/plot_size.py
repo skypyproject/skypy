@@ -94,11 +94,9 @@ R50_r_phys, c, M_r = np.genfromtxt('SDSS_DR7.csv', delimiter=',')
 M_r_late, R50_r_phys_late = M_r[c < 2.86], R50_r_phys[c < 2.86]
 M_r_early, R50_r_phys_early = M_r[c > 2.86], R50_r_phys[c > 2.86]
 
-# Load data from figure 4 in Shen et al 2003 and correct for shift in bins
+# Load data from figure 4 in Shen et al 2003
 sdss_early = np.loadtxt('Shen+03_early.txt')
 sdss_late = np.loadtxt('Shen+03_late.txt')
-sdss_early[:, 0] -= 0.25
-sdss_late[:, 0] -= 0.25
 
 # Median sizes for SkyPy late- and early-type galaxies
 R_bar_early = [np.median(R_early[(M_early <= Ma) & (M_early > Mb)])
