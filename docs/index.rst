@@ -49,6 +49,14 @@ Pipeline
 Developer Documentation
 ***********************
 
+Contributor guidelines
+----------------------
+
+.. toctree::
+   :maxdepth: 1
+
+   contributing/CONTRIBUTING
+
 
 .. _project-details:
 
