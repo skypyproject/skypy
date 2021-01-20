@@ -428,7 +428,7 @@ class KCorrectTemplates(SpectrumTemplates):
         '''
 
         sm = stellar_mass if stellar_mass is not None else 1
-        return sm * np.sum(coefficients * self.mass300) / np.sum(coefficients * self.mass)
+        return sm * np.sum(coefficients * self.mass1000) / np.sum(coefficients * self.mass)
 
 
 kcorrect = KCorrectTemplates(hdu=1)
