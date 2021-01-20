@@ -1,4 +1,4 @@
-"""Galaxy size module.
+r"""Galaxy size module.
 
 This modules computes the angular size of galaxies from their physical size.
 """
