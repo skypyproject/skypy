@@ -4,7 +4,8 @@ Contributing to SkyPy
 GitHub Workflow
 ---------------
 
-### Fork and Clone the SkyPy Repository
+Fork and Clone the SkyPy Repository
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 **You should only need to do this step once**
 
 First *fork* the SkyPy repository. A fork is your own remote copy of the repository on GitHub. To create a fork:
@@ -26,7 +27,8 @@ Finally add the `skypyproject` repository as a *remote*. This will allow you to 
   git remote add skypyproject https://github.com/skypyproject/skypy.git
   ```
 
-### Create a branch for your new feature
+Create a branch for your new feature
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Create a *branch* off the `skypyproject` master branch. Working on unique branches for each new feature simplifies the development, review and merge processes by maintining logical separation. To create a feature branch:
 
@@ -35,7 +37,8 @@ Create a *branch* off the `skypyproject` master branch. Working on unique branch
   git checkout -b <your-branch-name> skypyproject/master
   ```
 
-### Hack away!
+Hack away!
+^^^^^^^^^^
 
 Write the new code you would like to contribute and *commit* it to the feature branch on your local repository. Ideally commit small units of work often with clear and descriptive commit messages describing the changes you made. To commit changes to a file:
 
@@ -56,7 +59,8 @@ Write the new code you would like to contribute and *commit* it to the feature b
   git push --set-upstream origin <your-branch-name>
   ```
 
-### Open a Pull Request
+Open a Pull Request
+^^^^^^^^^^^^^^^^^^^
 
 When you feel that work on your new feature is complete, you should create a *Pull Request*. This will propose your work to be merged into the main SkyPy repository.
 
@@ -68,7 +72,8 @@ When you feel that work on your new feature is complete, you should create a *Pu
   6. Give your pull request a title and fill out the the template for the description
   7. Click the green **Create pull request** button
 
-### Status checks
+Status checks
+^^^^^^^^^^^^^
 
 A series of automated checks will be run on your pull request, some of which will be required to pass before it can be merged into the main codebase:
 
@@ -77,7 +82,8 @@ A series of automated checks will be run on your pull request, some of which wil
   - `codecov` reports the test coverage for your pull request; you should aim for `codecov/patch — 100.00%`. Click "Details" to view coverage data.
   - `docs` (Required) builds the [documentation](#docstrings) on [readthedocs](https://readthedocs.org/). Click "Details" to view the documentation or the failed build log.
 
-### Updating your branch
+Updating your branch
+^^^^^^^^^^^^^^^^^^^^
 
 As you work on your feature, new commits might be made to the `skypyproject` master branch. You will need to update your branch with these new commits before your pull request can be accepted. You can achieve this in a few different ways:
 
@@ -101,7 +107,8 @@ For more information about resolving conflicts see the GitHub guides:
   - [Resolving a merge conflict using the command line](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/resolving-a-merge-conflict-using-the-command-line)
   - [About Git rebase](https://help.github.com/en/github/using-git/about-git-rebase)
 
-### More Information
+More Information
+^^^^^^^^^^^^^^^^
 
 More information regarding the usage of GitHub can be found in the [GitHub Guides](https://guides.github.com/).
 
@@ -110,7 +117,8 @@ Coding Guidelines
 
 Before your pull request can be merged into the codebase, it will be reviewed by one of the SkyPy developers and required to pass a number of automated checks. Below are a minimum set of guidelines for developers to follow:
 
-### General Guidelines
+General Guidelines
+^^^^^^^^^^^^^^^^^^
 
 - SkyPy is compatible with Python>=3.5 (see [setup.cfg](setup.cfg)). SkyPy *does not* support backwards compatibility with Python 2.x; `six`, `__future__` and `2to3` should not be used.
 - All contributions should follow the [PEP8 Style Guide for Python Code](https://www.python.org/dev/peps/pep-0008/). We recommend using [flake8](https://flake8.pycqa.org/) to check your code for PEP8 compliance.
@@ -118,13 +126,15 @@ Before your pull request can be merged into the codebase, it will be reviewed by
 - Code is grouped into submodules based on broad science areas e.g. [galaxies](skypy/galaxy). There is also a [utils](skypy/utils) submodule for general utility functions.
 - For more information see the [Astropy Coding Guidelines](http://docs.astropy.org/en/latest/development/codeguide.html)
 
-### Unit Tests
+Unit Tests
+^^^^^^^^^^
 
 Pull requests will require existing unit tests to pass before they can be merged. Additionally, new unit tests should be written for all new public methods and functions. Unit tests for each submodule are contained in subdirectories called `tests` and you can run them locally using `pytest`. For more information see the [Astropy Testing Guidelines](https://docs.astropy.org/en/stable/development/testguide.html).
 
 If your unit tests check the statistical distribution of a random sample, the test outcome itself is a random variable, and the test will fail from time to time. Please mark such tests with the `@pytest.mark.flaky` decorator, so that they will be automatically tried again on failure. To prevent non-random test failures from being run multiple times, please isolate random statistical tests and deterministic tests in their own test cases.
 
-### Docstrings
+Docstrings
+^^^^^^^^^^
 
 All public classes, methods and functions require docstrings. You can build documentation locally by installing [sphinx-astropy](https://github.com/astropy/sphinx-astropy) and calling `make html` in the `docs` subdirectory. Docstrings should include the following sections:
 
