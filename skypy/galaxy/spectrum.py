@@ -401,6 +401,35 @@ class KCorrectTemplates(SpectrumTemplates):
         sm = stellar_mass if stellar_mass is not None else 1
         return sm * np.sum(coefficients * self.mass300) / np.sum(coefficients * self.mass)
 
+    def m1000(self, coefficients, stellar_mass=None):
+        r'''Stellar mass formed in the last 300 Myr.
+
+        This function calculates the stellar mass formed within in the last
+        1 Gyr for galaxies modelled as a linear combination of the kcorrect
+        templates [1]_.
+
+        Parameters
+        ----------
+        coefficients : (ng, 5) array_like
+            Array of template coefficients.
+        stellar_mass : (ng,) array_like, optional
+            Optional array of stellar masses for each galaxy in units
+            for stellar mass.
+
+        Returns
+        -------
+        m1000 : (ng,) array_like
+            Stellar mass formed in the last 1 Gyr in units of stellar mass.
+
+        References
+        ----------
+        .. [1] M. R. Blanton and S. Roweis, 2007, AJ, 125, 2348
+
+        '''
+
+        sm = stellar_mass if stellar_mass is not None else 1
+        return sm * np.sum(coefficients * self.mass300) / np.sum(coefficients * self.mass)
+
 
 kcorrect = KCorrectTemplates(hdu=1)
 kcorrect.__doc__ = '''Galaxy spectra from kcorrect smoothed templates.'''
