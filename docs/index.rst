@@ -13,6 +13,11 @@ This package contains methods for modelling the Universe, galaxies and the Milky
 Getting Started
 ***************
 
+.. toctree::
+   :maxdepth: 1
+
+   install
+   examples/index
 
 .. _user-docs:
 
@@ -26,13 +31,7 @@ Packages
 .. toctree::
    :maxdepth: 1
 
-   cluster/index
    galaxy
-   gravitational_wave/index
-   halo/index
-   position/index
-   power_spectrum/index
-   supernova/index
    utils/index
 
 Pipeline

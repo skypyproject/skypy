@@ -1,9 +1,0 @@
-# survey information
-survey_centre: !astropy.coordinates.SkyCoord [ '3h50m59.75s', '+54d39m22.15s' ]
-survey_area: !astropy.units.Quantity [ '1000 deg2' ]
-
-# sample 500 galaxies in survey
-positions: !skypy.position.uniform_around
-  centre: $survey_centre
-  area: $survey_area
-  size: 500

@@ -205,7 +205,7 @@ github_issues_url = 'https://github.com/{0}/issues/'.format(setup_cfg['github_pr
 # -----------------------------------------------------------------------------
 
 intersphinx_mapping.update({
-    'specutils': ('https://specutils.readthedocs.io/en/stable/', None),
+    'speclite': ('https://speclite.readthedocs.io/en/latest/', None),
 })
 
 
@@ -257,3 +257,10 @@ try:
     import_module('camb')
 except ImportError:
     autodoc_mock_imports.append('camb')
+
+# Sphinx Gallery
+extensions += ['sphinx_gallery.gen_gallery', ]
+sphinx_gallery_conf = {
+    'examples_dirs': '../examples',  # path to examples scripts
+    'gallery_dirs': 'examples',      # path to gallery generated examples
+}
