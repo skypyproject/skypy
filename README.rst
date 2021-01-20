@@ -18,7 +18,7 @@ our `Citation Guidelines`_.
 .. _Galaxy: https://skypy.readthedocs.io/en/latest/galaxy.html
 .. _Pipelines: https://skypy.readthedocs.io/en/latest/pipeline/index.html
 .. _SkyPy Documentation: https://skypy.readthedocs.io/en/latest/
-.. _Citation Guidelines: CITATION
+.. _Citation Guidelines: CITATION.rst
 
 
 Installation
