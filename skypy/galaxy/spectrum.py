@@ -380,7 +380,7 @@ class KCorrectTemplates(SpectrumTemplates):
 
         Parameters
         ----------
-        coefficients : (ng, nt) array_like
+        coefficients : (ng, 5) array_like
             Array of template coefficients.
 
         Returns
