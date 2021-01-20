@@ -373,10 +373,10 @@ class KCorrectTemplates(SpectrumTemplates):
         return np.power(10, 0.4*(Mt-magnitudes))
 
     def metallicity(self, coefficients):
-        r'''Metallicity from template spectra.
+        r'''Galaxy metallicities from kcorrect templates.
 
-        This function calculates the matallicities of galaxies whose spectra are
-        modelled as a linear combination of the kcorrect template spectra [1]_.
+        This function calculates the matallicities of galaxies modelled as a
+        linear combination of the kcorrect templates [1]_.
 
         Parameters
         ----------
@@ -394,6 +394,7 @@ class KCorrectTemplates(SpectrumTemplates):
         '''
 
         return np.sum(coefficients * self.mremain * self.mets) / np.sum(coefficients * self.mremain)
+
 
 kcorrect = KCorrectTemplates(hdu=1)
 kcorrect.__doc__ = '''Galaxy spectra from kcorrect smoothed templates.'''
