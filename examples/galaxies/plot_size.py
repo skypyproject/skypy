@@ -105,7 +105,7 @@ plt.plot((M_bins_early[:-1]+M_bins_early[1:])/2, R_bar_early, 'r', label='SkyPy 
 plt.plot((M_bins_late[:-1]+M_bins_late[1:])/2, R_bar_late, 'b', label='SkyPy late')
 
 plt.errorbar(sdss_early[:, 0], sdss_early[:, 1], yerr=error_early, color='coral',
-             marker='s', label= 'Shen+03 early', lw=0.5)
+             marker='s', label='Shen+03 early', lw=0.5)
 plt.errorbar(sdss_late[:, 0], sdss_late[:, 1], yerr=error_late, color='deepskyblue',
              marker='^', label='Shen+03 late', lw=0.5)
 
