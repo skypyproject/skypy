@@ -156,7 +156,7 @@ def early_type_lognormal(magnitude, a, b, M0, sigma1, sigma2, size=None):
 
     References
     ----------
-    ..[1] S. Shen, H.J. Mo, S.D.M. White, M.R. Blanton, G. Kauffmann, W. Voges,
+    .. [1] S. Shen, H.J. Mo, S.D.M. White, M.R. Blanton, G. Kauffmann, W. Voges,
         J. Brinkmann, I. Csabai, Mon. Not. Roy. Astron. Soc. 343, 978 (2003).
     """
 
