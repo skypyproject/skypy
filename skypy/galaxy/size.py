@@ -65,10 +65,10 @@ def late_type_lognormal(magnitude, alpha, beta, gamma, M0, sigma1, sigma2,
         Galaxy magnitude at which evaluate the lognormal distribution.
     alpha, beta, gamma, M0: float
         Model parameters describing the mean size of galaxies in [kpc].
-        Equation 15 in [1]_.
+        (Equation 15).
     sigma1, sigma2: float
         Parameters describing the standard deviation of the lognormal
-        distribution for the physical radius of galaxies. Equation 16 in [1]_.
+        distribution for the physical radius of galaxies. (Equation 16).
     size : int or tuple of ints, optional.
         Output shape. If the given shape is, e.g., (m, n, k),
         then m * n * k samples are drawn. If size is None (default),
@@ -125,7 +125,7 @@ def early_type_lognormal(magnitude, a, b, M0, sigma1, sigma2, size=None):
         Galaxy magnitude at which evaluate the lognormal distribution.
     a, b : float
         Linear model parameters describing the mean size of galaxies,
-        equation 3.14 in [1]_.
+        (Equation 14).
     sigma: float
         Standard deviation of the lognormal distribution for the
         physical radius of galaxies.
@@ -176,7 +176,7 @@ def linear_lognormal(magnitude, a_mu, b_mu, sigma, size=None):
         Galaxy absolute magnitude at which evaluate the lognormal distribution.
     a_mu, b_mu : float
         Linear model parameters describing the mean size of galaxies,
-        equation 3.14 in [1]_.
+        (Equation 3.14).
     sigma: float
         Standard deviation of the lognormal distribution for the
         physical radius of galaxies.
