@@ -53,18 +53,18 @@ in SkyPy.
 
 import numpy as np
 import matplotlib.pyplot as plt
-from skypy.galaxy import size
+from skypy.galaxy.size import early_type_lognormal, late_type_lognormal
 
 # Parameters for the late-type and early-type galaxies
 alpha, beta, gamma = 0.21, 0.53, -1.31
 a, b = 0.6, -4.63
 M0 = -20.52
-sigma1, sigma2 = 0., 0.
+sigma1, sigma2 = 0.48, 0.25
 
 # Size
 m = np.linspace(-16, -24, 100)
-slate = size.late_type_lognormal(m, alpha, beta, gamma, M0, sigma1, sigma2)
-searly = size.early_type_lognormal(m, a, b, M0, sigma1, sigma2)
+slate = late_type_lognormal(m, alpha, beta, gamma, M0, sigma1, sigma2)
+searly = early_type_lognormal(m, a, b, M0, sigma1, sigma2)
 
 # %%
 # Validation with the SDSS sample
@@ -84,25 +84,52 @@ searly = size.early_type_lognormal(m, a, b, M0, sigma1, sigma2)
 # early-type galaxies.
 
 
-# Load SDSS data release 7
+# Load SDSS data release 7 and split the sample
 R50_r_phys, c, M_r = np.genfromtxt('SDSS_DR7.csv', delimiter=',')
+M_r_late, R50_r_phys_late = M_r[c < 2.86], R50_r_phys[c < 2.86]
+M_r_early, R50_r_phys_early = M_r[c > 2.86], R50_r_phys[c > 2.86]
 
-# Split the sample
-M_r_late, R50_r_phys_late = M_r[c < 2.86], np.log10(R50_r_phys[c < 2.86])
-M_r_early, R50_r_phys_early = M_r[c > 2.86], np.log10(R50_r_phys[c > 2.86])
+# Load data from figure 4 in Shen et al 2003 and correct for shift in bins
+sdss_early = np.loadtxt('Shen+03_early.txt')
+sdss_late = np.loadtxt('Shen+03_late.txt')
+sdss_early[:, 0] -= 0.25
+sdss_late[:, 0] -= 0.25
+
+# SkyPy late sample
+M_bins_late = np.arange(-16, -24.1, -0.5)
+M_late = np.random.uniform(M_bins_late[0], M_bins_late[-1], size=138000)
+R_late = late_type_lognormal(M_late, alpha, beta, gamma, M0, sigma1, sigma2).value
+
+# SkyPy early sample
+M_bins_early = np.arange(-18, -24.1, -0.5)
+M_early = np.random.uniform(M_bins_early[0], M_bins_early[-1], size=138000)
+R_early = early_type_lognormal(M_early, a, b, M0, sigma1, sigma2).value
+
+# Median sizes for late- and early-type galaxies
+R_bar_early = [np.median(R_early[(M_early <= Ma) & (M_early > Mb)])
+               for Ma, Mb in zip(M_bins_early, M_bins_early[1:])]
+R_bar_late = [np.median(R_late[(M_late <= Ma) & (M_late > Mb)])
+              for Ma, Mb in zip(M_bins_late, M_bins_late[1:])]
+
 
 # Plot
-plt.scatter(M_r_late, R50_r_phys_late, color='lightskyblue', marker='+', alpha=0.01)
-plt.scatter(M_r_early, R50_r_phys_early, color='coral',  marker='+', alpha=0.01)
-plt.plot(m, np.log10(slate.value), 'b', label='SkyPy Late')
-plt.plot(m, np.log10(searly.value), 'r', label='SkyPy Early')
+plt.scatter(M_r_late, R50_r_phys_late, color='lightskyblue', marker='+', alpha=0.005)
+plt.scatter(M_r_early, R50_r_phys_early, color='coral',  marker='+', alpha=0.05)
 
-plt.ylim(-1.5, 1.5)
-plt.xlabel('$M$')
-plt.ylabel('$R_{50,r}$ (kpc)')
+
+plt.plot(sdss_early[:, 0], sdss_early[:, 1], color='coral', label='Shen+03 early')
+plt.plot(sdss_late[:, 0], sdss_late[:, 1], color='deepskyblue', label='Shen+03 late')
+plt.plot((M_bins_early[:-1]+M_bins_early[1:])/2, R_bar_early, 'r', label='SkyPy early')
+plt.plot((M_bins_late[:-1]+M_bins_late[1:])/2, R_bar_late, 'b', label='SkyPy late')
+
+plt.ylim(5e-1, 2e1)
+plt.xlim(-24, -15.5)
+plt.xlabel('Magnitude $M$')
+plt.ylabel('$R_{50,r} (kpc)$')
 plt.title("SDSS data release 7")
 plt.legend(frameon=False)
 
+plt.yscale('log')
 plt.show()
 
 # %%
