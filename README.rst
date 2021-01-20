@@ -32,14 +32,15 @@ section of the documentation.
 Examples
 --------
 
-The Examples_ section of the documentation contains some examples to run SkyPy.
-You can also download the examples as Python source code or Jupyter notebooks 
-from there.
+SkyPy has a driver script that can run simulation pipelines from the command
+line. The documentation contains a description of the Pipeline_ module and
+Examples_ that demonstrate how to use it.
 
 .. _PyPI: https://pypi.org/project/skypy/
 .. _conda-forge: https://anaconda.org/conda-forge/skypy
 .. _Installation: https://skypy.readthedocs.io/en/stable/install.html
-.. _Examples: https://skypy.readthedocs.io/en/latest/examples/index.html
+.. _Pipeline: https://skypy.readthedocs.io/en/stable/pipeline.html
+.. _Examples: https://skypy.readthedocs.io/en/stable/examples/index.html
 
 
 Contributing
