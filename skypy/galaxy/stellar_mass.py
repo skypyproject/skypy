@@ -3,15 +3,18 @@
 
 import numpy as np
 
-from skypy.utils.random import schechter
+from ..utils.random import schechter
+from ..utils import dependent_argument
 
 
 __all__ = [
-    'schechter_smf',
+    'schechter_smf_mass',
 ]
 
-
-def schechter_smf(alpha, m_star, x_min, x_max, resolution=100, size=None):
+@dependent_argument('m_star', 'redshift')
+@dependent_argument('alpha', 'redshift')
+def schechter_smf_mass(m_star, alpha, m_min, m_max, size=None,
+                       resolution=1000):
     r""" Stellar masses following the Schechter mass function [1]_.
 
     Parameters
@@ -25,8 +28,8 @@ def schechter_smf(alpha, m_star, x_min, x_max, resolution=100, size=None):
          is a scalar, a single sample is returned. If size is None and
          m_star is an array, an array of samples is returned with the same
          shape as m_star.
-    x_min, x_max : float
-        Lower and upper bounds for the random variable x in units of M_*.
+    m_min, m_max : float
+        Lower and upper bounds for the stellar mass.
     resolution : int, optional
         Resolution of the inverse transform sampling spline. Default is 100.
 
@@ -53,10 +56,10 @@ def schechter_smf(alpha, m_star, x_min, x_max, resolution=100, size=None):
     >>> from skypy.galaxy import stellar_mass
 
     Sample 100 stellar masses values at redshift z = 1.0 with alpha = -1.4,
-    m_star = 10**10.67, x_min = 0.0002138 and x_max = 213.8
+    m_star = 10**10.67, m_min = 1.e8 and m_max = 1.e13
 
-    >>> masses = stellar_mass.schechter_smf(-1.4, 10**10.67, 0.0002138,
-    ...                               213.8, size=100)
+    >>> masses = stellar_mass.schechter_smf_mass(-1.4, 10**10.67, 1.e8
+    ...                               1.e13, size=100)
 
     References
     ----------
@@ -66,9 +69,15 @@ def schechter_smf(alpha, m_star, x_min, x_max, resolution=100, size=None):
 
     """
 
+    # only alpha scalars supported at the moment
+    if np.ndim(alpha) > 0:
+        raise NotImplementedError('only scalar alpha is supported')
+
     if size is None and np.shape(m_star):
         size = np.shape(m_star)
 
-    x_sample = schechter(alpha, x_min, x_max, resolution=resolution, size=size)
+    # sample masses
+    m = schechter(alpha, m_min, m_max, resolution, size=size)
+    m *= m_star
 
-    return m_star * x_sample
+    return m

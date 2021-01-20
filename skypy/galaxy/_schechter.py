@@ -2,12 +2,14 @@
 
 import numpy as np
 
-from .redshift import schechter_lf_redshift
+from .redshift import schechter_lf_redshift, schechter_smf_redshift
+from .stellar_mass import schechter_smf_mass
 from .luminosity import schechter_lf_magnitude
 from astropy import units
 
 __all__ = [
     'schechter_lf',
+    'schechter_smf',
 ]
 
 
@@ -73,3 +75,22 @@ def schechter_lf(redshift, M_star, phi_star, alpha, m_lim, sky_area, cosmology, 
     M = schechter_lf_magnitude(z, M_star, alpha, m_lim, cosmology)
 
     return z, M
+
+@units.quantity_input(sky_area=units.sr)
+def schechter_smf(redshift, m_star, phi_star, alpha, m_min, m_max, sky_area, noise=True):
+
+    # sample halo redshifts
+    z = schechter_smf_redshift(redshift, m_star, phi_star, alpha, m_min, m_max, sky_area, cosmology, noise)
+
+    # if a function is NOT given for M_star, phi_star, alpha, interpolate to z
+    if not callable(m_star) and np.ndim(m_star) > 0:
+        m_star = np.interp(z, redshift, m_star)
+    if not callable(phi_star) and np.ndim(phi_star) > 0:
+        phi_star = np.interp(z, redshift, phi_star)
+    if not callable(alpha) and np.ndim(alpha) > 0:
+        alpha = np.interp(z, redshift, alpha)
+
+    # sample galaxy mass for redshifts
+    m = schechter_smf_mass(m_star, alpha, m_min, m_max)
+
+    return z, m
