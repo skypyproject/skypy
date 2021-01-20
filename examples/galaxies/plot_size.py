@@ -25,7 +25,7 @@ in SkyPy.
 #
 # .. math::
 #
-#    log_{10} (\bar{R}/kpc) = -0.4\alpha M +(\beta -\alpha) log \left[1 + 10^{-0.4(M-M_0)}\right] +\gamma
+#    log_{10}(\bar{R}/kpc)=-0.4\alpha M+(\beta -\alpha)log \left[1 + 10^{-0.4(M-M_0)}\right] +\gamma
 #
 # with a dispersion given by equation 16
 #
