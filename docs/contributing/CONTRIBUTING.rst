@@ -16,48 +16,54 @@ First *fork* the SkyPy repository. A fork is your own remote copy of the reposit
 
 Next *clone* your fork. Cloning creates a local copy of the repository on your computer to work with. To clone your fork:
 
-  ```bash
-  git clone https://github.com/<your-account>/skypy.git
-  ```
+::
+
+   git clone https://github.com/<your-account>/skypy.git
+
 
 Finally add the `skypyproject` repository as a *remote*. This will allow you to fetch changes made to the codebase. To add the `skypyproject` remote:
 
-  ```bash
+::
+
   cd skypy
   git remote add skypyproject https://github.com/skypyproject/skypy.git
-  ```
+
 
 Create a branch for your new feature
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Create a *branch* off the `skypyproject` master branch. Working on unique branches for each new feature simplifies the development, review and merge processes by maintining logical separation. To create a feature branch:
 
-  ```bash
+::
+
   git fetch skypyproject
   git checkout -b <your-branch-name> skypyproject/master
-  ```
+
 
 Hack away!
 ^^^^^^^^^^
 
 Write the new code you would like to contribute and *commit* it to the feature branch on your local repository. Ideally commit small units of work often with clear and descriptive commit messages describing the changes you made. To commit changes to a file:
 
-  ```bash
+::
+
   git add file_containing_your_contribution
   git commit -m 'Your clear and descriptive commit message'
-  ```
+
 
 *Push* the contributions in your feature branch to your remote fork on GitHub:
 
-  ```bash
+::
+
   git push origin <your-branch-name>
-  ```
+
 
 **Note:** The first time you *push* a feature branch you will probably need to use `--set-upstream origin` to link to your remote fork:
 
-  ```bash
+::
+
   git push --set-upstream origin <your-branch-name>
-  ```
+
 
 Open a Pull Request
 ^^^^^^^^^^^^^^^^^^^
@@ -95,10 +101,11 @@ As you work on your feature, new commits might be made to the `skypyproject` mas
     git merge skypyproject/master
     ```
   - *rebase* your feature branch onto the `skypyproject` master branch from the command line:
-    ```bash
+::
+
     git fetch skypyproject
     git rebase skypyproject/master
-    ```
+    
 
 **Warning**: It is bad practice to *rebase* commits that have already been pushed to a remote such as your fork. Rebasing creates new copies of your commits that can cause the local and remote branches to diverge. `git push --force` will **overwrite** the remote branch with your newly rebased local branch. This is strongly discouraged, particularly when working on a shared branch where you could erase a collaborators commits.
 
