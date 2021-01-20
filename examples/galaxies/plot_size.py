@@ -88,15 +88,11 @@ R_early = early_type_lognormal(M_early, a, b, M0, sigma1, sigma2).value
 # and the conditions :math:`c < 2.86` for late-type and :math:`c > 2.86` for
 # early-type galaxies.
 
-
-# Load SDSS data release 7 and split the sample
-R50_r_phys, c, M_r = np.genfromtxt('SDSS_DR7.csv', delimiter=',')
-M_r_late, R50_r_phys_late = M_r[c < 2.86], R50_r_phys[c < 2.86]
-M_r_early, R50_r_phys_early = M_r[c > 2.86], R50_r_phys[c > 2.86]
-
 # Load data from figure 4 in Shen et al 2003
 sdss_early = np.loadtxt('Shen+03_early.txt')
 sdss_late = np.loadtxt('Shen+03_late.txt')
+error_late =  sdss_late[:, 3] - sdss_late[:, 2]
+error_early =  sdss_early[:, 3] - sdss_early[:, 2]
 
 # Median sizes for SkyPy late- and early-type galaxies
 R_bar_early = [np.median(R_early[(M_early <= Ma) & (M_early > Mb)])
@@ -105,17 +101,14 @@ R_bar_late = [np.median(R_late[(M_late <= Ma) & (M_late > Mb)])
               for Ma, Mb in zip(M_bins_late, M_bins_late[1:])]
 
 # Plot
-plt.scatter(M_r_late, R50_r_phys_late, color='lightskyblue', marker='+', alpha=0.005)
-plt.scatter(M_r_early, R50_r_phys_early, color='coral',  marker='+', alpha=0.05)
-
-
-plt.plot(sdss_early[:, 0], sdss_early[:, 1], color='coral', label='Shen+03 early')
-plt.plot(sdss_late[:, 0], sdss_late[:, 1], color='deepskyblue', label='Shen+03 late')
 plt.plot((M_bins_early[:-1]+M_bins_early[1:])/2, R_bar_early, 'r', label='SkyPy early')
 plt.plot((M_bins_late[:-1]+M_bins_late[1:])/2, R_bar_late, 'b', label='SkyPy late')
 
+plt.errorbar(sdss_early[:, 0], sdss_early[:, 1], yerr=error_early, color='coral',  marker='s', label= 'Shen+03 early', lw=0.5)
+plt.errorbar(sdss_late[:, 0], sdss_late[:, 1], yerr=error_late, color='deepskyblue',  marker='^', label='Shen+03 late', lw=0.5)
+
 plt.ylim(5e-1, 2e1)
-plt.xlim(-24, -15.5)
+plt.xlim(-24,-15.5)
 plt.xlabel('Magnitude $M$')
 plt.ylabel('$R_{50,r} (kpc)$')
 plt.title("SDSS data release 7")
