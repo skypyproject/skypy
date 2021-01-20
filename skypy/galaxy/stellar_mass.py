@@ -11,9 +11,7 @@ __all__ = [
     'schechter_smf_mass',
 ]
 
-@dependent_argument('m_star', 'redshift')
-@dependent_argument('alpha', 'redshift')
-def schechter_smf_mass(m_star, alpha, m_min, m_max, size=None,
+def schechter_smf_mass(alpha, m_star, m_min, m_max, size=None,
                        resolution=1000):
     r""" Stellar masses following the Schechter mass function [1]_.
 
@@ -55,11 +53,8 @@ def schechter_smf_mass(m_star, alpha, m_min, m_max, size=None,
     --------
     >>> from skypy.galaxy import stellar_mass
 
-    Sample 100 stellar masses values at redshift z = 1.0 with alpha = -1.4,
+    Sample 100 stellar masses with alpha = -1.4,
     m_star = 10**10.67, m_min = 1.e8 and m_max = 1.e13
-
-    >>> masses = stellar_mass.schechter_smf_mass(-1.4, 10**10.67, 1.e8
-    ...                               1.e13, size=100)
 
     References
     ----------
@@ -76,8 +71,12 @@ def schechter_smf_mass(m_star, alpha, m_min, m_max, size=None,
     if size is None and np.shape(m_star):
         size = np.shape(m_star)
 
+    # convert m_min, m_max to units of m_star
+    x_min = m_min / m_star
+    x_max = m_max / m_star
+
     # sample masses
-    m = schechter(alpha, m_min, m_max, resolution, size=size)
+    m = schechter(alpha, x_min, x_max, resolution, size=size)
     m *= m_star
 
     return m
