@@ -340,6 +340,11 @@ class KCorrectTemplates(SpectrumTemplates):
         with fits.open(filename) as hdul:
             self.templates = hdul[hdu].data * units.Unit('erg s-1 cm-2 angstrom-1')
             self.wavelength = hdul[11].data * units.Unit('angstrom')
+            self.mass = hdul[16].data * units.Unit('angstrom')
+            self.mremain = hdul[17].data * units.Unit('angstrom')
+            self.mets = hdul[18].data * units.Unit('angstrom')
+            self.mass300 = hdul[19].data * units.Unit('angstrom')
+            self.mass1000 = hdul[20].data * units.Unit('angstrom')
 
     def stellar_mass(self, coefficients, magnitudes, filter):
         r'''Compute stellar mass from absolute magnitudes in a reference filter.
@@ -366,6 +371,35 @@ class KCorrectTemplates(SpectrumTemplates):
         '''
         Mt = self.absolute_magnitudes(coefficients, filter)
         return np.power(10, 0.4*(Mt-magnitudes))
+
+    def m300(self, coefficients, stellar_mass=None):
+        r'''Stellar mass formed in the last 300 Myr.
+
+        This function calculates the stellar mass formed within in the last 300
+        Myr for galaxies modelled as a linear combination of the kcorrect
+        templates [1]_.
+
+        Parameters
+        ----------
+        coefficients : (ng, 5) array_like
+            Array of template coefficients.
+        stellar_mass : (ng,) array_like, optional
+            Optional array of stellar masses for each galaxy in units
+            for stellar mass.
+
+        Returns
+        -------
+        m300 : (ng,) array_like
+            Stellar mass formed in the last 300 Myr in units of stellar mass.
+
+        References
+        ----------
+        .. [1] M. R. Blanton and S. Roweis, 2007, AJ, 125, 2348
+
+        '''
+
+        sm = stellar_mass if stellar_mass is not None else 1
+        return sm * np.sum(coefficients * self.mass300) / np.sum(coefficients * self.mass)
 
 
 kcorrect = KCorrectTemplates(hdu=1)
