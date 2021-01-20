@@ -14,6 +14,7 @@ This example demonstrates...
 #
 # .. literalinclude:: ../../../examples/galaxies/sdss_photometry.yml
 #   :language: YAML
+#   :caption: examples/galaxies/sdss_photometry.yml
 
 # %%
 # SDSS Photometry
