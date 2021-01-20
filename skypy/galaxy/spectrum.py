@@ -402,7 +402,7 @@ class KCorrectTemplates(SpectrumTemplates):
         return sm * np.sum(coefficients * self.mass300) / np.sum(coefficients * self.mass)
 
     def m1000(self, coefficients, stellar_mass=None):
-        r'''Stellar mass formed in the last 300 Myr.
+        r'''Stellar mass formed in the last 1 Gyr.
 
         This function calculates the stellar mass formed within in the last
         1 Gyr for galaxies modelled as a linear combination of the kcorrect
