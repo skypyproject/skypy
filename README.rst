@@ -39,7 +39,7 @@ Examples_ that demonstrate how to use it.
 .. _PyPI: https://pypi.org/project/skypy/
 .. _conda-forge: https://anaconda.org/conda-forge/skypy
 .. _Installation: https://skypy.readthedocs.io/en/stable/install.html
-.. _Pipeline: https://skypy.readthedocs.io/en/stable/pipeline.html
+.. _Pipeline: https://skypy.readthedocs.io/en/stable/pipeline/index.html
 .. _Examples: https://skypy.readthedocs.io/en/stable/examples/index.html
 
 
