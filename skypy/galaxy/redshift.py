@@ -8,7 +8,6 @@ import numpy as np
 import scipy.integrate
 import scipy.special
 from astropy import units
-import pdb
 
 from ..utils import broadcast_arguments, dependent_argument
 
@@ -204,9 +203,6 @@ def schechter_smf_redshift(redshift, m_star, phi_star, alpha, m_min, m_max, sky_
         Redshifts of the galaxy sample described by the Schechter
         function.
 
-    Examples
-    --------
-
     '''
 
     lnxmin = np.log(m_min)
@@ -221,7 +217,7 @@ def schechter_smf_redshift(redshift, m_star, phi_star, alpha, m_min, m_max, sky_
 
     # integrate gamma function for each redshift
     gam = np.empty_like(alpha)
-    #pdb.set_trace()
+
     for i, _ in np.ndenumerate(gam):
         gam[i], _ = scipy.integrate.quad(f, lnxmin[i], lnxmax[i], args=(alpha[i],))
 

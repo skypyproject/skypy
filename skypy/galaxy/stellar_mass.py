@@ -50,13 +50,6 @@ def schechter_smf_mass(alpha, m_star, m_min, m_max, size=None,
 
     From this pdf one can sample the stellar masses.
 
-    Examples
-    --------
-    >>> from skypy.galaxy import stellar_mass
-
-    Sample 100 stellar masses with alpha = -1.4,
-    m_star = 10**10.67, m_min = 1.e8 and m_max = 1.e13
-
     References
     ----------
     .. [1] Mo, H., Van den Bosch, F., & White, S. (2010). Galaxy Formation and

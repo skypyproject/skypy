@@ -69,7 +69,7 @@ def test_schechter_smf_redshift():
     z = np.linspace(1e-10, 2., 1000)
     m_star = 10 ** 10.67
     phi_star = 1e-3
-    alpha = -1.5
+    alpha = -0.5
     m_min = 10 ** 7
     m_max = 10 ** 13
     sky_area = 1.0 * units.deg**2
@@ -78,7 +78,7 @@ def test_schechter_smf_redshift():
     z_gal = schechter_smf_redshift(z, m_star, phi_star, alpha, m_min, m_max, sky_area, cosmo, noise=False)
 
     # density with factor from upper incomplete gamma function
-    density = phi_star*gamma(alpha+1)*gammaincc(alpha+1, m_min)
+    density = phi_star*gamma(alpha+1)*gammaincc(alpha+1, m_min / m_star)
 
     # turn into galaxies/surface area
     density *= (sky_area * cosmo.differential_comoving_volume(z)).to_value('Mpc3')
