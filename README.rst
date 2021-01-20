@@ -56,7 +56,7 @@ For information on how to contribute see our `Contributor Guidelines`_.
 All communication relating to The SkyPy Project must meet the standards set out
 in the `Code of Conduct`_.
 
-.. _Contributor Guidelines: CONTRIBUTING.md
+.. _Contributor Guidelines: docs/contributing/CONTRIBUTING.rst
 .. _Code of Conduct: CODE_OF_CONDUCT.md
 
 .. |PyPI| image:: https://img.shields.io/pypi/v/skypy?label=PyPI&logo=pypi
