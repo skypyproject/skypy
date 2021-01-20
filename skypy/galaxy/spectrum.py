@@ -6,25 +6,16 @@ import numpy as np
 from astropy import units
 from astropy.io import fits
 from pkg_resources import resource_filename
-from ..utils import spectral_data_input
 from abc import ABCMeta, abstractmethod
 
 
 __all__ = [
     'dirichlet_coefficients',
-    'load_spectral_data',
     'mag_ab',
     'SpectrumTemplates',
     'KCorrectTemplates',
     'kcorrect',
 ]
-
-try:
-    __import__('specutils')
-except ImportError:
-    HAS_SPECUTILS = False
-else:
-    HAS_SPECUTILS = True
 
 try:
     import speclite.filters
@@ -379,60 +370,3 @@ class KCorrectTemplates(SpectrumTemplates):
 
 kcorrect = KCorrectTemplates(hdu=1)
 kcorrect.__doc__ = '''Galaxy spectra from kcorrect smoothed templates.'''
-
-
-def load_spectral_data(name):
-    '''Load spectral data from a known source or a local file.
-
-    If the given name refers to a known source, the associated spectral data is
-    constructed by its designated loader. If no source with the given name is
-    found, it is assumed to be a filename.
-
-    Parameters
-    ----------
-    name : str or list of str
-        The name of the spectral data to load, or a list of multiple names.
-
-    Returns
-    -------
-    spectrum : `~specutils.Spectrum1D` or `~specutils.SpectrumList`
-        The spectral data. The wavelength or frequency column is the
-        `~specutils.Spectrum1D.spectral_axis` (with units) of the returned
-        spectrum, and the spectral column or columns are the
-        `~specutils.Spectrum1D.flux` array (with units) of the returned
-        spectrum.
-
-    Warnings
-    --------
-    The :mod:`specutils` package must be installed to use this function.
-    The :mod:`speclite` package must be installed to use this function.
-
-    '''
-
-    import re
-
-    # loaders registry
-    from ._spectrum_loaders import spectrum_loaders, combine_spectra
-
-    # check non-string input
-    if not isinstance(name, str):
-        # recurse on lists
-        if hasattr(name, '__iter__'):
-            spectra = None
-            for name_ in name:
-                spectra = combine_spectra(spectra, load_spectral_data(name_))
-            return spectra
-        else:
-            raise TypeError('name: not a string or list of strings')
-
-    # go through loaders
-    for pattern, loader, *args in spectrum_loaders:
-        # try to match given name against pattern
-        match = re.fullmatch(pattern, name)
-        if match:
-            # collect nonempty group matches
-            groups = [g for g in match.groups() if g]
-            break
-
-    # run the loader
-    return loader(*args, *groups)

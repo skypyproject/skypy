@@ -1,7 +1,7 @@
 import numpy as np
 import scipy.stats
 import pytest
-from skypy.galaxy.spectrum import HAS_SPECUTILS, HAS_SPECLITE
+from skypy.galaxy.spectrum import HAS_SPECLITE
 
 
 @pytest.mark.flaky
@@ -151,8 +151,7 @@ def test_mag_ab_multi():
     np.testing.assert_allclose(*np.broadcast_arrays(magnitudes, truth), rtol=1e-4)
 
 
-@pytest.mark.skipif(not HAS_SPECUTILS or not HAS_SPECLITE,
-                    reason='test requires specutils and speclite')
+@pytest.mark.skipif(not HAS_SPECLITE, reason='test requires speclite')
 def test_template_spectra():
 
     from astropy import units
@@ -264,8 +263,7 @@ def test_kcorrect_magnitudes():
     np.testing.assert_allclose(mB_s, mB - 2.5*np.log10(sm)[:, np.newaxis])
 
 
-@pytest.mark.skipif(not HAS_SPECUTILS or not HAS_SPECLITE,
-                    reason='test requires specutils and speclite')
+@pytest.mark.skipif(not HAS_SPECLITE, reason='test requires speclite')
 def test_kcorrect_stellar_mass():
 
     from astropy import units
@@ -296,72 +294,3 @@ def test_kcorrect_stellar_mass():
     stellar_mass = kcorrect.stellar_mass(coeff, Mb, 'test-filt')
     truth = np.power(10, -0.4*(Mb-Mt))
     np.testing.assert_allclose(stellar_mass, truth)
-
-
-@pytest.mark.skipif(not HAS_SPECUTILS or not HAS_SPECLITE,
-                    reason='test requires specutils and speclite')
-def test_load_spectral_data():
-
-    from skypy.galaxy.spectrum import load_spectral_data
-    from astropy.utils.data import get_pkg_data_filename
-
-    # load a local file
-    filename = get_pkg_data_filename('data/spectrum.ecsv')
-    load_spectral_data(filename)
-
-    # load skypy data spectrum templates
-    load_spectral_data('kcorrect_spec')
-
-    # Load speclite bandpasses
-    load_spectral_data('decam2014_ugrizY')
-    load_spectral_data('sdss2010_ugriz')
-    load_spectral_data('wise2010_W1W2W3W4')
-    load_spectral_data('bessell_UBVRI')
-
-    # load multiple sources
-    load_spectral_data(['BASS_gr', 'MzLS_z'])
-
-    # try to load non-string name
-    with pytest.raises(TypeError):
-        load_spectral_data(1.0)
-
-    # try to load unknown data
-    with pytest.raises(FileNotFoundError):
-        load_spectral_data('!!UNKNOWN!!')
-
-
-@pytest.mark.skipif(not HAS_SPECUTILS, reason='test requires specutils')
-def test_combine_spectra():
-
-    from skypy.galaxy._spectrum_loaders import combine_spectra
-    from astropy import units
-    from specutils import Spectrum1D, SpectrumList
-
-    a = Spectrum1D(spectral_axis=[1., 2., 3.]*units.AA, flux=[1., 2., 3.]*units.Jy)
-    b = Spectrum1D(spectral_axis=[1e-10, 2e-10, 3e-10]*units.m,
-                   flux=[4e-23, 5e-23, 6e-23]*units.Unit('erg s-1 cm-2 Hz-1'))
-
-    assert np.allclose(a.spectral_axis, b.spectral_axis, atol=0, rtol=1e-10)
-
-    assert a == combine_spectra(a, None)
-    assert a == combine_spectra(None, a)
-
-    ab = combine_spectra(a, b)
-    assert isinstance(ab, Spectrum1D)
-    assert ab.shape == (2, 3)
-    assert ab.flux.unit == units.Jy
-    assert np.allclose([[1, 2, 3], [4, 5, 6]], ab.flux.value)
-
-    abb = combine_spectra(ab, b)
-    assert isinstance(ab, Spectrum1D)
-    assert abb.shape == (3, 3)
-    assert abb.flux.unit == units.Jy
-    assert np.allclose([[1, 2, 3], [4, 5, 6], [4, 5, 6]], abb.flux.value)
-
-    c = Spectrum1D(spectral_axis=[1., 2., 3., 4.]*units.AA, flux=[1., 2., 3., 4.]*units.Jy)
-
-    ac = combine_spectra(a, c)
-    assert isinstance(ac, SpectrumList)
-
-    aca = combine_spectra(ac, a)
-    assert isinstance(aca, SpectrumList)

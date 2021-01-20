@@ -53,11 +53,7 @@ Installing using pip or conda will automatically install or update these core
 dependencies if necessary. SkyPy also has a number of optional dependencies
 that enable additional features:
 
-- `camb <https://camb.info/>`_
-- `classy <https://lesgourg.github.io/class_public/class.html>`_
-- `healpy <https://healpy.readthedocs.io/>`_
 - `speclite <https://speclite.readthedocs.io/>`_
-- `specutils <https://specutils.readthedocs.io/>`_
 
 To install SkyPy with all optional dependencies using pip:
 

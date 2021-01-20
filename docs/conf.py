@@ -205,7 +205,6 @@ github_issues_url = 'https://github.com/{0}/issues/'.format(setup_cfg['github_pr
 # -----------------------------------------------------------------------------
 
 intersphinx_mapping.update({
-    'specutils': ('https://specutils.readthedocs.io/en/stable/', None),
     'speclite': ('https://speclite.readthedocs.io/en/latest/', None),
 })
 
@@ -251,13 +250,6 @@ plot_rcparams = {
     'figure.subplot.wspace': 0.4,
     'text.usetex': False,
 }
-
-# Mock camb if it is not available e.g. on readthedocs
-autodoc_mock_imports = []
-try:
-    import_module('camb')
-except ImportError:
-    autodoc_mock_imports.append('camb')
 
 # Sphinx Gallery
 extensions += ['sphinx_gallery.gen_gallery', ]
