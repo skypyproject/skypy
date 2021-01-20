@@ -32,19 +32,14 @@ section of the documentation.
 Examples
 --------
 
-SkyPy also has a driver script that can run simulation pipelines from the
-command line. The `skypyproject/examples`_ repository contains sample
-configuration files that you can clone and run:
-
-.. code:: bash
-
-    $ git clone --depth 1 -b v$(skypy --version) https://github.com/skypyproject/examples.git
-    $ skypy examples/mccl_galaxies.yml --format fits
+The Examples_ section of the documentation contains some examples to run SkyPy.
+You can also download the examples as Python source code or Jupyter notebooks 
+from there.
 
 .. _PyPI: https://pypi.org/project/skypy/
 .. _conda-forge: https://anaconda.org/conda-forge/skypy
 .. _Installation: https://skypy.readthedocs.io/en/stable/install.html
-.. _skypyproject/examples: https://github.com/skypyproject/examples
+.. _Examples: https://skypy.readthedocs.io/en/latest/examples/index.html
 
 
 Contributing
