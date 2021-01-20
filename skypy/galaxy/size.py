@@ -18,7 +18,7 @@ __all__ = [
 def angular_size(physical_size, redshift, cosmology):
     """Angular size of a galaxy.
     This function transforms physical radius into angular distance, described
-    in [1].
+    in [1]_.
 
     Parameters
     ----------
@@ -57,7 +57,7 @@ def late_type_lognormal(magnitude, alpha, beta, gamma, M0, sigma1, sigma2,
                         size=None):
     """Lognormal distribution for late-type galaxies.
     This function provides a lognormal distribution for the physical size of
-    late-type galaxies, described by equations 12, 15 and 16 in [1].
+    late-type galaxies, described by equations 12, 15 and 16 in [1]_.
 
     Parameters
     ----------
@@ -65,10 +65,10 @@ def late_type_lognormal(magnitude, alpha, beta, gamma, M0, sigma1, sigma2,
         Galaxy magnitude at which evaluate the lognormal distribution.
     alpha, beta, gamma, M0: float
         Model parameters describing the mean size of galaxies in [kpc].
-        Equation 15 in [1].
+        (Equation 15).
     sigma1, sigma2: float
         Parameters describing the standard deviation of the lognormal
-        distribution for the physical radius of galaxies. Equation 16 in [1].
+        distribution for the physical radius of galaxies. (Equation 16).
     size : int or tuple of ints, optional.
         Output shape. If the given shape is, e.g., (m, n, k),
         then m * n * k samples are drawn. If size is None (default),
@@ -97,7 +97,7 @@ def late_type_lognormal(magnitude, alpha, beta, gamma, M0, sigma1, sigma2,
 
     References
     ----------
-    ..[1] S. Shen, H.J. Mo, S.D.M. White, M.R. Blanton, G. Kauffmann, W. Voges,
+    .. [1] S. Shen, H.J. Mo, S.D.M. White, M.R. Blanton, G. Kauffmann, W. Voges,
         J. Brinkmann, I. Csabai, Mon. Not. Roy. Astron. Soc. 343, 978 (2003).
     """
 
@@ -117,7 +117,7 @@ def late_type_lognormal(magnitude, alpha, beta, gamma, M0, sigma1, sigma2,
 def early_type_lognormal(magnitude, a, b, M0, sigma1, sigma2, size=None):
     """Lognormal distribution for early-type galaxies.
     This function provides a lognormal distribution for the physical size of
-    early-type galaxies, described by equations 12, 14 and 16 in [1].
+    early-type galaxies, described by equations 12, 14 and 16 in [1]_.
 
     Parameters
     ----------
@@ -125,7 +125,7 @@ def early_type_lognormal(magnitude, a, b, M0, sigma1, sigma2, size=None):
         Galaxy magnitude at which evaluate the lognormal distribution.
     a, b : float
         Linear model parameters describing the mean size of galaxies,
-        equation 3.14 in [1].
+        (Equation 14).
     sigma: float
         Standard deviation of the lognormal distribution for the
         physical radius of galaxies.
@@ -156,7 +156,7 @@ def early_type_lognormal(magnitude, a, b, M0, sigma1, sigma2, size=None):
 
     References
     ----------
-    ..[1] S. Shen, H.J. Mo, S.D.M. White, M.R. Blanton, G. Kauffmann, W. Voges,
+    .. [1] S. Shen, H.J. Mo, S.D.M. White, M.R. Blanton, G. Kauffmann, W. Voges,
         J. Brinkmann, I. Csabai, Mon. Not. Roy. Astron. Soc. 343, 978 (2003).
     """
 
@@ -167,8 +167,8 @@ def early_type_lognormal(magnitude, a, b, M0, sigma1, sigma2, size=None):
 def linear_lognormal(magnitude, a_mu, b_mu, sigma, size=None):
     """Lognormal distribution with linear mean.
     This function provides a lognormal distribution for the physical size of
-    galaxies with a linear mean, described by equation 3.14 in [1]. See also
-    equation 14 in [2].
+    galaxies with a linear mean, described by equation 3.14 in [1]_. See also
+    equation 14 in [2]_.
 
     Parameters
     ----------
@@ -176,7 +176,7 @@ def linear_lognormal(magnitude, a_mu, b_mu, sigma, size=None):
         Galaxy absolute magnitude at which evaluate the lognormal distribution.
     a_mu, b_mu : float
         Linear model parameters describing the mean size of galaxies,
-        equation 3.14 in [1].
+        (Equation 3.14).
     sigma: float
         Standard deviation of the lognormal distribution for the
         physical radius of galaxies.
@@ -205,9 +205,9 @@ def linear_lognormal(magnitude, a_mu, b_mu, sigma, size=None):
 
     References
     ----------
-    ..[1] J. Herbel, T. Kacprzak, A. Amara, A. Refregier, C.Bruderer and
+    .. [1] J. Herbel, T. Kacprzak, A. Amara, A. Refregier, C.Bruderer and
            A. Nicola, JCAP 1708, 035 (2017).
-    ..[2] S. Shen, H.J. Mo, S.D.M. White, M.R. Blanton, G. Kauffmann, W.Voges,
+    .. [2] S. Shen, H.J. Mo, S.D.M. White, M.R. Blanton, G. Kauffmann, W.Voges,
            J. Brinkmann, I.Csabai, Mon. Not. Roy. Astron. Soc. 343, 978 (2003).
     """
 
