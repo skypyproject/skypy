@@ -340,11 +340,9 @@ class KCorrectTemplates(SpectrumTemplates):
         with fits.open(filename) as hdul:
             self.templates = hdul[hdu].data * units.Unit('erg s-1 cm-2 angstrom-1')
             self.wavelength = hdul[11].data * units.Unit('angstrom')
-            self.mass = hdul[16].data * units.Unit('angstrom')
-            self.mremain = hdul[17].data * units.Unit('angstrom')
-            self.mets = hdul[18].data * units.Unit('angstrom')
-            self.mass300 = hdul[19].data * units.Unit('angstrom')
-            self.mass1000 = hdul[20].data * units.Unit('angstrom')
+            self.mass = hdul[16].data
+            self.mass300 = hdul[19].data
+            self.mass1000 = hdul[20].data
 
     def stellar_mass(self, coefficients, magnitudes, filter):
         r'''Compute stellar mass from absolute magnitudes in a reference filter.
