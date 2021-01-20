@@ -307,6 +307,6 @@ def test_kcorrect_star_formation_rates():
     np.testing.assert_allclose(kcorrect.m1000(coefficients), m1000)
 
     # Test using stellar mass argument
-    sm = [10, 20, 30, 40, 50]
+    sm = np.array([10, 20, 30, 40, 50])
     np.testing.assert_allclose(kcorrect.m300(coefficients, sm), m300 * sm)
     np.testing.assert_allclose(kcorrect.m1000(coefficients, sm), m1000 * sm)
