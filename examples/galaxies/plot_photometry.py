@@ -12,7 +12,7 @@ This example demonstrates...
 #
 # Describe kcorrect templates [1]_
 #
-# .. literalinclude:: ../../../examples/galaxies/mccl_galaxies.yml
+# .. literalinclude:: ../../../examples/galaxies/sdss_photometry.yml
 #   :language: YAML
 
 # %%
@@ -27,7 +27,7 @@ import numpy as np
 from skypy.pipeline import Pipeline
 
 # Execute SkyPy galaxy photometry simulation pipeline
-pipeline = Pipeline.read("mccl_galaxies.yml")
+pipeline = Pipeline.read("sdss_photometry.yml")
 pipeline.execute()
 skypy_galaxies = vstack([pipeline['blue_galaxies'], pipeline['red_galaxies']])
 
