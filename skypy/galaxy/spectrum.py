@@ -375,8 +375,8 @@ class KCorrectTemplates(SpectrumTemplates):
     def m300(self, coefficients, stellar_mass=None):
         r'''Stellar mass formed in the last 300 Myr.
 
-        This function calculates the stellar mass formed within in the last 300
-        Myr for galaxies modelled as a linear combination of the kcorrect
+        This function calculates the mass of new stars formed within the last
+        300 Myr for galaxies modelled as a linear combination of the kcorrect
         templates [1]_.
 
         Parameters
@@ -384,13 +384,14 @@ class KCorrectTemplates(SpectrumTemplates):
         coefficients : (ng, 5) array_like
             Array of template coefficients.
         stellar_mass : (ng,) array_like, optional
-            Optional array of stellar masses for each galaxy in units
-            for stellar mass.
+            Optional array of stellar masses for each galaxy.
 
         Returns
         -------
         m300 : (ng,) array_like
-            Stellar mass formed in the last 300 Myr in units of stellar mass.
+            Total mass of new stars formed in the last 300 Myr as a fraction of
+            the stellar mass of each galaxy. If stellar_mass is given, instead
+            returns the absolute mass of new stars.
 
         References
         ----------
@@ -404,7 +405,7 @@ class KCorrectTemplates(SpectrumTemplates):
     def m1000(self, coefficients, stellar_mass=None):
         r'''Stellar mass formed in the last 1 Gyr.
 
-        This function calculates the stellar mass formed within in the last
+        This function calculates the mass of new stars formed within the last
         1 Gyr for galaxies modelled as a linear combination of the kcorrect
         templates [1]_.
 
@@ -413,13 +414,14 @@ class KCorrectTemplates(SpectrumTemplates):
         coefficients : (ng, 5) array_like
             Array of template coefficients.
         stellar_mass : (ng,) array_like, optional
-            Optional array of stellar masses for each galaxy in units
-            for stellar mass.
+            Optional array of stellar masses for each galaxy.
 
         Returns
         -------
         m1000 : (ng,) array_like
-            Stellar mass formed in the last 1 Gyr in units of stellar mass.
+            Total mass of new stars formed in the last 1 Gyr as a fraction of
+            the stellar mass of each galaxy. If stellar_mass is given, instead
+            returns the absolute mass of new stars.
 
         References
         ----------
