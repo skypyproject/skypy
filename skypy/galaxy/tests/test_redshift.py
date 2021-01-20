@@ -55,6 +55,52 @@ def test_schechter_lf_redshift():
 
 
 @pytest.mark.flaky
+def test_schechter_smf_redshift():
+
+    from skypy.galaxy.redshift import schechter_smf_redshift
+    from astropy.cosmology import FlatLambdaCDM
+    from astropy import units
+    from scipy.special import gamma, gammaincc
+
+    # fix this cosmology
+    cosmo = FlatLambdaCDM(H0=70, Om0=0.3)
+
+    # parameters for the sampling
+    z = np.linspace(1e-10, 2., 1000)
+    m_star = 10 ** 10.67
+    phi_star = 1e-3
+    alpha = -1.5
+    m_min = 10 ** 7
+    m_max = 10 ** 13
+    sky_area = 1.0 * units.deg**2
+
+    # sample redshifts
+    z_gal = schechter_smf_redshift(z, m_star, phi_star, alpha, m_min, m_max, sky_area, cosmo, noise=False)
+
+    # density with factor from upper incomplete gamma function
+    density = phi_star*gamma(alpha+1)*gammaincc(alpha+1, m_min)
+
+    # turn into galaxies/surface area
+    density *= (sky_area * cosmo.differential_comoving_volume(z)).to_value('Mpc3')
+
+    # integrate total number
+    n_gal = np.trapz(density, z, axis=-1)
+
+    # make sure noise-free sample has right size
+    assert np.isclose(len(z_gal), n_gal, atol=1.0)
+
+    # turn density into CDF
+    cdf = density  # same memory
+    np.cumsum((density[1:]+density[:-1])/2*np.diff(z), out=cdf[1:])
+    cdf[0] = 0
+    cdf /= cdf[-1]
+
+    # check distribution of sample
+    D, p = kstest(z_gal, lambda z_: np.interp(z_, z, cdf))
+    assert p > 0.01, 'D = {}, p = {}'.format(D, p)
+
+
+@pytest.mark.flaky
 def test_redshifts_from_comoving_density():
 
     from skypy.galaxy.redshift import redshifts_from_comoving_density
