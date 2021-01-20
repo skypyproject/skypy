@@ -106,7 +106,6 @@ R_bar_early = [np.median(R_early[(M_early <= Ma) & (M_early > Mb)])
 R_bar_late = [np.median(R_late[(M_late <= Ma) & (M_late > Mb)])
               for Ma, Mb in zip(M_bins_late, M_bins_late[1:])]
 
-
 # Plot
 plt.scatter(M_r_late, R50_r_phys_late, color='lightskyblue', marker='+', alpha=0.005)
 plt.scatter(M_r_early, R50_r_phys_early, color='coral',  marker='+', alpha=0.05)
