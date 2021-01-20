@@ -10,7 +10,7 @@ Fork and Clone the SkyPy Repository
 
 First *fork* the SkyPy repository. A fork is your own remote copy of the repository on GitHub. To create a fork:
 
-  1. Go to the [SkyPy GitHub Repository](https://github.com/skypyproject/skypy)
+  1. Go to the `SkyPy GitHub Repository <https://github.com/skypyproject/skypy>`_
   2. Click the **Fork** button (in the top-right-hand corner)
   3. Choose where to create the fork, typically your personal GitHub account
 
@@ -70,7 +70,7 @@ Open a Pull Request
 
 When you feel that work on your new feature is complete, you should create a *Pull Request*. This will propose your work to be merged into the main SkyPy repository.
 
-  1. Go to [SkyPy Pull Requests](https://github.com/skypyproject/skypy/pulls)
+  1. Go to `SkyPy Pull Requests <https://github.com/skypyproject/skypy/pulls>`_
   2. Click the green **New pull request** button
   3. Click **compare across forks**
   4. Confirm that the base fork is `skypyproject/skypy` and the base branch is `master`
@@ -84,9 +84,9 @@ Status checks
 A series of automated checks will be run on your pull request, some of which will be required to pass before it can be merged into the main codebase:
 
   - `Tests` (Required) runs the [unit tests](#unit-tests) in four predefined environments; `latest supported versions`, `oldest supported versions`, `macOS latest supported` and `Windows latest supported`. Click "Details" to view the output including any failures.
-  - `codeclimate` (Required) runs [pycodestyle](https://pycodestyle.pycqa.org/en/latest/) to check that your code conforms to the [PEP 8](https://www.python.org/dev/peps/pep-0008/) style guidelines. Click "Details" to view any errors.
+  - `codeclimate` (Required) runs `pycodestyle <https://pycodestyle.pycqa.org/en/latest/>`_ to check that your code conforms to the `PEP 8 <https://www.python.org/dev/peps/pep-0008/>`_ style guidelines. Click "Details" to view any errors.
   - `codecov` reports the test coverage for your pull request; you should aim for `codecov/patch — 100.00%`. Click "Details" to view coverage data.
-  - `docs` (Required) builds the [documentation](#docstrings) on [readthedocs](https://readthedocs.org/). Click "Details" to view the documentation or the failed build log.
+  - `docs` (Required) builds the [documentation](#docstrings) on `readthedocs <https://readthedocs.org/>`_. Click "Details" to view the documentation or the failed build log.
 
 Updating your branch
 ^^^^^^^^^^^^^^^^^^^^
@@ -105,19 +105,19 @@ As you work on your feature, new commits might be made to the `skypyproject` mas
 
     git fetch skypyproject
     git rebase skypyproject/master
-    
+
 
 **Warning**: It is bad practice to *rebase* commits that have already been pushed to a remote such as your fork. Rebasing creates new copies of your commits that can cause the local and remote branches to diverge. `git push --force` will **overwrite** the remote branch with your newly rebased local branch. This is strongly discouraged, particularly when working on a shared branch where you could erase a collaborators commits.
 
 For more information about resolving conflicts see the GitHub guides:
-  - [Resolving a merge conflict on GitHub](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/resolving-a-merge-conflict-on-github)
-  - [Resolving a merge conflict using the command line](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/resolving-a-merge-conflict-using-the-command-line)
-  - [About Git rebase](https://help.github.com/en/github/using-git/about-git-rebase)
+  - `Resolving a merge conflict on GitHub <https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/resolving-a-merge-conflict-on-github>`_
+  - `Resolving a merge conflict using the command line <https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/resolving-a-merge-conflict-using-the-command-line>`_
+  - `About Git rebase <https://help.github.com/en/github/using-git/about-git-rebase>`_
 
 More Information
 ^^^^^^^^^^^^^^^^
 
-More information regarding the usage of GitHub can be found in the [GitHub Guides](https://guides.github.com/).
+More information regarding the usage of GitHub can be found in the `GitHub Guides <https://guides.github.com/>`_.
 
 Coding Guidelines
 -----------------
@@ -128,10 +128,10 @@ General Guidelines
 ^^^^^^^^^^^^^^^^^^
 
 - SkyPy is compatible with Python>=3.5 (see [setup.cfg](setup.cfg)). SkyPy *does not* support backwards compatibility with Python 2.x; `six`, `__future__` and `2to3` should not be used.
-- All contributions should follow the [PEP8 Style Guide for Python Code](https://www.python.org/dev/peps/pep-0008/). We recommend using [flake8](https://flake8.pycqa.org/) to check your code for PEP8 compliance.
-- Importing SkyPy should only depend on having [NumPy](https://www.numpy.org), [SciPy](https://www.scipy.org/) and [Astropy](https://www.astropy.org/) installed.
+- All contributions should follow the `PEP8 Style Guide for Python Code <https://www.python.org/dev/peps/pep-0008/>`_. We recommend using `flake8 <https://flake8.pycqa.org/>`_ to check your code for PEP8 compliance.
+- Importing SkyPy should only depend on having `NumPy <https://www.numpy.org>`_, `SciPy <https://www.scipy.org/>`_ and `Astropy <https://www.astropy.org/>`_ installed.
 - Code is grouped into submodules based on broad science areas e.g. [galaxies](skypy/galaxy). There is also a [utils](skypy/utils) submodule for general utility functions.
-- For more information see the [Astropy Coding Guidelines](http://docs.astropy.org/en/latest/development/codeguide.html)
+- For more information see the `Astropy Coding Guidelines <http://docs.astropy.org/en/latest/development/codeguide.html>`_.
 
 Unit Tests
 ^^^^^^^^^^
@@ -143,7 +143,7 @@ If your unit tests check the statistical distribution of a random sample, the te
 Docstrings
 ^^^^^^^^^^
 
-All public classes, methods and functions require docstrings. You can build documentation locally by installing [sphinx-astropy](https://github.com/astropy/sphinx-astropy) and calling `make html` in the `docs` subdirectory. Docstrings should include the following sections:
+All public classes, methods and functions require docstrings. You can build documentation locally by installing `sphinx-astropy <https://github.com/astropy/sphinx-astropy>`_ and calling `make html` in the `docs` subdirectory. Docstrings should include the following sections:
 
   - Description
   - Parameters
