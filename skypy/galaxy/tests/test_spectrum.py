@@ -294,3 +294,19 @@ def test_kcorrect_stellar_mass():
     stellar_mass = kcorrect.stellar_mass(coeff, Mb, 'test-filt')
     truth = np.power(10, -0.4*(Mb-Mt))
     np.testing.assert_allclose(stellar_mass, truth)
+
+def test_kcorrect_star_formation_rates():
+
+    from skypy.galaxy.spectrum import kcorrect
+
+    # Each test galaxy is exactly one of the templates
+    coefficients = np.eye(5)
+    m300 = np.sum(kcorrect.mass300) / np.sum(kcorrect.mass)
+    m1000 = np.sum(kcorrect.mass300) / np.sum(kcorrect.mass)
+    np.testing.assert_allclose(kcorrect.m300(coefficients), m300)
+    np.testing.assert_allclose(kcorrect.m300(coefficients), m1000)
+
+    # Test using stellar mass argument
+    sm = [10, 20, 30, 40, 50]
+    np.testing.assert_allclose(kcorrect.m300(coefficients, sm), m300 * sm)
+    np.testing.assert_allclose(kcorrect.m300(coefficients, sm), m1000 * sm)
