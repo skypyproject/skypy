@@ -61,10 +61,15 @@ a, b = 0.6, -4.63
 M0 = -20.52
 sigma1, sigma2 = 0.48, 0.25
 
-# Size
-m = np.linspace(-16, -24, 100)
-slate = late_type_lognormal(m, alpha, beta, gamma, M0, sigma1, sigma2)
-searly = early_type_lognormal(m, a, b, M0, sigma1, sigma2)
+# SkyPy late sample
+M_bins_late = np.arange(-16, -24.1, -0.5)
+M_late = np.random.uniform(M_bins_late[0], M_bins_late[-1], size=138000)
+R_late = late_type_lognormal(M_late, alpha, beta, gamma, M0, sigma1, sigma2).value
+
+# SkyPy early sample
+M_bins_early = np.arange(-18, -24.1, -0.5)
+M_early = np.random.uniform(M_bins_early[0], M_bins_early[-1], size=138000)
+R_early = early_type_lognormal(M_early, a, b, M0, sigma1, sigma2).value
 
 # %%
 # Validation with the SDSS sample
@@ -94,16 +99,6 @@ sdss_early = np.loadtxt('Shen+03_early.txt')
 sdss_late = np.loadtxt('Shen+03_late.txt')
 sdss_early[:, 0] -= 0.25
 sdss_late[:, 0] -= 0.25
-
-# SkyPy late sample
-M_bins_late = np.arange(-16, -24.1, -0.5)
-M_late = np.random.uniform(M_bins_late[0], M_bins_late[-1], size=138000)
-R_late = late_type_lognormal(M_late, alpha, beta, gamma, M0, sigma1, sigma2).value
-
-# SkyPy early sample
-M_bins_early = np.arange(-18, -24.1, -0.5)
-M_early = np.random.uniform(M_bins_early[0], M_bins_early[-1], size=138000)
-R_early = early_type_lognormal(M_early, a, b, M0, sigma1, sigma2).value
 
 # Median sizes for late- and early-type galaxies
 R_bar_early = [np.median(R_early[(M_early <= Ma) & (M_early > Mb)])
