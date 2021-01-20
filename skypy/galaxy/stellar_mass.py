@@ -11,6 +11,7 @@ __all__ = [
     'schechter_smf_mass',
 ]
 
+
 def schechter_smf_mass(alpha, m_star, m_min, m_max, size=None,
                        resolution=1000):
     r""" Stellar masses following the Schechter mass function [1]_.

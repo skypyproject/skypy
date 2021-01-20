@@ -8,6 +8,7 @@ import numpy as np
 import scipy.integrate
 import scipy.special
 from astropy import units
+import pdb
 
 from ..utils import broadcast_arguments, dependent_argument
 
@@ -157,6 +158,7 @@ def schechter_lf_redshift(redshift, M_star, phi_star, alpha, m_lim, sky_area,
     return redshifts_from_comoving_density(redshift=redshift, density=density,
                                            sky_area=sky_area, cosmology=cosmology, noise=noise)
 
+
 @dependent_argument('m_star', 'redshift')
 @dependent_argument('phi_star', 'redshift')
 @dependent_argument('alpha', 'redshift')
@@ -199,7 +201,7 @@ def schechter_smf_redshift(redshift, m_star, phi_star, alpha, m_min, m_max, sky_
     Returns
     -------
     redshifts : array_like
-        Redshifts of the galaxy sample described by the Schechter 
+        Redshifts of the galaxy sample described by the Schechter
         function.
 
     Examples
@@ -215,12 +217,13 @@ def schechter_smf_redshift(redshift, m_star, phi_star, alpha, m_min, m_max, sky_
 
     # gamma function integrand
     def f(lnx, a):
-        return np.exp((a + 1)*lnx - np.exp(lnx)) if lnx < lnxmax else 0.
+        return np.exp((a + 1)*lnx - np.exp(lnx)) if lnx < lnxmax.max() else 0.
 
     # integrate gamma function for each redshift
     gam = np.empty_like(alpha)
+    #pdb.set_trace()
     for i, _ in np.ndenumerate(gam):
-        gam[i], _ = scipy.integrate.quad(f, lnxmin, lnxmax, args=(alpha[i],))
+        gam[i], _ = scipy.integrate.quad(f, lnxmin[i], lnxmax[i], args=(alpha[i],))
 
     # comoving number density is normalisation times upper incomplete gamma
     density = phi_star*gam
@@ -228,6 +231,7 @@ def schechter_smf_redshift(redshift, m_star, phi_star, alpha, m_min, m_max, sky_
     # sample redshifts from the comoving density
     return redshifts_from_comoving_density(redshift=redshift, density=density,
                                            sky_area=sky_area, cosmology=cosmology, noise=noise)
+
 
 @units.quantity_input(sky_area=units.sr)
 def redshifts_from_comoving_density(redshift, density, sky_area, cosmology, noise=True):

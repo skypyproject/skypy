@@ -76,11 +76,13 @@ def schechter_lf(redshift, M_star, phi_star, alpha, m_lim, sky_area, cosmology, 
 
     return z, M
 
+
 @units.quantity_input(sky_area=units.sr)
-def schechter_smf(redshift, m_star, phi_star, alpha, m_min, m_max, sky_area, noise=True):
+def schechter_smf(redshift, m_star, phi_star, alpha, m_min, m_max, sky_area, cosmology, noise=True):
 
     # sample halo redshifts
-    z = schechter_smf_redshift(redshift, m_star, phi_star, alpha, m_min, m_max, sky_area, cosmology, noise)
+    z = schechter_smf_redshift(redshift, m_star, phi_star, alpha, m_min, m_max,
+                               sky_area, cosmology, noise)
 
     # if a function is NOT given for M_star, phi_star, alpha, interpolate to z
     if not callable(m_star) and np.ndim(m_star) > 0:
