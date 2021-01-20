@@ -100,7 +100,7 @@ sdss_late = np.loadtxt('Shen+03_late.txt')
 sdss_early[:, 0] -= 0.25
 sdss_late[:, 0] -= 0.25
 
-# Median sizes for late- and early-type galaxies
+# Median sizes for SkyPy late- and early-type galaxies
 R_bar_early = [np.median(R_early[(M_early <= Ma) & (M_early > Mb)])
                for Ma, Mb in zip(M_bins_early, M_bins_early[1:])]
 R_bar_late = [np.median(R_late[(M_late <= Ma) & (M_late > Mb)])
