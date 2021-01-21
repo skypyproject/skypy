@@ -93,6 +93,6 @@ def schechter_smf(redshift, m_star, phi_star, alpha, m_min, m_max, sky_area, cos
         alpha = np.interp(z, redshift, alpha)
 
     # sample galaxy mass for redshifts
-    m = schechter_smf_mass(alpha, m_star, m_min, m_max)
+    m = schechter_smf_mass(z, alpha, m_star, m_min, m_max)
 
     return z, m

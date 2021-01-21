@@ -12,7 +12,7 @@ from skypy.utils import special
 def test_exponential_distribution():
     # When alpha=0, M*=1 and x_min~0 we get a truncated exponential
     q_max = 1e2
-    sample = stellar_mass.schechter_smf_mass(0, 1, size=1000,
+    sample = stellar_mass.schechter_smf_mass(0, 0, 1, size=1000,
                                         m_min=1e-10, m_max=q_max,
                                         resolution=1000)
     d, p_value = scipy.stats.kstest(sample, 'truncexpon', args=(q_max,))
@@ -24,12 +24,12 @@ def test_stellar_masses():
     # Test that error is returned if m_star input is an array but size !=
     # None and size != m_star,size
     with pytest.raises(ValueError):
-        stellar_mass.schechter_smf_mass(-1.4, np.array([1e10, 2e10]), 1.e7, 1.e13, size=3)
+        stellar_mass.schechter_smf_mass(0., -1.4, np.array([1e10, 2e10]), 1.e7, 1.e13, size=3)
 
     # Test that an array with the sme shape as m_star is returned if m_star is
     # an array and size = None
     m_star = np.array([1e10, 2e10])
-    sample = stellar_mass.schechter_smf_mass(-1.4, m_star, 1.e7, 1.e13, size=None)
+    sample = stellar_mass.schechter_smf_mass(0., -1.4, m_star, 1.e7, 1.e13, size=None)
     assert m_star.shape == sample.shape
 
     # Test that sampling corresponds to sampling from the right pdf.
@@ -57,7 +57,7 @@ def test_stellar_masses():
     m_star = 10 ** 10.67
     m_min = 10 ** 7
     m_max = 10 ** 13
-    sample = stellar_mass.schechter_smf_mass(-1.4, m_star, m_min,
+    sample = stellar_mass.schechter_smf_mass(0., -1.4, m_star, m_min,
                                         m_max, size=1000,
                                         resolution=100)
     p_value = scipy.stats.kstest(sample, calc_cdf)[1]

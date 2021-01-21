@@ -4,15 +4,17 @@
 import numpy as np
 
 from ..utils.random import schechter
-from ..utils import dependent_argument
+from ..utils import broadcast_arguments, dependent_argument
 
 
 __all__ = [
     'schechter_smf_mass',
 ]
 
-
-def schechter_smf_mass(alpha, m_star, m_min, m_max, size=None,
+@dependent_argument('m_star', 'redshift')
+@dependent_argument('alpha', 'redshift')
+@broadcast_arguments('redshift', 'm_star', 'm_min', 'm_max')
+def schechter_smf_mass(redshift, alpha, m_star, m_min, m_max, size=None,
                        resolution=1000):
     r""" Stellar masses following the Schechter mass function [1]_.
 
