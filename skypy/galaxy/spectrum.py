@@ -458,4 +458,4 @@ class KCorrectTemplates(SpectrumTemplates):
 
 
 kcorrect = KCorrectTemplates(hdu=1)
-kcorrect.__doc__ = '''Galaxy spectra from kcorrect smoothed templates.'''
+'''`KCorrectTemplates` using kcorrect smoothed templates.'''
