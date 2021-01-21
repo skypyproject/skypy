@@ -23,7 +23,7 @@ def schechter_smf_mass(redshift, alpha, m_star, m_min, m_max, size=None,
     alpha : float
         The alpha parameter in the Schechter stellar mass function.
     m_star : (nm,) array-like
-        Characteristic stellar mass M_*.
+        Characteristic stellar mass m_*.
     size: int, optional
          Output shape of stellar mass samples. If size is None and m_star
          is a scalar, a single sample is returned. If size is None and
@@ -72,7 +72,6 @@ def schechter_smf_mass(redshift, alpha, m_star, m_min, m_max, size=None,
     x_max = m_max / m_star
 
     # sample masses
-    m = schechter(alpha, x_min, x_max, resolution, size=size)
-    m *= m_star
+    m = schechter(alpha, x_min, x_max, resolution, size=size, scale=m_star)
 
     return m

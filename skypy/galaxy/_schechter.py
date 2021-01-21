@@ -79,6 +79,50 @@ def schechter_lf(redshift, M_star, phi_star, alpha, m_lim, sky_area, cosmology, 
 
 @units.quantity_input(sky_area=units.sr)
 def schechter_smf(redshift, m_star, phi_star, alpha, m_min, m_max, sky_area, cosmology, noise=True):
+    r'''Sample redshifts and stellar masses from a Schechter mass function.
+
+    Sample the redshifts and stellar masses of galaxies following a Schechter
+    mass function with potentially redshift-dependent parameters, limited
+    by maximum and minimum masses `m_min`, `m_max`, for a sky area `sky_area`.
+
+    Parameters
+    ----------
+    redshift : array_like
+        Input redshift grid on which the Schechter function parameters are
+        evaluated. Galaxies are sampled over this redshift range.
+    m_star : array_like or function
+        Characteristic mass of the Schechter function. Can be a
+        single value, an array of values for each `redshift`, or a function of
+        redshift.
+    phi_star : array_like or function
+        Normalisation of the Schechter function. Can be a single value, an
+        array of values for each `redshift`, or a function of redshift.
+    alpha : array_like or function
+        Schechter function power law index. Can be a single value, an array of
+        values for each `redshift`, or a function of redshift.
+    m_min, m_max : float
+        Lower and upper bounds for the stellar mass.
+    sky_area : `~astropy.units.Quantity`
+        Sky area over which galaxies are sampled. Must be in units of solid angle.
+    cosmology : Cosmology
+        Cosmology object to calculate comoving densities.
+    noise : bool, optional
+        Poisson-sample the number of galaxies. Default is `True`.
+
+    Notes
+    -----
+
+    Effectively calls `~skypy.galaxy.redshift.schechter_smf_redshift` and
+    `~skypy.galaxy.stellar_mass.schechter_smf_mass` internally and returns
+    the tuple of results.
+
+    Returns
+    -------
+    redshifts, stellar masses : tuple of array_like
+        Redshifts and stellar masses of the galaxy sample described by the Schechter
+        stellar mass function.
+
+    '''
 
     # sample halo redshifts
     z = schechter_smf_redshift(redshift, m_star, phi_star, alpha, m_min, m_max,
