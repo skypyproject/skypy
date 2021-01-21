@@ -12,15 +12,14 @@ __all__ = [
 ]
 
 
-@dependent_argument('m_star', 'redshift')
-@dependent_argument('alpha', 'redshift')
-@broadcast_arguments('redshift', 'm_star', 'm_min', 'm_max')
 def schechter_smf_mass(redshift, alpha, m_star, m_min, m_max, size=None,
                        resolution=1000):
     r""" Stellar masses following the Schechter mass function [1]_.
 
     Parameters
     ----------
+    redshift : array_like
+        Galaxy redshifts for which to sample magnitudes.
     alpha : float
         The alpha parameter in the Schechter stellar mass function.
     m_star : (nm,) array-like
@@ -65,8 +64,8 @@ def schechter_smf_mass(redshift, alpha, m_star, m_min, m_max, size=None,
     if np.ndim(alpha) > 0:
         raise NotImplementedError('only scalar alpha is supported')
 
-    if size is None and np.shape(m_star):
-        size = np.shape(m_star)
+    if size is None and np.shape(redshift):
+        size = np.shape(redshift)
 
     # convert m_min, m_max to units of m_star
     x_min = m_min / m_star
