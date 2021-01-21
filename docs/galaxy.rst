@@ -109,4 +109,5 @@ Reference/API
    :include-all-objects:
 .. automodapi:: skypy.galaxy.size
 .. automodapi:: skypy.galaxy.spectrum
+   :include-all-objects:
 .. automodapi:: skypy.galaxy.stellar_mass
