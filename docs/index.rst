@@ -55,7 +55,7 @@ Contributor guidelines
 .. toctree::
    :maxdepth: 1
 
-   contributing/CONTRIBUTING
+   developer/CONTRIBUTING
 
 
 .. _project-details:
