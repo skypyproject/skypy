@@ -11,6 +11,7 @@ __all__ = [
     'schechter_smf_mass',
 ]
 
+
 @dependent_argument('m_star', 'redshift')
 @dependent_argument('alpha', 'redshift')
 @broadcast_arguments('redshift', 'm_star', 'm_min', 'm_max')
