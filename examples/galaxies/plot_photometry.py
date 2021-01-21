@@ -2,7 +2,8 @@
 Optical Photometry
 ==================
 
-This example demonstrates...
+This example demonstrates how to model galaxy photometry using the kcorrect
+spectral energy distribution templates as implemented in SkyPy.
 
 """
 
@@ -32,7 +33,7 @@ pipeline = Pipeline.read("sdss_photometry.yml")
 pipeline.execute()
 skypy_galaxies = vstack([pipeline['blue_galaxies'], pipeline['red_galaxies']])
 
-# Read SDSS magnitude distributions for a 1 degree^2
+# SDSS magnitude distributions for a 10 degree^2 region
 sdss_data = Table.read("sdss_dered_10deg2.ecsv", format='ascii.ecsv')
 
 # Plot magnitude distributions for SkyPy simulation and SDSS data
