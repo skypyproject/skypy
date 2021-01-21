@@ -1,5 +1,5 @@
-Contributing to SkyPy
-=======================
+Contributor Guidelines
+======================
 
 GitHub Workflow
 ---------------
