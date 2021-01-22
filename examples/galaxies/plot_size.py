@@ -63,13 +63,11 @@ M0 = -20.52
 sigma1, sigma2 = 0.48, 0.25
 
 # SkyPy late sample
-M_bins_late = np.arange(-16, -24.1, -0.5)
-M_late = np.random.uniform(M_bins_late[0], M_bins_late[-1], size=138000)
+M_late = np.random.uniform(-16, -24, size=10000)
 R_late = late_type_lognormal(M_late, alpha, beta, gamma, M0, sigma1, sigma2).value
 
 # SkyPy early sample
-M_bins_early = np.arange(-18, -24.1, -0.5)
-M_early = np.random.uniform(M_bins_early[0], M_bins_early[-1], size=138000)
+M_early = np.random.uniform(-18, -24, size=10000)
 R_early = early_type_lognormal(M_early, a, b, M0, sigma1, sigma2).value
 
 # %%
@@ -94,6 +92,10 @@ sdss_early = np.loadtxt('Shen+03_early.txt')
 sdss_late = np.loadtxt('Shen+03_late.txt')
 error_late = sdss_late[:, 3] - sdss_late[:, 2]
 error_early = sdss_early[:, 3] - sdss_early[:, 2]
+
+# Bins for median radii
+M_bins_late = np.arange(-16, -24.1, -0.5)
+M_bins_early = np.arange(-18, -24.1, -0.5)
 
 # Median sizes for SkyPy late- and early-type galaxies
 R_bar_early = [np.median(R_early[(M_early <= Ma) & (M_early > Mb)])
