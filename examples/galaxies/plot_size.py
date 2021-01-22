@@ -79,14 +79,16 @@ R_early = early_type_lognormal(M_early, a, b, M0, sigma1, sigma2).value
 # Load data from figure 4 in Shen et al 2003
 sdss_early = np.loadtxt('Shen+03_early.txt')
 sdss_late = np.loadtxt('Shen+03_late.txt')
-error_late = sdss_late[:, 2] + sdss_late[:, 3]
-error_early = sdss_early[:, 2] + sdss_early[:, 3]
-error_late /= (sdss_late[:, 1] * np.log(10))
-error_early /= (sdss_early[:, 1] * np.log(10))
+error_late = (sdss_late[:, 2], sdss_late[:, 3])
+error_early = (sdss_early[:, 2], sdss_early[:, 3])
 
 # Bins for median radii
 M_bins_late = np.arange(-16, -24.1, -0.5)
 M_bins_early = np.arange(-18, -24.1, -0.5)
+
+# Center bins
+center_late = (M_bins_late[:-1] + M_bins_late[1:]) / 2
+center_early = (M_bins_early[:-1] + M_bins_early[1:]) / 2
 
 # Median sizes for SkyPy late- and early-type galaxies
 R_bar_early = [np.median(R_early[(M_early <= Ma) & (M_early > Mb)])
@@ -95,8 +97,8 @@ R_bar_late = [np.median(R_late[(M_late <= Ma) & (M_late > Mb)])
               for Ma, Mb in zip(M_bins_late, M_bins_late[1:])]
 
 # Plot
-plt.plot((M_bins_early[:-1]+M_bins_early[1:])/2, R_bar_early, 'r', label='SkyPy early')
-plt.plot((M_bins_late[:-1]+M_bins_late[1:])/2, R_bar_late, 'b', label='SkyPy late')
+plt.plot(center_early, R_bar_early, 'r', label='SkyPy early')
+plt.plot(center_late, R_bar_late, 'b', label='SkyPy late')
 
 plt.errorbar(sdss_early[:, 0], sdss_early[:, 1], yerr=error_early, color='coral',
              marker='s', label='Shen+03 early', lw=0.5)
