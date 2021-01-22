@@ -5,6 +5,7 @@ This module provides facilities to sample the ellipticities of galaxies.
 
 import numpy as np
 from scipy import stats
+from ..utils import random
 
 
 __all__ = [
@@ -120,19 +121,8 @@ def ryden04(mu_gamma, sigma_gamma, mu, sigma, size=None):
     if size == () and not np.isscalar(gam):  # pragma: no cover
         gam, eps = gam.item(), eps.item()
 
-    # draw random viewing angle (theta, phi)
-    cos2_theta = np.random.uniform(low=-1., high=1., size=size)**2
-    cos2_phi = np.cos(np.random.uniform(low=0., high=2*np.pi, size=size))**2
-    sin2_theta = 1 - cos2_theta
-    sin2_phi = 1 - cos2_phi
-
-    # compute Binney's ABC -- eq.s (13)-(15)
-    A = (1 - eps*(2-eps)*sin2_phi)*cos2_theta + gam**2*sin2_theta
-    B = (2*eps*(2-eps))**2*cos2_theta*sin2_phi*cos2_phi
-    C = 1 - eps*(2-eps)*cos2_phi
-
-    # compute axis ratio q -- eq. (12)
-    q = np.sqrt((A+C-np.sqrt((A-C)**2+B))/(A+C+np.sqrt((A-C)**2+B)))
+    # random projection of random triaxial ellipsoid
+    q = random.triaxial_axis_ratio(gam, 1-eps)
 
     # return the ellipticity
     return (1-q)/(1+q)
