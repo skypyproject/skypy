@@ -103,7 +103,9 @@ The Code of Conduct is a living document, which is the responsibility of the Boa
 Credits
 #######
 
-This Code of Conduct borrows heavily from the Carpentries Code of Conduct.
+This Code of Conduct borrows heavily from the `Carpentries Code of Conduct`_.
+
+.. _Carpentries Code of Conduct: https://docs.carpentries.org/topic_folders/policies/code-of-conduct.html
 
 License
 #######
