@@ -83,7 +83,7 @@ Status checks
 
 A series of automated checks will be run on your pull request, some of which will be required to pass before it can be merged into the main codebase:
 
-  - ``Tests`` (Required) runs the `unit-tests`_ in four predefined environments; `latest supported versions`, `oldest supported versions`, `macOS latest supported` and `Windows latest supported`. Click "Details" to view the output including any failures.
+  - ``Tests`` (Required) runs the `unit tests`_ in four predefined environments; `latest supported versions`, `oldest supported versions`, `macOS latest supported` and `Windows latest supported`. Click "Details" to view the output including any failures.
   - ``codeclimate`` (Required) runs `pycodestyle <https://pycodestyle.pycqa.org/en/latest/>`_ to check that your code conforms to the `PEP 8 <https://www.python.org/dev/peps/pep-0008/>`_ style guidelines. Click "Details" to view any errors.
   - ``codecov`` reports the test coverage for your pull request; you should aim for `codecov/patch — 100.00%`. Click "Details" to view coverage data.
   - ``docs`` (Required) builds the `docstrings`_ on `readthedocs <https://readthedocs.org/>`_. Click "Details" to view the documentation or the failed build log.
@@ -131,7 +131,7 @@ General Guidelines
 
 - SkyPy is compatible with Python>=3.5 (see [setup.cfg](setup.cfg)). SkyPy *does not* support backwards compatibility with Python 2.x; `six`, `__future__` and `2to3` should not be used.
 - All contributions should follow the `PEP8 Style Guide for Python Code <https://www.python.org/dev/peps/pep-0008/>`_. We recommend using `flake8 <https://flake8.pycqa.org/>`_ to check your code for PEP8 compliance.
-- Importing SkyPy should only depend on having `NumPy <https://www.numpy.org>`_, `SciPy <https://www.scipy.org/>`_ and `Astropy <https://www.astropy.org/>`_ installed.
+- Importing SkyPy should only depend on having `NumPy <https://www.numpy.org>`_, `SciPy <https://www.scipy.org/>`_ and `Astropy <https://www.astropy.org/>`__ installed.
 - Code is grouped into submodules based on broad science areas e.g. [galaxies](skypy/galaxy). There is also a [utils](skypy/utils) submodule for general utility functions.
 - For more information see the `Astropy Coding Guidelines <http://docs.astropy.org/en/latest/development/codeguide.html>`_.
 
