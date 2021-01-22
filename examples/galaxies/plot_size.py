@@ -79,10 +79,10 @@ R_early = early_type_lognormal(M_early, a, b, M0, sigma1, sigma2).value
 # Load data from figure 4 in Shen et al 2003
 sdss_early = np.loadtxt('Shen+03_early.txt')
 sdss_late = np.loadtxt('Shen+03_late.txt')
-error_late = sdss_late[:,2] + sdss_late[:,3]
-error_early = sdss_early[:,2] + sdss_early[:,3]
-error_late /= (sdss_late[:,1] * np.log(10))
-error_early /= (sdss_early[:,1] * np.log(10))
+error_late = sdss_late[:, 2] + sdss_late[:, 3]
+error_early = sdss_early[:, 2] + sdss_early[:, 3]
+error_late /= (sdss_late[:, 1] * np.log(10))
+error_early /= (sdss_early[:, 1] * np.log(10))
 
 # Bins for median radii
 M_bins_late = np.arange(-16, -24.1, -0.5)
