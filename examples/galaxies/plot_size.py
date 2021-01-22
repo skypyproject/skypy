@@ -45,7 +45,7 @@ in SkyPy.
 # (c.f. equations above).
 #
 # In this example, the values of the fitting parameters
-# are taken from the model in Shen et al. 2003 [1]_.
+# are taken from the model in Shen et al. 2003 [1].
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -68,8 +68,8 @@ R_early = early_type_lognormal(M_early, a, b, M0, sigma1, sigma2).value
 # %%
 # Validation with SDSS data
 # -------------------------
-# In this example, we reproduce figure 4 in reference [1]_ .
-# The data files can be downloaded here: `early-type
+# In this example, we reproduce figure 4 in reference [1]_.
+# The data files are included here: `early-type
 # <https://github.com/skypyproject/skypy/raw/master/examples/galaxies/Shen+03_early.txt>`_
 # and `late-type
 # <https://github.com/skypyproject/skypy/raw/master/examples/galaxies/Shen+03_late.txt>`_.
@@ -101,15 +101,14 @@ plt.plot(center_early, R_bar_early, 'r', label='SkyPy early')
 plt.plot(center_late, R_bar_late, 'b', label='SkyPy late')
 
 plt.errorbar(sdss_early[:, 0], sdss_early[:, 1], yerr=error_early, color='coral',
-             marker='s', label='Shen+03 early', lw=0.5)
+             marker='s', label='Shen+03 early', ls='none')
 plt.errorbar(sdss_late[:, 0], sdss_late[:, 1], yerr=error_late, color='deepskyblue',
-             marker='^', label='Shen+03 late', lw=0.5)
+             marker='^', label='Shen+03 late', ls='none')
 
 plt.ylim(5e-1, 2e1)
-plt.xlim(-24, -15.5)
+plt.xlim(-16, -24)
 plt.xlabel('Magnitude $M$')
 plt.ylabel('$R_{50,r} (kpc)$')
-plt.title("SDSS data release 7")
 plt.legend(frameon=False)
 
 plt.yscale('log')
