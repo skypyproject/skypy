@@ -21,7 +21,7 @@ in SkyPy.
 #    \log_{10} (\bar{R}/{\rm kpc}) = -0.4aM + b,
 #
 # with :math:`a` and :math:`b` fitting constants. Likewise, for late-type galaxies
-# the formula (15) reads
+# the equation (15) reads
 #
 # .. math::
 #
