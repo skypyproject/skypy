@@ -66,21 +66,23 @@ M_early = np.random.uniform(-18, -24, size=10000)
 R_early = early_type_lognormal(M_early, a, b, M0, sigma1, sigma2).value
 
 # %%
-# Validation with the SDSS sample
-# -------------------------------
+# Validation with SDSS data
+# -------------------------
 # In this example, we reproduce figure 4 in reference [1]_ .
 # The data files can be downloaded here: `early-type
 # <https://github.com/skypyproject/skypy/raw/master/examples/galaxies/Shen+03_early.txt>`_
 # and `late-type
 # <https://github.com/skypyproject/skypy/raw/master/examples/galaxies/Shen+03_late.txt>`_.
-# The columns of these files represent magnitudes, radii, lower error and
-# upper error.
+# The columns of these files represent magnitudes, radii, minus error and
+# plus error.
 
 # Load data from figure 4 in Shen et al 2003
 sdss_early = np.loadtxt('Shen+03_early.txt')
 sdss_late = np.loadtxt('Shen+03_late.txt')
-error_late = sdss_late[:, 3] - sdss_late[:, 2]
-error_early = sdss_early[:, 3] - sdss_early[:, 2]
+error_late = sdss_late[:,2] + sdss_late[:,3]
+error_early = sdss_early[:,2] + sdss_early[:,3]
+error_late /= (sdss_late[:,1] * np.log(10))
+error_early /= (sdss_early[:,1] * np.log(10))
 
 # Bins for median radii
 M_bins_late = np.arange(-16, -24.1, -0.5)
