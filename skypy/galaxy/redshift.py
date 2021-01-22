@@ -15,6 +15,7 @@ from ..utils import broadcast_arguments, dependent_argument
 __all__ = [
     'redshifts_from_comoving_density',
     'schechter_lf_redshift',
+    'schechter_smf_redshift',
     'smail',
 ]
 
@@ -148,6 +149,77 @@ def schechter_lf_redshift(redshift, M_star, phi_star, alpha, m_lim, sky_area,
     gam = np.empty_like(lnxmin)
     for i, _ in np.ndenumerate(gam):
         gam[i], _ = scipy.integrate.quad(f, lnxmin[i], np.inf, args=(alpha[i],))
+
+    # comoving number density is normalisation times upper incomplete gamma
+    density = phi_star*gam
+
+    # sample redshifts from the comoving density
+    return redshifts_from_comoving_density(redshift=redshift, density=density,
+                                           sky_area=sky_area, cosmology=cosmology, noise=noise)
+
+
+@dependent_argument('m_star', 'redshift')
+@dependent_argument('phi_star', 'redshift')
+@dependent_argument('alpha', 'redshift')
+@broadcast_arguments('redshift', 'm_star', 'phi_star', 'alpha')
+@units.quantity_input(sky_area=units.sr)
+def schechter_smf_redshift(redshift, m_star, phi_star, alpha, m_min, m_max, sky_area,
+                           cosmology, noise=True):
+    r'''Sample redshifts from Schechter function.
+
+    Sample the redshifts of galaxies following a Schechter function
+    with potentially redshift-dependent parameters, limited by stellar masses
+    `m_max` and `m_min`, for a sky area `sky_area`.
+
+    Parameters
+    ----------
+    redshift : array_like
+        Input redshift grid on which the Schechter function parameters are
+        evaluated. Galaxies are sampled over this redshift range.
+    m_star : array_like or function
+        Characteristic stellar mass of the Schechter function. Can be a
+        single value, an array of values for each `redshift`, or a function of
+        redshift.
+    phi_star : array_like or function
+        Normalisation of the Schechter function. Can be a single value, an
+        array of values for each `redshift`, or a function of redshift.
+    alpha : array_like or function
+        Schechter function power law index. Can be a single value, an array of
+        values for each `redshift`, or a function of redshift.
+    m_min : float
+        Minimum stellar mass.
+    m_max : float
+        Maximum stellar mass.
+    sky_area : `~astropy.units.Quantity`
+        Sky area over which galaxies are sampled. Must be in units of solid angle.
+    cosmology : Cosmology
+        Cosmology object to convert comoving density.
+    noise : bool, optional
+        Poisson-sample the number of galaxies. Default is `True`.
+
+    Returns
+    -------
+    redshifts : array_like
+        Redshifts of the galaxy sample described by the Schechter
+        function.
+
+    '''
+
+    lnxmin = np.log(m_min)
+    lnxmin -= np.log(m_star)
+
+    lnxmax = np.log(m_max)
+    lnxmax -= np.log(m_star)
+
+    # gamma function integrand
+    def f(lnx, a):
+        return np.exp((a + 1)*lnx - np.exp(lnx)) if lnx < lnxmax.max() else 0.
+
+    # integrate gamma function for each redshift
+    gam = np.empty_like(alpha)
+
+    for i, _ in np.ndenumerate(gam):
+        gam[i], _ = scipy.integrate.quad(f, lnxmin[i], lnxmax[i], args=(alpha[i],))
 
     # comoving number density is normalisation times upper incomplete gamma
     density = phi_star*gam

@@ -50,6 +50,7 @@ The following models are found in the `skypy.galaxy.redshift` package.
 
    redshifts_from_comoving_density
    schechter_lf_redshift
+   schechter_smf_redshift
    smail
 
 
@@ -78,9 +79,10 @@ The following models are found in the `skypy.galaxy.spectrum` package.
    :nosignatures:
 
    dirichlet_coefficients
-   load_spectral_data
    mag_ab
-   magnitudes_from_templates
+   SpectrumTemplates
+   KCorrectTemplates
+   kcorrect
 
 
 Stellar mass
@@ -92,7 +94,7 @@ The following models are found in the `skypy.galaxy.stellar_mass` package.
 .. autosummary::
   :nosignatures:
 
-  schechter_smf
+  schechter_smf_mass
 
 
 Reference/API
@@ -107,4 +109,5 @@ Reference/API
    :include-all-objects:
 .. automodapi:: skypy.galaxy.size
 .. automodapi:: skypy.galaxy.spectrum
+   :include-all-objects:
 .. automodapi:: skypy.galaxy.stellar_mass

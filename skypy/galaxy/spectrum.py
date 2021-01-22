@@ -4,25 +4,21 @@ r"""Galaxy spectrum module.
 
 import numpy as np
 from astropy import units
-from ..utils import spectral_data_input
+from astropy.io import fits
+from pkg_resources import resource_filename
+from abc import ABCMeta, abstractmethod
 
 
 __all__ = [
     'dirichlet_coefficients',
-    'load_spectral_data',
     'mag_ab',
-    'magnitudes_from_templates',
+    'SpectrumTemplates',
+    'KCorrectTemplates',
+    'kcorrect',
 ]
 
 try:
-    __import__('specutils')
-except ImportError:
-    HAS_SPECUTILS = False
-else:
-    HAS_SPECUTILS = True
-
-try:
-    import speclite
+    import speclite.filters
 except ImportError:
     HAS_SPECLITE = False
 else:
@@ -231,8 +227,11 @@ def mag_ab(wavelength, spectrum, filters, *, redshift=None, coefficients=None,
     # combine spectra if asked to
     if coefficients is not None:
         # contraction over spectrum axes (`nd_z` to `nd_z+nd_s`)
-        c = np.reshape(coefficients, np.shape(coefficients) + (1,)*nd_f)
-        m = np.sum(m*c, axis=tuple(range(nd_z, nd_z+nd_s)))
+        if nd_z == 0:
+            m = np.matmul(coefficients, m)
+        else:
+            c = np.reshape(coefficients, np.shape(coefficients) + (1,)*nd_f)
+            m = np.sum(m*c, axis=tuple(range(nd_z, nd_z+nd_s)))
         # no spectrum axes left
         nd_s = 0
 
@@ -253,150 +252,210 @@ def mag_ab(wavelength, spectrum, filters, *, redshift=None, coefficients=None,
     return m
 
 
-@spectral_data_input(templates=units.Jy)
-def magnitudes_from_templates(coefficients, templates, filters, redshift=None,
-                              resolution=1000, stellar_mass=None, distance_modulus=None):
-    r'''Compute AB magnitudes from template spectra.
+class SpectrumTemplates(metaclass=ABCMeta):
+    '''Base class for composite galaxy spectra from a set of basis templates'''
 
-    This function calculates photometric AB magnitudes for objects whose
-    spectra are modelled as a linear combination of template spectra following
-    [1]_ and [2]_.
+    @abstractmethod
+    def __init__(self):
+        raise NotImplementedError
 
-    Parameters
-    ----------
-    coefficients : (ng, nt) array_like
-        Array of spectrum coefficients.
-    templates : spectral_data
-        Template spectra.
-    filters : str or list of str
-        Bandpass filter specification for `~speclite.filters.load_filters`.
-    redshift : (ng,) array_like, optional
-        Optional array of values for redshifting the source spectrum.
-    resolution : integer, optional
-        Redshift resolution for intepolating magnitudes. Default is 1000. If
-        the number of objects is less than resolution their magnitudes are
-        calculated directly without interpolation.
-    stellar_mass : (ng,) array_like, optional
-        Optional array of stellar masses for each galaxy in template units.
-    distance_modulus : (ng,) array_like, optional
-        Optional array of distance moduli for each galaxy.
+    def absolute_magnitudes(self, coefficients, filters, stellar_mass=None):
+        '''Galaxy AB absolute magnitudes from template spectra.
 
-    Returns
-    -------
-    mag_ab : (ng, nf) array_like
-        The absolute AB magnitude of each object in each filter, where ``nf``
-        is the number of loaded filters.
+        This function calculates photometric AB absolute magnitudes for
+        galaxies whose spectra are modelled as a linear combination of a set of
+        template spectra.
+
+        Parameters
+        ----------
+        coefficients : (ng, nt) array_like
+            Array of spectrum coefficients.
+        filters : str or list of str
+            Bandpass filter specification for `~speclite.filters.load_filters`.
+        stellar_mass : (ng,) array_like, optional
+            Optional array of stellar masses for each galaxy in template units.
+
+        Returns
+        -------
+        magnitudes : (ng, nf) array_like
+            The absolute AB magnitude of each object in each filter, where
+            ``nf`` is the number of loaded filters.
+        '''
+        mass_modulus = -2.5*np.log10(stellar_mass) if stellar_mass is not None else 0
+        M = mag_ab(self.wavelength, self.templates, filters, coefficients=coefficients)
+        return (M.T + mass_modulus).T
+
+    def apparent_magnitudes(self, coefficients, redshift, filters, cosmology, *,
+                            stellar_mass=None, resolution=1000):
+        '''Galaxy AB apparent magnitudes from template spectra.
+
+        This function calculates photometric AB apparent magnitudes for
+        galaxies whose spectra are modelled as a linear combination of a set of
+        template spectra.
+
+        Parameters
+        ----------
+        coefficients : (ng, nt) array_like
+            Array of spectrum coefficients.
+        redshifts : (ng,) array_like
+            Array of redshifts for each galaxy used to calculte the distance
+            modulus and k-correction.
+        filters : str or list of str
+            Bandpass filter specification for `~speclite.filters.load_filters`.
+        cosmology : Cosmology
+            Astropy Cosmology object to calculate distance modulus.
+        stellar_mass : (ng,) array_like, optional
+            Optional array of stellar masses for each galaxy in template units.
+        resolution : integer, optional
+            Redshift resolution for intepolating magnitudes. Default is 1000. If
+            the number of objects is less than resolution their magnitudes are
+            calculated directly without interpolation.
+
+        Returns
+        -------
+        magnitudes : (ng, nf) array_like
+            The apparent AB magnitude of each object in each filter, where
+            ``nf`` is the number of loaded filters.
+        '''
+        distmod = cosmology.distmod(redshift).value
+        mass_modulus = -2.5*np.log10(stellar_mass) if stellar_mass is not None else 0
+        m = mag_ab(self.wavelength, self.templates, filters, redshift=redshift,
+                   coefficients=coefficients, distmod=distmod, interpolate=resolution)
+        return (m.T + mass_modulus).T
+
+
+class KCorrectTemplates(SpectrumTemplates):
+    '''Galaxy spectra from kcorrect templates.
+
+    Class for modeling galaxy spectra as a linear combination of the five
+    kcorrect template spectra [1]_.
 
     References
     ----------
-    .. [1] M. R. Blanton et al., 2003, AJ, 125, 2348
-    .. [2] M. R. Blanton and S. Roweis, 2007, AJ, 125, 2348
+    .. [1] M. R. Blanton and S. Roweis, 2007, AJ, 125, 2348
     '''
 
-    # combine coefficients and stellar masses, if given
-    if stellar_mass is not None:
-        coefficients = (coefficients.T * stellar_mass).T
+    def __init__(self, hdu=1):
+        filename = resource_filename('skypy', 'data/kcorrect/k_nmf_derived.default.fits')
+        with fits.open(filename) as hdul:
+            self.templates = hdul[hdu].data * units.Unit('erg s-1 cm-2 angstrom-1')
+            self.wavelength = hdul[11].data * units.Unit('angstrom')
+            self.mass = hdul[16].data
+            self.mremain = hdul[17].data
+            self.mets = hdul[18].data
+            self.mass300 = hdul[19].data
+            self.mass1000 = hdul[20].data
 
-    # compute AB magnitudes
-    magnitudes = mag_ab(templates.wavelength, templates.flux, filters,
-                        redshift=redshift, coefficients=coefficients,
-                        distmod=distance_modulus, interpolate=resolution)
+    def stellar_mass(self, coefficients, magnitudes, filter):
+        r'''Compute stellar mass from absolute magnitudes in a reference filter.
 
-    return magnitudes
+        This function takes composite spectra for a set of galaxies defined by
+        template fluxes *per unit stellar mass* and multiplicative coefficients
+        and calculates the stellar mass required to match given absolute
+        magnitudes for a given bandpass filter in the rest frame.
+
+        Parameters
+        ----------
+        coefficients : (ng, nt) array_like
+            Array of template coefficients.
+        magnitudes : (ng,) array_like
+            The magnitudes to match in the reference bandpass.
+        filter : str
+            A single reference bandpass filter specification for
+            `~speclite.filters.load_filters`.
+
+        Returns
+        -------
+        stellar_mass : (ng,) array_like
+            Stellar mass of each galaxy in template units.
+        '''
+        Mt = self.absolute_magnitudes(coefficients, filter)
+        return np.power(10, 0.4*(Mt-magnitudes))
+
+    def metallicity(self, coefficients):
+        r'''Galaxy metallicities from kcorrect templates.
+
+        This function calculates the matallicities of galaxies modelled as a
+        linear combination of the kcorrect templates [1]_.
+
+        Parameters
+        ----------
+        coefficients : (ng, 5) array_like
+            Array of template coefficients.
+
+        Returns
+        -------
+        metallicity : (ng,) array_like
+            Metallicity of each galaxy.
+
+        References
+        ----------
+        .. [1] M. R. Blanton and S. Roweis, 2007, AJ, 125, 2348
+
+        '''
+
+        return np.sum(coefficients * self.mremain * self.mets) / np.sum(coefficients * self.mremain)
+
+    def m300(self, coefficients, stellar_mass=None):
+        r'''Stellar mass formed in the last 300 Myr.
+
+        This function calculates the mass of new stars formed within the last
+        300 Myr for galaxies modelled as a linear combination of the kcorrect
+        templates [1]_.
+
+        Parameters
+        ----------
+        coefficients : (ng, 5) array_like
+            Array of template coefficients.
+        stellar_mass : (ng,) array_like, optional
+            Optional array of stellar masses for each galaxy.
+
+        Returns
+        -------
+        m300 : (ng,) array_like
+            Total mass of new stars formed in the last 300 Myr as a fraction of
+            the stellar mass of each galaxy. If stellar_mass is given, instead
+            returns the absolute mass of new stars.
+
+        References
+        ----------
+        .. [1] M. R. Blanton and S. Roweis, 2007, AJ, 125, 2348
+
+        '''
+
+        sm = stellar_mass if stellar_mass is not None else 1
+        return sm * np.sum(coefficients * self.mass300) / np.sum(coefficients * self.mass)
+
+    def m1000(self, coefficients, stellar_mass=None):
+        r'''Stellar mass formed in the last 1 Gyr.
+
+        This function calculates the mass of new stars formed within the last
+        1 Gyr for galaxies modelled as a linear combination of the kcorrect
+        templates [1]_.
+
+        Parameters
+        ----------
+        coefficients : (ng, 5) array_like
+            Array of template coefficients.
+        stellar_mass : (ng,) array_like, optional
+            Optional array of stellar masses for each galaxy.
+
+        Returns
+        -------
+        m1000 : (ng,) array_like
+            Total mass of new stars formed in the last 1 Gyr as a fraction of
+            the stellar mass of each galaxy. If stellar_mass is given, instead
+            returns the absolute mass of new stars.
+
+        References
+        ----------
+        .. [1] M. R. Blanton and S. Roweis, 2007, AJ, 125, 2348
+
+        '''
+
+        sm = stellar_mass if stellar_mass is not None else 1
+        return sm * np.sum(coefficients * self.mass1000) / np.sum(coefficients * self.mass)
 
 
-@spectral_data_input(templates=units.Jy)
-def stellar_mass_from_reference_band(coefficients, templates, magnitudes, filter):
-    r'''Compute stellar mass from absolute magnitudes in a reference filter.
-
-    This function takes composite spectra for a set of galaxies defined by
-    template fluxes *per unit stellar mass* and multiplicative coefficients and
-    calculates the stellar mass required to match given absolute magnitudes for
-    a given bandpass filter in the rest frame.
-
-    Parameters
-    ----------
-    coefficients : (ng, nt) array_like
-        Array of template coefficients.
-    templates : (nt,) spectral_data
-        Emission spectra of the templates.
-    magnitudes : (ng,) array_like
-        The magnitudes to match in the reference bandpass.
-    filter : str
-        A single reference bandpass filter specification for
-        `~speclite.filters.load_filters`.
-
-    Returns
-    -------
-    stellar_mass : (ng,) array_like
-        Stellar mass of each galaxy in template units.
-    '''
-
-    # compute AB magnitudes for reference band
-    M = mag_ab(templates.wavelength, templates.flux, filter, coefficients=coefficients)
-
-    # compute "stellar mass modulus" from magnitudes
-    M -= magnitudes
-
-    # turn into stellar mass
-    M *= 0.4
-    np.power(10., M, out=M)
-
-    return M
-
-
-def load_spectral_data(name):
-    '''Load spectral data from a known source or a local file.
-
-    If the given name refers to a known source, the associated spectral data is
-    constructed by its designated loader. If no source with the given name is
-    found, it is assumed to be a filename.
-
-    Parameters
-    ----------
-    name : str or list of str
-        The name of the spectral data to load, or a list of multiple names.
-
-    Returns
-    -------
-    spectrum : `~specutils.Spectrum1D` or `~specutils.SpectrumList`
-        The spectral data. The wavelength or frequency column is the
-        `~specutils.Spectrum1D.spectral_axis` (with units) of the returned
-        spectrum, and the spectral column or columns are the
-        `~specutils.Spectrum1D.flux` array (with units) of the returned
-        spectrum.
-
-    Warnings
-    --------
-    The :mod:`specutils` package must be installed to use this function.
-    The :mod:`speclite` package must be installed to use this function.
-
-    '''
-
-    import re
-
-    # loaders registry
-    from ._spectrum_loaders import spectrum_loaders, combine_spectra
-
-    # check non-string input
-    if not isinstance(name, str):
-        # recurse on lists
-        if hasattr(name, '__iter__'):
-            spectra = None
-            for name_ in name:
-                spectra = combine_spectra(spectra, load_spectral_data(name_))
-            return spectra
-        else:
-            raise TypeError('name: not a string or list of strings')
-
-    # go through loaders
-    for pattern, loader, *args in spectrum_loaders:
-        # try to match given name against pattern
-        match = re.fullmatch(pattern, name)
-        if match:
-            # collect nonempty group matches
-            groups = [g for g in match.groups() if g]
-            break
-
-    # run the loader
-    return loader(*args, *groups)
+kcorrect = KCorrectTemplates(hdu=1)
+'''`KCorrectTemplates` using kcorrect smoothed templates.'''
