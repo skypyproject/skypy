@@ -49,9 +49,6 @@ Pipeline
 Developer Documentation
 ***********************
 
-Contributor guidelines
-----------------------
-
 .. toctree::
    :maxdepth: 1
 
