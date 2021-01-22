@@ -73,19 +73,13 @@ R_early = early_type_lognormal(M_early, a, b, M0, sigma1, sigma2).value
 # %%
 # Validation with the SDSS sample
 # -------------------------------
-# In this example, we reproduce figure 4 in reference [1]_ and use SDSS data [2]_.
-# We obtain the SDSS DR7 sample via `astroquery.sdss` and select the Petrosian
-# :math:`R_{50}` and :math:`R_{90}` radii for the r-band magnitudes and redshifts
-# of 50000 objects. We then convert radii into physical size for a Planck15
-# cosmology. Finally we split the SDSS sample
-# using the concentration index, :math:`c`:
-#
-# .. math::
-#
-#    c \equiv R_{90} / R_{50}
-#
-# and the conditions :math:`c < 2.86` for late-type and :math:`c > 2.86` for
-# early-type galaxies.
+# In this example, we reproduce figure 4 in reference [1]_ .
+# The data files can be downloaded here: `early-type
+# <https://github.com/skypyproject/skypy/raw/master/examples/galaxies/Shen+03_early.txt>`_
+# and `late-type
+# <https://github.com/skypyproject/skypy/raw/master/examples/galaxies/Shen+03_late.txt>`_.
+# The columns of these files represent magnitudes, radii, lower error and
+# upper error.
 
 # Load data from figure 4 in Shen et al 2003
 sdss_early = np.loadtxt('Shen+03_early.txt')
@@ -131,4 +125,3 @@ plt.show()
 #   Brinkmann, I. Csabai, `Mon. Not. Roy. Astron. Soc. 343, 978 (2003)`_
 #
 # .. _Mon. Not. Roy. Astron. Soc. 343, 978 (2003): https://arxiv.org/pdf/astro-ph/0301527.pdf
-# .. [2] https://www.sdss.org
