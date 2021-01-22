@@ -38,13 +38,8 @@ in SkyPy.
 # :math:`M_0` are fitting parameters.
 #
 # In SkyPy, we draw physical sizes of both galaxy types from a lognormal distribution
-#
-# .. math::
-#
-#    p(R) = \frac{1}{\sigma R \sqrt{2 \pi}}e^{- \frac{(ln R - \mu)^2}{2 \sigma^2}}
-#
-# with mean :math:`\mu = 0` and standard deviation :math:`\sigma`, and an amplitude
-# :math:`\bar{R}` given by the Shen et al. 2003 model:
+# with standard deviation, :math:`\sigma`, and amplitude,
+# :math:`\bar{R}`, given by the Shen et al. 2003 model:
 # :func:`skypy.galaxy.size.early_type_lognormal()` and
 # :func:`skypy.galaxy.size.late_type_lognormal()`
 # (c.f. equations above).
