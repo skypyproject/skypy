@@ -1,4 +1,5 @@
-# CONTRIBUTION GUIDELINES
+CONTRIBUTOR GUIDELINES
+======================
 
 For information on how to contribute see our `Contributor Guidelines`_.
 
