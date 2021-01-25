@@ -92,6 +92,11 @@ def triaxial_axis_ratio(zeta, xi, size=None):
         Size of the random draw. If `None` is given, size is inferred from
         other inputs.
 
+    Returns
+    -------
+    q : array_like
+        Axis ratio of the randomly projected ellipsoid.
+
     Notes
     -----
     See equations (11) and (12) in [1]_ for details.
