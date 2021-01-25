@@ -9,26 +9,27 @@ in SkyPy.
 
 
 # %%
-# Size-magnitude relation
+# Size-Magnitude Relation
 # -------------------------
 #
-# According to Shen et al. 2003 [1]_, the observed size of galaxies
-# and the absolute magnitudes follow simple analytic formulae. For early-type
-# galaxies, the relation (14) reads
+# In Shen et al. 2003 [1]_, the observed sizes, :math:`R`, of galaxies
+# were shown to follow simple analytic relations as a function of their absolute
+# magnitudes,:math:`M`.
+# For early-type galaxies, their mean radius follows Equation 14:
 #
 # .. math::
 #
 #    \log_{10} (\bar{R}/{\rm kpc}) = -0.4aM + b,
 #
-# with :math:`a` and :math:`b` fitting constants. Likewise, for late-type galaxies
-# the equation (15) reads
+# with :math:`a` and :math:`b` fitting constants. Likewise, late-type galaxies
+# follow Equation 15:
 #
 # .. math::
 #
 #    \log_{10}(\bar{R}/{\rm kpc})=-0.4\alpha M+
-#                                  (\beta -\alpha)\log \left[1+10^{-0.4(M-M_0)}\right]+\gamma
+#                                  (\beta -\alpha)\log \left[1+10^{-0.4(M-M_0)}\right]+\gamma \, .
 #
-# with a dispersion given by equation 16
+# The dispersion on these relations is given by Equation 16:
 #
 # .. math::
 #
