@@ -14,7 +14,7 @@ in SkyPy.
 #
 # In Shen et al. 2003 [1]_, the observed sizes, :math:`R`, of galaxies
 # were shown to follow simple analytic relations as a function of their absolute
-# magnitudes,:math:`M`.
+# magnitudes, :math:`M`.
 # For early-type galaxies, their mean radius follows Equation 14:
 #
 # .. math::
