@@ -14,12 +14,12 @@ Running ``skypy`` from the command line
 
 ``skypy`` is a command line script that runs a pipeline of functions defined in
 a config file to generate tables of objects and write them to file. For example,
-you can use ``skypy`` to run one of the `example pipelines`_ and write the
-outputs to fits files:
+you can use ``skypy`` to run one of the `Examples`_ and write the outputs to
+fits files:
 
 .. code-block:: bash
 
-    $ skypy examples/mccl_galaxies.yml --format fits
+    $ skypy examples/galaxies/sdss_photometry.yml --format fits
 
 Config files are written in YAML format and read using the
 `~skypy.pipeline.load_skypy_yaml` funciton. Each entry in the config specifices
@@ -61,7 +61,7 @@ with a dollar sign ``$``. For example:
 When executing a pipeline, all dependencies are tracked and resolved in order
 using a Directed Acylic Graph implemented in networkx_.
 
-.. _Example Pipelines: https://github.com/skypyproject/skypy/tree/master/examples
+.. _Examples: https://skypy.readthedocs.io/en/stable/examples/index.html
 .. _pyyaml: https://pyyaml.org/
 .. _networkx: https://networkx.github.io/
 
