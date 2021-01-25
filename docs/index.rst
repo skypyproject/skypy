@@ -49,6 +49,11 @@ Pipeline
 Developer Documentation
 ***********************
 
+.. toctree::
+   :maxdepth: 1
+
+   developer/CONTRIBUTING
+
 
 .. _project-details:
 
