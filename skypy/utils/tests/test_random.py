@@ -58,7 +58,6 @@ def test_schechter_gamma():
     assert p > 0.01
 
 
-@pytest.mark.flaky
 def test_triaxial_axis_ratio():
 
     from skypy.utils.random import triaxial_axis_ratio
