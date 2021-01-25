@@ -34,7 +34,7 @@ kcorrect spectral energy distribution templates as implemented in SkyPy.
 #   :caption: examples/galaxies/sdss_photometry.yml
 #
 # The config file can be downloaded
-# `here <https://github.com/skypyproject/skypy/raw/master/examples/galaxies/sdss_photometry.yml>`_
+# :download:`here <../../../examples/galaxies/sdss_photometry.yml>`
 # and the simulation can be run either from the command line and saved to FITS
 # files:
 #
