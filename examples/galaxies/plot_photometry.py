@@ -16,14 +16,16 @@ kcorrect spectral energy distribution templates as implemented in SkyPy.
 # [1]_. One possible model for the coefficients is a redshift-dependent
 # Dirichlet distribution [2]_ which can be sampled from using the
 # :func:`dirichlet_coefficients <skypy.galaxy.spectrum.dirichlet_coefficients>`
-# function. The coefficients are then taken by the
-# :meth:`kcorrect.absolute_magnitudes <skypy.galaxy.spectrum.SpectrumTemplates.absolute_magnitudes>`
-# and :meth:`kcorrect.apparent_magnitudes <skypy.galaxy.spectrum.SpectrumTemplates.apparent_magnitudes>`
+# function. The coefficients are then taken by the :meth:`kcorrect.absolute_magnitudes
+# <skypy.galaxy.spectrum.SpectrumTemplates.absolute_magnitudes>` and
+# :meth:`kcorrect.apparent_magnitudes
+# <skypy.galaxy.spectrum.SpectrumTemplates.apparent_magnitudes>`
 # methods to calculate the relevant photometric quantities using the
 # :doc:`speclite <speclite:overview>` package. Note that since the kcorrect
 # templates are defined per unit stellar mass, the total stellar mass of each
 # galaxy must either be given or calculated from its absolute magnitude in
-# another band using :meth:`kcorrect.stellar_mass <skypy.galaxy.spectrum.KCorrectTemplates.stellar_mass>`.
+# another band using :meth:`kcorrect.stellar_mass
+# <skypy.galaxy.spectrum.KCorrectTemplates.stellar_mass>`.
 # An example simulation for the SDSS u- and r-band apparent magnitudes of "red"
 # and "blue" galaxy populations is given by the following config file:
 #
@@ -82,6 +84,7 @@ plt.show()
 # ----------
 #
 # .. [1] M. R. Blanton and S. Roweis, 2007, AJ, 125, 2348
-# .. [2] J. Herbel, T. Kacprzak, A. Amara, A. Refregier, C.Bruderer and A. Nicola 2017, JCAP, 1708, 035
+# .. [2] J. Herbel, T. Kacprzak, A. Amara, A. Refregier, C.Bruderer and
+#        A. Nicola 2017, JCAP, 1708, 035
 # .. [3] K. N. Abazajian et al. 2009, ApJS, 182, 543
 #
