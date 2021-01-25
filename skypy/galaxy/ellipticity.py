@@ -122,7 +122,7 @@ def ryden04(mu_gamma, sigma_gamma, mu, sigma, size=None):
         gam, eps = gam.item(), eps.item()
 
     # random projection of random triaxial ellipsoid
-    q = random.triaxial_axis_ratio(gam, 1-eps)
+    q = random.triaxial_axis_ratio(1-eps, gam)
 
     # return the ellipticity
     return (1-q)/(1+q)
