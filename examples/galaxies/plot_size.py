@@ -39,7 +39,7 @@ in SkyPy.
 # :math:`M_0` are fitting parameters.
 #
 # In SkyPy, we can sample physical sizes for each galaxy type from lognormal distributions,
-# with median :math:`\bar{R}`, using the functions
+# with median :math:`\bar{R}` and width :math:`\sigma_{ln R}`, using the functions
 # :func:`skypy.galaxy.size.early_type_lognormal()` and
 # :func:`skypy.galaxy.size.late_type_lognormal()`.
 #
@@ -73,8 +73,8 @@ R_early = early_type_lognormal(M_early, a, b, M0, sigma1, sigma2).value
 # You can download the data files for `early-type
 # <https://github.com/skypyproject/skypy/raw/master/examples/galaxies/Shen+03_early.txt>`_
 # and `late-type
-# <https://github.com/skypyproject/skypy/raw/master/examples/galaxies/Shen+03_late.txt>`_.
-# distributions which have the following columns: magnitudes, median radius, minus error, and
+# <https://github.com/skypyproject/skypy/raw/master/examples/galaxies/Shen+03_late.txt>`_
+# SDSS galaxies which have the following columns: magnitudes, median radius, minus error, and
 # plus error.
 
 # Load data from figure 4 in Shen et al 2003
