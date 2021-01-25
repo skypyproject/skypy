@@ -43,8 +43,9 @@ in SkyPy.
 # :func:`skypy.galaxy.size.early_type_lognormal()` and
 # :func:`skypy.galaxy.size.late_type_lognormal()`.
 #
-# In this example, the values of the fitting parameters
-# are taken from the model in Shen et al. 2003 [1].
+# In this example, we simulate the sizes of galaxies with random magnitudes using the
+# values for the parameters
+# given in Shen et al. 2003 Table 1 [1]_ :
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -65,14 +66,15 @@ M_early = np.random.uniform(-18, -24, size=10000)
 R_early = early_type_lognormal(M_early, a, b, M0, sigma1, sigma2).value
 
 # %%
-# Validation with SDSS data
-# -------------------------
-# In this example, we reproduce figure 4 in reference [1]_.
-# The data files are included here: `early-type
+# Validation against SDSS Data
+# ----------------------------
+# Here we reproduce Figure 4 from [1]_, comparing our simulated galaxy sizes against
+# observational data from SDSS.
+# You can download the data files for `early-type
 # <https://github.com/skypyproject/skypy/raw/master/examples/galaxies/Shen+03_early.txt>`_
 # and `late-type
 # <https://github.com/skypyproject/skypy/raw/master/examples/galaxies/Shen+03_late.txt>`_.
-# The columns of these files represent magnitudes, radii, minus error and
+# distributions which have the following columns: magnitudes, median radius, minus error, and
 # plus error.
 
 # Load data from figure 4 in Shen et al 2003
