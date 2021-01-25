@@ -1,8 +1,8 @@
 """
-Galaxy size
-===========
+Galaxy Size Distributions
+=========================
 
-This example demonstrate how to obtain sizes for early and late type galaxies
+This example demonstrate how to sample sizes for early and late type galaxies
 in SkyPy.
 
 """
