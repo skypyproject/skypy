@@ -51,7 +51,9 @@ kcorrect spectral energy distribution templates as implemented in SkyPy.
 #
 # Here we compare the apparent magnitude distributions of our simulated
 # galaxies with data from a :math:`10 \, \mathrm{deg^2}` region of the Sloan
-# Digital Sky Survey [3]_:
+# Digital Sky Survey [3]_. The binned SDSS magnitude distributions were
+# genereated from a query of the DR7 data release and can be downloaded
+# :download:`here <../../../examples/galaxies/sdss_dered_10deg2.ecsv>`:.
 
 from astropy.table import Table, vstack
 from matplotlib import pyplot as plt
@@ -85,6 +87,6 @@ plt.show()
 #
 # .. [1] M. R. Blanton and S. Roweis, 2007, AJ, 125, 2348
 # .. [2] J. Herbel, T. Kacprzak, A. Amara, A. Refregier, C.Bruderer and
-#        A. Nicola 2017, JCAP, 1708, 035
+#    A. Nicola 2017, JCAP, 1708, 035
 # .. [3] K. N. Abazajian et al. 2009, ApJS, 182, 543
 #
