@@ -73,8 +73,8 @@ When you feel that work on your new feature is complete, you should create a *Pu
   1. Go to `SkyPy Pull Requests <https://github.com/skypyproject/skypy/pulls>`_
   2. Click the green **New pull request** button
   3. Click **compare across forks**
-  4. Confirm that the base fork is ``skypyproject/skypy`` and the base branch is ```master``
-  5. Confirm the head fork is ``<your-account>/skypy`` and the compare branch is ```<your-branch-name>``
+  4. Confirm that the base fork is ``skypyproject/skypy`` and the base branch is ``master``
+  5. Confirm the head fork is ``<your-account>/skypy`` and the compare branch is ``<your-branch-name>``
   6. Give your pull request a title and fill out the the template for the description
   7. Click the green **Create pull request** button
 
