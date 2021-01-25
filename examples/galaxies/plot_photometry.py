@@ -2,8 +2,8 @@
 Optical Photometry
 ==================
 
-This example demonstrates how to model galaxy photometry using the kcorrect
-spectral energy distribution templates as implemented in SkyPy.
+This example demonstrates how to model galaxy photometric magnitudes using the
+kcorrect spectral energy distribution templates as implemented in SkyPy.
 
 """
 
@@ -11,17 +11,45 @@ spectral energy distribution templates as implemented in SkyPy.
 # kcorrect Spectral Templates
 # ---------------------------
 #
-# Describe kcorrect templates [1]_
+# In SkyPy, the rest-frame spectral energy distributions (SEDs) of galaxies can
+# be modelled as a linear combination of the five kcorrect basis templates
+# [1]_. One possible model for the coefficients is a redshift-dependent
+# Dirichlet distribution [2]_ which can be sampled from using the
+# :func:`dirichlet_coefficients <skypy.galaxy.spectrum.dirichlet_coefficients>`
+# function. The coefficients are then taken by the
+# :meth:`kcorrect.absolute_magnitudes <skypy.galaxy.spectrum.SpectrumTemplates.absolute_magnitudes>`
+# and :meth:`kcorrect.apparent_magnitudes <skypy.galaxy.spectrum.SpectrumTemplates.apparent_magnitudes>`
+# methods to calculate the relevant photometric quantities using the
+# :doc:`speclite <speclite:overview>` package. Note that since the kcorrect
+# templates are defined per unit stellar mass, the total stellar mass of each
+# galaxy must either be given or calculated from its absolute magnitude in
+# another band using :meth:`kcorrect.stellar_mass <skypy.galaxy.spectrum.KCorrectTemplates.stellar_mass>`.
+# An example simulation for the SDSS u- and r-band apparent magnitudes of "red"
+# and "blue" galaxy populations is given by the following config file:
 #
 # .. literalinclude:: ../../../examples/galaxies/sdss_photometry.yml
 #   :language: YAML
 #   :caption: examples/galaxies/sdss_photometry.yml
-
-# %%
+#
+# The config file can be downloaded
+# `here <https://github.com/skypyproject/skypy/raw/master/examples/galaxies/sdss_photometry.yml>`_
+# and the simulation can be run either from the command line and saved to FITS
+# files:
+#
+# .. code-block:: bash
+#
+#    $ skypy examples/galaxies/sdss_photometry.yml --format fits
+#
+# or in a python script using the :class:`Pipeline <skypy.pipeline.Pipeline>`
+# class as demonstrated in the `SDSS Photometry`_ section below. For more
+# details on writing config files see the :doc:`Pipeline Documentation </pipeline/index>`.
+#
 # SDSS Photometry
 # ---------------
 #
-# Here we compare with SDSS data [2]_
+# Here we compare the apparent magnitude distributions of our simulated
+# galaxies with data from a :math:`10 \, \mathrm{deg^2}` region of the Sloan
+# Digital Sky Survey [3]_:
 
 from astropy.table import Table, vstack
 from matplotlib import pyplot as plt
@@ -54,5 +82,6 @@ plt.show()
 # ----------
 #
 # .. [1] M. R. Blanton and S. Roweis, 2007, AJ, 125, 2348
-# .. [2] K. N. Abazajian et al. 2009, ApJS, 182, 543
+# .. [2] J. Herbel, T. Kacprzak, A. Amara, A. Refregier, C.Bruderer and A. Nicola 2017, JCAP, 1708, 035
+# .. [3] K. N. Abazajian et al. 2009, ApJS, 182, 543
 #
