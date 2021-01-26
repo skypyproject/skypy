@@ -17,9 +17,9 @@ kcorrect spectral energy distribution templates as implemented in SkyPy.
 # Dirichlet distribution [2]_ which can be sampled from using the
 # :func:`dirichlet_coefficients <skypy.galaxies.spectrum.dirichlet_coefficients>`
 # function. The coefficients are then taken by the :meth:`kcorrect.absolute_magnitudes
-# <skypy.galaxies.spectrum.SpectrumTemplates.absolute_magnitudes>` and
+# <skypy.utils.photometry.SpectrumTemplates.absolute_magnitudes>` and
 # :meth:`kcorrect.apparent_magnitudes
-# <skypy.galaxies.spectrum.SpectrumTemplates.apparent_magnitudes>`
+# <skypy.utils.photometry.SpectrumTemplates.apparent_magnitudes>`
 # methods to calculate the relevant photometric quantities using the
 # :doc:`speclite <speclite:overview>` package. Note that since the kcorrect
 # templates are defined per unit stellar mass, the total stellar mass of each
