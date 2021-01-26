@@ -1,6 +1,21 @@
-r"""Photometry module.
+"""Photometry module.
+
+This module contains methods that model spectral energy distributions and
+calculate photometric properties.
+
+
+Utility Functions
+=================
+
+.. autosummary::
+   :nosignatures:
+   :toctree: ../api/
+
+   mag_ab
+   SpectrumTemplates
 
 """
+
 
 from abc import ABCMeta, abstractmethod
 import numpy as np

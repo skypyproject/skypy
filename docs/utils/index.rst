@@ -120,6 +120,12 @@ should be placed below decorators which modify any of the independent
 arguments.
 
 
+Photometry (`skypy.utils.photometry`)
+=====================================
+
+.. automodule:: skypy.utils.photometry
+
+
 Random sampling (`skypy.utils.random`)
 ======================================
 

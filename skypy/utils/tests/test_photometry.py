@@ -1,6 +1,6 @@
 import numpy as np
 import pytest
-from skypy.photometry import HAS_SPECLITE
+from skypy.utils.photometry import HAS_SPECLITE
 
 
 @pytest.mark.skipif(not HAS_SPECLITE, reason='test requires speclite')
@@ -8,7 +8,7 @@ def test_mag_ab_standard_source():
 
     from astropy import units
     from speclite.filters import FilterResponse
-    from skypy.photometry import mag_ab
+    from skypy.utils.photometry import mag_ab
 
     # create a filter
     filt_lam = np.logspace(0, 4, 1000)*units.AA
@@ -31,7 +31,7 @@ def test_mag_ab_redshift_dependence():
 
     from astropy import units
     from speclite.filters import FilterResponse
-    from skypy.photometry import mag_ab
+    from skypy.utils.photometry import mag_ab
 
     # make a wide tophat bandpass
     filt_lam = [1.0e-10, 1.1e-10, 1.0e0, 0.9e10, 1.0e10]
@@ -57,7 +57,7 @@ def test_mag_ab_redshift_dependence():
 def test_mag_ab_multi():
 
     from astropy import units
-    from skypy.photometry import mag_ab
+    from skypy.utils.photometry import mag_ab
     from speclite.filters import FilterResponse
 
     # 5 redshifts
@@ -94,7 +94,7 @@ def test_mag_ab_multi():
 def test_template_spectra():
 
     from astropy import units
-    from skypy.photometry import mag_ab, SpectrumTemplates
+    from skypy.utils.photometry import mag_ab, SpectrumTemplates
     from astropy.cosmology import Planck15
     from speclite.filters import FilterResponse
 

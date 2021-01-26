@@ -1,7 +1,7 @@
 import numpy as np
 import scipy.stats
 import pytest
-from skypy.photometry import HAS_SPECLITE
+from skypy.utils.photometry import HAS_SPECLITE
 
 
 @pytest.mark.flaky

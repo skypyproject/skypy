@@ -6,7 +6,7 @@ from astropy import units
 from astropy.io import fits
 import numpy as np
 from pkg_resources import resource_filename
-from skypy.photometry import SpectrumTemplates
+from skypy.utils.photometry import SpectrumTemplates
 
 
 __all__ = [
