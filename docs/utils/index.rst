@@ -120,6 +120,20 @@ should be placed below decorators which modify any of the independent
 arguments.
 
 
+Photometry (`skypy.utils.photometry`)
+=====================================
+
+This module contains methods that model spectral energy distributions and
+calculate photometric properties.
+
+.. currentmodule:: skypy.utils.photometry
+.. autosummary::
+   :nosignatures:
+
+   mag_ab
+   SpectrumTemplates
+
+
 Random sampling (`skypy.utils.random`)
 ======================================
 
@@ -136,3 +150,4 @@ Reference/API
 =============
 
 .. automodapi:: skypy.utils
+.. automodapi:: skypy.utils.photometry
