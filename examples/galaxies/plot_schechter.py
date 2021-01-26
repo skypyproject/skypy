@@ -32,7 +32,7 @@ luminosity function as implemented in SkyPy.
 # In general, :math:`\phi_*`, :math:`M_*` and :math:`\alpha` can be redshift
 # dependent, resulting in a joint redshift-magnitude distribution
 # :math:`\phi(M, z)`. In SkyPy, sampling from this joint distribution is
-# implemented in :func:`skypy.galaxy.schechter_lf` where both `phi_star` and
+# implemented in :func:`skypy.galaxies.schechter_lf` where both `phi_star` and
 # `m_star` can be either constants or functions of redshift. In this example,
 # we follow a common parameterisation where `phi_star` and `m_star` are
 # exponential and linear functions of redshift respectively. Samples are
@@ -47,7 +47,7 @@ from astropy.table import Table
 from astropy.units import Quantity
 from matplotlib import pyplot as plt
 import numpy as np
-from skypy.galaxy import schechter_lf
+from skypy.galaxies import schechter_lf
 
 z_range = np.linspace(0.2, 1.0, 100)
 m_star = Linear1D(-1.03, -20.485)

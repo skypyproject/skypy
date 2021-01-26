@@ -7,10 +7,11 @@ def test_magnitude_functions():
 
     from astropy.cosmology import default_cosmology
 
-    from skypy.galaxy.luminosity import (absolute_to_apparent_magnitude,
-                                         apparent_to_absolute_magnitude, distance_modulus,
-                                         luminosity_in_band, luminosity_from_absolute_magnitude,
-                                         absolute_magnitude_from_luminosity)
+    from skypy.galaxies.luminosity import (
+            absolute_to_apparent_magnitude, apparent_to_absolute_magnitude,
+            distance_modulus, luminosity_in_band,
+            luminosity_from_absolute_magnitude,
+            absolute_magnitude_from_luminosity)
 
     cosmo = default_cosmology.get()
 
@@ -56,7 +57,7 @@ def test_magnitude_functions():
 
 @pytest.mark.flaky
 def test_schechter_lf_magnitude():
-    from skypy.galaxy.luminosity import schechter_lf_magnitude
+    from skypy.galaxies.luminosity import schechter_lf_magnitude
     from astropy.cosmology import default_cosmology
     import pytest
 

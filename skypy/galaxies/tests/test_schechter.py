@@ -7,7 +7,7 @@ from astropy.cosmology import default_cosmology
 def test_schechter_lf():
 
     from pytest import raises
-    from skypy.galaxy import schechter_lf
+    from skypy.galaxies import schechter_lf
     from astropy import units
 
     # redshift and magnitude distributions are tested separately
@@ -40,7 +40,7 @@ def test_schechter_lf():
 def test_schechter_smf():
 
     from pytest import raises
-    from skypy.galaxy import schechter_smf
+    from skypy.galaxies import schechter_smf
     from astropy import units
 
     # redshift and magnitude distributions are tested separately

@@ -31,7 +31,7 @@ Packages
 .. toctree::
    :maxdepth: 1
 
-   galaxy
+   galaxies
    utils/index
 
 Pipeline

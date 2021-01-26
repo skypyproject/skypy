@@ -63,7 +63,7 @@ def smail(z_median, alpha, beta, size=None):
     Sample 10 random variates from the Smail model with `alpha = 1.5` and
     `beta = 2` and median redshift `z_median = 1.2`.
 
-    >>> from skypy.galaxy.redshift import smail
+    >>> from skypy.galaxies.redshift import smail
     >>> redshift = smail(1.2, 1.5, 2.0, size=10)
 
     '''
@@ -124,7 +124,7 @@ def schechter_lf_redshift(redshift, M_star, phi_star, alpha, m_lim, sky_area,
     apparent magnitude cut of 22 for a survey of 1 square degree = 1/41253 of
     the sky.
 
-    >>> from skypy.galaxy.redshift import schechter_lf_redshift
+    >>> from skypy.galaxies.redshift import schechter_lf_redshift
     >>> from astropy import units
     >>> from astropy.cosmology import Planck15
     >>> z = [0., 5.]
@@ -265,7 +265,7 @@ def redshifts_from_comoving_density(redshift, density, sky_area, cosmology, nois
     Sample redshifts with a constant comoving number density 1e-3/Mpc3 up to
     redshift 1 for a survey of 1 square degree = 1/41253 of the sky.
 
-    >>> from skypy.galaxy.redshift import redshifts_from_comoving_density
+    >>> from skypy.galaxies.redshift import redshifts_from_comoving_density
     >>> from astropy import units
     >>> from astropy.cosmology import Planck15
     >>> z_range = np.arange(0, 1.01, 0.1)

@@ -4,7 +4,7 @@ import scipy.integrate
 from scipy.special import gammaln
 import pytest
 
-from skypy.galaxy import stellar_mass
+from skypy.galaxies import stellar_mass
 from skypy.utils import special
 
 

@@ -75,7 +75,7 @@ def dirichlet_coefficients(redshift, alpha0, alpha1, z1=1., weight=None):
 
     Examples
     --------
-    >>> from skypy.galaxy.spectrum import dirichlet_coefficients
+    >>> from skypy.galaxies.spectrum import dirichlet_coefficients
     >>> import numpy as np
 
     Sample the coefficients according to [1]_ for n blue galaxies with

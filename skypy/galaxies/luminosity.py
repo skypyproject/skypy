@@ -194,7 +194,7 @@ def schechter_lf_magnitude(redshift, M_star, alpha, m_lim, cosmology, size=None,
     brighter than m = 22.0 around redshift 0.5.
 
     >>> import numpy as np
-    >>> from skypy.galaxy.luminosity import schechter_lf_magnitude
+    >>> from skypy.galaxies.luminosity import schechter_lf_magnitude
     >>> from astropy.cosmology import Planck15
     >>> z = np.random.uniform(4.9, 5.1, size=20)
     >>> M = schechter_lf_magnitude(z, -20.5, -1.3, 22.0, Planck15)

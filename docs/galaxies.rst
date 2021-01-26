@@ -1,6 +1,6 @@
-*************************
-Galaxies (`skypy.galaxy`)
-*************************
+***************************
+Galaxies (`skypy.galaxies`)
+***************************
 
 
 Introduction
@@ -17,9 +17,9 @@ the available models for each individual property.
 Luminosity
 ----------
 
-The following models are found in the `skypy.galaxy.luminosity` package.
+The following models are found in the `skypy.galaxies.luminosity` package.
 
-.. currentmodule:: skypy.galaxy.luminosity
+.. currentmodule:: skypy.galaxies.luminosity
 .. autosummary::
    :nosignatures:
 
@@ -29,9 +29,9 @@ The following models are found in the `skypy.galaxy.luminosity` package.
 Morphology
 ----------
 
-The following models are found in the `skypy.galaxy.morphology` package.
+The following models are found in the `skypy.galaxies.morphology` package.
 
-.. currentmodule:: skypy.galaxy.morphology
+.. currentmodule:: skypy.galaxies.morphology
 .. autosummary::
    :nosignatures:
 
@@ -46,9 +46,9 @@ The following models are found in the `skypy.galaxy.morphology` package.
 Redshift
 --------
 
-The following models are found in the `skypy.galaxy.redshift` package.
+The following models are found in the `skypy.galaxies.redshift` package.
 
-.. currentmodule:: skypy.galaxy.redshift
+.. currentmodule:: skypy.galaxies.redshift
 .. autosummary::
    :nosignatures:
 
@@ -61,9 +61,9 @@ The following models are found in the `skypy.galaxy.redshift` package.
 Spectrum
 --------
 
-The following models are found in the `skypy.galaxy.spectrum` package.
+The following models are found in the `skypy.galaxies.spectrum` package.
 
-.. currentmodule:: skypy.galaxy.spectrum
+.. currentmodule:: skypy.galaxies.spectrum
 .. autosummary::
    :nosignatures:
 
@@ -75,9 +75,9 @@ The following models are found in the `skypy.galaxy.spectrum` package.
 Stellar mass
 ------------
 
-The following models are found in the `skypy.galaxy.stellar_mass` package.
+The following models are found in the `skypy.galaxies.stellar_mass` package.
 
-.. currentmodule:: skypy.galaxy.stellar_mass
+.. currentmodule:: skypy.galaxies.stellar_mass
 .. autosummary::
   :nosignatures:
 
@@ -87,12 +87,12 @@ The following models are found in the `skypy.galaxy.stellar_mass` package.
 Reference/API
 =============
 
-.. automodapi:: skypy.galaxy
-.. automodapi:: skypy.galaxy.luminosity
+.. automodapi:: skypy.galaxies
+.. automodapi:: skypy.galaxies.luminosity
    :include-all-objects:
-.. automodapi:: skypy.galaxy.morphology
-.. automodapi:: skypy.galaxy.redshift
+.. automodapi:: skypy.galaxies.morphology
+.. automodapi:: skypy.galaxies.redshift
    :include-all-objects:
-.. automodapi:: skypy.galaxy.spectrum
+.. automodapi:: skypy.galaxies.spectrum
    :include-all-objects:
-.. automodapi:: skypy.galaxy.stellar_mass
+.. automodapi:: skypy.galaxies.stellar_mass

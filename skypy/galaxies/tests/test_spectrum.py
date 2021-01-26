@@ -7,7 +7,7 @@ from skypy.utils.photometry import HAS_SPECLITE
 @pytest.mark.flaky
 def test_sampling_coefficients():
 
-    from skypy.galaxy.spectrum import dirichlet_coefficients
+    from skypy.galaxies.spectrum import dirichlet_coefficients
 
     alpha0 = np.array([2.079, 3.524, 1.917, 1.992, 2.536])
     alpha1 = np.array([2.265, 3.862, 1.921, 1.685, 2.480])
@@ -68,7 +68,7 @@ def test_sampling_coefficients():
 def test_kcorrect_magnitudes():
 
     from astropy.cosmology import Planck15
-    from skypy.galaxy.spectrum import kcorrect
+    from skypy.galaxies.spectrum import kcorrect
 
     # Test returned array shapes with single and multiple filters
     ng, nt = 7, 5
@@ -129,7 +129,7 @@ def test_kcorrect_magnitudes():
 def test_kcorrect_stellar_mass():
 
     from astropy import units
-    from skypy.galaxy.spectrum import kcorrect
+    from skypy.galaxies.spectrum import kcorrect
     from speclite.filters import FilterResponse
 
     # Gaussian bandpass
@@ -160,7 +160,7 @@ def test_kcorrect_stellar_mass():
 
 def test_kcorrect_metallicity():
 
-    from skypy.galaxy.spectrum import kcorrect
+    from skypy.galaxies.spectrum import kcorrect
 
     # Each test galaxy is exactly one of the templates
     coefficients = np.diag(np.ones(5))
@@ -171,7 +171,7 @@ def test_kcorrect_metallicity():
 
 def test_kcorrect_star_formation_rates():
 
-    from skypy.galaxy.spectrum import kcorrect
+    from skypy.galaxies.spectrum import kcorrect
 
     # Each test galaxy is exactly one of the templates
     coefficients = np.eye(5)
