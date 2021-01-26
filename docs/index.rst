@@ -32,15 +32,9 @@ Packages
    :maxdepth: 1
 
    galaxy
-   utils/index
-
-Pipeline
---------
-
-.. toctree::
-   :maxdepth: 1
-
+   photometry
    pipeline/index
+   utils/index
 
 
 .. _developer-docs:
