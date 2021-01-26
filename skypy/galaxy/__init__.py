@@ -7,10 +7,9 @@ __all__ = [
     'schechter_lf',
 ]
 
-from . import ellipticity  # noqa F401,F403
 from . import luminosity  # noqa F401,F403
+from . import morphology  # noqa F401,F403
 from . import redshift  # noqa F401,F403
-from . import size  # noqa F401,F403
 from . import spectrum  # noqa F401,F403
 from . import stellar_mass  # noqa F401,F403
 
