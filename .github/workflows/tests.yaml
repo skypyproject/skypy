@@ -58,9 +58,6 @@ jobs:
       run: |
         sudo install $(which gfortran-9) /usr/bin/gfortran
         echo gfortran=$(which gfortran)
-    - name: Add pytest Matcher
-      run: |
-        echo ::add-matcher::.github/problem_matchers/pytest.json
     - name: Run Tests
       run: |
         tox -e ${{ matrix.toxenv }} ${{ matrix.toxargs }} -- ${{ matrix.toxposargs }}
