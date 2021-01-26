@@ -14,19 +14,6 @@ What follows are the physical properties of galaxies simulated by SkyPy, and
 the available models for each individual property.
 
 
-Ellipticity
------------
-
-The following models are found in the `skypy.galaxy.ellipticity` package.
-
-.. currentmodule:: skypy.galaxy.ellipticity
-.. autosummary::
-   :nosignatures:
-
-   beta_ellipticity
-   ryden04
-
-
 Luminosity
 ----------
 
@@ -37,6 +24,23 @@ The following models are found in the `skypy.galaxy.luminosity` package.
    :nosignatures:
 
    schechter_lf_magnitude
+
+
+Morphology
+----------
+
+The following models are found in the `skypy.galaxy.morphology` package.
+
+.. currentmodule:: skypy.galaxy.morphology
+.. autosummary::
+   :nosignatures:
+
+   angular_size
+   beta_ellipticity
+   early_type_lognormal_size
+   late_type_lognormal_size
+   linear_lognormal_size
+   ryden04_ellipticity
 
 
 Redshift
@@ -52,21 +56,6 @@ The following models are found in the `skypy.galaxy.redshift` package.
    schechter_lf_redshift
    schechter_smf_redshift
    smail
-
-
-Size
-----
-
-The following models are found in the `skypy.galaxy.size` package.
-
-.. currentmodule:: skypy.galaxy.size
-.. autosummary::
-   :nosignatures:
-
-   angular_size
-   early_type_lognormal
-   late_type_lognormal
-   linear_lognormal
 
 
 Spectrum
@@ -101,11 +90,9 @@ Reference/API
 .. automodapi:: skypy.galaxy
 .. automodapi:: skypy.galaxy.luminosity
    :include-all-objects:
-.. automodapi:: skypy.galaxy.ellipticity
-   :include-all-objects:
+.. automodapi:: skypy.galaxy.morphology
 .. automodapi:: skypy.galaxy.redshift
    :include-all-objects:
-.. automodapi:: skypy.galaxy.size
 .. automodapi:: skypy.galaxy.spectrum
    :include-all-objects:
 .. automodapi:: skypy.galaxy.stellar_mass
