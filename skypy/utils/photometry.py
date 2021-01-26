@@ -22,7 +22,6 @@ import numpy as np
 
 
 __all__ = [
-    'HAS_SPECLITE',
     'mag_ab',
     'SpectrumTemplates',
 ]
