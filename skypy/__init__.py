@@ -14,5 +14,5 @@ from ._astropy_init import *   # noqa
 
 __all__ = []
 
-from . import galaxy  # noqa
+from . import galaxies  # noqa
 from . import pipeline  # noqa

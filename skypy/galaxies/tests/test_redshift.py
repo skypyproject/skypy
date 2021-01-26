@@ -6,7 +6,7 @@ from scipy.stats import kstest
 @pytest.mark.flaky
 def test_schechter_lf_redshift():
 
-    from skypy.galaxy.redshift import schechter_lf_redshift
+    from skypy.galaxies.redshift import schechter_lf_redshift
     from astropy.cosmology import FlatLambdaCDM
     from astropy import units
     from scipy.special import gamma, gammaincc
@@ -57,7 +57,7 @@ def test_schechter_lf_redshift():
 @pytest.mark.flaky
 def test_schechter_smf_redshift():
 
-    from skypy.galaxy.redshift import schechter_smf_redshift
+    from skypy.galaxies.redshift import schechter_smf_redshift
     from astropy.cosmology import FlatLambdaCDM
     from astropy import units
     from scipy.special import gamma, gammaincc
@@ -103,7 +103,7 @@ def test_schechter_smf_redshift():
 @pytest.mark.flaky
 def test_redshifts_from_comoving_density():
 
-    from skypy.galaxy.redshift import redshifts_from_comoving_density
+    from skypy.galaxies.redshift import redshifts_from_comoving_density
     from astropy.cosmology import LambdaCDM
     from astropy import units
 
@@ -143,7 +143,7 @@ def test_redshifts_from_comoving_density():
 
 @pytest.mark.flaky
 def test_smail():
-    from skypy.galaxy.redshift import smail
+    from skypy.galaxies.redshift import smail
 
     # sample a single redshift
     rvs = smail(1.3, 2.0, 1.5)

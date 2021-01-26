@@ -10,7 +10,7 @@ from astropy.cosmology import FlatLambdaCDM
 def test_angular_size():
     """ Test a FlatLambdaCDM cosmology with omega_matter = 1"""
 
-    from skypy.galaxy import morphology
+    from skypy.galaxies import morphology
 
     cosmology = FlatLambdaCDM(Om0=1.0, H0=70.0)
 
@@ -34,7 +34,7 @@ def test_angular_size():
 @pytest.mark.flaky
 def test_beta_ellipticity():
 
-    from skypy.galaxy.morphology import beta_ellipticity
+    from skypy.galaxies.morphology import beta_ellipticity
 
     # randomised ellipticity distribution with beta distribution parameters a,b
     # and the equivalent reparametrisation
@@ -71,7 +71,7 @@ def test_beta_ellipticity():
 def test_late_type_lognormal_size():
     """ Test lognormal distribution of late-type galaxy sizes"""
 
-    from skypy.galaxy.morphology import late_type_lognormal_size
+    from skypy.galaxies.morphology import late_type_lognormal_size
 
     # Test that a scalar input gives a scalar output
     magnitude_scalar = -20.0
@@ -116,7 +116,7 @@ def test_late_type_lognormal_size():
 def test_early_type_lognormal_size():
     """ Test lognormal distribution of late-type galaxy sizes"""
 
-    from skypy.galaxy.morphology import early_type_lognormal_size
+    from skypy.galaxies.morphology import early_type_lognormal_size
 
     # Test that a scalar input gives a scalar output
     magnitude_scalar = -20.0
@@ -158,7 +158,7 @@ def test_early_type_lognormal_size():
 def test_linear_lognormal_size():
     """ Test lognormal distribution of galaxy sizes"""
 
-    from skypy.galaxy.morphology import linear_lognormal_size
+    from skypy.galaxies.morphology import linear_lognormal_size
 
     # Test that a scalar input gives a scalar output
     magnitude_scalar = -20.0
@@ -191,7 +191,7 @@ def test_linear_lognormal_size():
 
 
 def test_ryden04_ellipticity():
-    from skypy.galaxy.morphology import ryden04_ellipticity
+    from skypy.galaxies.morphology import ryden04_ellipticity
 
     # sample a single ellipticity
     e = ryden04_ellipticity(0.222, 0.056, -1.85, 0.89)

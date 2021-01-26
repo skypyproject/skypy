@@ -43,7 +43,7 @@ def angular_size(physical_size, redshift, cosmology):
     Examples
     --------
     >>> from astropy import units
-    >>> from skypy.galaxy.morphology import angular_size
+    >>> from skypy.galaxies.morphology import angular_size
     >>> from astropy.cosmology import Planck15
     >>> r = angular_size(10*units.kpc, 1, Planck15)
 
@@ -94,7 +94,7 @@ def beta_ellipticity(e_ratio, e_sum, size=None):
     Sample 10000 random variates from the Kacprzak model with
     :math:`e_{\rm ratio} = 0.5` and :math:`e_{\rm sum} = 1.0`:
 
-    >>> from skypy.galaxy.morphology import beta_ellipticity
+    >>> from skypy.galaxies.morphology import beta_ellipticity
     >>> ellipticity = beta_ellipticity(0.5, 1.0, size=10000)
 
     '''
@@ -142,7 +142,7 @@ def late_type_lognormal_size(magnitude, alpha, beta, gamma, M0, sigma1, sigma2,
     Examples
     --------
     >>> import numpy as np
-    >>> from skypy.galaxy import morphology
+    >>> from skypy.galaxies import morphology
     >>> magnitude = -16.0
     >>> alpha, beta, gamma, M0 = 0.21, 0.53, -1.31, -20.52
     >>> sigma1, sigma2 = 0.48, 0.25
@@ -203,7 +203,7 @@ def early_type_lognormal_size(magnitude, a, b, M0, sigma1, sigma2, size=None):
     Examples
     --------
     >>> import numpy as np
-    >>> from skypy.galaxy import morphology
+    >>> from skypy.galaxies import morphology
     >>> magnitude = -20.0
     >>> a, b, M0 = 0.6, -4.63, -20.52
     >>> sigma1, sigma2 = 0.48, 0.25
@@ -256,7 +256,7 @@ def linear_lognormal_size(magnitude, a_mu, b_mu, sigma, size=None):
     Examples
     --------
     >>> import numpy as np
-    >>> from skypy.galaxy import morphology
+    >>> from skypy.galaxies import morphology
     >>> magnitude = -20.0
     >>> a_mu, b_mu, sigma =-0.24, -4.63, 0.4
     >>> s = morphology.linear_lognormal_size(magnitude, a_mu, b_mu, sigma)
@@ -306,7 +306,7 @@ def ryden04_ellipticity(mu_gamma, sigma_gamma, mu, sigma, size=None):
     :math:`\mu_\gamma = 0.222`, :math:`\sigma_\gamma = 0.056`,
     :math:`\mu = -1.85`, and :math:`\sigma = 0.89`.
 
-    >>> from skypy.galaxy.morphology import ryden04_ellipticity
+    >>> from skypy.galaxies.morphology import ryden04_ellipticity
     >>> ellipticity = ryden04_ellipticity(0.222, 0.056, -1.85, 0.89, size=10000)
 
     '''

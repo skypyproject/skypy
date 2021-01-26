@@ -1,4 +1,4 @@
-.. _galaxy_examples:
+.. _galaxies_examples:
 
 Galaxies
 --------

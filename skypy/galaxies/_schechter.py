@@ -48,8 +48,8 @@ def schechter_lf(redshift, M_star, phi_star, alpha, m_lim, sky_area, cosmology, 
     Notes
     -----
 
-    Effectively calls `~skypy.galaxy.redshift.schechter_lf_redshift` and
-    `~skypy.galaxy.luminosity.schechter_lf_magnitude` internally and returns
+    Effectively calls `~skypy.galaxies.redshift.schechter_lf_redshift` and
+    `~skypy.galaxies.luminosity.schechter_lf_magnitude` internally and returns
     the tuple of results.
 
     Returns
@@ -112,8 +112,8 @@ def schechter_smf(redshift, m_star, phi_star, alpha, m_min, m_max, sky_area, cos
     Notes
     -----
 
-    Effectively calls `~skypy.galaxy.redshift.schechter_smf_redshift` and
-    `~skypy.galaxy.stellar_mass.schechter_smf_mass` internally and returns
+    Effectively calls `~skypy.galaxies.redshift.schechter_smf_redshift` and
+    `~skypy.galaxies.stellar_mass.schechter_smf_mass` internally and returns
     the tuple of results.
 
     Returns

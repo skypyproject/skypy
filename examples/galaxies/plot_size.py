@@ -40,8 +40,8 @@ in SkyPy.
 #
 # In SkyPy, we can sample physical sizes for each galaxy type from lognormal distributions,
 # with median :math:`\bar{R}` and width :math:`\sigma_{ln R}`, using the functions
-# :func:`skypy.galaxy.morphology.early_type_lognormal_size()` and
-# :func:`skypy.galaxy.morphology.late_type_lognormal_size()`.
+# :func:`skypy.galaxies.morphology.early_type_lognormal_size()` and
+# :func:`skypy.galaxies.morphology.late_type_lognormal_size()`.
 #
 # In this example, we simulate the sizes of galaxies with random magnitudes using the
 # values for the parameters
@@ -49,8 +49,8 @@ in SkyPy.
 
 import numpy as np
 import matplotlib.pyplot as plt
-from skypy.galaxy.morphology import (early_type_lognormal_size,
-                                     late_type_lognormal_size)
+from skypy.galaxies.morphology import (early_type_lognormal_size,
+                                       late_type_lognormal_size)
 
 # Parameters for the late-type and early-type galaxies
 alpha, beta, gamma = 0.21, 0.53, -1.31
