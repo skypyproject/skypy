@@ -123,7 +123,15 @@ arguments.
 Photometry (`skypy.utils.photometry`)
 =====================================
 
-.. automodule:: skypy.utils.photometry
+This module contains methods that model spectral energy distributions and
+calculate photometric properties.
+
+.. currentmodule:: skypy.utils.photometry
+.. autosummary::
+   :nosignatures:
+
+   mag_ab
+   SpectrumTemplates
 
 
 Random sampling (`skypy.utils.random`)
@@ -142,3 +150,4 @@ Reference/API
 =============
 
 .. automodapi:: skypy.utils
+.. automodapi:: skypy.utils.photometry
