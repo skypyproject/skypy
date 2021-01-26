@@ -46,11 +46,6 @@ jobs:
     - name: Install Dependencies
       run: |
         pip install tox
-    - if: contains(matrix.toxenv, '-all') && runner.os == 'Linux'
-      name: Install Additional Dependencies (Linux)
-      run: |
-        sudo install $(which gfortran-9) /usr/bin/gfortran
-        echo gfortran=$(which gfortran)
     - name: Run Tests
       run: |
         tox -e ${{ matrix.toxenv }} ${{ matrix.toxargs }} -- ${{ matrix.toxposargs }}
