@@ -56,3 +56,37 @@ def test_schechter_gamma():
 
     _, p = kstest(x, 'gamma', args=(alpha+1, 0, scale))
     assert p > 0.01
+
+
+def test_triaxial_axis_ratio():
+
+    from skypy.utils.random import triaxial_axis_ratio
+
+    # sample a single axis ratio
+    q = triaxial_axis_ratio(0.8, 0.4)
+    assert np.isscalar(q)
+
+    # sample many axis ratios
+    q = triaxial_axis_ratio(0.8, 0.4, size=1000)
+    assert np.shape(q) == (1000,)
+
+    # sample with explicit shape
+    q = triaxial_axis_ratio(0.8, 0.4, size=(10, 10))
+    assert np.shape(q) == (10, 10)
+
+    # sample with implicit size
+    q1 = triaxial_axis_ratio([0.8, 0.9], 0.4)
+    q2 = triaxial_axis_ratio(0.8, [0.4, 0.5])
+    assert np.shape(q1) == np.shape(q2) == (2,)
+
+    # sample with broadcasting rule
+    q = triaxial_axis_ratio([[0.6, 0.7], [0.8, 0.9]], [0.4, 0.5])
+    assert np.shape(q) == (2, 2)
+
+    # sample with random parameters and check that projection is
+    # between largest and smallest possible value
+    zeta, xi = np.sort(np.random.uniform(0, 1, size=(2, 1000)), axis=0)
+    qmin = np.min([zeta, xi, xi/zeta], axis=0)
+    qmax = np.max([zeta, xi, xi/zeta], axis=0)
+    q = triaxial_axis_ratio(zeta, xi)
+    assert np.all((qmax >= q) & (q >= qmin))
