@@ -1,6 +1,6 @@
 import numpy as np
 import pytest
-from skypy.galaxy.spectrum import HAS_SPECLITE
+from skypy.utils.photometry import HAS_SPECLITE
 
 
 def test_broadcast_arguments():

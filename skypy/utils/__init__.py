@@ -4,6 +4,7 @@ This module contains utility functions.
 
 __all__ = []
 
+from . import photometry
 from . import random
 from . import special
 

@@ -68,8 +68,6 @@ The following models are found in the `skypy.galaxy.spectrum` package.
    :nosignatures:
 
    dirichlet_coefficients
-   mag_ab
-   SpectrumTemplates
    KCorrectTemplates
    kcorrect
 
