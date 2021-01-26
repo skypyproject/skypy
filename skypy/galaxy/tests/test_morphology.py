@@ -68,7 +68,7 @@ def test_beta_ellipticity():
 
 
 @pytest.mark.flaky
-def test_late_type_lognormal():
+def test_late_type_lognormal_size():
     """ Test lognormal distribution of late-type galaxy sizes"""
 
     from skypy.galaxy.morphology import late_type_lognormal_size
@@ -113,7 +113,7 @@ def test_late_type_lognormal():
 
 
 @pytest.mark.flaky
-def test_early_type_lognormal():
+def test_early_type_lognormal_size():
     """ Test lognormal distribution of late-type galaxy sizes"""
 
     from skypy.galaxy.morphology import early_type_lognormal_size
@@ -155,7 +155,7 @@ def test_early_type_lognormal():
 
 
 @pytest.mark.flaky
-def test_linear_lognormal():
+def test_linear_lognormal_size():
     """ Test lognormal distribution of galaxy sizes"""
 
     from skypy.galaxy.morphology import linear_lognormal_size
