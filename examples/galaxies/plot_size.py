@@ -40,8 +40,8 @@ in SkyPy.
 #
 # In SkyPy, we can sample physical sizes for each galaxy type from lognormal distributions,
 # with median :math:`\bar{R}` and width :math:`\sigma_{ln R}`, using the functions
-# :func:`skypy.galaxy.morphology.early_type_lognormal()` and
-# :func:`skypy.galaxy.morphology.late_type_lognormal()`.
+# :func:`skypy.galaxy.morphology.early_type_lognormal_size()` and
+# :func:`skypy.galaxy.morphology.late_type_lognormal_size()`.
 #
 # In this example, we simulate the sizes of galaxies with random magnitudes using the
 # values for the parameters
@@ -49,7 +49,8 @@ in SkyPy.
 
 import numpy as np
 import matplotlib.pyplot as plt
-from skypy.galaxy.morphology import early_type_lognormal, late_type_lognormal
+from skypy.galaxy.morphology import (early_type_lognormal_size,
+                                     late_type_lognormal_size)
 
 # Parameters for the late-type and early-type galaxies
 alpha, beta, gamma = 0.21, 0.53, -1.31
@@ -59,11 +60,11 @@ sigma1, sigma2 = 0.48, 0.25
 
 # SkyPy late sample
 M_late = np.random.uniform(-16, -24, size=10000)
-R_late = late_type_lognormal(M_late, alpha, beta, gamma, M0, sigma1, sigma2).value
+R_late = late_type_lognormal_size(M_late, alpha, beta, gamma, M0, sigma1, sigma2).value
 
 # SkyPy early sample
 M_early = np.random.uniform(-18, -24, size=10000)
-R_early = early_type_lognormal(M_early, a, b, M0, sigma1, sigma2).value
+R_early = early_type_lognormal_size(M_early, a, b, M0, sigma1, sigma2).value
 
 # %%
 # Validation against SDSS Data
