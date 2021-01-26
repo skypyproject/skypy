@@ -37,10 +37,10 @@ The following models are found in the `skypy.galaxy.morphology` package.
 
    angular_size
    beta_ellipticity
-   early_type_lognormal
-   late_type_lognormal
-   linear_lognormal
-   ryden04
+   early_type_lognormal_size
+   late_type_lognormal_size
+   linear_lognormal_size
+   ryden04_ellipticity
 
 
 Redshift

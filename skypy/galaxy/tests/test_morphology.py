@@ -71,14 +71,14 @@ def test_beta_ellipticity():
 def test_late_type_lognormal():
     """ Test lognormal distribution of late-type galaxy sizes"""
 
-    from skypy.galaxy import morphology
+    from skypy.galaxy.morphology import late_type_lognormal_size
 
     # Test that a scalar input gives a scalar output
     magnitude_scalar = -20.0
     alpha, beta, gamma, M0 = 0.21, 0.53, -1.31, -20.52
     sigma1, sigma2 = 0.48, 0.25
-    size_scalar = morphology.late_type_lognormal(magnitude_scalar, alpha, beta,
-                                                 gamma, M0, sigma1, sigma2)
+    size_scalar = late_type_lognormal_size(magnitude_scalar, alpha, beta,
+                                           gamma, M0, sigma1, sigma2)
 
     assert np.isscalar(size_scalar.value)
 
@@ -87,15 +87,15 @@ def test_late_type_lognormal():
 
     # Test that an array input gives an array output, with the same shape
     magnitude_array = np.array([-20.0, -21.0])
-    size_array = morphology.late_type_lognormal(magnitude_array, alpha, beta,
-                                                gamma, M0, sigma1, sigma2)
+    size_array = late_type_lognormal_size(magnitude_array, alpha, beta,
+                                          gamma, M0, sigma1, sigma2)
 
     assert np.shape(size_array.value) == np.shape(magnitude_array)
 
     # Test that size not None gives an array output, with the correct shape
-    size_sample = morphology.late_type_lognormal(magnitude_scalar, alpha, beta,
-                                                 gamma, M0, sigma1, sigma2,
-                                                 size=1000)
+    size_sample = late_type_lognormal_size(magnitude_scalar, alpha, beta,
+                                           gamma, M0, sigma1, sigma2,
+                                           size=1000)
 
     assert np.shape(size_sample.value) == (1000,)
 
@@ -116,14 +116,14 @@ def test_late_type_lognormal():
 def test_early_type_lognormal():
     """ Test lognormal distribution of late-type galaxy sizes"""
 
-    from skypy.galaxy import morphology
+    from skypy.galaxy.morphology import early_type_lognormal_size
 
     # Test that a scalar input gives a scalar output
     magnitude_scalar = -20.0
     a, b, M0 = 0.6, -4.63, -20.52
     sigma1, sigma2 = 0.48, 0.25
-    size_scalar = morphology.early_type_lognormal(magnitude_scalar, a, b, M0,
-                                                  sigma1, sigma2)
+    size_scalar = early_type_lognormal_size(magnitude_scalar, a, b, M0,
+                                            sigma1, sigma2)
 
     assert np.isscalar(size_scalar.value)
 
@@ -132,14 +132,14 @@ def test_early_type_lognormal():
 
     # Test that an array input gives an array output, with the same shape
     magnitude_array = np.array([-20.0, -21.0])
-    size_array = morphology.early_type_lognormal(magnitude_array, a, b, M0,
-                                                 sigma1, sigma2)
+    size_array = early_type_lognormal_size(magnitude_array, a, b, M0,
+                                           sigma1, sigma2)
 
     assert np.shape(size_array.value) == np.shape(magnitude_array)
 
     # Test that size not None gives an array output, with the correct shape
-    size_sample = morphology.early_type_lognormal(magnitude_scalar, a, b, M0,
-                                                  sigma1, sigma2, size=1000)
+    size_sample = early_type_lognormal_size(magnitude_scalar, a, b, M0,
+                                            sigma1, sigma2, size=1000)
 
     assert np.shape(size_sample.value) == (1000,)
 
@@ -158,13 +158,12 @@ def test_early_type_lognormal():
 def test_linear_lognormal():
     """ Test lognormal distribution of galaxy sizes"""
 
-    from skypy.galaxy import morphology
+    from skypy.galaxy.morphology import linear_lognormal_size
 
     # Test that a scalar input gives a scalar output
     magnitude_scalar = -20.0
     a_mu, b_mu, sigma = -0.24, -4.63, 0.4
-    size_scalar = morphology.linear_lognormal(magnitude_scalar, a_mu, b_mu,
-                                              sigma)
+    size_scalar = linear_lognormal_size(magnitude_scalar, a_mu, b_mu, sigma)
 
     assert np.isscalar(size_scalar.value)
 
@@ -173,13 +172,13 @@ def test_linear_lognormal():
 
     # Test that an array input gives an array output, with the same shape
     magnitude_array = np.array([-20.0, -21.0])
-    size_array = morphology.linear_lognormal(magnitude_array, a_mu, b_mu, sigma)
+    size_array = linear_lognormal_size(magnitude_array, a_mu, b_mu, sigma)
 
     assert np.shape(size_array.value) == np.shape(magnitude_array)
 
     # Test that size not None gives an array output, with the correct shape
-    size_sample = morphology.linear_lognormal(magnitude_scalar, a_mu, b_mu,
-                                              sigma, size=1000)
+    size_sample = linear_lognormal_size(magnitude_scalar, a_mu, b_mu,
+                                        sigma, size=1000)
 
     assert np.shape(size_sample.value) == (1000,)
 
@@ -191,37 +190,37 @@ def test_linear_lognormal():
     assert p > 0.01
 
 
-def test_ryden04():
-    from skypy.galaxy.morphology import ryden04
+def test_ryden04_ellipticity():
+    from skypy.galaxy.morphology import ryden04_ellipticity
 
     # sample a single ellipticity
-    e = ryden04(0.222, 0.056, -1.85, 0.89)
+    e = ryden04_ellipticity(0.222, 0.056, -1.85, 0.89)
     assert np.isscalar(e)
 
     # sample many ellipticities
-    e = ryden04(0.222, 0.056, -1.85, 0.89, size=1000)
+    e = ryden04_ellipticity(0.222, 0.056, -1.85, 0.89, size=1000)
     assert np.shape(e) == (1000,)
 
     # sample with explicit shape
-    e = ryden04(0.222, 0.056, -1.85, 0.89, size=(10, 10))
+    e = ryden04_ellipticity(0.222, 0.056, -1.85, 0.89, size=(10, 10))
     assert np.shape(e) == (10, 10)
 
     # sample with implicit size
-    e1 = ryden04([0.222, 0.333], 0.056, -1.85, 0.89)
-    e2 = ryden04(0.222, [0.056, 0.067], -1.85, 0.89)
-    e3 = ryden04(0.222, 0.056, [-1.85, -2.85], 0.89)
-    e4 = ryden04(0.222, 0.056, -1.85, [0.89, 1.001])
+    e1 = ryden04_ellipticity([0.222, 0.333], 0.056, -1.85, 0.89)
+    e2 = ryden04_ellipticity(0.222, [0.056, 0.067], -1.85, 0.89)
+    e3 = ryden04_ellipticity(0.222, 0.056, [-1.85, -2.85], 0.89)
+    e4 = ryden04_ellipticity(0.222, 0.056, -1.85, [0.89, 1.001])
     assert np.shape(e1) == np.shape(e2) == np.shape(e3) == np.shape(e4) == (2,)
 
     # sample with broadcasting rule
-    e = ryden04([[0.2, 0.3], [0.4, 0.5]], 0.1, [-1.9, -2.9], 0.9)
+    e = ryden04_ellipticity([[0.2, 0.3], [0.4, 0.5]], 0.1, [-1.9, -2.9], 0.9)
     assert np.shape(e) == (2, 2)
 
     # sample with random parameters and check that result is in unit range
     args = np.random.rand(4)*[1., .1, -2., 1.]
-    e = ryden04(*args, size=1000)
+    e = ryden04_ellipticity(*args, size=1000)
     assert np.all((e >= 0.) & (e <= 1.))
 
     # sample a spherical distribution
-    e = ryden04(1-1e-99, 1e-99, -1e99, 1e-99, size=1000)
+    e = ryden04_ellipticity(1-1e-99, 1e-99, -1e99, 1e-99, size=1000)
     assert np.allclose(e, 0.)

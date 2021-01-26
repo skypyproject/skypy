@@ -7,10 +7,10 @@ galaxies.
 __all__ = [
     'angular_size',
     'beta_ellipticity',
-    'early_type_lognormal',
-    'late_type_lognormal',
-    'linear_lognormal',
-    'ryden04',
+    'early_type_lognormal_size',
+    'late_type_lognormal_size',
+    'linear_lognormal_size',
+    'ryden04_ellipticity',
 ]
 
 
@@ -107,9 +107,10 @@ def beta_ellipticity(e_ratio, e_sum, size=None):
     return np.random.beta(a, b, size)
 
 
-def late_type_lognormal(magnitude, alpha, beta, gamma, M0, sigma1, sigma2,
-                        size=None):
-    """Lognormal distribution for late-type galaxies.
+def late_type_lognormal_size(magnitude, alpha, beta, gamma, M0, sigma1, sigma2,
+                             size=None):
+    """Lognormal size distribution for late-type galaxies.
+
     This function provides a lognormal distribution for the physical size of
     late-type galaxies, described by equations 12, 15 and 16 in [1]_.
 
@@ -145,8 +146,8 @@ def late_type_lognormal(magnitude, alpha, beta, gamma, M0, sigma1, sigma2,
     >>> magnitude = -16.0
     >>> alpha, beta, gamma, M0 = 0.21, 0.53, -1.31, -20.52
     >>> sigma1, sigma2 = 0.48, 0.25
-    >>> s = morphology.late_type_lognormal(magnitude, alpha, beta, gamma, M0,
-    ...                                    sigma1, sigma2)
+    >>> s = morphology.late_type_lognormal_size(magnitude, alpha, beta, gamma,
+    ...                                         M0, sigma1, sigma2)
 
 
     References
@@ -168,8 +169,9 @@ def late_type_lognormal(magnitude, alpha, beta, gamma, M0, sigma1, sigma2,
     return r_bar * np.random.lognormal(sigma=sigma_lnR, size=size)
 
 
-def early_type_lognormal(magnitude, a, b, M0, sigma1, sigma2, size=None):
-    """Lognormal distribution for early-type galaxies.
+def early_type_lognormal_size(magnitude, a, b, M0, sigma1, sigma2, size=None):
+    """Lognormal size distribution for early-type galaxies.
+
     This function provides a lognormal distribution for the physical size of
     early-type galaxies, described by equations 12, 14 and 16 in [1]_.
 
@@ -205,7 +207,8 @@ def early_type_lognormal(magnitude, a, b, M0, sigma1, sigma2, size=None):
     >>> magnitude = -20.0
     >>> a, b, M0 = 0.6, -4.63, -20.52
     >>> sigma1, sigma2 = 0.48, 0.25
-    >>> s = morphology.early_type_lognormal(magnitude, a, b, M0, sigma1, sigma2)
+    >>> s = morphology.early_type_lognormal_size(magnitude, a, b, M0, sigma1,
+    ...                                          sigma2)
 
 
     References
@@ -214,12 +217,13 @@ def early_type_lognormal(magnitude, a, b, M0, sigma1, sigma2, size=None):
         J. Brinkmann, I. Csabai, Mon. Not. Roy. Astron. Soc. 343, 978 (2003).
     """
 
-    return late_type_lognormal(magnitude, a, a, b, M0, sigma1, sigma2,
-                               size=size)
+    return late_type_lognormal_size(magnitude, a, a, b, M0, sigma1, sigma2,
+                                    size=size)
 
 
-def linear_lognormal(magnitude, a_mu, b_mu, sigma, size=None):
-    """Lognormal distribution with linear mean.
+def linear_lognormal_size(magnitude, a_mu, b_mu, sigma, size=None):
+    """Lognormal size distribution with linear mean.
+
     This function provides a lognormal distribution for the physical size of
     galaxies with a linear mean, described by equation 3.14 in [1]_. See also
     equation 14 in [2]_.
@@ -255,7 +259,7 @@ def linear_lognormal(magnitude, a_mu, b_mu, sigma, size=None):
     >>> from skypy.galaxy import morphology
     >>> magnitude = -20.0
     >>> a_mu, b_mu, sigma =-0.24, -4.63, 0.4
-    >>> s = morphology.linear_lognormal(magnitude, a_mu, b_mu, sigma)
+    >>> s = morphology.linear_lognormal_size(magnitude, a_mu, b_mu, sigma)
 
     References
     ----------
@@ -265,11 +269,11 @@ def linear_lognormal(magnitude, a_mu, b_mu, sigma, size=None):
            J. Brinkmann, I.Csabai, Mon. Not. Roy. Astron. Soc. 343, 978 (2003).
     """
 
-    return late_type_lognormal(magnitude, -a_mu / 0.4, -a_mu / 0.4,
-                               b_mu, -np.inf, sigma, sigma, size=size)
+    return late_type_lognormal_size(magnitude, -a_mu / 0.4, -a_mu / 0.4,
+                                    b_mu, -np.inf, sigma, sigma, size=size)
 
 
-def ryden04(mu_gamma, sigma_gamma, mu, sigma, size=None):
+def ryden04_ellipticity(mu_gamma, sigma_gamma, mu, sigma, size=None):
     r'''Ellipticity distribution of Ryden (2004).
 
     The ellipticity is sampled by randomly projecting a 3D ellipsoid with
@@ -302,8 +306,8 @@ def ryden04(mu_gamma, sigma_gamma, mu, sigma, size=None):
     :math:`\mu_\gamma = 0.222`, :math:`\sigma_\gamma = 0.056`,
     :math:`\mu = -1.85`, and :math:`\sigma = 0.89`.
 
-    >>> from skypy.galaxy.morphology import ryden04
-    >>> ellipticity = ryden04(0.222, 0.056, -1.85, 0.89, size=10000)
+    >>> from skypy.galaxy.morphology import ryden04_ellipticity
+    >>> ellipticity = ryden04_ellipticity(0.222, 0.056, -1.85, 0.89, size=10000)
 
     '''
 
