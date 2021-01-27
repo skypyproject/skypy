@@ -3,6 +3,28 @@ import pytest
 from skypy.utils.photometry import HAS_SPECLITE
 
 
+def test_magnitude_functions():
+
+    from skypy.utils.photometry import (luminosity_in_band,
+            luminosity_from_absolute_magnitude,
+            absolute_magnitude_from_luminosity)
+
+    # convert between absolute luminosity and magnitude
+    assert np.isclose(luminosity_from_absolute_magnitude(-22), 630957344.5)
+    assert np.isclose(absolute_magnitude_from_luminosity(630957344.5), -22)
+
+    # convert with standard luminosities
+    for ref, mag in luminosity_in_band.items():
+        assert np.isclose(luminosity_from_absolute_magnitude(mag, ref), 1.0)
+        assert np.isclose(absolute_magnitude_from_luminosity(1.0, ref), mag)
+
+    # error when unknown reference is used
+    with pytest.raises(KeyError):
+        luminosity_from_absolute_magnitude(0., 'unknown')
+    with pytest.raises(KeyError):
+        absolute_magnitude_from_luminosity(1., 'unknown')
+
+
 @pytest.mark.skipif(not HAS_SPECLITE, reason='test requires speclite')
 def test_mag_ab_standard_source():
 

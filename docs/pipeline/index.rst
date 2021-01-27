@@ -51,12 +51,10 @@ with a dollar sign ``$``. For example:
     pipeline.execute()
 
     z = pipeline['galaxies']['redshift']
-    dm = pipeline['galaxies']['distance_modulus']
 
-    plt.scatter(z, dm, marker='+', color='k', label='galaxies')
+    plt.hist(z, histtype='step', density=True, label='redshifts')
     plt.legend()
     plt.xlabel('redshift')
-    plt.ylabel('distance_modulus')
 
 When executing a pipeline, all dependencies are tracked and resolved in order
 using a Directed Acylic Graph implemented in networkx_.

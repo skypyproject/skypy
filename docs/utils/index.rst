@@ -130,6 +130,9 @@ calculate photometric properties.
 .. autosummary::
    :nosignatures:
 
+   absolute_magnitude_from_luminosity
+   luminosity_from_absolute_magnitude
+   luminosity_in_band
    mag_ab
    SpectrumTemplates
 
