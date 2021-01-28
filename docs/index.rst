@@ -64,7 +64,7 @@ Project details
 .. toctree::
    :maxdepth: 1
 
-   project/CODE_OF_CONDUCT
+   project/code_of_conduct
 
 
 *****
