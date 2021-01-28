@@ -52,7 +52,7 @@ Developer Documentation
 .. toctree::
    :maxdepth: 1
 
-   developer/CONTRIBUTING
+   developer/contributing
 
 
 .. _project-details:
