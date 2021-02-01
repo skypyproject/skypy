@@ -32,6 +32,7 @@ Packages
    :maxdepth: 1
 
    galaxies
+   halo/index
    utils/index
 
 Pipeline
