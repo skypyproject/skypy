@@ -33,6 +33,7 @@ Packages
 
    galaxies
    halo/index
+   power_spectrum/index
    utils/index
 
 Pipeline

@@ -9,6 +9,7 @@ Way. Also included are methods for generating observed data.
 
 * Galaxies_: morphology, luminosity and redshift distributions
 * Halo_ and subhalo mass distributions
+* `Power Spectra`_ using CAMB and Halofit
 * Pipelines_ to generate populations of astronomical objects
 
 The full list of features can be found in the `SkyPy Documentation`_.
@@ -17,7 +18,11 @@ If you use SkyPy for work or research presented in a publication please follow
 our `Citation Guidelines`_.
 
 .. _Galaxies: https://skypy.readthedocs.io/en/latest/galaxies.html
+<<<<<<< HEAD
 .. _Halo: https://skypy.readthedocs.io/en/latest/halo/index.html
+=======
+.. _Power Spectra: https://skypy.readthedocs.io/en/latest/power_spectrum/index.html
+>>>>>>> module/power_spectrum
 .. _Pipelines: https://skypy.readthedocs.io/en/latest/pipeline/index.html
 .. _SkyPy Documentation: https://skypy.readthedocs.io/en/latest/
 .. _Citation Guidelines: CITATION.rst
