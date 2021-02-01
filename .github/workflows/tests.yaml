@@ -3,9 +3,11 @@ on:
   push:
     branches:
     - master
+    - module/*
   pull_request:
     branches:
     - master
+    - module/*
 jobs:
   test:
     name: ${{ matrix.name }}
