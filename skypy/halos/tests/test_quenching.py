@@ -3,7 +3,7 @@ import pytest
 from scipy import stats
 from collections import Counter
 
-from skypy.halo.quenching import environment_quenched, mass_quenched
+from skypy.halos.quenching import environment_quenched, mass_quenched
 
 
 @pytest.mark.flaky

@@ -18,11 +18,8 @@ If you use SkyPy for work or research presented in a publication please follow
 our `Citation Guidelines`_.
 
 .. _Galaxies: https://skypy.readthedocs.io/en/latest/galaxies.html
-<<<<<<< HEAD
-.. _Halo: https://skypy.readthedocs.io/en/latest/halo/index.html
-=======
+.. _Halo: https://skypy.readthedocs.io/en/latest/halos/index.html
 .. _Power Spectra: https://skypy.readthedocs.io/en/latest/power_spectrum/index.html
->>>>>>> module/power_spectrum
 .. _Pipelines: https://skypy.readthedocs.io/en/latest/pipeline/index.html
 .. _SkyPy Documentation: https://skypy.readthedocs.io/en/latest/
 .. _Citation Guidelines: CITATION.rst

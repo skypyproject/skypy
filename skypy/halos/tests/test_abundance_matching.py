@@ -1,6 +1,6 @@
 from astropy.cosmology import default_cosmology
 import numpy as np
-from skypy.halo.abundance_matching import vale_ostriker
+from skypy.halos.abundance_matching import vale_ostriker
 
 
 def test_vale_ostriker():

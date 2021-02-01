@@ -32,7 +32,7 @@ Packages
    :maxdepth: 1
 
    galaxies
-   halo/index
+   halos/index
    power_spectrum/index
    utils/index
 

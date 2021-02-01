@@ -48,7 +48,7 @@ def environment_quenched(nh, probability):
     and how many survive (False) from a list of 1000 halos:
 
     >>> import numpy as np
-    >>> from skypy.halo.quenching import environment_quenched
+    >>> from skypy.halos.quenching import environment_quenched
     >>> from collections import Counter
     >>> quenched = environment_quenched(1000, 0.5)
     >>> Counter(quenched)
@@ -93,7 +93,7 @@ def mass_quenched(halo_mass, offset, width):
 
     >>> import numpy as np
     >>> from astropy import units
-    >>> from skypy.halo.quenching import mass_quenched
+    >>> from skypy.halos.quenching import mass_quenched
     >>> from collections import Counter
     >>> offset, width = 1.0e12, 0.5
     >>> halo_mass = np.random.lognormal(mean=np.log(offset), sigma=width,

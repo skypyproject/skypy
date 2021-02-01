@@ -4,7 +4,7 @@ power_spectrum: !skypy.power_spectrum.eisenstein_hu
   A_s: 2.1982e-09
   n_s: 0.969453
   cosmology: $cosmology
-sheth-tormen: !skypy.halo.mass.sheth_tormen
+sheth-tormen: !skypy.halos.mass.sheth_tormen
   m_min: 1.0E+10
   m_max: 1.0E+13
   resolution: 10000
@@ -13,7 +13,7 @@ sheth-tormen: !skypy.halo.mass.sheth_tormen
   growth_function: 1.0
   cosmology: $cosmology
   size: 10000
-press-schechter: !skypy.halo.mass.press_schechter
+press-schechter: !skypy.halos.mass.press_schechter
   m_min: 1.0E+10
   m_max: 1.0E+13
   resolution: 10000

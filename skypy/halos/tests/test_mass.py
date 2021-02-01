@@ -4,7 +4,7 @@ from astropy.units import allclose
 from skypy.power_spectrum import eisenstein_hu
 
 
-import skypy.halo.mass as mass
+import skypy.halos.mass as mass
 
 # Precomputed values for the test, for a Planck15 cosmology at redshift 0 and a
 # power spectrum given by the Eisenstein and Hu fitting formula
