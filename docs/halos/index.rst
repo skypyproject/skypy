@@ -1,8 +1,8 @@
-********************************
-Dark Matter Halos (`skypy.halo`)
-********************************
+*********************************
+Dark Matter Halos (`skypy.halos`)
+*********************************
 
-.. automodule:: skypy.halo
+.. automodule:: skypy.halos
 
 You can reproduce figure 2 in Sheth and Tormen 1999
 and plot the collapse functions for different halo models. For this, you can use
@@ -16,7 +16,7 @@ a python script, for example.
     import numpy as np
     from astropy.cosmology import Planck15
     from skypy.power_spectrum import eisenstein_hu
-    from skypy.halo.mass import _sigma_squared
+    from skypy.halos.mass import _sigma_squared
 
     # Power spectrum and amplitude of perturbations at redshift 0
     growth_0 = 1.0
@@ -28,7 +28,7 @@ a python script, for example.
     sigma = np.sqrt(_sigma_squared(mass, k, pk0, growth_0, Planck15))
 
     # Collapse functions
-    from skypy.halo import mass
+    from skypy.halos import mass
 
     params_ellipsoidal = (0.3, 0.7, 0.3, 1.686)
 
@@ -64,7 +64,7 @@ a python script, for example.
 You can also sample halos using their mass function. For this, you can use a config
 file and run the pipeline, for example.
 
-.. literalinclude:: examples/halo.yml
+.. literalinclude:: examples/halos.yml
    :language: yaml
 
 .. plot::
@@ -72,7 +72,7 @@ file and run the pipeline, for example.
    :context: close-figs
 
     from skypy.pipeline import Pipeline
-    pipeline = Pipeline.read('examples/halo.yml')
+    pipeline = Pipeline.read('examples/halos.yml')
     pipeline.execute()
 
     # Draw from different halo mass samplers
@@ -91,19 +91,19 @@ file and run the pipeline, for example.
     plt.show()
 
 
-Abundance Matching (`skypy.halo.abundance_matching`)
-====================================================
+Abundance Matching (`skypy.halos.abundance_matching`)
+=====================================================
 
-.. automodule:: skypy.halo.abundance_matching
-
-
-Mass (`skypy.halo.mass`)
-========================
-
-.. automodule:: skypy.halo.mass
+.. automodule:: skypy.halos.abundance_matching
 
 
-Quenching (`skypy.halo.quenching`)
-==================================
+Mass (`skypy.halos.mass`)
+=========================
 
-.. automodule:: skypy.halo.quenching
+.. automodule:: skypy.halos.mass
+
+
+Quenching (`skypy.halos.quenching`)
+===================================
+
+.. automodule:: skypy.halos.quenching

@@ -80,7 +80,7 @@ def halo_mass_function(M, wavenumber, power_spectrum, growth_function,
     Examples
     ---------
     >>> import numpy as np
-    >>> from skypy.halo import mass
+    >>> from skypy.halos import mass
     >>> from skypy.power_spectrum import eisenstein_hu
 
     This example will compute the halo mass function for elliptical and
@@ -170,7 +170,7 @@ def halo_mass_sampler(m_min, m_max, resolution, wavenumber, power_spectrum,
     Examples
     ---------
     >>> import numpy as np
-    >>> from skypy.halo import mass
+    >>> from skypy.halos import mass
     >>> from skypy.power_spectrum import eisenstein_hu
 
     This example will sample from the halo mass function for
@@ -235,7 +235,7 @@ def ellipsoidal_collapse_function(sigma, params):
     Examples
     ---------
     >>> import numpy as np
-    >>> from skypy.halo import mass
+    >>> from skypy.halos import mass
     >>> from skypy.power_spectrum import eisenstein_hu
     >>> from skypy.power_spectrum import growth_function
 
@@ -357,7 +357,7 @@ def number_subhalos(halo_mass, alpha, beta, gamma_M, x, m_min, noise=True):
     Examples
     ---------
     >>> import numpy as np
-    >>> from skypy.halo import mass
+    >>> from skypy.halos import mass
 
     This gives the number of subhalos in a parent halo of mass :math:`10^{12} M_\odot`
 
@@ -419,7 +419,7 @@ def subhalo_mass_sampler(halo_mass, nsubhalos, alpha, beta,
     Examples
     ---------
     >>> import numpy as np
-    >>> from skypy.halo import mass
+    >>> from skypy.halos import mass
 
     This example samples 100 subhalos for a parent halo of mass 1.0E12 Msun:
 

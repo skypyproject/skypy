@@ -15,8 +15,8 @@ Models
 """
 
 import numpy as np
-from skypy.halo.mass import press_schechter, number_subhalos, subhalo_mass_sampler
-from skypy.galaxy.luminosity import schechter_lf_magnitude
+from skypy.halos.mass import press_schechter, number_subhalos, subhalo_mass_sampler
+from skypy.galaxies.luminosity import schechter_lf_magnitude
 
 __all__ = [
     'vale_ostriker',
@@ -31,16 +31,16 @@ def vale_ostriker(halo_kwargs, subhalo_kwargs, galaxy_kwargs, cosmology):
     Parameters
     ----------
     halo_kwargs : dict
-        Dictionary of keyword arguments for `~skypy.halo.mass.press_schechter`.
+        Dictionary of keyword arguments for `~skypy.halos.mass.press_schechter`.
     subhalo_kwargs : dict
-        Dictionary of keyword arguments for `~skypy.halo.mass.number_subhalos`
-        and `~skypy.halo.mass.subhalo_mass_sampler`.
+        Dictionary of keyword arguments for `~skypy.halos.mass.number_subhalos`
+        and `~skypy.halos.mass.subhalo_mass_sampler`.
     galaxy_kwargs : dict
         Dictionary of keyword arguments for
-        `~skypy.galaxy.luminosity.schechter_lf_magnitude`.
+        `~skypy.galaxies.luminosity.schechter_lf_magnitude`.
     cosmology : astropy.cosmology.Cosmology
-        Cosmology argument for `~skypy.halo.mass.press_schechter` and
-        `~skypy.galaxy.luminosity.schechter_lf_magnitude`.
+        Cosmology argument for `~skypy.halos.mass.press_schechter` and
+        `~skypy.galaxies.luminosity.schechter_lf_magnitude`.
 
     Returns
     -------
