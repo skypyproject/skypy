@@ -226,8 +226,8 @@ class Pipeline:
             If filename already exists, this flag indicates whether or not to
             overwrite it (without warning).
         '''
-        from astropy.io.fits import BinTableHDU, HDUList
-        hdul = [BinTableHDU(data=self.state[t], name=t) for t in self.table_config.keys()]
+        from astropy.io.fits import BinTableHDU, HDUList, PrimaryHDU
+        hdul = [PrimaryHDU()] + [BinTableHDU(data=self[t], name=t) for t in self.table_config]
         HDUList(hdul).writeto(filename, overwrite=overwrite)
 
     def write_hdf5(self, filename, overwrite=False):
@@ -242,8 +242,8 @@ class Pipeline:
             overwrite it (without warning).
         '''
         from astropy.io.misc.hdf5 import write_table_hdf5
-        for t in self.table_config.keys():
-            write_table_hdf5(self.state[t], filename, path=f'tables/{t}', overwrite=overwrite)
+        for t in self.table_config:
+            write_table_hdf5(self[t], filename, path=f'tables/{t}', overwrite=overwrite)
 
     def evaluate(self, value):
         '''evaluate an item in the pipeline'''

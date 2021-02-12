@@ -36,17 +36,18 @@ def test_pipeline():
 
     pipeline = Pipeline(config)
     pipeline.execute()
-    pipeline.write(file_format='fits')
+    output_filename = 'output.fits'
+    pipeline.write(output_filename)
     assert len(pipeline['test_table']) == size
     assert np.all(pipeline['test_table.column1'] < pipeline['test_table.column2'])
-    with fits.open('test_table.fits') as hdu:
+    with fits.open(output_filename) as hdu:
         assert np.all(Table(hdu[1].data) == pipeline['test_table'])
 
     # Check for failure if output files already exist and overwrite is False
     pipeline = Pipeline(config)
     pipeline.execute()
     with pytest.raises(OSError):
-        pipeline.write(file_format='fits', overwrite=False)
+        pipeline.write(output_filename, overwrite=False)
 
     # Check that the existing output files are modified if overwrite is True
     new_size = 2 * size
@@ -55,8 +56,8 @@ def test_pipeline():
     config['tables']['test_table']['column3'].args = [new_string]
     pipeline = Pipeline(config)
     pipeline.execute()
-    pipeline.write(file_format='fits', overwrite=True)
-    with fits.open('test_table.fits') as hdu:
+    pipeline.write(output_filename, overwrite=True)
+    with fits.open(output_filename) as hdu:
         assert len(hdu[1].data) == new_size
 
     # Check for failure if 'column1' requires itself creating a cyclic
@@ -240,4 +241,4 @@ def test_column_quantity():
 def teardown_module(module):
 
     # Remove fits file generated in test_pipeline
-    os.remove('test_table.fits')
+    os.remove('output.fits')
