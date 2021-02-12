@@ -13,6 +13,13 @@ import pytest
 from skypy.pipeline import Pipeline
 from skypy.pipeline._items import Call, Ref
 
+try:
+    import h5py # noqa
+except ImportError:
+    HAS_H5PY = False
+else:
+    HAS_H5PY = True
+
 
 def test_pipeline():
 
@@ -44,13 +51,7 @@ def test_pipeline():
     with fits.open(output_filename) as hdu:
         assert np.all(Table(hdu['test_table'].data) == pipeline['test_table'])
 
-    # Test hdf5
-    hdf5_filename = 'output.hdf5'
-    pipeline.write(hdf5_filename)
-    hdf5_table = read_table_hdf5(hdf5_filename, 'tables/test_table', character_as_bytes=False)
-    assert np.all(hdf5_table == pipeline['test_table'])
-
-    # Test invalid extensions
+    # Test invalid file extension
     with pytest.raises(ValueError):
         pipeline.write('output.invalid')
 
@@ -249,8 +250,30 @@ def test_column_quantity():
     np.testing.assert_array_less(pipeline['test_table.lengths_in_cm'], 100)
 
 
+@pytest.mark.skipif(not HAS_H5PY, reason='Requires h5py')
+def test_hdf5():
+    size = 100
+    string = size*'a'
+    config = {'tables': {
+              'test_table': {
+                'column1': Call(np.random.uniform, [], {
+                  'size': size}),
+                'column2': Call(np.random.uniform, [], {
+                  'low': Ref('test_table.column1')}),
+                'column3': Call(list, [string], {})}}}
+
+    pipeline = Pipeline(config)
+    pipeline.execute()
+    pipeline.write('output.hdf5')
+    hdf_table = read_table_hdf5('output.hdf5', 'tables/test_table', character_as_bytes=False)
+    assert np.all(hdf_table == pipeline['test_table'])
+
+
 def teardown_module(module):
 
     # Remove fits file generated in test_pipeline
     os.remove('output.fits')
-    os.remove('output.hdf5')
+
+    # Remove hdf5 file generated in test_hdf5
+    if HAS_H5PY:
+        os.remove('output.hdf5')
