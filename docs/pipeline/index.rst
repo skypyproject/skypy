@@ -19,7 +19,7 @@ fits files:
 
 .. code-block:: bash
 
-    $ skypy examples/galaxies/sdss_photometry.yml --format fits
+    $ skypy examples/galaxies/sdss_photometry.yml -o sdss_photometry.fits
 
 Config files are written in YAML format and read using the
 `~skypy.pipeline.load_skypy_yaml` funciton. Each entry in the config specifices

@@ -28,12 +28,12 @@ def test_skypy():
 
     # Missing positional argument 'config'
     with pytest.raises(SystemExit) as e:
-        skypy.main(['--format', 'fits'])
+        skypy.main(['--output', 'output.fits'])
     assert e.value.code == 2
 
     # Invalid file format
     with pytest.raises(SystemExit) as e:
-        skypy.main(['--format', 'invalid', 'config.filename'])
+        skypy.main(['config.filename', 'output.invalid'])
     assert e.value.code == 2
 
     # Process empty config file

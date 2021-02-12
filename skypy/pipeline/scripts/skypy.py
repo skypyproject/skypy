@@ -11,9 +11,8 @@ def main(args=None):
     parser = argparse.ArgumentParser(description="SkyPy pipeline driver")
     parser.add_argument('--version', action='version', version=skypy_version)
     parser.add_argument('config', help='Config file name')
-    parser.add_argument('-f', '--format', required=False,
-                        choices=['fits', 'hdf5'], help='Table file format')
-    parser.add_argument('-o', '--overwrite', action='store_true',
+    parser.add_argument('-o', '--output', required=False, help='Output file name')
+    parser.add_argument('-v', '--overwrite', action='store_true',
                         help='Whether to overwrite existing files')
 
     # get system args if none passed
@@ -25,5 +24,6 @@ def main(args=None):
 
     pipeline = Pipeline(config)
     pipeline.execute()
-    pipeline.write(file_format=args.format, overwrite=args.overwrite)
+    if args.output:
+        pipeline.write(args.output, overwrite=args.overwrite)
     return(0)
