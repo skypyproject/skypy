@@ -212,8 +212,8 @@ class Pipeline:
             self.write_hdf5(filename, overwrite)
         else:
             raise ValueError(f'{suffix} is an unsupported file format. SkyPy supports '
-                              'FITS (' + ' '.join(_fits_suffixes) + ') and '
-                              'HDF5 (' + ' '.join(_hdf5_suffixes) + ').')
+                             'FITS (' + ' '.join(_fits_suffixes) + ') and '
+                             'HDF5 (' + ' '.join(_hdf5_suffixes) + ').')
 
     def write_fits(self, filename, overwrite=False):
         r'''Write pipeline results to a FITS file.
