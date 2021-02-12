@@ -1,6 +1,7 @@
 from astropy.cosmology import FlatLambdaCDM, default_cosmology
 from astropy.cosmology.core import Cosmology
 from astropy.io import fits
+from astropy.io.misc.hdf5 import read_table_hdf5
 from astropy.table import Table
 from astropy.table.column import Column
 from astropy.units import Quantity
@@ -41,7 +42,17 @@ def test_pipeline():
     assert len(pipeline['test_table']) == size
     assert np.all(pipeline['test_table.column1'] < pipeline['test_table.column2'])
     with fits.open(output_filename) as hdu:
-        assert np.all(Table(hdu[1].data) == pipeline['test_table'])
+        assert np.all(Table(hdu['test_table'].data) == pipeline['test_table'])
+
+    # Test hdf5
+    hdf5_filename = 'output.hdf5'
+    pipeline.write(hdf5_filename)
+    hdf5_table = read_table_hdf5(hdf5_filename, 'tables/test_table', character_as_bytes=False)
+    assert np.all(hdf5_table == pipeline['test_table'])
+
+    # Test invalid extensions
+    with pytest.raises(ValueError):
+        pipeline.write('output.invalid')
 
     # Check for failure if output files already exist and overwrite is False
     pipeline = Pipeline(config)
@@ -242,3 +253,4 @@ def teardown_module(module):
 
     # Remove fits file generated in test_pipeline
     os.remove('output.fits')
+    os.remove('output.hdf5')
