@@ -216,11 +216,31 @@ class Pipeline:
                               'HDF5 (' + ' '.join(_hdf5_suffixes) + ').')
 
     def write_fits(self, filename, overwrite=False):
+        r'''Write pipeline results to a FITS file.
+
+        Parameters
+        ----------
+        filename : str
+            Name of output file to be written.
+        overwrite : bool
+            If filename already exists, this flag indicates whether or not to
+            overwrite it (without warning).
+        '''
         from astropy.io.fits import BinTableHDU, HDUList
         hdul = [BinTableHDU(data=self.state[t], name=t) for t in self.table_config.keys()]
         HDUList(hdul).writeto(filename, overwrite=overwrite)
 
     def write_hdf5(self, filename, overwrite=False):
+        r'''Write pipeline results to a HDF5 file.
+
+        Parameters
+        ----------
+        filename : str
+            Name of output file to be written.
+        overwrite : bool
+            If filename already exists, this flag indicates whether or not to
+            overwrite it (without warning).
+        '''
         from astropy.io.misc.hdf5 import write_table_hdf5
         for t in self.table_config.keys():
             write_table_hdf5(self.state[t], filename, path=f'tables/{t}', overwrite=overwrite)
