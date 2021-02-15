@@ -241,9 +241,8 @@ class Pipeline:
             If filename already exists, this flag indicates whether or not to
             overwrite it (without warning).
         '''
-        from astropy.io.misc.hdf5 import write_table_hdf5
         for t in self.table_config:
-            write_table_hdf5(self[t], filename, path=f'tables/{t}', overwrite=overwrite)
+            self[t].write(filename, path=f'tables/{t}', append=True, overwrite=overwrite)
 
     def evaluate(self, value):
         '''evaluate an item in the pipeline'''
