@@ -69,14 +69,12 @@ R_early = early_type_lognormal_size(M_early, a, b, M0, sigma1, sigma2).value
 # %%
 # Validation against SDSS Data
 # ----------------------------
-# Here we reproduce Figure 4 from [1]_, comparing our simulated galaxy sizes against
-# observational data from SDSS.
-# You can download the data files for `early-type
-# <https://github.com/skypyproject/skypy/raw/master/examples/galaxies/Shen+03_early.txt>`_
-# and `late-type
-# <https://github.com/skypyproject/skypy/raw/master/examples/galaxies/Shen+03_late.txt>`_
-# SDSS galaxies which have the following columns: magnitudes, median radius, minus error, and
-# plus error.
+# Here we reproduce Figure 4 from [1]_, comparing our simulated galaxy sizes
+# against observational data from SDSS. You can download the data files for
+# :download:`early-type <../../../examples/galaxies/Shen+03_early.txt>` and
+# :download:`late-type <../../../examples/galaxies/Shen+03_late.txt>` SDSS
+# galaxies which have the following columns: magnitudes, median radius, minus
+# error, and plus error.
 
 # Load data from figure 4 in Shen et al 2003
 sdss_early = np.loadtxt('Shen+03_early.txt')
