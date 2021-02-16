@@ -4,7 +4,6 @@ This module provides methods to run pipelines of functions with dependencies
 and handle their results.
 """
 
-from astropy.cosmology import default_cosmology
 from astropy.table import Table, Column
 from copy import copy, deepcopy
 from collections.abc import Sequence, Mapping
