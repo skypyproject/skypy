@@ -16,6 +16,10 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          - name: Code Style
+            os: ubuntu-latest
+            python: 3.x
+            toxenv: codestyle
 
           - name: latest supported versions
             os: ubuntu-latest
