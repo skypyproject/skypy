@@ -5,8 +5,6 @@ import numpy as np
 
 from inspect import signature
 from functools import wraps
-from astropy import units
-from astropy.cosmology import default_cosmology
 
 
 def broadcast_arguments(*broadcast_args):

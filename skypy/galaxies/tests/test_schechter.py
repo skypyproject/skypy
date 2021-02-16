@@ -1,6 +1,4 @@
 import numpy as np
-import pytest
-from scipy.stats import kstest
 from astropy.cosmology import default_cosmology
 
 

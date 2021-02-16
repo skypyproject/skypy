@@ -1,2 +1,2 @@
 def test_import():
-    import skypy
+    import skypy  # noqa: F401

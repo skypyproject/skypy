@@ -1,6 +1,4 @@
 import numpy as np
-import pytest
-from skypy.utils.photometry import HAS_SPECLITE
 
 
 def test_broadcast_arguments():
