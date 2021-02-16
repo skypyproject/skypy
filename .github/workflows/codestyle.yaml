@@ -9,7 +9,7 @@ on:
     - master
     - module/*
 jobs:
-  codestyle:
+  flake8:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout Repository
