@@ -70,15 +70,6 @@ def gammaincc(a, x):
     --------
     scipy.special.gammaincc : Computes the start of the recurrence.
 
-    Examples
-    --------
-    This implementation of `gammaincc` supports positive and negative values
-    of `a`.
-
-    >>> from skypy.utils.special import gammaincc
-    >>> gammaincc([-1.5, -0.5, 0.5, 1.5], 1.2)
-    array([ 0.03084582, -0.03378949,  0.12133525,  0.49363462])
-
     '''
     if np.broadcast(a, x).ndim == 0:
         return _gammaincc(a, x)
