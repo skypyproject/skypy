@@ -6,7 +6,7 @@ tags:
   - cosmology
   - simulations
 authors:
-  - name: Adam Amara^[adam.amara@port.ac.uk]
+  - name: Adam Amara^[adam.amara\@port.ac.uk]
     orcid: 0000-0003-3481-3491
     affiliation: 1
   - name: Lucia F. de la Bella
@@ -42,7 +42,7 @@ authors:
   - name: Laura K. Nuttall
     orcid: 0000-0002-8599-8791
     affiliation: 1
-  - name: Richard P. Rollins^[richard.rollins@manchester.ac.uk]
+  - name: Richard P. Rollins^[richard.rollins\@manchester.ac.uk]
     orcid: 0000-0003-1291-1023
     affiliation: 2
   - name: Philipp Sudek
