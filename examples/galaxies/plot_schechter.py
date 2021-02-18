@@ -65,9 +65,8 @@ redshift, magnitude = schechter_lf(z_range, m_star, phi_star, alpha,
 # Here we compare our sampled galaxy B-band magnitudes in four different
 # redshift slices to the observed B-band magnitude distribution of
 # star-forming galaxies in the ALHAMBRA survey and the median-redshift
-# model from López-Sanjuan et al. 2017.
-# The data file can be downloaded `here
-# <https://github.com/skypyproject/skypy/raw/master/examples/galaxies/lopez_sanjuan%2B17_B1.ecsv>`_.
+# model from López-Sanjuan et al. 2017. The data file can be downloaded
+# :download:`here <../../../examples/galaxies/lopez_sanjuan+17_B1.ecsv>`.
 
 data = Table.read("lopez_sanjuan+17_B1.ecsv", format='ascii.ecsv')
 fig, ((a1, a2), (a3, a4)) = plt.subplots(nrows=2, ncols=2, constrained_layout=True)

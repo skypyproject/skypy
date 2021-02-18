@@ -4,7 +4,6 @@
 import numpy as np
 
 from ..utils.random import schechter
-from ..utils import broadcast_arguments, dependent_argument
 
 
 __all__ = [

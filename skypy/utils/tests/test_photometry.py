@@ -6,8 +6,8 @@ from skypy.utils.photometry import HAS_SPECLITE
 def test_magnitude_functions():
 
     from skypy.utils.photometry import (luminosity_in_band,
-            luminosity_from_absolute_magnitude,
-            absolute_magnitude_from_luminosity)
+                                        luminosity_from_absolute_magnitude,
+                                        absolute_magnitude_from_luminosity)
 
     # convert between absolute luminosity and magnitude
     assert np.isclose(luminosity_from_absolute_magnitude(-22), 630957344.5)
