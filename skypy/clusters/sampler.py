@@ -43,7 +43,7 @@ def selection(z):
         fit_M = 10**(p)
     return fit_M  ##unit: Msun
 
-def mass_sampler(z, size, mdef = '500c', m_min = 1e+12, m_max = 1e+16, select = False, newcosmo_astropy = WMAP9, sigma8 = 0.8200, ns = 0.9608):
+def colossus_mass_sampler(redshift, model, mdef, m_min, m_max, cosmology, sigma8, ns, size=None):
     """
         This function generate a sample of cluster with halo mass from Despali+16 mass function.
        
@@ -98,4 +98,3 @@ def mass_sampler(z, size, mdef = '500c', m_min = 1e+12, m_max = 1e+16, select = 
     n_uniform = np.random.uniform(size = size)
     masssample = np.interp(n_uniform, CDF, m)
     return masssample
-
