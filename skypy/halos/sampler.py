@@ -4,14 +4,8 @@ This code samples cluster halos from colossus mass function .
 '''
 import numpy as np
 import colossus as colossus
-import astropy as astropy
-from astropy.cosmology import WMAP9
-from colossus.cosmology import cosmology
 from colossus.lss import mass_function
 from scipy import integrate
-import scipy
-
-
 
 def colossus_mass_sampler(redshift, model, mdef, m_min, m_max, cosmology, sigma8, ns, size=None, resolution=1000):
     """
@@ -54,7 +48,7 @@ def colossus_mass_sampler(redshift, model, mdef, m_min, m_max, cosmology, sigma8
     
     """
     cosmo = colossus.cosmology.cosmology.fromAstropy(cosmology, sigma8 = sigma8, ns = ns, name = 'my_cosmo')
-    h0 = cosmology.h
+    h0 = cosmo.h
     m_h0 = np.logspace(np.log10(m_min*h0), np.log10(m_max*h0), resolution) ##unit: Msun/h
     dndm = mass_function.massFunction(m_h0, redshift, mdef = mdef, model = model,q_out = 'dndlnM',q_in='M')/m_h0
     m = m_h0/h0
