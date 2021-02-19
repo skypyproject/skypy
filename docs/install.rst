@@ -29,13 +29,13 @@ channel. To install the latest version for your active conda environment:
 From GitHub
 -----------
 
-The latest development version of SkyPy can be found on the master branch of
+The latest development version of SkyPy can be found on the main branch of
 the `skypyproject/skypy`_ GitHub repository. This and any other branch or tag
 can be installed directly from GitHub using a recent version of pip:
 
 .. code:: console
 
-    $ pip install skypy@git+https://github.com/skypyproject/skypy.git@master
+    $ pip install skypy@git+https://github.com/skypyproject/skypy.git@main
 
 Dependencies
 ------------

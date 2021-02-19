@@ -65,7 +65,7 @@ class Pipeline:
 
         References
         ----------
-        .. [1] https://github.com/skypyproject/skypy/tree/master/examples
+        .. [1] https://github.com/skypyproject/skypy/tree/main/examples
 
         '''
 
