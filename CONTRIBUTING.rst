@@ -77,7 +77,8 @@ Push your changes to your fork
 
 To make your proposed changes visible to the world, you need to *push* your feature branch to your remote fork on GitHub::
 
-  # on the first push, use -u to tell git that this feature branch always goes to your fork
+  # on the first push, use -u to tell git that this feature branch
+  # always goes to your fork
   git push -u GITHUB_USER BRANCH_NAME
   # on subsequent pushes, you can then `git push` without options
 
@@ -128,7 +129,7 @@ As you work on your feature, new commits might be made to the ``skypyproject`` m
 For more information about resolving conflicts see the GitHub guides:
   - `Resolving a merge conflict on GitHub <https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/resolving-a-merge-conflict-on-github>`_
   - `Resolving a merge conflict using the command line <https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/resolving-a-merge-conflict-using-the-command-line>`_
-  - `About Git rebase <https://help.github.com/en/github/using-git/about-git-rebase>`_
+
 
 More Information
 ^^^^^^^^^^^^^^^^
