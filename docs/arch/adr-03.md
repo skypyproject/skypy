@@ -113,3 +113,8 @@ list of regions. For example, a very real use case would be to generate
 populations of galaxies and simply count the total number in each HEALPix pixel
 to generate a density map. This will be addressed in a separate ADR.
 
+
+Consequences
+------------
+The existing `Pipeline` class must be extended to support iterating regions. No
+existing interfaces are affected.
