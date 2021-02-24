@@ -1,5 +1,6 @@
-'''Halo mass sampler.
-This code samples cluster halos from colossus mass function .
+'''Colossus halo mass sampler.
+
+This module facilitates the sampling of cluster halos from `Colossus <http://www.benediktdiemer.com/code/colossus/>`_.
 
 '''
 import numpy as np
