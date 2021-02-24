@@ -53,6 +53,7 @@ Installing using pip or conda will automatically install or update these core
 dependencies if necessary. SkyPy also has a number of optional dependencies
 that enable additional features:
 
+- `h5py <https://www.h5py.org/>`_
 - `speclite <https://speclite.readthedocs.io/>`_
 
 To install SkyPy with all optional dependencies using pip:
