@@ -1,6 +1,6 @@
 '''Colossus halo mass sampler.
 
-This module facilitates the sampling of cluster halos from `Colossus <http://www.benediktdiemer.com/code/colossus/>`_.
+This module facilitates the sampling of halos from `Colossus <http://www.benediktdiemer.com/code/colossus/>`_.
 
 '''
 import numpy as np
@@ -10,47 +10,42 @@ from scipy import integrate
 
 def colossus_mass_sampler(redshift, model, mdef, m_min, m_max, cosmology, sigma8, ns, size=None, resolution=1000):
     """
-        This function generate a sample of cluster with halo mass from Despali+16 mass function.
+        This function generate a sample of halos with halo mass from Despali+16 mass function.
        
     Parameters
     -----------
-    redshift: float
-         The redshift values at which to sample the halo mass.
-    model: string
-     Mass function model which is available in colossus
-    mdef: str
-     halo mass definition, any spherical overdensity. For example: '200m', 200c', '500c', '2500c'
-         ***If select=True, then mdef has to be '500c'.
-    m_min, m_max: float
-     Lower and upper bounds for cluster mass (Unit: Msun).
-    cosmology: astropy.cosmology.Cosmology
-    sigma8: float
-    ns: float
-    size: int
-     Number of clusters we need.
-     
+    redshift : float
+        The redshift values at which to sample the halo mass.
+    model : string
+        Mass function model which is available in colossus.
+    mdef : str
+        Halo mass definition for spherical overdensities.
+        Choose from :math:`<int>c`, :math:`<int>m`, :math:`vir`, :math:`fof`.
+        For example: '200m', 200c', '500c', 'fof', 'vir'.
+    m_min, m_max : float
+        Lower and upper bounds for halo mass in units of Solar mass, :math:`Msun`.
+    cosmology : astropy.cosmology.Cosmology
+        Astropy cosmology object
+    sigma8 : float
+        Cosmology parameter, amplitude of the (linear) power spectrum on the scale of :math:`8 h-1 Mpc`.
+    ns : float
+        Cosmology parameter, spectral index of scalar perturbation power spectrum.
+    size : int, optional
+        Number of halos to sample. If size is None (default), a single value is returned.
+    resolution : int, optional
+        Resolution of the inverse transform sampling spline. Default is 1000.
     Returns
     --------
-    halo mass: array_like (unit: Msun)
-    
-    Examples
-    ---------
-    >>>import numpy as np
-    >>>import colossus as colossus
-    >>>import astropy as astropy
-    >>>from astropy.cosmology import WMAP9
-    >>>from colossus.cosmology import cosmology
-    >>>from colossus.lss import mass_function
-    >>>from scipy import integrate
-
-    >>>sigma8 = 0.8200
-    >>>ns = 0.9608
-    >>>colossus_mass_sampler(redshift=0.1, model='despali16', mdef= '500c', m_min = 1e+12, m_max = 1e+16, cosmology=WMAP9, sigma8 = 0.8200, ns = 0.9608, size=100)
-    
+    sample : (size,) array_like
+        Samples drawn from the mass function, in units of solar masses.
+        
+    References
+    -----------
+    .. [1] Diemer et al. (2018) doi 10.3847/1538-4365/aaee8c
     """
     cosmo = colossus.cosmology.cosmology.fromAstropy(cosmology, sigma8 = sigma8, ns = ns, name = 'my_cosmo')
     h0 = cosmo.h
-    m_h0 = np.logspace(np.log10(m_min*h0), np.log10(m_max*h0), resolution) ##unit: Msun/h
+    m_h0 = np.logspace(np.log10(m_min*h0), np.log10(m_max*h0), resolution) # unit: Msun/h
     dndm = mass_function.massFunction(m_h0, redshift, mdef = mdef, model = model,q_out = 'dndlnM',q_in='M')/m_h0
     m = m_h0/h0
     CDF = integrate.cumtrapz(dndm, (m), initial=0)
