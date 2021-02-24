@@ -15,7 +15,7 @@ def colossus_mass_sampler(redshift, model, mdef, m_min, m_max, cosmology, sigma8
     Parameters
     -----------
     redshift: float
-     Redshift
+         The redshift values at which to sample the halo mass.
     model: string
      Mass function model which is available in colossus
     mdef: str
