@@ -67,7 +67,7 @@ in the `Code of Conduct`_.
 .. |GitHub| image:: https://github.com/skypyproject/skypy/workflows/Tests/badge.svg
     :target: https://github.com/skypyproject/skypy/actions
 
-.. |Codecov| image:: https://codecov.io/gh/skypyproject/skypy/branch/master/graph/badge.svg
+.. |Codecov| image:: https://codecov.io/gh/skypyproject/skypy/branch/main/graph/badge.svg
     :target: https://codecov.io/gh/skypyproject/skypy
 
 .. |Zenodo| image:: https://zenodo.org/badge/221432358.svg

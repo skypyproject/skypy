@@ -1,2 +1,2 @@
 def test_import():
-    import skypy.pipeline
+    import skypy.pipeline  # noqa: F401

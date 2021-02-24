@@ -2,11 +2,11 @@ name: Tests
 on:
   push:
     branches:
-    - master
+    - main
     - module/*
   pull_request:
     branches:
-    - master
+    - main
     - module/*
 jobs:
   test:
@@ -41,6 +41,8 @@ jobs:
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
     - name: Install Python ${{ matrix.python }}
       uses: actions/setup-python@v2
       with:
