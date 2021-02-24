@@ -4,7 +4,7 @@ ADR 3: Position sampling and patches of the sky
 
 Author: Nicolas Tessore  
 Date: 5 February 2021  
-Status: draft
+Status: Accepted
 
 
 Context
