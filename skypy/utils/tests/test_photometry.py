@@ -161,3 +161,17 @@ def test_template_spectra():
                                                   Planck15, resolution=2)
     np.testing.assert_allclose(m_true, m_interp, rtol=1e-5)
     assert not np.all(m_true == m_interp)
+
+
+@pytest.mark.skipif(HAS_SPECLITE, reason='test requires that speclite is not installed')
+def test_speclite_not_installed():
+    """
+    Regression test for #436
+    Test that mag_ab raises the correct exception if speclite is not insalled.
+    """
+    from skypy.utils.photometry import mag_ab
+    wavelength = np.linspace(1, 10, 100)
+    spectrum = np.ones(10)
+    filter = 'bessell-B'
+    with pytest.raises(ImportError):
+        mag_ab(wavelength, spectrum, filter)
