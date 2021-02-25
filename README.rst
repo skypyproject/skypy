@@ -15,9 +15,9 @@ The full list of features can be found in the `SkyPy Documentation`_.
 If you use SkyPy for work or research presented in a publication please follow
 our `Citation Guidelines`_.
 
-.. _Galaxies: https://skypy.readthedocs.io/en/latest/galaxies.html
-.. _Pipelines: https://skypy.readthedocs.io/en/latest/pipeline/index.html
-.. _SkyPy Documentation: https://skypy.readthedocs.io/en/latest/
+.. _Galaxies: https://skypy.readthedocs.io/en/stable/galaxies.html
+.. _Pipelines: https://skypy.readthedocs.io/en/stable/pipeline/index.html
+.. _SkyPy Documentation: https://skypy.readthedocs.io/en/stable/
 .. _Citation Guidelines: CITATION.rst
 
 
