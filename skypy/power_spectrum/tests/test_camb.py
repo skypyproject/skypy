@@ -36,3 +36,16 @@ def test_camb():
     pzk = camb(wavenumber, redshift, Planck15, 2.e-9, 0.965)
     assert pzk.shape == (len(redshift), len(wavenumber))
     assert allclose(pzk, test_pzk[np.argsort(redshift), :], rtol=1.e-4)
+
+
+@pytest.mark.skipif(CAMB_NOT_FOUND, reason='CAMB not found')
+def test_camb_redshift_zero():
+    """
+    Regression test for #438
+    Test that camb runs succesfully with redshift=0.0
+    """
+    from skypy.power_spectrum import camb
+    redshift = 0.0
+    wavenumber = np.logspace(-4.0, np.log10(2.0), 200)
+    pzk = camb(wavenumber, redshift, Planck15, 2.e-9, 0.965)
+    assert allclose(pzk, test_pzk[0], rtol=1.e-4)
