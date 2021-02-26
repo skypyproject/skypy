@@ -16,7 +16,7 @@ __all__ = [
 ]
 
 try:
-    import speclite.filters
+    import speclite.filters  # noqa F401
 except ImportError:
     HAS_SPECLITE = False
 else:
@@ -84,11 +84,12 @@ def mag_ab(wavelength, spectrum, filters, *, redshift=None, coefficients=None,
     .. [1] M. R. Blanton et al., 2003, AJ, 125, 2348
 
     '''
+    from speclite.filters import load_filters
 
     # load the filters
     if np.ndim(filters) == 0:
         filters = (filters,)
-    filters = speclite.filters.load_filters(*filters)
+    filters = load_filters(*filters)
     if np.shape(filters) == (1,):
         filters = filters[0]
 
