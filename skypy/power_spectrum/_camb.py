@@ -1,5 +1,6 @@
 import numpy as np
 from astropy import units
+from inspect import signature
 
 
 __all__ = [
@@ -85,7 +86,7 @@ def camb(wavenumber, redshift, cosmology, A_s, n_s):
 
     pars.NonLinear = model.NonLinear_none
 
-    if len(redshift) > 1:
+    if len(redshift) > signature(get_matter_power_interpolator).parameters['nz_step'].default:
         redshift_kwargs = {'zmin': np.min(redshift), 'zmax': np.max(redshift)}
     else:
         redshift_kwargs = {'zs': redshift}
