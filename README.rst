@@ -2,7 +2,7 @@
 SkyPy: A package for modelling the Universe
 ===========================================
 
-|PyPI| |conda-forge| |Read the Docs| |GitHub| |Codecov| |Zenodo|
+|PyPI| |conda-forge| |Read the Docs| |GitHub| |Codecov| |JOSS| |Zenodo|
 
 This package contains methods for modelling the Universe, galaxies and the Milky
 Way. Also included are methods for generating observed data.
@@ -69,6 +69,9 @@ in the `Code of Conduct`_.
 
 .. |Codecov| image:: https://codecov.io/gh/skypyproject/skypy/branch/main/graph/badge.svg
     :target: https://codecov.io/gh/skypyproject/skypy
+
+.. |JOSS| image:: https://joss.theoj.org/papers/d4fac0604318190d6627ab29b568a48d/status.svg
+    :target: https://joss.theoj.org/papers/d4fac0604318190d6627ab29b568a48d
 
 .. |Zenodo| image:: https://zenodo.org/badge/221432358.svg
     :target: https://zenodo.org/badge/latestdoi/221432358
