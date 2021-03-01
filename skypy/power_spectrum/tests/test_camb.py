@@ -49,3 +49,28 @@ def test_camb_redshift_zero():
     wavenumber = np.logspace(-4.0, np.log10(2.0), 200)
     pzk = camb(wavenumber, redshift, Planck15, 2.e-9, 0.965)
     assert allclose(pzk, test_pzk[0], rtol=1.e-4)
+
+
+@pytest.mark.skipif(CAMB_NOT_FOUND, reason='CAMB not found')
+def test_camb_interpolation():
+    from camb import get_matter_power_interpolator
+    from inspect import signature
+    from skypy.power_spectrum import camb
+
+    # Number of redshifts above which CAMB will do interpolation
+    nz_step = signature(get_matter_power_interpolator).parameters['nz_step'].default
+
+    # Two redshift arrays. For the first CAMB will calculate the exact power
+    # spectrum. The second contains all of the redshifts from the first as a
+    # subset, but CAMB will calculate the power spectrum using interpolation.
+    z_exact = np.linspace(0, 1, nz_step)
+    z_interp = np.linspace(0, 1, 2*nz_step - 1)
+
+    # Exact power spectrum
+    wavenumber = np.logspace(-3.0, 1, 100)
+    A_s, n_s = 2.2E-9, 0.97
+    p_exact = camb(wavenumber, z_exact, Planck15, A_s, n_s)
+
+    # Interpolated power spectrum at the same redshifts
+    p_interp = camb(wavenumber, z_interp, Planck15, A_s, n_s)[::2]
+    assert allclose(p_exact, p_interp)
