@@ -2,7 +2,7 @@
 SkyPy: A package for modelling the Universe
 ===========================================
 
-|PyPI| |conda-forge| |Read the Docs| |GitHub| |Codecov| |Zenodo|
+|Read the Docs| |GitHub| |Codecov|
 
 This package contains methods for modelling the Universe, galaxies and the Milky
 Way. Also included are methods for generating observed data.
@@ -12,17 +12,26 @@ Way. Also included are methods for generating observed data.
 
 The full list of features can be found in the `SkyPy Documentation`_.
 
-If you use SkyPy for work or research presented in a publication please follow
-our `Citation Guidelines`_.
-
 .. _Galaxies: https://skypy.readthedocs.io/en/latest/galaxies.html
 .. _Pipelines: https://skypy.readthedocs.io/en/latest/pipeline/index.html
 .. _SkyPy Documentation: https://skypy.readthedocs.io/en/latest/
+
+
+Citation
+--------
+
+|JOSS| |Zenodo|
+
+If you use SkyPy for work or research presented in a publication please follow
+our `Citation Guidelines`_.
+
 .. _Citation Guidelines: CITATION.rst
 
 
 Installation
 ------------
+
+|PyPI| |conda-forge|
 
 SkyPy releases are distributed through PyPI_ and conda-forge_. Instructions for
 installing SkyPy and its dependencies can be found in the Installation_
@@ -73,3 +82,6 @@ in the `Code of Conduct`_.
 .. |Zenodo| image:: https://zenodo.org/badge/221432358.svg
     :target: https://zenodo.org/badge/latestdoi/221432358
     :alt: SkyPy Concept DOI
+
+.. |JOSS| image:: https://joss.theoj.org/papers/d4fac0604318190d6627ab29b568a48d/status.svg
+    :target: https://joss.theoj.org/papers/d4fac0604318190d6627ab29b568a48d
