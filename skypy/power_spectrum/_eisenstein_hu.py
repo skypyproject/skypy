@@ -272,8 +272,8 @@ def eisenstein_hu(wavenumber, A_s, n_s, cosmology, kwmap=0.02, wiggle=True):
     >>> wavenumber = np.logspace(-3, 1, num=5, base=10.0)
     >>> A_s, n_s = 2.1982e-09, 0.969453
     >>> eisenstein_hu(wavenumber, A_s, n_s, Planck15, kwmap=0.02, wiggle=True)
-    array([9.29895009e+03, 4.10421883e+04, 5.62046151e+03, 4.63533349e+01,
-       1.41107939e-01])
+    array([2.99156428e+04, 1.32036782e+05, 1.80815810e+04, 1.49123267e+02,
+       4.53958208e-01])
 
     References
     ----------
@@ -292,6 +292,6 @@ def eisenstein_hu(wavenumber, A_s, n_s, cosmology, kwmap=0.02, wiggle=True):
     # Eq [74] in [3]
     power_spectrum = A_s * (2 * (wavenumber / h0)**2 * 2998**2 / 5 / om0)**2 * \
         transfer**2 * (wavenumber / kwmap)**(n_s - 1) * 2 * \
-        np.pi**2 / (wavenumber / h0)**3
+        np.pi**2 / (wavenumber)**3
 
     return power_spectrum
