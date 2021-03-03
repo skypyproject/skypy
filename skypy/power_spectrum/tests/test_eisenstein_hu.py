@@ -37,10 +37,10 @@ def test_eisenstein_hu():
                                       wiggle=True)
     pk_eisensteinhu_nw = eisenstein_hu(wavenumber, A_s, n_s, cosmology, kwmap,
                                        wiggle=False)
-    pk_cosmosis_w = np.array([6.47460158e+03, 3.71610099e+04, 9.65702614e+03,
-                              1.14604456e+02, 3.91399918e-01])
-    pk_cosmosis_nw = np.array([6.47218600e+03, 3.77330704e+04, 1.00062077e+04,
-                              1.13082980e+02, 3.83094714e-01])
+    pk_cosmosis_w = np.array([9.29895009e+03, 4.10421883e+04, 5.62046151e+03,
+                              4.63533349e+01, 1.41107939e-01])
+    pk_cosmosis_nw = np.array([9.29660250e+03, 4.17746880e+04, 5.54047525e+03,
+                              4.55237583e+01, 1.38127599e-01])
 
     assert np.allclose(pk_eisensteinhu_w, pk_cosmosis_w)
     assert np.allclose(pk_eisensteinhu_nw, pk_cosmosis_nw)

@@ -54,8 +54,8 @@ def transfer_with_wiggles(wavenumber, A_s, n_s, cosmology, kwmap=0.02):
     >>> wavenumber = np.logspace(-3, 1, num=5, base=10.0)
     >>> A_s, n_s = 2.1982e-09, 0.969453
     >>> transfer_with_wiggles(wavenumber, A_s, n_s, Planck15, kwmap=0.02)
-    array([9.92144790e-01, 7.78548704e-01, 1.29998169e-01, 4.63863054e-03,
-       8.87918075e-05])
+    array([9.84445487e-01, 6.77428507e-01, 8.21122028e-02, 2.44250638e-03,
+       4.41412308e-05])
 
     References
     ----------
@@ -84,7 +84,7 @@ def transfer_with_wiggles(wavenumber, A_s, n_s, cosmology, kwmap=0.02):
         raise ValueError("Tcmb0 for input cosmology must be non-zero if"
                          "wiggles = True")
 
-    ak = wavenumber * h0
+    ak = wavenumber
     om0h2 = om0 * h0**2
     ob0h2 = ob0 * h0**2
     f_baryon = ob0 / om0
@@ -190,8 +190,8 @@ def transfer_no_wiggles(wavenumber, A_s, n_s, cosmology):
     >>> wavenumber = np.logspace(-3, 1, num=5, base=10.0)
     >>> A_s, n_s = 2.1982e-09, 0.969453
     >>> transfer_no_wiggles(wavenumber, A_s, n_s, Planck15)
-    array([9.91959695e-01, 7.84518347e-01, 1.32327555e-01, 4.60773671e-03,
-       8.78447096e-05])
+    array([9.84321214e-01, 6.83446969e-01, 8.15258290e-02, 2.42055117e-03,
+       4.36725897e-05])
 
     References
     ----------
@@ -210,7 +210,7 @@ def transfer_no_wiggles(wavenumber, A_s, n_s, cosmology):
     ob0 = cosmology.Ob0
     h0 = cosmology.H0.value / 100
     Tcmb0 = cosmology.Tcmb0.value
-    ak = wavenumber * h0
+    ak = wavenumber
     om0h2 = om0 * h0**2
     f_baryon = ob0 / om0
 
@@ -272,8 +272,8 @@ def eisenstein_hu(wavenumber, A_s, n_s, cosmology, kwmap=0.02, wiggle=True):
     >>> wavenumber = np.logspace(-3, 1, num=5, base=10.0)
     >>> A_s, n_s = 2.1982e-09, 0.969453
     >>> eisenstein_hu(wavenumber, A_s, n_s, Planck15, kwmap=0.02, wiggle=True)
-    array([6.47460158e+03, 3.71610099e+04, 9.65702614e+03, 1.14604456e+02,
-       3.91399918e-01])
+    array([9.29895009e+03, 4.10421883e+04, 5.62046151e+03, 4.63533349e+01,
+       1.41107939e-01])
 
     References
     ----------
@@ -290,8 +290,8 @@ def eisenstein_hu(wavenumber, A_s, n_s, cosmology, kwmap=0.02, wiggle=True):
         transfer = transfer_no_wiggles(wavenumber, A_s, n_s, cosmology)
 
     # Eq [74] in [3]
-    power_spectrum = A_s * (2 * wavenumber**2 * 2998**2 / 5 / om0)**2 * \
-        transfer**2 * (wavenumber * h0 / kwmap)**(n_s - 1) * 2 * \
-        np.pi**2 / wavenumber**3
+    power_spectrum = A_s * (2 * (wavenumber / h0)**2 * 2998**2 / 5 / om0)**2 * \
+        transfer**2 * (wavenumber / kwmap)**(n_s - 1) * 2 * \
+        np.pi**2 / (wavenumber / h0)**3
 
     return power_spectrum
