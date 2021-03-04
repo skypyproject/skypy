@@ -5,6 +5,7 @@ from scipy import integrate
 from scipy.stats import kstest
 import pytest
 
+
 @pytest.mark.flaky
 def test_colossus_mass_sampler():
     from astropy.cosmology import WMAP9
@@ -15,7 +16,7 @@ def test_colossus_mass_sampler():
                                    cosmology=WMAP9, sigma8=0.8200, ns=0.9608,
                                    size=100, resolution=1000)
     assert np.all(sample >= m_min)
-        
+
     cosmo = colossus.cosmology.cosmology.fromAstropy(WMAP9, sigma8=0.8200,
                                                      ns=0.9608, name='my_cosmo')
     h0 = cosmo.h
