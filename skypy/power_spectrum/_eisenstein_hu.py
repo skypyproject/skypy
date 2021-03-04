@@ -6,6 +6,7 @@ formula for the matter power spectrum.
 
 from astropy.utils import isiterable
 import numpy as np
+from astropy import constants
 
 
 __all__ = [
@@ -84,7 +85,6 @@ def transfer_with_wiggles(wavenumber, A_s, n_s, cosmology, kwmap=0.02):
         raise ValueError("Tcmb0 for input cosmology must be non-zero if"
                          "wiggles = True")
 
-    ak = wavenumber
     om0h2 = om0 * h0**2
     ob0h2 = ob0 * h0**2
     f_baryon = ob0 / om0
@@ -126,8 +126,8 @@ def transfer_with_wiggles(wavenumber, A_s, n_s, cosmology, kwmap=0.02):
     beta_b = 0.5 + f_baryon + (3 - 2 * f_baryon) * np.sqrt((17.2 * om0h2)**2
                                                            + 1.0)
 
-    q = ak / (13.41 * k_eq)
-    ks = ak * sound_horizon
+    q = wavenumber / (13.41 * k_eq)
+    ks = wavenumber * sound_horizon
 
     T_c_ln_beta = np.log(np.e + 1.8 * beta_c * q)
     T_c_ln_nobeta = np.log(np.e + 1.8 * q)
@@ -143,11 +143,12 @@ def transfer_with_wiggles(wavenumber, A_s, n_s, cosmology, kwmap=0.02):
         (1 - T_c_f) * f(T_c_ln_beta, T_c_C_alpha)
 
     s_tilde = sound_horizon * (1 + (beta_node / ks)**3)**(-1 / 3)
-    ks_tilde = ak * s_tilde
+    ks_tilde = wavenumber * s_tilde
 
     T_b_T0 = f(T_c_ln_nobeta, T_c_C_noalpha)
     T_b_1 = T_b_T0 / (1 + (ks / 5.2)**2)
-    T_b_2 = alpha_b / (1 + (beta_b / ks)**3) * np.exp(-(ak / k_silk)**1.4)
+    T_b_2 = alpha_b / (1 + (beta_b / ks)**3) * np.exp(-(wavenumber
+                                                      / k_silk)**1.4)
     T_b = np.sinc(ks_tilde / np.pi) * (T_b_1 + T_b_2)
 
     transfer = f_baryon * T_b + (1 - f_baryon) * T_c
@@ -210,7 +211,6 @@ def transfer_no_wiggles(wavenumber, A_s, n_s, cosmology):
     ob0 = cosmology.Ob0
     h0 = cosmology.H0.value / 100
     Tcmb0 = cosmology.Tcmb0.value
-    ak = wavenumber
     om0h2 = om0 * h0**2
     f_baryon = ob0 / om0
 
@@ -218,8 +218,9 @@ def transfer_no_wiggles(wavenumber, A_s, n_s, cosmology):
         np.log(22.3 * om0h2) * f_baryon**2
     sound = 44.5 * np.log(9.83 / om0h2) / \
         np.sqrt(1 + 10 * (f_baryon * om0h2)**(0.75))
-    shape = om0h2 * (alpha + (1 - alpha) / (1 + (0.43 * ak * sound)**4))
-    aq = ak * (Tcmb0 / 2.7)**2 / shape
+    shape = om0h2 * (alpha + (1 - alpha) / (1 + (0.43 * wavenumber
+                                                 * sound)**4))
+    aq = wavenumber * (Tcmb0 / 2.7)**2 / shape
     transfer = np.log(2 * np.e + 1.8 * aq) / \
         (np.log(2 * np.e + 1.8 * aq) +
          (14.2 + 731 / (1 + 62.5 * aq)) * aq * aq)
@@ -272,8 +273,8 @@ def eisenstein_hu(wavenumber, A_s, n_s, cosmology, kwmap=0.02, wiggle=True):
     >>> wavenumber = np.logspace(-3, 1, num=5, base=10.0)
     >>> A_s, n_s = 2.1982e-09, 0.969453
     >>> eisenstein_hu(wavenumber, A_s, n_s, Planck15, kwmap=0.02, wiggle=True)
-    array([2.99156428e+04, 1.32036782e+05, 1.80815810e+04, 1.49123267e+02,
-       4.53958208e-01])
+    array([2.99126326e+04, 1.32023496e+05, 1.80797616e+04, 1.49108261e+02,
+           4.53912529e-01])
 
     References
     ----------
@@ -282,7 +283,8 @@ def eisenstein_hu(wavenumber, A_s, n_s, cosmology, kwmap=0.02, wiggle=True):
     .. [3] Komatsu et al., ApJS, 180, 330 (2009)
     """
     om0 = cosmology.Om0
-    h0 = cosmology.H0.value / 100
+    H0_c = (cosmology.H0 / constants.c).to_value('Mpc-1')
+
     if wiggle:
         transfer = transfer_with_wiggles(wavenumber, A_s, n_s, cosmology,
                                          kwmap)
@@ -290,7 +292,7 @@ def eisenstein_hu(wavenumber, A_s, n_s, cosmology, kwmap=0.02, wiggle=True):
         transfer = transfer_no_wiggles(wavenumber, A_s, n_s, cosmology)
 
     # Eq [74] in [3]
-    power_spectrum = A_s * (2 * (wavenumber / h0)**2 * 2998**2 / 5 / om0)**2 * \
+    power_spectrum = A_s * (2 * (wavenumber / H0_c)**2 / 5 / om0)**2 * \
         transfer**2 * (wavenumber / kwmap)**(n_s - 1) * 2 * \
         np.pi**2 / (wavenumber)**3
 
