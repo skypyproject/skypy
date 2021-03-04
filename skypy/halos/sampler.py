@@ -10,7 +10,7 @@ Models
     :toctree: ../api/
 
     colossus_mass_sampler
-    
+
 """
 
 import numpy as np
@@ -26,7 +26,8 @@ __all__ = [
 def colossus_mass_sampler(redshift, model, mdef, m_min, m_max,
                           cosmology, sigma8, ns, size=None, resolution=1000):
     """Colossus halo mass sampler.
-        This function generate a sample of halos from a mass function which is available in colossus.
+        This function generate a sample of halos from a mass function which
+        is available in colossus.
 
     Parameters
     -----------
@@ -65,7 +66,7 @@ def colossus_mass_sampler(redshift, model, mdef, m_min, m_max,
     h0 = cosmo.h
     m_h0 = np.logspace(np.log10(m_min*h0), np.log10(m_max*h0), resolution)  # unit: Msun/h
     dndm = mass_function.massFunction(m_h0, redshift, mdef=mdef, model=model,
-                                      q_out ='dndlnM', q_in='M')/m_h0
+                                      q_out='dndlnM', q_in='M')/m_h0
     m = m_h0/h0
     CDF = integrate.cumtrapz(dndm, (m), initial=0)
     CDF = CDF / CDF[-1]
