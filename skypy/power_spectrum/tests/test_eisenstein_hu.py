@@ -38,9 +38,9 @@ def test_eisenstein_hu():
     pk_eisensteinhu_nw = eisenstein_hu(wavenumber, A_s, n_s, cosmology, kwmap,
                                        wiggle=False)
     pk_pre_w = np.array([2.99126326e+04, 1.32023496e+05, 1.80797616e+04,
-                            1.49108261e+02, 4.53912529e-01])
+                         1.49108261e+02, 4.53912529e-01])
     pk_pre_nw = np.array([2.99050810e+04, 1.34379783e+05, 1.78224637e+04,
-                            1.46439700e+02, 4.44325443e-01])
+                         1.46439700e+02, 4.44325443e-01])
 
     assert np.allclose(pk_eisensteinhu_w, pk_pre_w)
     assert np.allclose(pk_eisensteinhu_nw, pk_pre_nw)
