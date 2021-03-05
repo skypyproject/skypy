@@ -147,8 +147,7 @@ def transfer_with_wiggles(wavenumber, A_s, n_s, cosmology, kwmap=0.02):
 
     T_b_T0 = f(T_c_ln_nobeta, T_c_C_noalpha)
     T_b_1 = T_b_T0 / (1 + (ks / 5.2)**2)
-    T_b_2 = alpha_b / (1 + (beta_b / ks)**3) * np.exp(-(wavenumber
-                                                      / k_silk)**1.4)
+    T_b_2 = alpha_b / (1 + (beta_b / ks)**3) * np.exp(-(wavenumber/k_silk)**1.4)
     T_b = np.sinc(ks_tilde / np.pi) * (T_b_1 + T_b_2)
 
     transfer = f_baryon * T_b + (1 - f_baryon) * T_c
@@ -218,8 +217,7 @@ def transfer_no_wiggles(wavenumber, A_s, n_s, cosmology):
         np.log(22.3 * om0h2) * f_baryon**2
     sound = 44.5 * np.log(9.83 / om0h2) / \
         np.sqrt(1 + 10 * (f_baryon * om0h2)**(0.75))
-    shape = om0h2 * (alpha + (1 - alpha) / (1 + (0.43 * wavenumber
-                                                 * sound)**4))
+    shape = om0h2 * (alpha + (1 - alpha) / (1 + (0.43 * wavenumber * sound)**4))
     aq = wavenumber * (Tcmb0 / 2.7)**2 / shape
     transfer = np.log(2 * np.e + 1.8 * aq) / \
         (np.log(2 * np.e + 1.8 * aq) +
