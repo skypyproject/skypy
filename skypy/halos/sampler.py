@@ -14,8 +14,6 @@ Models
 """
 
 import numpy as np
-import colossus as colossus
-from colossus.lss import mass_function
 from scipy import integrate
 
 __all__ = [
