@@ -20,6 +20,13 @@ __all__ = [
         'colossus_mass_sampler',
            ]
 
+try:
+    import colossus
+except ImportError:
+    HAS_COLOSSUS = False
+else:
+    HAS_COLOSSUS = True
+
 
 def colossus_mass_sampler(redshift, model, mdef, m_min, m_max,
                           cosmology, sigma8, ns, size=None, resolution=1000):
@@ -59,6 +66,7 @@ def colossus_mass_sampler(redshift, model, mdef, m_min, m_max,
     -----------
     .. [1] Diemer et al. (2018) doi 10.3847/1538-4365/aaee8c
     """
+    from colossus.lss import mass_function
     cosmo = colossus.cosmology.cosmology.fromAstropy(cosmology, sigma8=sigma8,
                                                      ns=ns, name='my_cosmo')
     h0 = cosmo.h
