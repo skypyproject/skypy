@@ -38,22 +38,11 @@ def growth_function_carroll(redshift, cosmology):
         The growth function evaluated at the input redshifts for the given
         cosmology.
 
-    Examples
-    --------
-
-    This example returns the growth function for a given array of redshifts
-    and for the Planck 2015 cosmology:
-
-    >>> import numpy as np
-    >>> from astropy.cosmology import Planck15
-    >>> redshift = np.array([0, 1, 2])
-    >>> growth_function_carroll(redshift, Planck15)
-    array([0.781361..., 0.476280..., 0.327549...])
-
     References
     ----------
     .. [1] Carroll, M. and Press, W. and Turner, E., (1992),
         doi : 10.1146/annurev.aa.30.090192.002435
+
     '''
 
     if isiterable(redshift):
@@ -89,21 +78,10 @@ def growth_factor(redshift, cosmology, gamma=6.0/11.0):
     growth_factor : (nz,) array_like
       The redshift scaling of the growth factor.
 
-    Examples
-    --------
-
-    This example returns the growth factor for a given array of redshifts
-    and for a given cosmology:
-
-    >>> import numpy as np
-    >>> from astropy.cosmology import FlatLambdaCDM
-    >>> cosmology = FlatLambdaCDM(H0=67.04, Om0=0.3183, Ob0=0.047745)
-    >>> growth_factor(0, cosmology)
-    0.5355746155304598
-
     References
     ----------
     .. [1] E. V. Linder, Phys. Rev. D 72, 043529 (2005)
+
     '''
     z = redshift
 
@@ -137,22 +115,10 @@ def growth_function(redshift, cosmology, gamma=6.0/11.0, z_upper=1100):
     growth_function : (nz,) array_like
       The redshift scaling of the growth function.
 
-    Examples
-    --------
-
-    This example returns the growth function for a given array of redshifts
-    and for a given cosmology:
-
-    >>> import numpy as np
-    >>> from scipy import integrate
-    >>> from astropy.cosmology import FlatLambdaCDM
-    >>> cosmology = FlatLambdaCDM(H0=67.04, Om0=0.3183, Ob0=0.047745)
-    >>> growth_function(0, cosmology)
-    0.7909271056297236
-
     References
     ----------
     .. [1] E. V. Linder, Phys. Rev. D 72, 043529 (2005)
+
     '''
 
     def integrand(x):
@@ -206,23 +172,10 @@ def growth_function_derivative(redshift, cosmology, gamma=6.0/11.0):
 
     With :math:`f(z)` the growth factor.
 
-
-    Examples
-    --------
-
-    This example returns the first derivative of the growth function for a
-    given array of redshifts and cosmology:
-
-    >>> import numpy as np
-    >>> from scipy import integrate
-    >>> from astropy.cosmology import FlatLambdaCDM
-    >>> cosmology = FlatLambdaCDM(H0=67.04, Om0=0.3183, Ob0=0.047745)
-    >>> growth_function_derivative(0, cosmology)
-    -0.42360048051025856
-
     References
     ----------
     .. [1] E. V. Linder, Phys. Rev. D 72, 043529 (2005)
+    
     '''
     z = redshift
 
