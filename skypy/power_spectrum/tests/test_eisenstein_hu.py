@@ -37,13 +37,13 @@ def test_eisenstein_hu():
                                       wiggle=True)
     pk_eisensteinhu_nw = eisenstein_hu(wavenumber, A_s, n_s, cosmology, kwmap,
                                        wiggle=False)
-    pk_cosmosis_w = np.array([6.47460158e+03, 3.71610099e+04, 9.65702614e+03,
-                              1.14604456e+02, 3.91399918e-01])
-    pk_cosmosis_nw = np.array([6.47218600e+03, 3.77330704e+04, 1.00062077e+04,
-                              1.13082980e+02, 3.83094714e-01])
+    pk_pre_w = np.array([2.99126326e+04, 1.32023496e+05, 1.80797616e+04,
+                         1.49108261e+02, 4.53912529e-01])
+    pk_pre_nw = np.array([2.99050810e+04, 1.34379783e+05, 1.78224637e+04,
+                         1.46439700e+02, 4.44325443e-01])
 
-    assert np.allclose(pk_eisensteinhu_w, pk_cosmosis_w)
-    assert np.allclose(pk_eisensteinhu_nw, pk_cosmosis_nw)
+    assert np.allclose(pk_eisensteinhu_w, pk_pre_w)
+    assert np.allclose(pk_eisensteinhu_nw, pk_pre_nw)
 
     # Test for failure when wavenumber <= 0
     negative_wavenumber_scalar = 0
