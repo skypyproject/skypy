@@ -1,5 +1,4 @@
 import numpy as np
-import colossus as colossus
 from scipy import integrate
 from scipy.stats import kstest
 import pytest
