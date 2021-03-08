@@ -44,7 +44,7 @@ def colossus_mass_sampler(redshift, model, mdef, m_min, m_max,
     mdef : str
         Halo mass definition for spherical overdensities used by colossus.
     m_min, m_max : float
-        Lower and upper bounds for halo mass in units of Solar mass, :math:`Msun`.
+        Lower and upper bounds for halo mass in units of Solar mass, Msun.
     cosmology : astropy.cosmology.Cosmology
         Astropy cosmology object
     sigma8 : float
