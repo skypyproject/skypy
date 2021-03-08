@@ -49,7 +49,7 @@ def colossus_mass_sampler(redshift, model, mdef, m_min, m_max,
         Astropy cosmology object
     sigma8 : float
         Cosmology parameter, amplitude of the (linear) power spectrum on the
-        scale of :math:`8 h-1 Mpc`.
+        scale of 8 Mpc/h.
     ns : float
         Cosmology parameter, spectral index of scalar perturbation power spectrum.
     size : int, optional
