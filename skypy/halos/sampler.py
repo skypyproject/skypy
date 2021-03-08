@@ -31,8 +31,9 @@ else:
 def colossus_mass_sampler(redshift, model, mdef, m_min, m_max,
                           cosmology, sigma8, ns, size=None, resolution=1000):
     """Colossus halo mass sampler.
-        This function generate a sample of halos from a mass function which
-        is available in colossus.
+    
+    This function generate a sample of halos from a mass function which
+    is available in COLOSSUS [1]_.
 
     Parameters
     -----------
