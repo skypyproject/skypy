@@ -31,7 +31,7 @@ else:
 def colossus_mass_sampler(redshift, model, mdef, m_min, m_max,
                           cosmology, sigma8, ns, size=None, resolution=1000):
     """Colossus halo mass sampler.
-    
+
     This function generate a sample of halos from a mass function which
     is available in COLOSSUS [1]_.
 
@@ -56,6 +56,7 @@ def colossus_mass_sampler(redshift, model, mdef, m_min, m_max,
         Number of halos to sample. If size is None (default), a single value is returned.
     resolution : int, optional
         Resolution of the inverse transform sampling spline. Default is 1000.
+
     Returns
     --------
     sample : (size,) array_like
@@ -63,7 +64,8 @@ def colossus_mass_sampler(redshift, model, mdef, m_min, m_max,
 
         References
     -----------
-    .. [1] Diemer et al. (2018) doi 10.3847/1538-4365/aaee8c
+    .. [1] Diemer B., 2018, ApJS, 239, 35
+
     """
     from colossus.lss import mass_function
     cosmo = colossus.cosmology.cosmology.fromAstropy(cosmology, sigma8=sigma8,
