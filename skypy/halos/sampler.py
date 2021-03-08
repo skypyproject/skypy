@@ -42,9 +42,7 @@ def colossus_mass_sampler(redshift, model, mdef, m_min, m_max,
     model : string
         Mass function model which is available in colossus.
     mdef : str
-        Halo mass definition for spherical overdensities.
-        Choose from :math:`<int>c`, :math:`<int>m`, :math:`vir`, :math:`fof`.
-        For example: '200m', 200c', '500c', 'fof', 'vir'.
+        Halo mass definition for spherical overdensities used by colossus.
     m_min, m_max : float
         Lower and upper bounds for halo mass in units of Solar mass, :math:`Msun`.
     cosmology : astropy.cosmology.Cosmology
