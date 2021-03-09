@@ -50,7 +50,7 @@ def colossus_mass_sampler(redshift, model, mdef, m_min, m_max,
         Resolution of the inverse transform sampling spline. Default is 1000.
 
     Returns
-    --------
+    -------
     sample : (size,) array_like
         Samples drawn from the mass function, in units of solar masses.
 
