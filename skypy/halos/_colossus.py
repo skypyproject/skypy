@@ -28,7 +28,7 @@ def colossus_mass_sampler(redshift, model, mdef, m_min, m_max,
     is available in COLOSSUS [1]_.
 
     Parameters
-    -----------
+    ----------
     redshift : float
         The redshift values at which to sample the halo mass.
     model : string
