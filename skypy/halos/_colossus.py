@@ -54,8 +54,8 @@ def colossus_mass_sampler(redshift, model, mdef, m_min, m_max,
     sample : (size,) array_like
         Samples drawn from the mass function, in units of solar masses.
 
-        References
-    -----------
+    References
+    ----------
     .. [1] Diemer B., 2018, ApJS, 239, 35
 
     """
