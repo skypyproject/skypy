@@ -13,7 +13,7 @@ __all__ = [
 ]
 
 try:
-    import colossus
+    import colossus  # noqa F401
 except ImportError:
     HAS_COLOSSUS = False
 else:
@@ -59,10 +59,10 @@ def colossus_mass_sampler(redshift, model, mdef, m_min, m_max,
     .. [1] Diemer B., 2018, ApJS, 239, 35
 
     """
+    from colossus.cosmology.cosmology import fromAstropy
     from colossus.lss import mass_function
-    cosmo = colossus.cosmology.cosmology.fromAstropy(cosmology, sigma8=sigma8,
-                                                     ns=ns, name='my_cosmo')
-    h0 = cosmo.h
+    fromAstropy(cosmology, sigma8=sigma8, ns=ns)
+    h0 = cosmology.h
     m_h0 = np.logspace(np.log10(m_min*h0), np.log10(m_max*h0), resolution)  # unit: Msun/h
     dndm = mass_function.massFunction(m_h0, redshift, mdef=mdef, model=model,
                                       q_out='dndlnM', q_in='M')/m_h0
