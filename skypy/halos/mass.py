@@ -7,6 +7,7 @@ Models
    :nosignatures:
    :toctree: ../api/
 
+   colossus_mass_sampler
    ellipsoidal_collapse_function
    halo_mass_function
    halo_mass_sampler
@@ -27,8 +28,10 @@ from skypy.utils.special import gammaincc
 from functools import partial
 from astropy import units
 from skypy.utils.random import schechter
+from ._colossus import colossus_mass_sampler  # noqa F401,F403
 
 __all__ = [
+    'colossus_mass_sampler',
     'ellipsoidal_collapse_function',
     'halo_mass_function',
     'halo_mass_sampler',

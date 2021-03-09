@@ -1,15 +1,7 @@
-"""Colossus halo mass sampler.
+"""Colossus dark matter halo properties.
 
-This module facilitates the sampling of halos from
+This module contains functions that interfaces with the external code
 `Colossus <http://www.benediktdiemer.com/code/colossus/>`_.
-
-Models
-======
-.. autosummary::
-    :nosignatures:
-    :toctree: ../api/
-
-    colossus_mass_sampler
 
 """
 
@@ -17,8 +9,8 @@ import numpy as np
 from scipy import integrate
 
 __all__ = [
-        'colossus_mass_sampler',
-           ]
+    'colossus_mass_sampler',
+]
 
 try:
     import colossus

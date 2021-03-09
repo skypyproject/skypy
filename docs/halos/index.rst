@@ -107,9 +107,3 @@ Quenching (`skypy.halos.quenching`)
 ===================================
 
 .. automodule:: skypy.halos.quenching
-
-
-Sampler (`skypy.halos.sampler`)
-===================================
-
-.. automodule:: skypy.halos.sampler

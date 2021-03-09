@@ -2,7 +2,7 @@ import numpy as np
 from scipy import integrate
 from scipy.stats import kstest
 import pytest
-from skypy.halos.sampler import HAS_COLOSSUS
+from skypy.halos._colossus import HAS_COLOSSUS
 
 
 @pytest.mark.skipif(not HAS_COLOSSUS, reason='test requires colossus')
@@ -11,7 +11,7 @@ def test_colossus_mass_sampler():
     from astropy.cosmology import WMAP9
     import colossus as colossus
     from colossus.lss import mass_function
-    from skypy.halos.sampler import colossus_mass_sampler
+    from skypy.halos.mass import colossus_mass_sampler
     m_min, m_max, size = 1e+12, 1e+16, 100
     sample = colossus_mass_sampler(redshift=0.1, model='despali16',
                                    mdef='500c', m_min=m_min, m_max=m_max,
