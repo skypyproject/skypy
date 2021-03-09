@@ -75,7 +75,8 @@ def test_schechter_smf_redshift():
     sky_area = 1.0 * units.deg**2
 
     # sample redshifts
-    z_gal = schechter_smf_redshift(z, m_star, phi_star, alpha, m_min, m_max, sky_area, cosmo, noise=False)
+    z_gal = schechter_smf_redshift(z, m_star, phi_star, alpha, m_min, m_max,
+                                   sky_area, cosmo, noise=False)
 
     # density with factor from upper incomplete gamma function
     density = phi_star*gamma(alpha+1)*gammaincc(alpha+1, m_min / m_star)

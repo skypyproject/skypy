@@ -35,7 +35,7 @@ def test_load_skypy_yaml():
 def test_empty_ref():
     filename = get_pkg_data_filename('data/test_empty_ref.yml')
     with pytest.raises(ValueError, match='empty reference'):
-        config = load_skypy_yaml(filename)
+        load_skypy_yaml(filename)
 
 
 def test_yaml_quantities():
