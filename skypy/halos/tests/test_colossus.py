@@ -81,6 +81,7 @@ def test_colossus_mf_redshift():
     D, p = kstest(z_halo, lambda z_: np.interp(z_, redshift, cdf))
     assert p > 0.01, 'D = {}, p = {}'.format(D, p)
 
+
 @pytest.mark.skipif(not HAS_COLOSSUS, reason='test requires colossus')
 def test_colossus_mf():
 
