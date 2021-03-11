@@ -2,8 +2,6 @@
 Dark Matter Halos (`skypy.halos`)
 *********************************
 
-.. automodule:: skypy.halos
-
 You can reproduce figure 2 in Sheth and Tormen 1999
 and plot the collapse functions for different halo models. For this, you can use
 a python script, for example.
@@ -91,6 +89,12 @@ file and run the pipeline, for example.
     plt.show()
 
 
+Halos (`skypy.halos`)
+=====================
+
+.. automodule:: skypy.halos
+
+
 Abundance Matching (`skypy.halos.abundance_matching`)
 =====================================================
 
@@ -107,3 +111,9 @@ Quenching (`skypy.halos.quenching`)
 ===================================
 
 .. automodule:: skypy.halos.quenching
+
+
+Redshift (`skypy.halos.redshift`)
+=================================
+
+.. automodule:: skypy.halos.redshift

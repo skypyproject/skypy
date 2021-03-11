@@ -38,7 +38,7 @@ def test_colossus_mass_sampler():
 @pytest.mark.flaky
 def test_colossus_mf_redshift():
 
-    from skypy.halos._colossus import colossus_mf_redshift
+    from skypy.halos.redshift import colossus_mf_redshift
     from astropy.cosmology import Planck18
     from astropy import units
     from scipy import integrate
@@ -84,7 +84,7 @@ def test_colossus_mf_redshift():
 @pytest.mark.skipif(not HAS_COLOSSUS, reason='test requires colossus')
 def test_colossus_mf():
 
-    from skypy.halos._colossus import colossus_mf
+    from skypy.halos import colossus_mf
     from astropy.cosmology import Planck18
     from astropy import units
 
