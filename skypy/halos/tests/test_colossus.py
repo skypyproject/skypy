@@ -39,7 +39,7 @@ def test_colossus_mass_sampler():
 def test_colossus_mf_redshift():
 
     from skypy.halos.redshift import colossus_mf_redshift
-    from astropy.cosmology import Planck18
+    from astropy.cosmology import Planck15
     from astropy import units
     from scipy import integrate
     from colossus.lss.mass_function import massFunction
@@ -49,7 +49,7 @@ def test_colossus_mf_redshift():
     model, mdef = 'despali16', '500c'
     m_min, m_max = 1e+12, 1e+16
     sky_area = 1.0 * units.deg**2
-    cosmology = Planck18
+    cosmology = Planck15
     sigma8, ns = 0.82, 0.96
 
     # Sample redshifts
@@ -86,7 +86,7 @@ def test_colossus_mf_redshift():
 def test_colossus_mf():
 
     from skypy.halos import colossus_mf
-    from astropy.cosmology import Planck18
+    from astropy.cosmology import Planck15
     from astropy import units
 
     # redshift and mass distributions are tested separately
@@ -96,7 +96,7 @@ def test_colossus_mf():
     model, mdef = 'despali16', '500c'
     m_min, m_max = 1e+12, 1e+16
     sky_area = 1.0 * units.deg**2
-    cosmo = Planck18
+    cosmo = Planck15
     sigma8, ns = 0.82, 0.96
     z_halo, m_halo = colossus_mf(z, model, mdef, m_min, m_max, sky_area, cosmo, sigma8, ns)
 
