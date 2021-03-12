@@ -151,7 +151,7 @@ def colossus_mf(redshift, model, mdef, m_min, m_max, sky_area, cosmology,
     ----------
     redshift : array_like
         Defines the edges of a set of redshift bins for which the mass function
-        is evaluated. Must be a monotonically increasing one dimensinoal array
+        is evaluated. Must be a monotonically-increasing one-dimensional array
         of values. Halo redshifts are sampled between the minimum and maximum
         values in this array.
     model : string
