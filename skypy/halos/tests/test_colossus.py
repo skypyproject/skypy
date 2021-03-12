@@ -38,7 +38,7 @@ def test_colossus_mass_sampler():
 @pytest.mark.flaky
 def test_colossus_mf_redshift():
 
-    from skypy.halos.redshift import colossus_mf_redshift
+    from skypy.halos._colossus import colossus_mf_redshift
     from astropy.cosmology import Planck15
     from astropy import units
     from scipy import integrate

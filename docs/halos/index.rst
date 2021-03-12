@@ -111,9 +111,3 @@ Quenching (`skypy.halos.quenching`)
 ===================================
 
 .. automodule:: skypy.halos.quenching
-
-
-Redshift (`skypy.halos.redshift`)
-=================================
-
-.. automodule:: skypy.halos.redshift
