@@ -129,8 +129,8 @@ def colossus_mf_redshift(redshift, model, mdef, m_min, m_max, sky_area,
     # Integrate the mass function to get the number density of halos at each redshift
     def dndlnM(lnm, z):
         return massFunction(np.exp(lnm), z, 'M', 'dndlnM', mdef, model)
-    lnmmin = np.log(m_min/cosmology.h)
-    lnmmax = np.log(m_max/cosmology.h)
+    lnmmin = np.log(m_min*cosmology.h)
+    lnmmax = np.log(m_max*cosmology.h)
     density = [integrate.quad(dndlnM, lnmmin, lnmmax, args=(z))[0] for z in redshift]
     density = np.array(density) * np.power(cosmology.h, 3)
 
