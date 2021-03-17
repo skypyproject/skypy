@@ -9,6 +9,7 @@ from copy import copy, deepcopy
 from collections.abc import Sequence, Mapping
 from ._config import load_skypy_yaml
 from ._items import Item, Call, Ref
+from . import log
 import networkx
 import pathlib
 
@@ -168,6 +169,7 @@ class Pipeline:
 
         # go through the jobs in dependency order
         for job in networkx.topological_sort(self.dag):
+            log.info(f"{job}")
             node = self.dag.nodes[job]
             skip = node.get('skip', True)
             if skip:
