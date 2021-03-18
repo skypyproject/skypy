@@ -4,6 +4,7 @@ from io import StringIO
 import os
 import pytest
 from skypy import __version__ as skypy_version
+from skypy.pipeline import load_skypy_yaml
 from skypy.pipeline.scripts import skypy
 
 
@@ -46,8 +47,28 @@ def test_skypy():
     assert e.value.code == 2
 
 
+def test_logging(capsys):
+
+    # Run skypy and capture log
+    filename = get_pkg_data_filename('data/test_config.yml')
+    skypy.main([filename, 'logging.fits', '--logging', 'INFO'])
+    out, err = capsys.readouterr()
+
+    # Determine all DAG jobs from config
+    config = load_skypy_yaml(filename)
+    tables = config.pop('tables', {})
+    complete = [f'{t}.complete' for t in tables]
+    columns = [f'{t}.{c}' for t, cols in tables.items() for c in cols if c != '.init']
+
+    # Check all jobs appear in the log
+    for job in list(config) + list(tables) + columns + complete:
+        log_string = f"[INFO] skypy.pipeline: {job}"
+        assert(log_string in err)
+
+
 def teardown_module(module):
 
     # Remove fits file generated in test_skypy
     os.remove('empty.fits')
+    os.remove('logging.fits')
     os.remove('test.fits')
