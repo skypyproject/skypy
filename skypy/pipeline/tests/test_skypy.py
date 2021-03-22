@@ -1,3 +1,4 @@
+from astropy.table import Table
 from astropy.utils.data import get_pkg_data_filename
 from contextlib import redirect_stdout
 from io import StringIO
@@ -5,6 +6,7 @@ import os
 import pytest
 from skypy import __version__ as skypy_version
 from skypy.pipeline import load_skypy_yaml
+from skypy.pipeline._items import Call
 from skypy.pipeline.scripts import skypy
 
 
@@ -62,13 +64,13 @@ def test_logging(capsys):
         skypy.main([filename, output_file, '--verbose'])
     out, err = capsys.readouterr()
 
-    # Determine all DAG jobs from config
+    # Determine all DAG jobs and function calls from config
     config = load_skypy_yaml(filename)
     tables = config.pop('tables', {})
-    columns = [f'{t}.{c}' for t, cols in tables.items() for c in cols if c != '.init']
-    config_functions = [f.split('.')[-1] for f in config.values() if isinstance(f, str) and f.startswith('!')]
-    table_functions = [f.split('.')[-1] if isinstance(f, str) and f.startswith('!') else 'Table' for f in tables.values()]
-    column_functions = [f.split('.')[-1] for t, cols in tables.items() for f in cols.values() if isinstance(f, str) and f.startswith('!')]
+    config.update({k: v.pop('.init', Call(Table)) for k, v in tables.items()})
+    columns = [f'{t}.{c}' for t, cols in tables.items() for c in cols]
+    functions = [f for f in config.values() if isinstance(f, Call)]
+    functions += [f for t, cols in tables.items() for f in cols.values() if isinstance(f, Call)]
 
     # Check all jobs appear in the log
     for job in list(config) + list(tables) + columns:
@@ -76,8 +78,8 @@ def test_logging(capsys):
         assert(log_string in err)
 
     # Check all jobs appear in the log
-    for function in config_functions + table_functions + column_functions:
-        log_string = f"[INFO] skypy.pipeline: Calling {function}"
+    for f in functions:
+        log_string = f"[INFO] skypy.pipeline: Calling {f.function.__name__}"
         assert(log_string in err)
 
     # Check writing output file is in the log
