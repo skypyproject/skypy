@@ -72,6 +72,9 @@ def test_logging(capsys):
         log_string = f"[INFO] skypy.pipeline: {job}"
         assert(log_string in err)
 
+    # Check writing output file is in the log
+    assert(f"[INFO] skypy: {output_file}" in err)
+
     # Check error for existing output file is in the log
     assert(f"[ERROR] skypy: File '{output_file}' already exists." in err)
 

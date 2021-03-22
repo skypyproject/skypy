@@ -42,6 +42,7 @@ def main(args=None):
         pipeline = Pipeline(config)
         pipeline.execute()
         if args.output:
+            logger.info(f"{args.output}")
             pipeline.write(args.output, overwrite=args.overwrite)
     except Exception as e:
         logger.exception(e)
