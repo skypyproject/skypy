@@ -173,7 +173,7 @@ class Pipeline:
             skip = node.get('skip', True)
             if skip:
                 continue
-            log.info(f"{job}")
+            log.info(f"Generating {job}")
             if job in self.config:
                 settings = self.config.get(job)
                 self.state[job] = self.evaluate(settings)

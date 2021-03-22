@@ -89,5 +89,5 @@ class Call(Item):
         '''execute the call in the given pipeline'''
         args = pipeline.evaluate(self.args)
         kwargs = pipeline.evaluate(self.kwargs)
-        log.info(f"{self.function.__name__}")
+        log.info(f"Calling {self.function.__name__}")
         return self.function(*args, **kwargs)

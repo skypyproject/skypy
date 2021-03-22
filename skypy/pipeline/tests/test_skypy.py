@@ -72,16 +72,16 @@ def test_logging(capsys):
 
     # Check all jobs appear in the log
     for job in list(config) + list(tables) + columns:
-        log_string = f"[INFO] skypy.pipeline: {job}"
+        log_string = f"[INFO] skypy.pipeline: Generating {job}"
         assert(log_string in err)
 
     # Check all jobs appear in the log
     for function in config_functions + table_functions + column_functions:
-        log_string = f"[INFO] skypy.pipeline: {function}"
+        log_string = f"[INFO] skypy.pipeline: Calling {function}"
         assert(log_string in err)
 
     # Check writing output file is in the log
-    assert(f"[INFO] skypy: {output_file}" in err)
+    assert(f"[INFO] skypy: Writing {output_file}" in err)
 
     # Check error for existing output file is in the log
     assert(f"[ERROR] skypy: File '{output_file}' already exists." in err)
