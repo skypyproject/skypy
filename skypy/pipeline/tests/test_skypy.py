@@ -66,10 +66,18 @@ def test_logging(capsys):
     config = load_skypy_yaml(filename)
     tables = config.pop('tables', {})
     columns = [f'{t}.{c}' for t, cols in tables.items() for c in cols if c != '.init']
+    config_functions = [f.split('.')[-1] for f in config.values() if isinstance(f, str) and f.startswith('!')]
+    table_functions = [f.split('.')[-1] if isinstance(f, str) and f.startswith('!') else 'Table' for f in tables.values()]
+    column_functions = [f.split('.')[-1] for t, cols in tables.items() for f in cols.values() if isinstance(f, str) and f.startswith('!')]
 
     # Check all jobs appear in the log
     for job in list(config) + list(tables) + columns:
         log_string = f"[INFO] skypy.pipeline: {job}"
+        assert(log_string in err)
+
+    # Check all jobs appear in the log
+    for function in config_functions + table_functions + column_functions:
+        log_string = f"[INFO] skypy.pipeline: {function}"
         assert(log_string in err)
 
     # Check writing output file is in the log
