@@ -215,7 +215,7 @@ def test_pipeline_read():
     assert isinstance(pipeline['test_int'], int)
     assert isinstance(pipeline['test_float'], float)
     assert isinstance(pipeline['test_str'], str)
-    assert isinstance(pipeline['test_cosmology'], Cosmology)
+    assert isinstance(pipeline['cosmology'], Cosmology)
     assert isinstance(pipeline['test_table_1'], Table)
     assert isinstance(pipeline['test_table_1']['test_column_3'], Column)
 
