@@ -77,7 +77,7 @@ def test_logging(capsys):
         log_string = f"[INFO] skypy.pipeline: Generating {job}"
         assert(log_string in err)
 
-    # Check all jobs appear in the log
+    # Check all functions appear in the log
     for f in functions:
         log_string = f"[INFO] skypy.pipeline: Calling {f.function.__name__}"
         assert(log_string in err)
