@@ -165,6 +165,7 @@ class Pipeline:
 
         # Initialise cosmology from config parameters
         if self.cosmology is not None:
+            log.info("Setting cosmology")
             self.state['cosmology'] = self.evaluate(self.cosmology)
 
         # go through the jobs in dependency order
