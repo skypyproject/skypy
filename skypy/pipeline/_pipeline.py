@@ -169,12 +169,12 @@ class Pipeline:
 
         # go through the jobs in dependency order
         for job in networkx.topological_sort(self.dag):
-            log.info(f"{job}")
             node = self.dag.nodes[job]
             skip = node.get('skip', True)
             if skip:
                 continue
-            elif job in self.config:
+            log.info(f"{job}")
+            if job in self.config:
                 settings = self.config.get(job)
                 self.state[job] = self.evaluate(settings)
             else:

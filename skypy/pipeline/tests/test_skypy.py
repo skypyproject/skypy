@@ -65,11 +65,10 @@ def test_logging(capsys):
     # Determine all DAG jobs from config
     config = load_skypy_yaml(filename)
     tables = config.pop('tables', {})
-    complete = [f'{t}.complete' for t in tables]
     columns = [f'{t}.{c}' for t, cols in tables.items() for c in cols if c != '.init']
 
     # Check all jobs appear in the log
-    for job in list(config) + list(tables) + columns + complete:
+    for job in list(config) + list(tables) + columns:
         log_string = f"[INFO] skypy.pipeline: {job}"
         assert(log_string in err)
 
