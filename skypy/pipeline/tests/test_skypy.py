@@ -49,9 +49,17 @@ def test_skypy():
 
 def test_logging(capsys):
 
-    # Run skypy and capture log
+    # Run skypy with default verbosity and check log is empty
     filename = get_pkg_data_filename('data/test_config.yml')
-    skypy.main([filename, 'logging.fits', '--logging', 'INFO'])
+    output_file = 'logging.fits'
+    skypy.main([filename, output_file])
+    out, err = capsys.readouterr()
+    assert(not err)
+
+    # Run again with increased verbosity and capture log. Force an exception by
+    # not using the "--overwrite" flag when the output file already exists.
+    with pytest.raises(SystemExit):
+        skypy.main([filename, output_file, '--verbose'])
     out, err = capsys.readouterr()
 
     # Determine all DAG jobs from config
@@ -64,6 +72,15 @@ def test_logging(capsys):
     for job in list(config) + list(tables) + columns + complete:
         log_string = f"[INFO] skypy.pipeline: {job}"
         assert(log_string in err)
+
+    # Check error for existing output file is in the log
+    assert(f"[ERROR] skypy: File '{output_file}' already exists." in err)
+
+    # Run again with decreased verbosity and check the log is empty
+    with pytest.raises(SystemExit):
+        skypy.main([filename, output_file, '-qq'])
+    out, err = capsys.readouterr()
+    assert(not err)
 
 
 def teardown_module(module):
