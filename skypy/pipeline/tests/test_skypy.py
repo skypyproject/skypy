@@ -66,6 +66,7 @@ def test_logging(capsys):
 
     # Determine all DAG jobs and function calls from config
     config = load_skypy_yaml(filename)
+    cosmology = config.pop('cosmology', None)
     tables = config.pop('tables', {})
     config.update({k: v.pop('.init', Call(Table)) for k, v in tables.items()})
     columns = [f'{t}.{c}' for t, cols in tables.items() for c in cols]
@@ -81,6 +82,10 @@ def test_logging(capsys):
     for f in functions:
         log_string = f"[INFO] skypy.pipeline: Calling {f.function.__name__}"
         assert(log_string in err)
+
+    # Check cosmology appears in the log
+    if cosmology:
+        assert("[INFO] skypy.pipeline: Setting cosmology" in err)
 
     # Check writing output file is in the log
     assert(f"[INFO] skypy: Writing {output_file}" in err)
