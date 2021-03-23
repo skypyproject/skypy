@@ -60,23 +60,21 @@ Functions
       myarray: !numpy.linspace [0, 2.5, 10]
 
   You can also define parameters of functions with a dictionary of keyword arguments.
-  Imagine you want to compute the total expense when buying a house (£230000) and a car (£15589.3). To run it with the `SkyPy` pipeline, you would call the function and define the parameters as an indented dictionary
+  Imagine you want to compute the comoving distance for a range of redshifts and an `Astropy` Planck 2015 cosmology.
+  To run it with the `SkyPy` pipeline, you would call the function and define the parameters as an indented dictionary
 
   .. code:: yaml
 
-      expense: !numpy.add
-        x1: 230000
-        x2: 15589.3
+      comoving_distance: !astropy.cosmology.Planck15.comoving_distance
+        z: !numpy.linspace [ 0, 1.3, num=10 ]
 
   or you could also define the variables at the top level and then reference them
 
   .. code:: yaml
 
-      house_price: 230000
-      car_price: 15589.3
-      expense: !numpy.add
-        x1: $house_price
-        x2: $car_price
+      redshift: !numpy.linspace [ 0, 1.3, num=10 ]
+      comoving_distance: !astropy.cosmology.Planck15.comoving_distance
+        z: $redshift
 
 
 Tables
