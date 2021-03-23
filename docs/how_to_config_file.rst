@@ -50,12 +50,40 @@ Variables
 
 Functions
 ^^^^^^^^^
-* Call a function
-* Define parameters: Variables that can be modified at execution
+* `Call a function`: functions are defined as tuples where the first entry is the fully qualified function name tagged with and exclamation mark ``!`` and the second entry is either a list of positional arguments or a dictionary of keyword arguments.
+
+  For example, you need to call the ``log10()`` and ``linspace()`` NumPy_ functions, for this you define the following key-value pairs:
+
+  .. code:: yaml
+
+      log_of_2: !numpy.log10 [2]
+      myarray: !numpy.linspace [0, 2.5, 10]
+
+
+* `Define parameters`: parameters are variables that can be modified at execution. You can also define parameters of functions with a dictionary of keyword arguments.
+
+  Imagine you want to compute the total expense when buying a house (£230000) and a car (£15589.3). To run it with the `SkyPy` pipeline, you would call the function and define the parameters as an indented dictionary
+
+  .. code:: yaml
+
+      expense: !numpy.add
+        x1: 230000
+        x2: 15589.3
+
+  or you could also define the variables at the top and then reference them
+
+  .. code:: yaml
+
+      house_price: 230000
+      car_price: 15589.3
+      expense: !numpy.add
+        x1: $house_price
+        x2: $car_price
+
 
 Tables
 ^^^^^^
-A dictionary of table names, each resolving to a dictionary of column names for that table
+A dictionary of table names, each resolving to a dictionary of column names for that table.
 
 * Create a table
 * Add a column
@@ -67,6 +95,7 @@ Cosmology, a special parameter
 The cosmology to be used by functions within the pipeline.
 
 .. _YAML: https://yaml.org
+.. _NumPy: https://numpy.org
 
 
 
