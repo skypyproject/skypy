@@ -158,6 +158,29 @@ Tables
 
 
 * `Table.init and table.complete dependencies`:
+  This needs work
+
+  .. code:: yaml
+
+    tables:
+      halos:
+        halo_mass: !scipy.stats.maxwell.rvs
+          s: 250
+          size: 1000
+        galaxies:
+          luminosity: !numpy.histogram
+      matching:
+        init: !Colossus_abundance_matching_function_or_vstack
+          halos: $halos
+          galaxies: $galaxies
+          depends: [ halos.complete, galaxies.complete ]
+
+  Equivalently, you could replace the last line by
+
+  .. code:: yaml
+
+    depends: [ halos.halo_mass, galaxies.luminosity ]
+
 
 Cosmology, a special parameter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -165,6 +188,7 @@ Cosmology, a special parameter
 * `Define parameters`: parameters are variables that can be modified at execution.
 
   For example,
+
   .. code:: yaml
 
     parameters:
