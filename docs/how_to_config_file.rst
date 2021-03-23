@@ -127,7 +127,7 @@ Tables
 
 * `Multi-column assignment`: if a function returns multiple columns, you can chose to assign them to multiple columns with different names or to a muti-column object.
 
-  Example: imagine the function is a 2-dimensional ``numpy.ndarray``. You could choose a multi-column assignment
+  Example: imagine the function is a 2-dimensional ``numpy.ndarray``. You could choose
 
   .. code:: yaml
 
@@ -135,7 +135,7 @@ Tables
       mytable:
         a, b: !numpy.ndarray [ [ 1,2,3 ] , [ 4,5,6 ] ]
 
-  or
+  or a multi-column assignment
 
   .. code:: yaml
 
