@@ -82,45 +82,49 @@ Tables
 
 * `Create a table`: a dictionary of table names, each resolving to a dictionary of column names for that table.
 
-  Let us create a table called lottery with a column to store the lottery results following a uniform distribution
+  Let us create a table called ``telescope`` with a column to store the width of spectral lines that follow a normal distribution
 
   .. code:: yaml
 
       tables:
-        lottery:
-          results: !numpy.rand.random
-            low: 0
-            high: 9
+        telescope:
+          spectral_lines: !scipy.stats.norm
+            loc: 550
+            scale: 1.6
+            size: 100
 
 * `Add a column`: you can add as many columns to a table as you need.
-    Imagine you want to add a column to our lottery table to include whether you won the lottery (returning ``True`` or ``False``)
+    Imagine you want to add a column for the telescope collecting surface
 
   .. code:: yaml
 
       tables:
-        lottery:
-          results: !numpy.rand.random
-            low: 0
-            high: 9
-          win: !bool
-            x: !numpy.random.randint [ 2 ]
+        telescope:
+          spectral_lines: !scipy.stats.norm
+            loc: 550
+            scale: 1.6
+            size: 100
+          collecting_surface: !numpy.random.uniform
+            low: 6.9
+            high: 7.1
 
 * `Reference a column`: columns in the pipeline can be referenced by their full name tagged with a dollar sign ``$``.
-  For example, you create a table  called ``motion`` with three columns storing the position, the time and the speed of the object.
-  The column ``speed`` will refer to the other columns
+  Example: the radius of cosmic voids seem to follow a lognormal distribution. You could create a table ``cosmic_voids``
+  with a column ``radii`` where you sample 1000 void sizes and two other columns, ``mean`` and ``variance`` that reference
+  the first column
+
 
   .. code:: yaml
 
     tables:
-      motion:
-        position: !np.linspace
-          start: 0.
-          stop: 10.5
-          num: 5
-        time: !np.arange [0, 25, 5]
-        speed: !numpy.divide
-          x1: $motion.position
-          x2: $motion.time
+      cosmic_voids:
+        radii: !scipy.stats.lognorm.rvs
+          s: 200.
+          size: 10000
+        mean: !numpy.mean
+          a: $radii
+        variance: !numpy.var
+          a: $radii
 
 
 * `Multi-column assignment`: if a function returns multiple columns, you can chose to assign them to multiple columns with different names or to a muti-column object.
