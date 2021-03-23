@@ -148,8 +148,19 @@ Tables
 
 Cosmology, a special parameter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 * `Define parameters`: parameters are variables that can be modified at execution.
-* The cosmology to be used by functions within the pipeline.
+
+* The `cosmology` to be used by functions within the pipeline only needs to be set up at the top. If a function needs ``cosmology`` as an input, you need not define it again, it is automatically detected.
+
+  .. code:: yaml
+
+    parameters:
+      hubble_constant: 70
+      omega_matter: 0.3
+    cosmology: !astropy.cosmology.FlatLambdaCDM
+      H0: $hubble_constant
+      Om0: $omega_matter
 
 .. _YAML: https://yaml.org
 .. _NumPy: https://numpy.org
