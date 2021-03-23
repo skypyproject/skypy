@@ -34,17 +34,17 @@ Variables
 
 
 * `Reference a variable`: variables can be referenced by their full name tagged with a dollar sign ``$``.
-  For example, if you previously defined a list of countries:
+  For example, if you previously defined a list of galaxy properties:
 
   .. code:: yaml
 
-      country_list: [ 'UK', 'Spain', 'Zambia', 'Chile', 'Japan' ]
+      galaxy_properties: [ 'OBJECT_ID', 'RA', 'DEC', 'REDSHIFT', 'FLUX', 'FLUX_ERR' ]
 
-  You would reference the variable;
+  You could reference the variable:
 
   .. code:: yaml
 
-      countries: $country_list
+      catalog: $galaxy_properties
 
 
 
@@ -68,7 +68,7 @@ Functions
         x1: 230000
         x2: 15589.3
 
-  or you could also define the variables at the top and then reference them
+  or you could also define the variables at the top level and then reference them
 
   .. code:: yaml
 
