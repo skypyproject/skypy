@@ -17,6 +17,7 @@ Getting Started
    :maxdepth: 1
 
    install
+   how_to_config_file
    examples/index
 
 .. _user-docs:
