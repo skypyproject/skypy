@@ -59,9 +59,7 @@ Functions
       log_of_2: !numpy.log10 [2]
       myarray: !numpy.linspace [0, 2.5, 10]
 
-
-* `Define parameters`: parameters are variables that can be modified at execution. You can also define parameters of functions with a dictionary of keyword arguments.
-
+  You can also define parameters of functions with a dictionary of keyword arguments.
   Imagine you want to compute the total expense when buying a house (£230000) and a car (£15589.3). To run it with the `SkyPy` pipeline, you would call the function and define the parameters as an indented dictionary
 
   .. code:: yaml
@@ -83,16 +81,75 @@ Functions
 
 Tables
 ^^^^^^
-A dictionary of table names, each resolving to a dictionary of column names for that table.
 
-* Create a table
-* Add a column
-* Multi-column assignment
-* Table.init and table.complete dependencies
+* `Create a table`: a dictionary of table names, each resolving to a dictionary of column names for that table.
+
+  Let us create a table called lottery with a column to store the lottery results following a uniform distribution
+
+  .. code:: yaml
+
+      tables:
+        lottery:
+          results: !numpy.rand.random
+            low: 0
+            high: 9
+
+* `Add a column`: you can add as many columns to a table as you need.
+    Imagine you want to add a column to our lottery table to include whether you won the lottery (returning ``True`` or ``False``)
+
+  .. code:: yaml
+
+      tables:
+        lottery:
+          results: !numpy.rand.random
+            low: 0
+            high: 9
+          win: !bool
+            x: !numpy.random.randint [ 2 ]
+
+* `Reference a column`: columns in the pipeline can be referenced by their full name tagged with a dollar sign ``$``.
+  For example, you create a table  called ``motion`` with three columns storing the position, the time and the speed of the object.
+  The column ``speed`` will refer to the other columns
+
+  .. code:: yaml
+
+    tables:
+      motion:
+        position: !np.linspace
+          start: 0.
+          stop: 10.5
+          num: 5
+        time: !np.arange [0, 25, 5]
+        speed: !numpy.divide
+          x1: $motion.position
+          x2: $motion.time
+
+
+* `Multi-column assignment`: if a function returns multiple columns, you can chose to assign them to multiple columns with different names or to a muti-column object.
+
+  Example: imagine the function is a 2-dimensional ``numpy.ndarray``. You could choose a multi-column assignment
+
+  .. code:: yaml
+
+    tables:
+      mytable:
+        a, b: !numpy.ndarray [ [ 1,2,3 ] , [ 4,5,6 ] ]
+
+  or
+
+  .. code:: yaml
+
+    tables:
+      mytable:
+        my2darray: !numpy.ndarray [ [ 1,2,3 ] , [ 4,5,6 ] ]
+
+
+* `Table.init and table.complete dependencies`:
 
 Cosmology, a special parameter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-The cosmology to be used by functions within the pipeline.
+* `Define parameters`: parameters are variables that can be modified at execution.
+* The cosmology to be used by functions within the pipeline.
 
 .. _YAML: https://yaml.org
 .. _NumPy: https://numpy.org
