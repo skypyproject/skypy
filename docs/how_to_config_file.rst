@@ -110,7 +110,7 @@ Tables
 
 * `Reference a column`: columns in the pipeline can be referenced by their full name tagged with a dollar sign ``$``.
   Example: the radius of cosmic voids seem to follow a lognormal distribution. You could create a table ``cosmic_voids``
-  with a column ``radii`` where you sample 1000 void sizes and two other columns, ``mean`` and ``variance`` that reference
+  with a column ``radii`` where you sample 10000 void sizes and two other columns, ``mean`` and ``variance`` that reference
   the first column
 
 
@@ -129,21 +129,32 @@ Tables
 
 * `Multi-column assignment`: if a function returns multiple columns, you can chose to assign them to multiple columns with different names or to a muti-column object.
 
-  Example: imagine the function is a 2-dimensional ``numpy.ndarray``. You could choose
+  Imagine you want the distribution of the circular velocities of 1000 halos following a Maxwellian distribution.
+  The histogram NumPy_ returns a 2-dimensional object. Therefore, you could choose
 
   .. code:: yaml
 
     tables:
-      mytable:
-        a, b: !numpy.ndarray [ [ 1,2,3 ] , [ 4,5,6 ] ]
+      halos:
+        circular_velocities: !scipy.stats.maxwell.rvs
+          s: 250
+          size: 1000
+        hist, bin_edges: !numpy.histogram
+          a: $circular_velocities
+          density: True
 
   or a multi-column assignment
 
   .. code:: yaml
 
     tables:
-      mytable:
-        my2darray: !numpy.ndarray [ [ 1,2,3 ] , [ 4,5,6 ] ]
+      halos:
+        circular_velocities: !scipy.stats.maxwell.rvs
+          s: 250
+          size: 1000
+        histogram: !numpy.histogram
+          a: $circular_velocities
+          density: True
 
 
 * `Table.init and table.complete dependencies`:
@@ -152,6 +163,13 @@ Cosmology, a special parameter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 * `Define parameters`: parameters are variables that can be modified at execution.
+
+  For example,
+  .. code:: yaml
+
+    parameters:
+      hubble_constant: 70
+      omega_matter: 0.3
 
 * The `cosmology` to be used by functions within the pipeline only needs to be set up at the top. If a function needs ``cosmology`` as an input, you need not define it again, it is automatically detected.
 
