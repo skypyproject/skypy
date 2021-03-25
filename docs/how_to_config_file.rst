@@ -19,6 +19,7 @@ This guide introduces the main syntax of YAML relevant when writing
 a configuration file to use with ``SkyPy``. Essentially, it would start with
 definitions of individual variables at the top, followed by the tables to produce,
 and, within the table entries, the features of the objects to simulate are included.
+The main keywords: ``parameters``, ``cosmology``, ``tables``.
 
 
 Variables
@@ -157,29 +158,56 @@ Tables
           density: True
 
 
-* `Table.init and table.complete dependencies`:
-  This needs work
+* `Referencing tables: table.init and table.complete dependencies`.
+
+  Most of the time you would be referencing simple
+  variables. However there are times when your function depends on tables. In these
+  cases, you would need to ensure the referenced table has the necessary content and is not empty.
+
+  Imagine you want to perform a very simple abundance matching, painting galaxies within your halos.
+  For this you could create two tables ``halos`` and ``galaxies`` storing the halo mass and galaxy luminosities.
+  The idea is to stack these two tables and store it in a third table called ``matching``. In principle you could do:
 
   .. code:: yaml
 
     tables:
       halos:
-        halo_mass: !scipy.stats.maxwell.rvs
-          s: 250
-          size: 1000
-        galaxies:
-          luminosity: !numpy.histogram
-      matching:
-        init: !Colossus_abundance_matching_function_or_vstack
-          halos: $halos
-          galaxies: $galaxies
-          depends: [ halos.complete, galaxies.complete ]
+        halo_mass: !mylibrary.my_halo_sampler
+          m_min: 1.0e8
+          m_max: 1.0e14
+      galaxies:
+        luminosity: !mylibrary.my_schechter_function
+          alpha: 1.20
+      matching_wrong:
+        match: !numpy.vstack
+          tup: [ $halos, $galaxies ]
 
-  Equivalently, you could replace the last line by
+  This would probably not do what you intend.
+  For example, if you have a table called ``tableA`` with columns ``c1`` and ``c2``.
+  In configuration language, ``tableA`` is the name of the job.
+  That means, when executing the config file, the first thing that happens is call ``tableA``, second,  call ``tableA.c1`` and third, call ``tableA.c2``.
+  In our example, when you call the function ``numpy.vstack()`` and reference the tables ``$halos`` and ``$galaxies``, this is actually
+  referencing the job that initialises the empty table ``halos`` and ``galaxies``.
+  The potential risk is that the function could be called before the jobs ``halos`` and ``galaxies`` are finished, so the tables would be empty
+
+  To overcome this issue you can initialise your ``matching`` table with ``init``, specify their dependences with the keyword ``depends``
+  and ensure the tables are completed before calling the function with ``.complete``. The previous configuration file reads now:
 
   .. code:: yaml
 
-    depends: [ halos.halo_mass, galaxies.luminosity ]
+    tables:
+      halos:
+        halo_mass: !mylibrary.my_halo_sampler
+          m_min: 1.0e8
+          m_max: 1.0e14
+      galaxies:
+        luminosity: !mylibrary.my_schechter_function
+          alpha: 1.20
+      matching:
+        init: !numpy.vstack
+          tup: [ $halos, $galaxies ]
+          depends: [ tup.complete ]
+
 
 
 Cosmology, a special parameter
