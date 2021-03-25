@@ -253,7 +253,8 @@ You can find more complex examples_ in our documentation.
 * `SkyPy`: that’s brilliant! Do you have your own function or is it included in SkyPy or any other compatible package?
 * `User`: I choose the SkyPy luminosity function, `~skypy.galaxies.schechter_lf`
 * `SkyPy`: Nice choice! But remember you can always use other libraries, as SkyPy has the flexibility to interface with external softwares.
-  The parameters for the SkyPy luminosity function, `~skypy.galaxies.schechter_lf`
+  T
+  he parameters for the SkyPy luminosity function, `~skypy.galaxies.schechter_lf`
   are: redshift, the characteristic absolute magnitude, the amplitude, faint-end slope parameter, the magnitude limit, the fraction of sky, cosmology and noise.
   Would you need to reuse these parameters?
 * `User`: yes, all of them except for the Schechter parameters. I will also use the default value for noise.
@@ -267,7 +268,7 @@ You can find more complex examples_ in our documentation.
     sky_area: 10 deg2
 
 * `User`: I would like to create a table with a column for the blue galaxies, as I intend to also include more features later on.
-* `SkyPy`: in that case, you can create the table `blue_galaxies` and for now add the columns for redshift and magnitude (note here the ``schechter_lf`` returns a 2D object)
+* `SkyPy`: in that case, you can create the table ```blue_galaxies`` and for now add the columns for redshift and magnitude (note here the ``schechter_lf`` returns a 2D object)
 
   .. code:: yaml
 
@@ -281,8 +282,9 @@ You can find more complex examples_ in our documentation.
       		m_lim: $magnitude_limit
       		sky_area: $sky_area
 
-* `User`: Why didn’t you define the cosmology parameter?
-* `SkyPy`: Aha! Good question! Remember, if cosmology is detected as parameter but is not set, it automatically uses the variable at the top of the file.
+* `User`: Why didn’t you define the parameter ``cosmology``?
+* `SkyPy`: Aha! Good question! Remember, if cosmology is detected as parameter but is not set, it automatically uses the variable at the top level of the file.
+
   This is how your entire config file looks like! You can now save it as ``luminosity.yml`` and run it using our SkyPy `~skypy.pipeline.Pipeline`!
 
   .. code:: yaml
