@@ -197,7 +197,7 @@ Tables
 
     tables:
       halos:
-        halo_mass: !mylibrary.my_halo_sampler
+        halo_mass: !mylibrary.my_halo_mass_function
           m_min: 1.0e8
           m_max: 1.0e14
       galaxies:
@@ -241,24 +241,21 @@ Cosmology, a special parameter
 
 
 
-Walkthrough example
--------------------
+SkyPy example
+-------------
 
-This dialog-like walkthrough example shows the natural flow of SkyPy pipelines and
-how to think through the process of creating a general configuration file.
-You can find more complex examples_ in our documentation.
+The guidelines above teach you how to write a configuration file when you have already thought about the physical problem you want to solve, the model and the functions to compute.
+These functions can be your own implementation, come from an external software or be part of the ``SkyPy`` library. Remember ``SkyPy`` is a library of astrophysical models, but mainly is infrastructure and a tool for you to run your own
+simulations of the Universe. In this last section, we show you how you can run a ``SkyPy`` pipeline. You can find more complex examples_ in our documentation.
 
-* `SkyPy`: Hi! This is SkyPy, how can I help?
-* `User`: Hi! I need to sample redshifts and magnitudes from a Schechter function. I would like to run my own pipeline within SkyPy.
-* `SkyPy`: that’s brilliant! Do you have your own function or is it included in SkyPy or any other compatible package?
-* `User`: I choose the SkyPy luminosity function, `~skypy.galaxies.schechter_lf`
-* `SkyPy`: Nice choice! But remember you can always use other libraries, as SkyPy has the flexibility to interface with external softwares.
-  T
-  he parameters for the SkyPy luminosity function, `~skypy.galaxies.schechter_lf`
-  are: redshift, the characteristic absolute magnitude, the amplitude, faint-end slope parameter, the magnitude limit, the fraction of sky, cosmology and noise.
-  Would you need to reuse these parameters?
-* `User`: yes, all of them except for the Schechter parameters. I will also use the default value for noise.
-* `SkyPy`: brill! You can define these variables at the top of your config file
+In this example, we sample redshifts and magnitudes from the SkyPy luminosity function, `~skypy.galaxies.schechter_lf`.
+
+- `Define variables`:
+
+From the documentation, the parameters for the `~skypy.galaxies.schechter_lf` function are: ``redshift``, the characteristic absolute magnitude ``M_star``, the amplitude ``phi_star``, faint-end slope parameter ``alpha``,
+the magnitude limit ``magnitude_limit``, the fraction of sky ``sky_area``, ``cosmology`` and ``noise``.
+If you are planning to reuse some of these parameters, you could define them at the top-level of your configuration file.
+Also, ``noise`` is an optional parameter and you could use its default value by omitting its definition.
 
   .. code:: yaml
 
@@ -267,8 +264,9 @@ You can find more complex examples_ in our documentation.
     magnitude_limit: 23
     sky_area: 10 deg2
 
-* `User`: I would like to create a table with a column for the blue galaxies, as I intend to also include more features later on.
-* `SkyPy`: in that case, you can create the table ```blue_galaxies`` and for now add the columns for redshift and magnitude (note here the ``schechter_lf`` returns a 2D object)
+- `Tables and columns`:
+
+You can create a table ``blue_galaxies`` and for now add the columns for redshift and magnitude (note here the ``schechter_lf`` returns a 2D object)
 
   .. code:: yaml
 
@@ -282,10 +280,9 @@ You can find more complex examples_ in our documentation.
       		m_lim: $magnitude_limit
       		sky_area: $sky_area
 
-* `User`: Why didn’t you define the parameter ``cosmology``?
-* `SkyPy`: Aha! Good question! Remember, if cosmology is detected as parameter but is not set, it automatically uses the variable at the top level of the file.
+Remember, if cosmology is detected as parameter but is not set, it automatically uses the variable at the top-level of the file.
 
-  This is how your entire config file looks like! You can now save it as ``luminosity.yml`` and run it using our SkyPy `~skypy.pipeline.Pipeline`!
+This is how the entire configuration file looks like! You can now save it as ``luminosity.yml`` and run it using our SkyPy `~skypy.pipeline.Pipeline`!
 
   .. code:: yaml
 
