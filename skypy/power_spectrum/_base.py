@@ -20,4 +20,11 @@ class TabulatedPowerSpectrum(PowerSpectrum):
 
     def __call__(self, wavenumber, redshift):
         shape = np.shape(redshift) + np.shape(wavenumber)
-        return np.power(10, self.interpolator(redshift, np.log10(wavenumber))).reshape(shape)
+        sort_k = np.argsort(wavenumber)
+        sort_z = np.argsort(redshift)
+        unsort_k = np.argsort(sort_k)
+        unsort_z = np.argsort(sort_z)
+        interp = self.interpolator(np.atleast_1d(redshift)[sort_z],
+                                   np.log10(np.atleast_1d(wavenumber)[sort_k]))
+        pzk = np.power(10, interp[unsort_z[:, np.newaxis], unsort_k]).reshape(shape)
+        return pzk.item() if np.isscalar(wavenumber) and np.isscalar(redshift) else pzk
