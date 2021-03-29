@@ -7,6 +7,8 @@ formula for the matter power spectrum.
 from astropy.utils import isiterable
 import numpy as np
 from astropy import constants
+from ._base import PowerSpectrum
+from ._growth import growth_function_carroll
 
 
 __all__ = [
@@ -295,3 +297,20 @@ def eisenstein_hu(wavenumber, A_s, n_s, cosmology, kwmap=0.02, wiggle=True):
         np.pi**2 / (wavenumber)**3
 
     return power_spectrum
+
+
+class EisensteinHu(PowerSpectrum):
+
+    def __init__(self, A_s, n_s, cosmology, kwmap=0.02, wiggle=True):
+        self.A_s = A_s
+        self.n_s = n_s
+        self.cosmology = cosmology
+        self.kwmap = kwmap
+        self.wiggle = wiggle
+
+    def __call__(self, wavenumber, redshift):
+        growth_function = growth_function_carroll(redshift, self.cosmology)
+        power_spectrum = eisenstein_hu(wavenumber, self.A_s, self.n_s, self.cosmology,
+                                       kwmap=self.kwmap, wiggle=self.wiggle)
+        shape = np.shape(redshift) + np.shape(wavenumber)
+        return (np.square(growth_function)[:, np.newaxis] * power_spectrum).reshape(shape)
