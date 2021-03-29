@@ -172,7 +172,7 @@ Tables
 
     tables:
       halos:
-        halo_mass: !mylibrary.my_halo_sampler
+        halo_mass: !mylibrary.my_halo_mass_function
           m_min: 1.0e8
           m_max: 1.0e14
       galaxies:
