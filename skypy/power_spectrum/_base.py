@@ -1,4 +1,5 @@
 from abc import ABCMeta, abstractmethod
+from inspect import signature
 import numpy as np
 from scipy.interpolate import RectBivariateSpline
 
@@ -15,8 +16,10 @@ class TabulatedPowerSpectrum(PowerSpectrum):
     '''Base class for power spectrum interpolation'''
 
     def __init__(self, wavenumber, redshift, power_spectrum):
+        kx = min(np.size(redshift)-1, signature(RectBivariateSpline).parameters['kx'].default)
+        ky = min(np.size(wavenumber)-1, signature(RectBivariateSpline).parameters['ky'].default)
         self.interpolator = RectBivariateSpline(redshift, np.log10(wavenumber),
-                                                np.log10(power_spectrum))
+                                                np.log10(power_spectrum), kx=kx, ky=ky)
 
     def __call__(self, wavenumber, redshift):
         shape = np.shape(redshift) + np.shape(wavenumber)
