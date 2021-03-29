@@ -12,6 +12,7 @@ from ._growth import growth_function_carroll
 
 
 __all__ = [
+    'EisensteinHu',
     'eisenstein_hu',
     'transfer_with_wiggles',
     'transfer_no_wiggles',

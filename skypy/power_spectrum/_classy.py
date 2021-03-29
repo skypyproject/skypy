@@ -2,6 +2,7 @@ import numpy as np
 from ._base import TabulatedPowerSpectrum
 
 __all__ = [
+    'CLASSY',
     'classy',
 ]
 

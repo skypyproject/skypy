@@ -5,6 +5,7 @@ from ._base import TabulatedPowerSpectrum
 
 
 __all__ = [
+    'CAMB',
     'camb',
 ]
 
