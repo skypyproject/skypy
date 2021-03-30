@@ -310,8 +310,9 @@ class EisensteinHu(PowerSpectrum):
         self.wiggle = wiggle
 
     def __call__(self, wavenumber, redshift):
-        growth_function = growth_function_carroll(redshift, self.cosmology)
+        growth_function = growth_function_carroll(np.atleast_1d(redshift), self.cosmology)
         power_spectrum = eisenstein_hu(wavenumber, self.A_s, self.n_s, self.cosmology,
                                        kwmap=self.kwmap, wiggle=self.wiggle)
         shape = np.shape(redshift) + np.shape(wavenumber)
-        return (np.square(growth_function)[:, np.newaxis] * power_spectrum).reshape(shape)
+        pzk = (np.square(growth_function)[:, np.newaxis] * power_spectrum).reshape(shape)
+        return pzk.item() if np.isscalar(wavenumber) and np.isscalar(redshift) else pzk
