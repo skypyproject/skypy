@@ -22,10 +22,13 @@ Galaxies
 Utils
 -----
 
+- `Photometry`_ : spectral energy distributions and photometric properties.
 - `Random Distributions`_
+- `Special Functions`_
 
+.. _Photometry: https://skypy.readthedocs.io/en/latest/utils/index.html#module-skypy.utils.photometry
 .. _Random Distributions: https://skypy.readthedocs.io/en/latest/utils/index.html#module-skypy.utils.random
-
+.. _Special Functions: https://skypy.readthedocs.io/en/latest/utils/index.html#module-skypy.utils.special
 
 Pipeline
 --------
