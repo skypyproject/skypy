@@ -17,6 +17,7 @@ Getting Started
    :maxdepth: 1
 
    install
+   main_functionalities
    examples/index
 
 .. _user-docs:
