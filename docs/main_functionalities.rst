@@ -10,7 +10,7 @@ Galaxies
 - `Luminosity Distributions`_
 - `Morphology Distributions`_
 - `Redshift Distributions`_
-- `Spectrum Distributions_`
+- `Spectrum Distributions`_
 - `Stellar Mass Distributions`_
 
 .. _Luminosity Distributions: https://skypy.readthedocs.io/en/latest/galaxies.html#module-skypy.galaxies.luminosity
