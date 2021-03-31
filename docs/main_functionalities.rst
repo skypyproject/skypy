@@ -6,12 +6,18 @@ This page outlines the main functionalities in the `SkyPy` library.
 
 Galaxies
 --------
-- `Galaxy Morphology Distributions`_
-- `Galaxy Redshift Distributions`_
 
+- `Luminosity Distributions`_
+- `Morphology Distributions`_
+- `Redshift Distributions`_
+- `Spectrum Distributions_`
+- `Stellar Mass Distributions`_
 
-.. _Galaxy Morphology Distributions: https://skypy.readthedocs.io/en/latest/galaxies.html#module-skypy.galaxies.morphology
-.. _Galaxy Redshift Distributions: https://skypy.readthedocs.io/en/latest/galaxies.html#module-skypy.galaxies.redshift
+.. _Luminosity Distributions: https://skypy.readthedocs.io/en/latest/galaxies.html#module-skypy.galaxies.luminosity
+.. _Morphology Distributions: https://skypy.readthedocs.io/en/latest/galaxies.html#module-skypy.galaxies.morphology
+.. _Redshift Distributions: https://skypy.readthedocs.io/en/latest/galaxies.html#module-skypy.galaxies.redshift
+.. _Spectrum Distributions: https://skypy.readthedocs.io/en/latest/galaxies.html#module-skypy.galaxies.spectrum
+.. _Stellar Mass Distributions: https://skypy.readthedocs.io/en/latest/galaxies.html#module-skypy.galaxies.stellar_mass
 
 Utilities
 ---------
