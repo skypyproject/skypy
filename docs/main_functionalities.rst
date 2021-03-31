@@ -19,8 +19,12 @@ Galaxies
 .. _Spectrum Distributions: https://skypy.readthedocs.io/en/latest/galaxies.html#module-skypy.galaxies.spectrum
 .. _Stellar Mass Distributions: https://skypy.readthedocs.io/en/latest/galaxies.html#module-skypy.galaxies.stellar_mass
 
-Utilities
----------
+Utils
+-----
+
+- `Random Distributions`_
+
+.. _Random Distributions: https://skypy.readthedocs.io/en/latest/utils/index.html#module-skypy.utils.random
 
 
 Pipeline
