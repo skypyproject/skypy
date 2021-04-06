@@ -255,12 +255,15 @@ In this example, we sample redshifts and magnitudes from the SkyPy luminosity fu
 From the documentation, the parameters for the `~skypy.galaxies.schechter_lf` function are: ``redshift``, the characteristic absolute magnitude ``M_star``, the amplitude ``phi_star``, faint-end slope parameter ``alpha``,
 the magnitude limit ``magnitude_limit``, the fraction of sky ``sky_area``, ``cosmology`` and ``noise``.
 If you are planning to reuse some of these parameters, you could define them at the top-level of your configuration file.
+In our example, we are using ``Astropy`` linear and exponential models for the characteristic absolute magnitude and the amplitude, respectively.
 Also, ``noise`` is an optional parameter and you could use its default value by omitting its definition.
 
   .. code:: yaml
 
     cosmology: !astropy.cosmology.default_cosmology.get
     z_range: !numpy.linspace [0, 2, 21]
+    M_star: !astropy.modeling.models.Linear1D [-0.9, -20.4]
+    phi_star: !astropy.modeling.models.Exponential1D [3e-3, -9.7]
     magnitude_limit: 23
     sky_area: 10 deg2
 
@@ -274,8 +277,8 @@ You can create a table ``blue_galaxies`` and for now add the columns for redshif
       blue_galaxies:
         redshift, magnitude: !skypy.galaxies.schechter_lf
       		redshift: $z_range
-      		M_star: 20
-      		phi_star: 3e-3
+      		M_star: $M_star
+      		phi_star: $phi_star
       		alpha: -1.3
       		m_lim: $magnitude_limit
       		sky_area: $sky_area
@@ -288,17 +291,19 @@ This is how the entire configuration file looks like! You can now save it as ``l
 
     cosmology: !astropy.cosmology.default_cosmology.get
     z_range: !numpy.linspace [0, 2, 21]
+    M_star: !astropy.modeling.models.Linear1D [-0.9, -20.4]
+    phi_star: !astropy.modeling.models.Exponential1D [3e-3, -9.7]
     magnitude_limit: 23
     sky_area: 10 deg2
     tables:
       blue_galaxies:
         redshift, magnitude: !skypy.galaxies.schechter_lf
-      		redshift: $z_range
-      		M_star: 20
-      		phi_star: 3e-3
-      		alpha: -1.3
-      		m_lim: $magnitude_limit
-      		sky_area: $sky_area
+          redshift: $z_range
+          M_star: $M_star
+          phi_star: $phi_star
+          alpha: -1.3
+          m_lim: $magnitude_limit
+          sky_area: $sky_area
 
 Don’t forget to check out for more complete examples_!
 
