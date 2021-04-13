@@ -24,7 +24,7 @@ In this example, we sample redshifts and magnitudes from the SkyPy luminosity fu
 
 From the documentation, the parameters for the `~skypy.galaxies.schechter_lf` function are: ``redshift``, the characteristic absolute magnitude ``M_star``, the amplitude ``phi_star``, faint-end slope parameter ``alpha``,
 the magnitude limit ``magnitude_limit``, the fraction of sky ``sky_area``, ``cosmology`` and ``noise``.
-If you are planning to reuse some of these parameters, you could define them at the top-level of your configuration file.
+If you are planning to reuse some of these parameters, you can define them at the top-level of your configuration file.
 In our example, we are using ``Astropy`` linear and exponential models for the characteristic absolute magnitude and the amplitude, respectively.
 Also, ``noise`` is an optional parameter and you could use its default value by omitting its definition.
 
@@ -53,9 +53,9 @@ You can create a table ``blue_galaxies`` and for now add the columns for redshif
       		m_lim: $magnitude_limit
       		sky_area: $sky_area
 
-Remember, if cosmology is detected as parameter but is not set, it automatically uses the variable at the top-level of the file.
+`Important:` if cosmology is detected as a parameter but is not set, it automatically uses the cosmology variable defined at the top-level of the file.
 
-This is how the entire configuration file looks like! You can now save it as ``luminosity.yml`` and run it using our SkyPy `~skypy.pipeline.Pipeline`!
+This is how the entire configuration file looks like! You may now save it as ``luminosity.yml`` and run it using the `SkyPy` `~skypy.pipeline.Pipeline`!
 
   .. code:: yaml
 
@@ -87,10 +87,10 @@ Fundamentally, a file written in YAML consists of a set of key-value pairs.
 Each pair is written as ``key: value``, where whitespace after the ``:`` is optional.
 
 This guide introduces the main syntax of YAML relevant when writing
-a configuration file to use with ``SkyPy``. Essentially, it would start with
-definitions of individual variables at the top, followed by the tables to produce,
-and, within the table entries, the features of the objects to simulate are included.
-The main keywords: ``parameters``, ``cosmology``, ``tables``.
+a configuration file to use with ``SkyPy``. Essentially, it begins with
+definitions of individual variables at the top level, followed by the tables,
+and, within the table entries, the features of objects to simulate are included.
+Main keywords: ``parameters``, ``cosmology``, ``tables``.
 
 
 Variables
@@ -124,7 +124,7 @@ Functions
 ^^^^^^^^^
 * `Call a function`: functions are defined as tuples where the first entry is the fully qualified function name tagged with and exclamation mark ``!`` and the second entry is either a list of positional arguments or a dictionary of keyword arguments.
 
-  For example, you need to call the ``log10()`` and ``linspace()`` NumPy_ functions, for this you define the following key-value pairs:
+  For example, if you need to call the ``log10()`` and ``linspace()`` NumPy_ functions, then you define the following key-value pairs:
 
   .. code:: yaml
 
@@ -133,7 +133,7 @@ Functions
 
   You can also define parameters of functions with a dictionary of keyword arguments.
   Imagine you want to compute the comoving distance for a range of redshifts and an `Astropy` Planck 2015 cosmology.
-  To run it with the `SkyPy` pipeline, you would call the function and define the parameters as an indented dictionary
+  To run it with the `SkyPy` pipeline, call the function and define the parameters as an indented dictionary.
 
   .. code:: yaml
 
@@ -181,7 +181,7 @@ Tables
             high: 7.1
 
 * `Reference a column`: columns in the pipeline can be referenced by their full name tagged with a dollar sign ``$``.
-  Example: the radius of cosmic voids seem to follow a lognormal distribution. You could create a table ``cosmic_voids``
+  Example: the radius of cosmic voids seem to follow a lognormal distribution. You can create a table ``cosmic_voids``
   with a column ``radii`` where you sample 10000 void sizes and two other columns, ``mean`` and ``variance`` that reference
   the first column
 
@@ -202,7 +202,7 @@ Tables
 * `Multi-column assignment`: if a function returns multiple columns, you can chose to assign them to multiple columns with different names or to a muti-column object.
 
   Imagine you want the distribution of the circular velocities of 1000 halos following a Maxwellian distribution.
-  The histogram NumPy_ returns a 2-dimensional object. Therefore, you could choose
+  The histogram NumPy_ returns a 2-dimensional object. Therefore, you can choose
 
   .. code:: yaml
 
@@ -233,11 +233,11 @@ Tables
 
   Most of the time you would be referencing simple
   variables. However there are times when your function depends on tables. In these
-  cases, you would need to ensure the referenced table has the necessary content and is not empty.
+  cases, you need to ensure the referenced table has the necessary content and is not empty.
 
-  Imagine you want to perform a very simple abundance matching, painting galaxies within your halos.
-  For this you could create two tables ``halos`` and ``galaxies`` storing the halo mass and galaxy luminosities.
-  The idea is to stack these two tables and store it in a third table called ``matching``. In principle you could do:
+  Imagine you want to perform a very simple abundance matching, i.e. painting galaxies within your halos.
+  For this you can create two tables ``halos`` and ``galaxies`` storing the halo mass and galaxy luminosities.
+  The idea is to stack these two tables and store it in a third table called ``matching``. For example:
 
   .. code:: yaml
 
