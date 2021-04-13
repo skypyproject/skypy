@@ -10,17 +10,14 @@ arbitrary workflow and store data in table format. You may use `SkyPy` `~skypy.p
 to call any function --your own, from any compatible external software or from the `SkyPy library`.
 Then `SkyPy` deals with the data dependencies and provides a library of functions to be used with it.
 
-This guidelines starts with an example using one of the `SkyPy` functions, and it follows
+These guidelines start with an example using one of the `SkyPy` functions, and it follows
 the concrete YAML syntax necessary for you to write your own configuration files, beyond using `SkyPy`
 functions.
 
 SkyPy example
 -------------
 
-The guidelines above teach you how to write a configuration file when you have already thought about the physical problem you want to solve, the model and the functions to compute.
-These functions can be your own implementation, come from an external software or be part of the ``SkyPy`` library. Remember ``SkyPy`` is a library of astrophysical models, but mainly is infrastructure and a tool for you to run your own
-simulations of the Universe. In this last section, we show you how you can run a ``SkyPy`` pipeline. You can find more complex examples_ in our documentation.
-
+In this section, we exemplify how you can write a configuration file and use some of the `SkyPy` functions.
 In this example, we sample redshifts and magnitudes from the SkyPy luminosity function, `~skypy.galaxies.schechter_lf`.
 
 - `Define variables`:
