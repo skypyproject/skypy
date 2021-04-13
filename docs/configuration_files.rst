@@ -10,6 +10,79 @@ arbitrary workflow and store data in table format. You may use `SkyPy Pipeline`
 to call any function --your own, from any compatible external software or from the `SkyPy library`.
 `SkyPy` deals with the data dependencies and provides a library of functions to be used with it.
 
+This guidelines starts with an example using one of the `SkyPy` functions, and it follows
+the concrete YAML syntax necessary for you to write your own configuration files, beyond using the `SkyPy`
+functions.
+
+SkyPy example
+-------------
+
+The guidelines above teach you how to write a configuration file when you have already thought about the physical problem you want to solve, the model and the functions to compute.
+These functions can be your own implementation, come from an external software or be part of the ``SkyPy`` library. Remember ``SkyPy`` is a library of astrophysical models, but mainly is infrastructure and a tool for you to run your own
+simulations of the Universe. In this last section, we show you how you can run a ``SkyPy`` pipeline. You can find more complex examples_ in our documentation.
+
+In this example, we sample redshifts and magnitudes from the SkyPy luminosity function, `~skypy.galaxies.schechter_lf`.
+
+- `Define variables`:
+
+From the documentation, the parameters for the `~skypy.galaxies.schechter_lf` function are: ``redshift``, the characteristic absolute magnitude ``M_star``, the amplitude ``phi_star``, faint-end slope parameter ``alpha``,
+the magnitude limit ``magnitude_limit``, the fraction of sky ``sky_area``, ``cosmology`` and ``noise``.
+If you are planning to reuse some of these parameters, you could define them at the top-level of your configuration file.
+In our example, we are using ``Astropy`` linear and exponential models for the characteristic absolute magnitude and the amplitude, respectively.
+Also, ``noise`` is an optional parameter and you could use its default value by omitting its definition.
+
+  .. code:: yaml
+
+    cosmology: !astropy.cosmology.default_cosmology.get
+    z_range: !numpy.linspace [0, 2, 21]
+    M_star: !astropy.modeling.models.Linear1D [-0.9, -20.4]
+    phi_star: !astropy.modeling.models.Exponential1D [3e-3, -9.7]
+    magnitude_limit: 23
+    sky_area: 10 deg2
+
+- `Tables and columns`:
+
+You can create a table ``blue_galaxies`` and for now add the columns for redshift and magnitude (note here the ``schechter_lf`` returns a 2D object)
+
+  .. code:: yaml
+
+    tables:
+      blue_galaxies:
+        redshift, magnitude: !skypy.galaxies.schechter_lf
+      		redshift: $z_range
+      		M_star: $M_star
+      		phi_star: $phi_star
+      		alpha: -1.3
+      		m_lim: $magnitude_limit
+      		sky_area: $sky_area
+
+Remember, if cosmology is detected as parameter but is not set, it automatically uses the variable at the top-level of the file.
+
+This is how the entire configuration file looks like! You can now save it as ``luminosity.yml`` and run it using our SkyPy `~skypy.pipeline.Pipeline`!
+
+  .. code:: yaml
+
+    cosmology: !astropy.cosmology.default_cosmology.get
+    z_range: !numpy.linspace [0, 2, 21]
+    M_star: !astropy.modeling.models.Linear1D [-0.9, -20.4]
+    phi_star: !astropy.modeling.models.Exponential1D [3e-3, -9.7]
+    magnitude_limit: 23
+    sky_area: 10 deg2
+    tables:
+      blue_galaxies:
+        redshift, magnitude: !skypy.galaxies.schechter_lf
+          redshift: $z_range
+          M_star: $M_star
+          phi_star: $phi_star
+          alpha: -1.3
+          m_lim: $magnitude_limit
+          sky_area: $sky_area
+
+Don’t forget to check out for more complete examples_!
+
+.. _examples: https://skypy.readthedocs.io/en/stable/examples/index.html
+
+
 YAML syntax
 -----------
 YAML_ is a file format designed to be readable by both computers and humans.
@@ -239,73 +312,3 @@ Cosmology, a special parameter
 
 .. _YAML: https://yaml.org
 .. _NumPy: https://numpy.org
-
-
-
-SkyPy example
--------------
-
-The guidelines above teach you how to write a configuration file when you have already thought about the physical problem you want to solve, the model and the functions to compute.
-These functions can be your own implementation, come from an external software or be part of the ``SkyPy`` library. Remember ``SkyPy`` is a library of astrophysical models, but mainly is infrastructure and a tool for you to run your own
-simulations of the Universe. In this last section, we show you how you can run a ``SkyPy`` pipeline. You can find more complex examples_ in our documentation.
-
-In this example, we sample redshifts and magnitudes from the SkyPy luminosity function, `~skypy.galaxies.schechter_lf`.
-
-- `Define variables`:
-
-From the documentation, the parameters for the `~skypy.galaxies.schechter_lf` function are: ``redshift``, the characteristic absolute magnitude ``M_star``, the amplitude ``phi_star``, faint-end slope parameter ``alpha``,
-the magnitude limit ``magnitude_limit``, the fraction of sky ``sky_area``, ``cosmology`` and ``noise``.
-If you are planning to reuse some of these parameters, you could define them at the top-level of your configuration file.
-In our example, we are using ``Astropy`` linear and exponential models for the characteristic absolute magnitude and the amplitude, respectively.
-Also, ``noise`` is an optional parameter and you could use its default value by omitting its definition.
-
-  .. code:: yaml
-
-    cosmology: !astropy.cosmology.default_cosmology.get
-    z_range: !numpy.linspace [0, 2, 21]
-    M_star: !astropy.modeling.models.Linear1D [-0.9, -20.4]
-    phi_star: !astropy.modeling.models.Exponential1D [3e-3, -9.7]
-    magnitude_limit: 23
-    sky_area: 10 deg2
-
-- `Tables and columns`:
-
-You can create a table ``blue_galaxies`` and for now add the columns for redshift and magnitude (note here the ``schechter_lf`` returns a 2D object)
-
-  .. code:: yaml
-
-    tables:
-      blue_galaxies:
-        redshift, magnitude: !skypy.galaxies.schechter_lf
-      		redshift: $z_range
-      		M_star: $M_star
-      		phi_star: $phi_star
-      		alpha: -1.3
-      		m_lim: $magnitude_limit
-      		sky_area: $sky_area
-
-Remember, if cosmology is detected as parameter but is not set, it automatically uses the variable at the top-level of the file.
-
-This is how the entire configuration file looks like! You can now save it as ``luminosity.yml`` and run it using our SkyPy `~skypy.pipeline.Pipeline`!
-
-  .. code:: yaml
-
-    cosmology: !astropy.cosmology.default_cosmology.get
-    z_range: !numpy.linspace [0, 2, 21]
-    M_star: !astropy.modeling.models.Linear1D [-0.9, -20.4]
-    phi_star: !astropy.modeling.models.Exponential1D [3e-3, -9.7]
-    magnitude_limit: 23
-    sky_area: 10 deg2
-    tables:
-      blue_galaxies:
-        redshift, magnitude: !skypy.galaxies.schechter_lf
-          redshift: $z_range
-          M_star: $M_star
-          phi_star: $phi_star
-          alpha: -1.3
-          m_lim: $magnitude_limit
-          sky_area: $sky_area
-
-Don’t forget to check out for more complete examples_!
-
-.. _examples: https://skypy.readthedocs.io/en/stable/examples/index.html
