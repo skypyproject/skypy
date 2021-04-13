@@ -5,9 +5,10 @@ Configuration files
 This page outlines how to construct configuration files to run your own routines
 with `~skypy.pipeline.Pipeline`.
 
-Remember that SkyPy not only is a library of astronomical models but a flexible
-tool with infrastructure for you to use with your own
-functions and pipelines!
+`SkyPy` is an astrophysical simulation pipeline tool that allows to define any
+arbitrary workflow and store data in table format. You may use `SkyPy Pipeline`
+to call any function --your own, from any compatible external software or from the `SkyPy library`.
+`SkyPy` deals with the data dependencies and provides a library of functions to be used with it.
 
 YAML syntax
 -----------
