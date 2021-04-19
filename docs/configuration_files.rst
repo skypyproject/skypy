@@ -55,25 +55,41 @@ You can create a table ``blue_galaxies`` and for now add the columns for redshif
 
 `Important:` if cosmology is detected as a parameter but is not set, it automatically uses the cosmology variable defined at the top-level of the file.
 
-This is how the entire configuration file looks like! You may now save it as ``luminosity.yml`` and run it using the `SkyPy` `~skypy.pipeline.Pipeline`!
+This is how the entire configuration file looks like!
+You may now save it as ``luminosity.yml`` and run it using the `SkyPy` `~skypy.pipeline.Pipeline`:
 
-  .. code:: yaml
+.. literalinclude:: luminosity.yml
+   :language: yaml
 
-    cosmology: !astropy.cosmology.default_cosmology.get
-    z_range: !numpy.linspace [0, 2, 21]
-    M_star: !astropy.modeling.models.Linear1D [-0.9, -20.4]
-    phi_star: !astropy.modeling.models.Exponential1D [3e-3, -9.7]
-    magnitude_limit: 23
-    sky_area: 10 deg2
-    tables:
-      blue_galaxies:
-        redshift, magnitude: !skypy.galaxies.schechter_lf
-          redshift: $z_range
-          M_star: $M_star
-          phi_star: $phi_star
-          alpha: -1.3
-          m_lim: $magnitude_limit
-          sky_area: $sky_area
+You may now save it as ``luminosity.yml`` and run it using the `SkyPy` `~skypy.pipeline.Pipeline`:
+
+.. plot::
+   :include-source: true
+   :context: close-figs
+
+    import matplotlib.pyplot as plt
+    from skypy.pipeline import Pipeline
+
+    # Execute SkyPy luminosity pipeline
+    pipeline = Pipeline.read("luminosity.yml")
+    pipeline.execute()
+
+    # Blue population
+    skypy_galaxies = pipeline['blue_galaxies']
+
+    # Plot histograms
+    fig, axs = plt.subplots(1, 2, figsize=(9, 3))
+
+    axs[0].hist(skypy_galaxies['redshift'], bins=50, histtype='step', color='purple')
+    axs[0].set_xlabel(r'$Redshift$')
+    axs[0].set_ylabel(r'$\mathrm{N}$')
+    axs[0].set_yscale('log')
+
+    axs[1].hist(skypy_galaxies['magnitude'], bins=50, histtype='step', color='green')
+    axs[1].set_xlabel(r'$Magnitude$')
+    axs[1].set_yscale('log')
+
+    plt.show()
 
 Don’t forget to check out for more complete examples_!
 
