@@ -158,14 +158,22 @@ Functions
   .. code:: yaml
 
       comoving_distance: !astropy.cosmology.Planck15.comoving_distance
-        z: !numpy.linspace [ 0, 1.3, num=10 ]
+        z: !numpy.linspace [ 0, 1.3, 10 ]
+
+  Similarly, you can specify the functions arguments as a dictionary:
+
+  .. code:: yaml
+
+      comoving_distance: !astropy.cosmology.Planck15.comoving_distance
+        z: !numpy.linspace {start: 0, stop: 1.3, num: 10}
+
 
 * `Reference a variable`: variables can be referenced by their full name tagged with a dollar sign ``$``.
   In the previous example you could also define the variables at the top-level of the file and then reference them:
 
   .. code:: yaml
 
-      redshift: !numpy.linspace [ 0, 1.3, num=10 ]
+      redshift: !numpy.linspace [ 0, 1.3, 10 ]
       comoving_distance: !astropy.cosmology.Planck15.comoving_distance
         z: $redshift
 
