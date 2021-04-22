@@ -122,7 +122,7 @@ Variables
   YAML is able to interpret any numeric data with the appropriate type: integer, float, boolean.
   Similarly for lists and dictionaries.
   In addition, SkyPy has added extra functionality to interpret and store Astropy Quantities_.
-  Everything else is stored as a string (whit or without explicitly using quotes)
+  Everything else is stored as a string (with or without explicitly using quotes)
 
   .. code:: yaml
 
