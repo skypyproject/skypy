@@ -91,6 +91,14 @@ You may now save it as ``luminosity.yml`` and run it using the `SkyPy` `~skypy.p
 
     plt.show()
 
+You can also run the pipeline directly from the command line:
+
+.. code-block:: bash
+
+    $ skypy luminosity.yml --format fits
+
+
+
 Don’t forget to check out for more complete examples_!
 
 .. _examples: https://skypy.readthedocs.io/en/stable/examples/index.html
