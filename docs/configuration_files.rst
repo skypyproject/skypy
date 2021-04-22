@@ -240,7 +240,7 @@ Tables
           s: 250
           size: 1000
         hist, bin_edges: !numpy.histogram
-          a: $circular_velocities
+          a: $halos.circular_velocities
           density: True
 
   or a multi-column assignment
@@ -253,7 +253,7 @@ Tables
           s: 250
           size: 1000
         histogram: !numpy.histogram
-          a: $circular_velocities
+          a: $halos.circular_velocities
           density: True
 
 
