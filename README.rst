@@ -15,16 +15,15 @@ Currently, SkyPy involves the following modules:
 * Galaxies_: morphology, luminosity and redshift distributions
 * Pipelines_ to generate populations of astronomical objects
 
-The full list of features can be found in the `SkyPy Documentation`_.
+The `full list of features`_ can be found in the `SkyPy Documentation`_.
 
 For more information on the people involved and how SkyPy is developed, please
-visit the SkyPy website (http:skypyproject.org)
+visit the SkyPy website (http://skypyproject.org)
 
 .. _Galaxies: https://skypy.readthedocs.io/en/latest/galaxies.html
 .. _Pipelines: https://skypy.readthedocs.io/en/latest/pipeline/index.html
+.. _full list of features: https://skypy.readthedocs.io/en/latest/main_functionalities.html
 .. _SkyPy Documentation: https://skypy.readthedocs.io/en/latest/
-
-For more information on
 
 Citation
 --------
@@ -82,7 +81,7 @@ For information on how to contribute see our `Contributor Guidelines`_.
 All communication relating to The SkyPy Project must meet the standards set out
 in the `Code of Conduct`_.
 
-.. _Contributor Guidelines: https://skypy.readthedocs.io/en/stable/developer/contributing.html
+.. _Contributor Guidelines: https://skypy.readthedocs.io/en/latest/developer/contributing.html
 .. _Code of Conduct: https://skypy.readthedocs.io/en/stable/project/CODE_OF_CONDUCT.html
 
 .. |PyPI| image:: https://img.shields.io/pypi/v/skypy?label=PyPI&logo=pypi
