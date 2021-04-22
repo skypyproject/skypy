@@ -222,7 +222,7 @@ Tables
           s: 200.
           size: 10000
         mean: !numpy.mean
-          a: $radii
+          a: $cosmic_voids.radii
         variance: !numpy.var
           a: $radii
 
