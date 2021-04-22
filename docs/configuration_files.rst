@@ -140,21 +140,6 @@ Variables
       distance: 300 kpc
 
 
-* `Reference a variable`: variables can be referenced by their full name tagged with a dollar sign ``$``.
-  For example, if you previously defined a list of galaxy properties:
-
-  .. code:: yaml
-
-      galaxy_properties: [ 'OBJECT_ID', 'RA', 'DEC', 'REDSHIFT', 'FLUX', 'FLUX_ERR' ]
-
-  You could reference the variable:
-
-  .. code:: yaml
-
-      catalog: $galaxy_properties
-
-
-
 Functions
 ^^^^^^^^^
 * `Call a function`: functions are defined as tuples where the first entry is the fully qualified function name tagged with and exclamation mark ``!`` and the second entry is either a list of positional arguments or a dictionary of keyword arguments.
@@ -175,7 +160,8 @@ Functions
       comoving_distance: !astropy.cosmology.Planck15.comoving_distance
         z: !numpy.linspace [ 0, 1.3, num=10 ]
 
-  or you could also define the variables at the top level and then reference them
+* `Reference a variable`: variables can be referenced by their full name tagged with a dollar sign ``$``.
+  In the previous example you could also define the variables at the top-level of the file and then reference them:
 
   .. code:: yaml
 
