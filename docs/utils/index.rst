@@ -126,6 +126,15 @@ Photometry (`skypy.utils.photometry`)
 This module contains methods that model spectral energy distributions and
 calculate photometric properties.
 
+Some of the following functions require a photometric filter as an input
+parameter. In SkyPy, we included the
+`speclite <https://speclite.readthedocs.io/>`_ package to enable different
+spectroscopic tasks
+(see `Dependencies <https://skypy.readthedocs.io/en/latest/install.html#dependencies>`_).
+One can choose between the available filters described
+`here <https://speclite.readthedocs.io/en/latest/filters.html>`_ by using the
+same syntax (see `speclite.filters.load_filters`).
+
 .. currentmodule:: skypy.utils.photometry
 .. autosummary::
    :nosignatures:
