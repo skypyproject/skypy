@@ -224,7 +224,7 @@ Tables
         mean: !numpy.mean
           a: $cosmic_voids.radii
         variance: !numpy.var
-          a: $radii
+          a: $cosmic_voids.radii
 
 
 * `Multi-column assignment`: if a function returns multiple columns, you can chose to assign them to multiple columns with different names or to a muti-column object.
