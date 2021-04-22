@@ -119,14 +119,25 @@ Main keywords: ``parameters``, ``cosmology``, ``tables``.
 
 Variables
 ^^^^^^^^^
-* `Define a variable`: a variable is defined as a key-value pair at the top of the file. You can define any type of variable:
+* `Define a variable`: a variable is defined as a key-value pair at the top of the file.
+  YAML is able to interpret any numeric data with the appropriate type: integer, float, boolean.
+  Similarly for lists and dictionaries.
+  In addition, SkyPy has added extra functionality to interpret and store Astropy Quantities_.
+  Everything else is stored as a string (whit or without explicitly using quotes)
 
   .. code:: yaml
 
+      # YAML interprets
       counter: 100 # An integer
       miles: 1000.0 # A floating point
       name: "Joy" # A string
+      planet: Earth # Another string
       mylist: [ 'abc', 789, 2.0e3 ] # A list
+      mydict: { 'fruit': 'orange', 'year': 2020 } # A dictionary
+
+      # SkyPy extra functionality
+      angle: 10 deg
+      distance: 300 kpc
 
 
 * `Reference a variable`: variables can be referenced by their full name tagged with a dollar sign ``$``.
@@ -333,3 +344,4 @@ Cosmology, a special parameter
 
 .. _YAML: https://yaml.org
 .. _NumPy: https://numpy.org
+.. _Quantities: https://docs.astropy.org/en/stable/units/
