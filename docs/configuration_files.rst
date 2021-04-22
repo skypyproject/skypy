@@ -56,7 +56,6 @@ You can create a table ``blue_galaxies`` and for now add the columns for redshif
 `Important:` if cosmology is detected as a parameter but is not set, it automatically uses the cosmology variable defined at the top-level of the file.
 
 This is how the entire configuration file looks like!
-You may now save it as ``luminosity.yml`` and run it using the `SkyPy` `~skypy.pipeline.Pipeline`:
 
 .. literalinclude:: luminosity.yml
    :language: yaml
