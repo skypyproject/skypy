@@ -18,7 +18,7 @@ def test_load_skypy_yaml():
     assert isinstance(config['test_float'], float)
     assert isinstance(config['test_str'], str)
     assert isinstance(config['test_func'], Call)
-    assert isinstance(config['test_cosmology'], Call)
+    assert isinstance(config['cosmology'], Call)
     assert isinstance(config['tables']['test_table_1']['test_column_3'], Call)
 
     # Bad function
