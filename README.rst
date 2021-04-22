@@ -18,7 +18,7 @@ Currently, SkyPy involves the following modules:
 The `full list of features`_ can be found in the `SkyPy Documentation`_.
 
 For more information on the people involved and how SkyPy is developed, please
-visit the SkyPy website (http://skypyproject.org)
+visit the SkyPy Collaboration website: `http://skypyproject.org`_
 
 .. _Galaxies: https://skypy.readthedocs.io/en/latest/galaxies.html
 .. _Pipelines: https://skypy.readthedocs.io/en/latest/pipeline/index.html
