@@ -63,10 +63,11 @@ Examples_ that demonstrate how to use it.
 Get in Touch
 ------------
 
-You are welcome to get in touch about issues to do with the SkyPy packge and code
+You are welcome to get in touch about the SkyPy package and code
 using our `Discussions page`_.
 
-Or for any other questions, please get in touch with the current SkyPy co-ordinators:
+Or for any other questions about the project in general, please get in touch with
+the current SkyPy co-ordinators:
 `coordinators@skypyroject.org`_.
 
  .. _Discussions page: https://github.com/skypyproject/skypy/discussions 
