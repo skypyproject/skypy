@@ -68,7 +68,20 @@ class SkyPyLoader(yaml.SafeLoader):
         except (ModuleNotFoundError, AttributeError) as e:
             raise ImportError(f'{e}\n{node.start_mark}') from e
 
-        return Call(function, args, kwargs) if callable(function) else function
+        return Call(function, args, kwargs)
+
+    def construct_imported_object(self, node):
+        name = self.construct_scalar(node)
+        if name[:1] == '~':
+            name = name[1:]
+        if not name:
+            raise ValueError(f'empty object\n{node.start_mark}')
+        try:
+            object = import_function(name)
+        except (ModuleNotFoundError, AttributeError) as e:
+            raise ImportError(f'{e}\n{node.start_mark}') from e
+
+        return object
 
     def construct_quantity(self, node):
         value = self.construct_scalar(node)
@@ -82,6 +95,10 @@ SkyPyLoader.add_implicit_resolver('!ref', re.compile(r'\$\w+'), ['$'])
 
 # constructor for generic function calls
 SkyPyLoader.add_multi_constructor('!', SkyPyLoader.construct_call)
+
+# constructor for importing generic objects from external (sub)modules
+SkyPyLoader.add_constructor('!import', SkyPyLoader.construct_imported_object)
+SkyPyLoader.add_implicit_resolver('!import', re.compile(r'\~\w+'), ['~'])
 
 # constructor for quantities
 SkyPyLoader.add_constructor('!quantity', SkyPyLoader.construct_quantity)
