@@ -1,8 +1,9 @@
 test_int: 1
 test_float: 1.0
 test_str: hello world
-test_func: !numpy.random.uniform
-test_func_with_arg: !len 'hello world'
+test_func: !numpy.random.uniform []
+test_func_with_arg: !len ['hello world']
+test_object: !astropy.cosmology.Planck15
 cosmology: !astropy.cosmology.FlatLambdaCDM
   H0: 67.74
   Om0: 0.3075
