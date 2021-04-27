@@ -176,6 +176,8 @@ Functions
       comoving_distance: !astropy.cosmology.Planck15.comoving_distance
         z: $redshift
 
+  Please, check below in the `cosmology`_ section how to use different cosmologies with the SkyPy pipeline.
+
 
 Tables
 ^^^^^^
@@ -315,8 +317,8 @@ Tables
 
 
 
-Cosmology, a special parameter
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Cosmology
+^^^^^^^^^
 
 * `Define parameters`: parameters are variables that can be modified at execution.
 
@@ -338,6 +340,8 @@ Cosmology, a special parameter
     cosmology: !astropy.cosmology.FlatLambdaCDM
       H0: $hubble_constant
       Om0: $omega_matter
+
+  * How to use `different cosmologies`
 
 
 
