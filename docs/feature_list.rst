@@ -1,5 +1,5 @@
 #############
-Feature list
+Feature List
 #############
 
 This page outlines the main features in the `SkyPy` library.
