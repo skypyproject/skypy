@@ -166,6 +166,13 @@ Functions
       comoving_distance: !astropy.cosmology.Planck15.comoving_distance
         z: !numpy.linspace {start: 0, stop: 1.3, num: 10}
 
+  `N.B.` To call a function with no arguments, you should pass an empty list of
+  ``args`` or an empty dictionary of ``kwargs``. For example:
+
+  .. code:: yaml
+
+      cosmo: !astropy.cosmology.default_cosmology.get []
+
 
 * `Reference a variable`: variables can be referenced by their full name tagged with a dollar sign ``$``.
   In the previous example you could also define the variables at the top-level of the file and then reference them:
@@ -214,7 +221,6 @@ Tables
   Example: the radius of cosmic voids seem to follow a lognormal distribution. You can create a table ``cosmic_voids``
   with a column ``radii`` where you sample 10000 void sizes and two other columns, ``mean`` and ``variance`` that reference
   the first column
-
 
   .. code:: yaml
 
@@ -322,6 +328,18 @@ Tables
   The ``numpy.vstack()`` function is called before the jobs ``halos`` and ``galaxies`` are finished, so the tables are empty.
 
 
+Import objects
+^^^^^^^^^^^^^^
+* The SkyPy configuration syntax allows objects to be imported directly from external
+  (sub)modules using the ``!`` tag and providing neither a list of arguments or a
+  dictionary of keywords. For example, this enables the import and usage of any Astropy cosmology:
+
+  .. code:: yaml
+
+    cosmo1: !astropy.cosmology.Planck13 # import the Planck18 object and bind to cosmo1
+    cosmo2: !astropy.cosmology.default_cosmology.get [] # call default_cosmology.get() and bind to cosmo2
+
+
 
 Cosmology
 ^^^^^^^^^
@@ -347,26 +365,6 @@ Cosmology
       H0: $hubble_constant
       Om0: $omega_matter
 
-* How to use `different cosmologies`: currently the cosmology parameter only accepts
-  functions, e.g.: ``astropy.cosmology.FlatLambdaCDM``. In order to use other cosmologies,
-  such as ``astropy.cosmology.Planck13`` or alike, you will need to use the Astropy `clone()`_ functionality.
-  This function returns a copy of the cosmology object, potentially with some changes:
-
-  .. code:: yaml
-
-    parameters:
-      hubble_constant: 70
-      omega_matter: 0.3
-    cosmology: !astropy.cosmology.Planck13.clone
-      name: 'Modified Planck 13'
-      H0: $hubble_constant
-      Om0: $omega_matter
-
-  `A non-working example`:
-
-  .. code:: yaml
-
-    cosmology: !astropy.cosmology.Planck13
 
 
 .. _YAML: https://yaml.org
