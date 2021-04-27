@@ -58,6 +58,8 @@ class SkyPyLoader(yaml.SafeLoader):
             raise ImportError(f'{e}\n{node.start_mark}') from e
 
         if isinstance(node, yaml.ScalarNode):
+            if node.value:
+                raise ValueError(f'{node.value}: ScalarNode should be empty to import an object')
             return object
         else:
             if isinstance(node, yaml.SequenceNode):

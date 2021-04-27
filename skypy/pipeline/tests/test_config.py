@@ -34,6 +34,11 @@ def test_load_skypy_yaml():
     with pytest.raises(ImportError):
         load_skypy_yaml(filename)
 
+    # Bad object
+    filename = get_pkg_data_filename('data/bad_object.yml')
+    with pytest.raises(ValueError):
+        load_skypy_yaml(filename)
+
 
 def test_empty_ref():
     filename = get_pkg_data_filename('data/test_empty_ref.yml')
