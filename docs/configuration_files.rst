@@ -283,12 +283,15 @@ Tables
 
     tables:
       halos:
-        halo_mass: !mylibrary.my_halo_mass_function
-          m_min: 1.0e8
-          m_max: 1.0e14
+        halo_mass: !numpy.random.uniform
+          low: 1.0e8
+          high: 1.0e14
+          size: 20
       galaxies:
-        luminosity: !mylibrary.my_schechter_function
-          alpha: 1.20
+        luminosity: !numpy.random.uniform
+          low: 0.05
+          high: 10.0
+          size: 20
       matching:
         init: !numpy.vstack
           tuple: [ $halos, $galaxies ]
@@ -300,13 +303,16 @@ Tables
   .. code:: yaml
 
     tables:
-      halos:
-        halo_mass: !mylibrary.my_halo_mass_function
-          m_min: 1.0e8
-          m_max: 1.0e14
-      galaxies:
-        luminosity: !mylibrary.my_schechter_function
-          alpha: 1.20
+    halos:
+      halo_mass: !numpy.random.uniform
+        low: 1.0e8
+        high: 1.0e14
+        size: 20
+    galaxies:
+      luminosity: !numpy.random.uniform
+        low: 0.05
+        high: 10.0
+        size: 20
       matching_wrong:
         match: !numpy.vstack
           tuple: [ $halos, $galaxies ]
