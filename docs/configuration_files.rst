@@ -259,38 +259,23 @@ Tables
 
 * `Referencing tables: table.init and table.complete dependencies`.
 
-  Most of the time you would be referencing simple
-  variables. However there are times when your function depends on tables. In these
+  There are times when your function depends on tables. In these
   cases, you need to ensure the referenced table has the necessary content and is not empty.
 
-  Imagine you want to perform a very simple abundance matching, i.e. painting galaxies within your halos.
-  For this you can create two tables ``halos`` and ``galaxies`` storing the halo mass and galaxy luminosities.
-  The idea is to stack these two tables and store it in a third table called ``matching``. For example:
+  Example: you want to perform a very simple abundance matching, i.e. painting galaxies within your halos.
+  You can create two tables ``halos`` and ``galaxies`` storing the halo mass and galaxy luminosities.
+  Then you can stack these two tables and store it in a third table called ``matching``.
 
-  .. code:: yaml
+  `Beware`: referencing tables is a bit different to variables or columns
+  -- where you simply tag a dollar sign.
 
-    tables:
-      halos:
-        halo_mass: !mylibrary.my_halo_mass_function
-          m_min: 1.0e8
-          m_max: 1.0e14
-      galaxies:
-        luminosity: !mylibrary.my_schechter_function
-          alpha: 1.20
-      matching_wrong:
-        match: !numpy.vstack
-          tup: [ $halos, $galaxies ]
-
-  This would probably not do what you intend.
-  For example, if you have a table called ``tableA`` with columns ``c1`` and ``c2``.
+  The challenge: let ``tableA`` be a table with columns ``c1`` and ``c2``.
   In configuration language, ``tableA`` is the name of the job.
-  That means, when executing the config file, the first thing that happens is call ``tableA``, second,  call ``tableA.c1`` and third, call ``tableA.c2``.
-  In our example, when you call the function ``numpy.vstack()`` and reference the tables ``$halos`` and ``$galaxies``, this is actually
-  referencing the job that initialises the empty table ``halos`` and ``galaxies``.
-  The potential risk is that the function could be called before the jobs ``halos`` and ``galaxies`` are finished, so the tables would be empty
+  *That means, when executing the configuration file, the first thing that happens is call ``tableA``, second,  call ``tableA.c1`` and third, call ``tableA.c2``.*
+  If you used the dollar sign to reference your ``tableA`` inside a function, this function might be called before the job ``tableA`` is complete, and the table will be empty.
 
-  To overcome this issue you can initialise your ``matching`` table with ``init``, specify their dependences with the keyword ``depends``
-  and ensure the tables are completed before calling the function with ``.complete``. The previous configuration file reads now:
+  `The solution`: to correctly reference tables, initialise your table with ``init``, specify their dependences with the keyword ``depends``
+  and ensure the tables are completed before calling the function with ``.complete``. Our example:
 
   .. code:: yaml
 
@@ -304,8 +289,29 @@ Tables
           alpha: 1.20
       matching:
         init: !numpy.vstack
-          tup: [ $halos, $galaxies ]
-          depends: [ tup.complete ]
+          tuple: [ $halos, $galaxies ]
+          depends: [ tuple.complete ]
+
+
+  `A non-working example`: this is an example of an incorrect table referencing.
+
+  .. code:: yaml
+
+    tables:
+      halos:
+        halo_mass: !mylibrary.my_halo_mass_function
+          m_min: 1.0e8
+          m_max: 1.0e14
+      galaxies:
+        luminosity: !mylibrary.my_schechter_function
+          alpha: 1.20
+      matching_wrong:
+        match: !numpy.vstack
+          tuple: [ $halos, $galaxies ]
+
+  Explanation: when calling the function ``numpy.vstack()`` and referencing the tables ``$halos`` and ``$galaxies``, this is actually
+  referencing the job that initialises the empty table ``halos`` and ``galaxies``.
+  The ``numpy.vstack()`` function is called before the jobs ``halos`` and ``galaxies`` are finished, so the tables are empty.
 
 
 
