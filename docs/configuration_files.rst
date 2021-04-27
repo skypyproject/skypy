@@ -347,10 +347,29 @@ Cosmology
       H0: $hubble_constant
       Om0: $omega_matter
 
-  * How to use `different cosmologies`
+* How to use `different cosmologies`: currently the cosmology parameter only accepts
+  functions, e.g.: ``astropy.cosmology.FlatLambdaCDM``. In order to use other cosmologies,
+  such as ``astropy.cosmology.Planck13`` or alike, you will need to use the Astropy `clone()`_ functionality.
+  This function returns a copy of the cosmology object, potentially with some changes:
 
+  .. code:: yaml
+
+    parameters:
+      hubble_constant: 70
+      omega_matter: 0.3
+    cosmology: !astropy.cosmology.Planck13.clone
+      name: 'Modified Planck 13'
+      H0: $hubble_constant
+      Om0: $omega_matter
+
+  `A non-working example`:
+
+  .. code:: yaml
+
+    cosmology: !astropy.cosmology.Planck13
 
 
 .. _YAML: https://yaml.org
 .. _NumPy: https://numpy.org
 .. _Quantities: https://docs.astropy.org/en/stable/units/
+.. _clone(): https://docs.astropy.org/en/stable/api/astropy.cosmology.FLRW.html?highlight=clone#astropy.cosmology.FLRW.clone
