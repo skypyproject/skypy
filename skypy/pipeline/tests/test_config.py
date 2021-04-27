@@ -3,6 +3,7 @@ import pytest
 from skypy.pipeline import load_skypy_yaml
 from skypy.pipeline._items import Call
 from astropy import units
+from astropy.cosmology.core import Cosmology
 
 
 def test_load_skypy_yaml():
@@ -18,6 +19,8 @@ def test_load_skypy_yaml():
     assert isinstance(config['test_float'], float)
     assert isinstance(config['test_str'], str)
     assert isinstance(config['test_func'], Call)
+    assert isinstance(config['test_func_with_arg'], Call)
+    assert isinstance(config['test_object'], Cosmology)
     assert isinstance(config['cosmology'], Call)
     assert isinstance(config['tables']['test_table_1']['test_column_3'], Call)
 
