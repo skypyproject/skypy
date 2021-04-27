@@ -68,7 +68,7 @@ class SkyPyLoader(yaml.SafeLoader):
         except (ModuleNotFoundError, AttributeError) as e:
             raise ImportError(f'{e}\n{node.start_mark}') from e
 
-        return Call(function, args, kwargs)
+        return Call(function, args, kwargs) if callable(function) else function
 
     def construct_quantity(self, node):
         value = self.construct_scalar(node)
