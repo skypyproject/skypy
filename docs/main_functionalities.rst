@@ -1,8 +1,8 @@
-####################
-Main functionalities
-####################
+#############
+Feature list
+#############
 
-This page outlines the main functionalities in the `SkyPy` library.
+This page outlines the main features in the `SkyPy` library.
 
 Galaxies
 --------
