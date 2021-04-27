@@ -52,23 +52,23 @@ class SkyPyLoader(yaml.SafeLoader):
         return Ref(ref)
 
     def construct_call(self, name, node):
-        if isinstance(node, yaml.ScalarNode):
-            arg = self.construct_scalar(node)
-            args = [arg] if arg != '' else []
-            kwargs = {}
-        elif isinstance(node, yaml.SequenceNode):
-            args = self.construct_sequence(node)
-            kwargs = {}
-        elif isinstance(node, yaml.MappingNode):
-            args = []
-            kwargs = self.construct_mapping(node)
-
         try:
-            function = import_function(name)
+            object = import_function(name)
         except (ModuleNotFoundError, AttributeError) as e:
             raise ImportError(f'{e}\n{node.start_mark}') from e
 
-        return Call(function, args, kwargs)
+        if isinstance(node, yaml.ScalarNode):
+            if node.value:
+                raise ValueError(f'{node.value}: ScalarNode should be empty to import an object')
+            return object
+        else:
+            if isinstance(node, yaml.SequenceNode):
+                args = self.construct_sequence(node)
+                kwargs = {}
+            if isinstance(node, yaml.MappingNode):
+                args = []
+                kwargs = self.construct_mapping(node)
+            return Call(object, args, kwargs)
 
     def construct_quantity(self, node):
         value = self.construct_scalar(node)
