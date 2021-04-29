@@ -4,9 +4,9 @@ SkyPy: A package for modelling the Universe
 
 |Read the Docs| |GitHub| |Codecov|
 
-The SkyPy package contains methods for simulating populations of astronomical
-objects, across the Universe, galaxies, and the Milky Way. These methods can
-generate random realisations of intrinsic and observed properties, with the
+This package contains methods for modelling the Universe, galaxies and the
+Milky Way. SkyPy simulates populations of astronomical objects, generating
+random realisations of intrinsic and observed properties, with the
 intention the simulations can then be compared to data as part of an inference
 pipeline.
 
