@@ -72,7 +72,7 @@ the current SkyPy co-ordinators:
 `coordinators@skypyroject.org`_.
 
  .. _Discussions page: https://github.com/skypyproject/skypy/discussions 
- .. _coordinators@skypyroject.org: mailto:coordinators@skypyproject.org
+ .. _coordinators@skypyroject.org: mailto:skypy-coordinators@googlegroups.com
 
 Contributing
 ------------
