@@ -33,6 +33,7 @@ Packages
    :maxdepth: 1
 
    galaxies
+   neutral_hydrogen
    utils/index
 
 Pipeline
