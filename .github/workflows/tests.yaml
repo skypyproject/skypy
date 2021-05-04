@@ -2,10 +2,12 @@ name: Tests
 on:
   push:
     branches:
-    - master
+    - main
+    - module/*
   pull_request:
     branches:
-    - master
+    - main
+    - module/*
 jobs:
   test:
     name: ${{ matrix.name }}
@@ -17,8 +19,8 @@ jobs:
 
           - name: latest supported versions
             os: ubuntu-latest
-            python: 3.8
-            toxenv: py38-test-all-latest-cov
+            python: 3.9
+            toxenv: py39-test-all-latest-cov
             toxposargs: --cov-report=xml:${GITHUB_WORKSPACE}/coverage.xml
 
           - name: oldest supported versions
@@ -28,39 +30,26 @@ jobs:
 
           - name: macOS latest supported
             os: macos-latest
-            python: 3.8
-            toxenv: py38-test-latest
+            python: 3.9
+            toxenv: py39-test-latest
 
           - name: Windows latest supported
             os: windows-latest
-            python: 3.8
-            toxenv: py38-test-latest
+            python: 3.9
+            toxenv: py39-test-latest
 
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
     - name: Install Python ${{ matrix.python }}
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python }}
-    - name: Cache SkyPy data
-      uses: actions/cache@v2
-      with:
-        path: ~/.skypy/cache
-        key: ${{ runner.os }}-skypy-cache-${{ matrix.toxenv }}-${{ github.run_id }}
-        restore-keys: |
-          ${{ runner.os }}-skypy-cache-${{ matrix.toxenv }}-
     - name: Install Dependencies
       run: |
         pip install tox
-    - if: contains(matrix.toxenv, '-all') && runner.os == 'Linux'
-      name: Install Additional Dependencies (Linux)
-      run: |
-        sudo install $(which gfortran-9) /usr/bin/gfortran
-        echo gfortran=$(which gfortran)
-    - name: Add pytest Matcher
-      run: |
-        echo ::add-matcher::.github/problem_matchers/pytest.json
     - name: Run Tests
       run: |
         tox -e ${{ matrix.toxenv }} ${{ matrix.toxargs }} -- ${{ matrix.toxposargs }}

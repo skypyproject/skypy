@@ -2,33 +2,36 @@
 SkyPy: A package for modelling the Universe
 ===========================================
 
-|PyPI| |conda-forge| |Read the Docs| |GitHub| |Codecov| |Zenodo|
+|Read the Docs| |GitHub| |Codecov|
 
 This package contains methods for modelling the Universe, galaxies and the Milky
 Way. Also included are methods for generating observed data.
 
-* Galaxy_ morphology, luminosity and redshift distributions
-* Halo_ and subhalo mass distributions
-* `Gravitational Wave`_ binary merger rates
-* `Power Spectra`_ using CAMB and Halofit
+* Galaxies_: morphology, luminosity and redshift distributions
 * Pipelines_ to generate populations of astronomical objects
 
 The full list of features can be found in the `SkyPy Documentation`_.
 
+.. _Galaxies: https://skypy.readthedocs.io/en/latest/galaxies.html
+.. _Pipelines: https://skypy.readthedocs.io/en/latest/pipeline/index.html
+.. _SkyPy Documentation: https://skypy.readthedocs.io/en/latest/
+
+
+Citation
+--------
+
+|JOSS| |Zenodo|
+
 If you use SkyPy for work or research presented in a publication please follow
 our `Citation Guidelines`_.
 
-.. _Galaxy: https://skypy.readthedocs.io/en/latest/galaxy.html
-.. _Halo: https://skypy.readthedocs.io/en/latest/halo/index.html
-.. _Gravitational Wave: https://skypy.readthedocs.io/en/latest/gravitational_wave/index.html
-.. _Power Spectra: https://skypy.readthedocs.io/en/latest/power_spectrum/index.html
-.. _Pipelines: https://skypy.readthedocs.io/en/latest/pipeline/index.html
-.. _SkyPy Documentation: https://skypy.readthedocs.io/en/latest/
-.. _Citation Guidelines: CITATION
+.. _Citation Guidelines: CITATION.rst
 
 
 Installation
 ------------
+
+|PyPI| |conda-forge|
 
 SkyPy releases are distributed through PyPI_ and conda-forge_. Instructions for
 installing SkyPy and its dependencies can be found in the Installation_
@@ -38,19 +41,15 @@ section of the documentation.
 Examples
 --------
 
-SkyPy also has a driver script that can run simulation pipelines from the
-command line. The `skypyproject/examples`_ repository contains sample
-configuration files that you can clone and run:
-
-.. code:: bash
-
-    $ git clone --depth 1 -b v$(skypy --version) https://github.com/skypyproject/examples.git
-    $ skypy examples/mccl_galaxies.yml --format fits
+SkyPy has a driver script that can run simulation pipelines from the command
+line. The documentation contains a description of the Pipeline_ module and
+Examples_ that demonstrate how to use it.
 
 .. _PyPI: https://pypi.org/project/skypy/
 .. _conda-forge: https://anaconda.org/conda-forge/skypy
 .. _Installation: https://skypy.readthedocs.io/en/stable/install.html
-.. _skypyproject/examples: https://github.com/skypyproject/examples
+.. _Pipeline: https://skypy.readthedocs.io/en/stable/pipeline/index.html
+.. _Examples: https://skypy.readthedocs.io/en/stable/examples/index.html
 
 
 Contributing
@@ -62,8 +61,8 @@ For information on how to contribute see our `Contributor Guidelines`_.
 All communication relating to The SkyPy Project must meet the standards set out
 in the `Code of Conduct`_.
 
-.. _Contributor Guidelines: CONTRIBUTING.md
-.. _Code of Conduct: CODE_OF_CONDUCT.md
+.. _Contributor Guidelines: https://skypy.readthedocs.io/en/latest/developer/contributing.html
+.. _Code of Conduct: https://skypy.readthedocs.io/en/stable/project/CODE_OF_CONDUCT.html
 
 .. |PyPI| image:: https://img.shields.io/pypi/v/skypy?label=PyPI&logo=pypi
     :target: https://pypi.python.org/pypi/skypy
@@ -77,9 +76,12 @@ in the `Code of Conduct`_.
 .. |GitHub| image:: https://github.com/skypyproject/skypy/workflows/Tests/badge.svg
     :target: https://github.com/skypyproject/skypy/actions
 
-.. |Codecov| image:: https://codecov.io/gh/skypyproject/skypy/branch/master/graph/badge.svg
+.. |Codecov| image:: https://codecov.io/gh/skypyproject/skypy/branch/main/graph/badge.svg
     :target: https://codecov.io/gh/skypyproject/skypy
 
 .. |Zenodo| image:: https://zenodo.org/badge/221432358.svg
     :target: https://zenodo.org/badge/latestdoi/221432358
     :alt: SkyPy Concept DOI
+
+.. |JOSS| image:: https://joss.theoj.org/papers/d4fac0604318190d6627ab29b568a48d/status.svg
+    :target: https://joss.theoj.org/papers/d4fac0604318190d6627ab29b568a48d

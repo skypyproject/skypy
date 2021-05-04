@@ -14,12 +14,15 @@ Running ``skypy`` from the command line
 
 ``skypy`` is a command line script that runs a pipeline of functions defined in
 a config file to generate tables of objects and write them to file. For example,
-you can use ``skypy`` to run one of the `example pipelines`_ and write the
-outputs to fits files:
+you can use ``skypy`` to run one of the `Examples`_ and write the outputs to
+fits files:
 
 .. code-block:: bash
 
-    $ skypy examples/mccl_galaxies.yml --format fits
+    $ skypy examples/galaxies/sdss_photometry.yml sdss_photometry.fits
+
+To view the progress of the pipeline as it runs you can enable logging using the
+`--verbose` flag.
 
 Config files are written in YAML format and read using the
 `~skypy.pipeline.load_skypy_yaml` funciton. Each entry in the config specifices
@@ -51,17 +54,15 @@ with a dollar sign ``$``. For example:
     pipeline.execute()
 
     z = pipeline['galaxies']['redshift']
-    dm = pipeline['galaxies']['distance_modulus']
 
-    plt.scatter(z, dm, marker='+', color='k', label='galaxies')
+    plt.hist(z, histtype='step', density=True, label='redshifts')
     plt.legend()
     plt.xlabel('redshift')
-    plt.ylabel('distance_modulus')
 
 When executing a pipeline, all dependencies are tracked and resolved in order
 using a Directed Acylic Graph implemented in networkx_.
 
-.. _Example Pipelines: https://github.com/skypyproject/skypy/tree/master/examples
+.. _Examples: https://skypy.readthedocs.io/en/stable/examples/index.html
 .. _pyyaml: https://pyyaml.org/
 .. _networkx: https://networkx.github.io/
 
@@ -113,62 +114,6 @@ changed for individual executions of the pipeline:
     plt.legend()
     plt.xlabel('redshift')
 
-
-Lightcone Simulations
-=====================
-
-The `~skypy.pipeline.Lightcone` class can be used to simulate a cosmological
-volume by subdiving it into a number of redshift slices and then running a
-pipeline for each slice. A typical config file would be:
-
-.. literalinclude:: examples/lightcone.yml
-   :language: yaml
-   :caption:
-
-This simulates between redshift 0.8 and 1.2 in four slices. The slices are
-determined by dividing the simulation volume into equally spaced comoving
-distance slices. For each slice the lightcone defines three additional
-parameters that can be referenced within the pipeline:
-
-- `slice_z_min` : The minimum redshift of the slice
-- `slice_z_max` : The maximum redshift of the slice
-- `slice_z_mid` : The redshift of the comoving distance midpoint of the slice.
-
-The redshifts of each galaxy in this simulated lightcone are shown below
-colour-coded by the slice that they were sampled in.
-
-.. plot::
-  :include-source: false
-
-    from astropy.cosmology import default_cosmology
-    import matplotlib.pyplot as plt
-    import numpy as np
-    from skypy.pipeline import Lightcone, load_skypy_yaml
-
-    # Run Lightcone
-    config = load_skypy_yaml('examples/lightcone.yml')
-    lightcone = Lightcone(config)
-    lightcone.execute()
-
-    # Lightcone outputs
-    z = lightcone.tables['galaxies']['redshift']
-    chi = default_cosmology.get().comoving_distance(z)
-    ids = np.arange(len(z))
-
-    # Redshift slices
-    chi_min = default_cosmology.get().comoving_distance(lightcone.lightcone_config['z_min'])
-    chi_max = default_cosmology.get().comoving_distance(lightcone.lightcone_config['z_max'])
-    n_slice = lightcone.lightcone_config['n_slice']
-    bounds = np.linspace(chi_min, chi_max, n_slice + 1)
-
-    # Plotting
-    colors = ['red', 'orange', 'green', 'blue']
-    for i, c, l, h in zip(np.arange(n_slice), colors, bounds[:-1], bounds[1:]):
-      mask = np.logical_and(chi > l, chi < h)
-      plt.scatter(ids[mask], z[mask], marker='+', label=f'Slice {i+1}', color=c)
-    plt.xlabel('Galaxy ID')
-    plt.ylabel('Redshift')
-    plt.legend()
 
 Reference/API
 =============

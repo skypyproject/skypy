@@ -120,6 +120,31 @@ should be placed below decorators which modify any of the independent
 arguments.
 
 
+Photometry (`skypy.utils.photometry`)
+=====================================
+
+This module contains methods that model spectral energy distributions and
+calculate photometric properties.
+
+SkyPy uses the `speclite <https://speclite.readthedocs.io/>`_ package for
+photometric calculations. Some of the following functions take the names of
+photometric filters as an input parameter. Users can choose from the available
+`Speclite Filters <https://speclite.readthedocs.io/en/latest/filters.html>`_
+following the naming syntax described in `speclite.filters.load_filters`, or
+create their own named `speclite.filters.FilterResponse`.
+
+
+.. currentmodule:: skypy.utils.photometry
+.. autosummary::
+   :nosignatures:
+
+   absolute_magnitude_from_luminosity
+   luminosity_from_absolute_magnitude
+   luminosity_in_band
+   mag_ab
+   SpectrumTemplates
+
+
 Random sampling (`skypy.utils.random`)
 ======================================
 
@@ -136,3 +161,4 @@ Reference/API
 =============
 
 .. automodapi:: skypy.utils
+.. automodapi:: skypy.utils.photometry

@@ -4,13 +4,14 @@ This module provides methods to run pipelines of functions with dependencies
 and handle their results.
 """
 
-from astropy.cosmology import default_cosmology
 from astropy.table import Table, Column
 from copy import copy, deepcopy
 from collections.abc import Sequence, Mapping
 from ._config import load_skypy_yaml
 from ._items import Item, Call, Ref
+from . import log
 import networkx
+import pathlib
 
 
 __all__ = [
@@ -66,7 +67,7 @@ class Pipeline:
 
         References
         ----------
-        .. [1] https://github.com/skypyproject/skypy/tree/master/examples
+        .. [1] https://github.com/skypyproject/skypy/tree/main/examples
 
         '''
 
@@ -164,6 +165,7 @@ class Pipeline:
 
         # Initialise cosmology from config parameters
         if self.cosmology is not None:
+            log.info("Setting cosmology")
             self.state['cosmology'] = self.evaluate(self.cosmology)
 
         # go through the jobs in dependency order
@@ -172,7 +174,8 @@ class Pipeline:
             skip = node.get('skip', True)
             if skip:
                 continue
-            elif job in self.config:
+            log.info(f"Generating {job}")
+            if job in self.config:
                 settings = self.config.get(job)
                 self.state[job] = self.evaluate(settings)
             else:
@@ -187,27 +190,65 @@ class Pipeline:
                     # Single column assignment
                     self.state[table][column] = self.evaluate(settings)
 
-    def write(self, file_format=None, overwrite=False):
+    def write(self, filename, overwrite=False):
         r'''Write pipeline results to disk.
 
         Parameters
         ----------
-        file_format : str
-            File format used to write tables. Files are written using the
-            Astropy unified file read/write interface; see [1]_ for supported
-            file formats. If None (default) tables are not written to file.
+        filename : str
+            Name of output file to be written. It must have one of the
+            supported file extensions for FITS (.fit .fits .fts) or HDF5
+            (.hdf5 .hd5 .he5 .h5).
         overwrite : bool
-            Whether to overwrite any existing files without warning.
-
-        References
-        ----------
-        .. [1] https://docs.astropy.org/en/stable/io/unified.html
-
+            If filename already exists, this flag indicates whether or not to
+            overwrite it (without warning).
         '''
-        if file_format:
-            for table in self.table_config.keys():
-                filename = '.'.join((table, file_format))
-                self.state[table].write(filename, overwrite=overwrite)
+
+        suffix = pathlib.Path(filename).suffix.lower()
+        _fits_suffixes = ('.fit', '.fits', '.fts')
+        _hdf5_suffixes = ('.hdf5', '.hd5', '.he5', '.h5')
+
+        if suffix in _fits_suffixes:
+            self.write_fits(filename, overwrite)
+        elif suffix in _hdf5_suffixes:
+            self.write_hdf5(filename, overwrite)
+        else:
+            raise ValueError(f'{suffix} is an unsupported file format. SkyPy supports '
+                             'FITS (' + ' '.join(_fits_suffixes) + ') and '
+                             'HDF5 (' + ' '.join(_hdf5_suffixes) + ').')
+
+    def write_fits(self, filename, overwrite=False):
+        r'''Write pipeline results to a FITS file.
+
+        Parameters
+        ----------
+        filename : str
+            Name of output file to be written.
+        overwrite : bool
+            If filename already exists, this flag indicates whether or not to
+            overwrite it (without warning).
+        '''
+        from astropy.io.fits import HDUList, PrimaryHDU, table_to_hdu
+        hdul = [PrimaryHDU()]
+        for t in self.table_config:
+            hdu = table_to_hdu(self[t])
+            hdu.header['EXTNAME'] = t
+            hdul.append(hdu)
+        HDUList(hdul).writeto(filename, overwrite=overwrite)
+
+    def write_hdf5(self, filename, overwrite=False):
+        r'''Write pipeline results to a HDF5 file.
+
+        Parameters
+        ----------
+        filename : str
+            Name of output file to be written.
+        overwrite : bool
+            If filename already exists, this flag indicates whether or not to
+            overwrite it (without warning).
+        '''
+        for t in self.table_config:
+            self[t].write(filename, path=f'tables/{t}', append=True, overwrite=overwrite)
 
     def evaluate(self, value):
         '''evaluate an item in the pipeline'''

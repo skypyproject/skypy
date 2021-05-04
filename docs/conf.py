@@ -165,7 +165,7 @@ if setup_cfg.get('edit_on_github').lower() == 'true':
     extensions += ['sphinx_astropy.ext.edit_on_github']
 
     edit_on_github_project = setup_cfg['github_project']
-    edit_on_github_branch = "master"
+    edit_on_github_branch = "main"
 
     edit_on_github_source_root = ""
     edit_on_github_doc_root = "docs"
@@ -205,7 +205,6 @@ github_issues_url = 'https://github.com/{0}/issues/'.format(setup_cfg['github_pr
 # -----------------------------------------------------------------------------
 
 intersphinx_mapping.update({
-    'specutils': ('https://specutils.readthedocs.io/en/stable/', None),
     'speclite': ('https://speclite.readthedocs.io/en/latest/', None),
 })
 
@@ -252,9 +251,9 @@ plot_rcparams = {
     'text.usetex': False,
 }
 
-# Mock camb if it is not available e.g. on readthedocs
-autodoc_mock_imports = []
-try:
-    import_module('camb')
-except ImportError:
-    autodoc_mock_imports.append('camb')
+# Sphinx Gallery
+extensions += ['sphinx_gallery.gen_gallery', ]
+sphinx_gallery_conf = {
+    'examples_dirs': '../examples',  # path to examples scripts
+    'gallery_dirs': 'examples',      # path to gallery generated examples
+}
