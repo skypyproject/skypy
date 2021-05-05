@@ -35,6 +35,7 @@ Packages
    galaxies
    gravitational_waves/index
    halos/index
+   neutral_hydrogen
    power_spectrum/index
    utils/index
 
