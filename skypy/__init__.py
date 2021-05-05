@@ -16,3 +16,4 @@ __all__ = []
 
 from . import galaxies  # noqa
 from . import pipeline  # noqa
+from . import power_spectrum  # noqa
