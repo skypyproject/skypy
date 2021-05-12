@@ -88,6 +88,7 @@ You may now save it as ``luminosity.yml`` and run it using the `SkyPy` `~skypy.p
     axs[1].set_xlabel(r'$Magnitude$')
     axs[1].set_yscale('log')
 
+    plt.tight_layout()
     plt.show()
 
 You can also run the pipeline directly from the command line:
