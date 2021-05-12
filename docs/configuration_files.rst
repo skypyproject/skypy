@@ -304,30 +304,6 @@ Tables
           depends: [ tuple.complete ]
 
 
-  `A non-working example`: this is an example of an incorrect table referencing.
-
-  .. code:: yaml
-
-    tables:
-    halos:
-      halo_mass: !numpy.random.uniform
-        low: 1.0e8
-        high: 1.0e14
-        size: 20
-    galaxies:
-      luminosity: !numpy.random.uniform
-        low: 0.05
-        high: 10.0
-        size: 20
-      matching_wrong:
-        match: !numpy.vstack
-          tuple: [ $halos, $galaxies ]
-
-  Explanation: when calling the function ``numpy.vstack()`` and referencing the tables ``$halos`` and ``$galaxies``, this is actually
-  referencing the job that initialises the empty table ``halos`` and ``galaxies``.
-  The ``numpy.vstack()`` function is called before the jobs ``halos`` and ``galaxies`` are finished, so the tables are empty.
-
-
 Import objects
 ^^^^^^^^^^^^^^
 * The SkyPy configuration syntax allows objects to be imported directly from external
