@@ -17,6 +17,7 @@ Getting Started
    :maxdepth: 1
 
    install
+   feature_list
    configuration_files
    examples/index
 

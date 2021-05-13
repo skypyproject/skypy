@@ -9,6 +9,7 @@ from copy import copy, deepcopy
 from collections.abc import Sequence, Mapping
 from ._config import load_skypy_yaml
 from ._items import Item, Call, Ref
+from . import log
 import networkx
 import pathlib
 
@@ -164,6 +165,7 @@ class Pipeline:
 
         # Initialise cosmology from config parameters
         if self.cosmology is not None:
+            log.info("Setting cosmology")
             self.state['cosmology'] = self.evaluate(self.cosmology)
 
         # go through the jobs in dependency order
@@ -172,7 +174,8 @@ class Pipeline:
             skip = node.get('skip', True)
             if skip:
                 continue
-            elif job in self.config:
+            log.info(f"Generating {job}")
+            if job in self.config:
                 settings = self.config.get(job)
                 self.state[job] = self.evaluate(settings)
             else:
