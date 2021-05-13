@@ -100,9 +100,25 @@ def test_logging(capsys):
     assert(not err)
 
 
+def test_init_depends():
+
+    # Regression test for pull request #464
+    # Previously the .depends keyword was also being passed to functions as a
+    # keyword argument. This was because of an inconsistency of how the config
+    # file was parsed and how the .depends keyword was handled by the Pipeline
+    # class during execution. The .depends keyword is now handled exclusively
+    # by the Call class.
+
+    # Run skypy with default verbosity and check log is empty
+    filename = get_pkg_data_filename('data/bug_464.yml')
+    output_file = 'bug_464.fits'
+    assert skypy.main([filename, output_file]) == 0
+
+
 def teardown_module(module):
 
     # Remove fits file generated in test_skypy
+    os.remove('bug_464.fits')
     os.remove('empty.fits')
     os.remove('logging.fits')
     os.remove('test.fits')

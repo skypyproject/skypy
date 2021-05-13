@@ -1,0 +1,7 @@
+tables:
+  bug_table_1:
+    a: !numpy.random.uniform [0, 1, 10]
+  bug_table_2:
+    .init: !astropy.table.vstack
+      tables: [ $bug_table_1 ]
+      .depends: [ bug_table_1.complete ]
