@@ -300,9 +300,9 @@ Tables
           high: 10.0
           size: 20
       matching:
-        init: !numpy.vstack
-          tuple: [ $halos, $galaxies ]
-          depends: [ tuple.complete ]
+        .init: !astropy.table.vstack
+          tables: [ $halos, $galaxies ]
+          .depends: [ halos.complete, galaxies.complete ]
 
 
 Import objects
