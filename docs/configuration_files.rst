@@ -283,7 +283,7 @@ Tables
   *That means, when executing the configuration file, the first thing that happens is call ``tableA``, second,  call ``tableA.c1`` and third, call ``tableA.c2``.*
   If you used the dollar sign to reference your ``tableA`` inside a function, this function might be called before the job ``tableA`` is complete, and the table will be empty.
 
-  `The solution`: to correctly reference tables, initialise your table with ``init``, specify their dependences with the keyword ``depends``
+  `The solution`: to correctly reference tables, initialise your table with ``.init``, specify their dependences with the keyword ``.depends``
   and ensure the tables are completed before calling the function with ``.complete``. Our example:
 
   .. code:: yaml
