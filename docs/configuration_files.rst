@@ -91,11 +91,11 @@ You may now save it as ``luminosity.yml`` and run it using the `SkyPy` `~skypy.p
     plt.tight_layout()
     plt.show()
 
-You can also run the pipeline directly from the command line:
+You can also run the pipeline directly from the command line and write the outputs to a fits file:
 
 .. code-block:: bash
 
-    $ skypy luminosity.yml --format fits
+    $ skypy luminosity.yml luminosity.fits
 
 
 
