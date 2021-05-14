@@ -216,6 +216,8 @@ Functions
       cosmology: !astropy.cosmology.FlatLambdaCDM
         H0: 70
         Om0: 0.3
+      growth: !skypy.power-spectrum.growth_function
+        redshift: 0.2
 
 
 Tables
