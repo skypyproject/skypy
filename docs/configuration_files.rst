@@ -229,7 +229,7 @@ Tables
     tables:
       cosmic_voids:
         radii: !scipy.stats.lognorm.rvs
-          s: 200.
+          s: 5.
           size: 10000
         mean: !numpy.mean
           a: $cosmic_voids.radii
