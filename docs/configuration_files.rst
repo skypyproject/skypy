@@ -150,6 +150,7 @@ Variables
       cosmo1: !astropy.cosmology.Planck13 # import the Planck13 object and bind to cosmo1
       cosmo2: !astropy.cosmology.default_cosmology.get [] # call default_cosmology.get() and bind to cosmo2
 
+
 Parameters
 ^^^^^^^^^^
 
@@ -162,7 +163,7 @@ Parameters
       parameters:
         hubble_constant: 70
         omega_matter: 0.3
-        
+
 
 Functions
 ^^^^^^^^^
@@ -207,6 +208,14 @@ Functions
       redshift: !numpy.linspace [ 0, 1.3, 10 ]
       comoving_distance: !astropy.cosmology.Planck15.comoving_distance
         z: $redshift
+
+* The `cosmology` to be used by functions within the pipeline only needs to be set up at the top. If a function needs ``cosmology`` as an input, you need not define it again, it is automatically detected.
+
+  .. code:: yaml
+
+      cosmology: !astropy.cosmology.FlatLambdaCDM
+        H0: 70
+        Om0: 0.3
 
 
 Tables
@@ -327,30 +336,6 @@ Tables
           tables: [ $halos, $galaxies ]
           .depends: [ halos.complete, galaxies.complete ]
 
-
-Cosmology
-^^^^^^^^^
-
-* `Define parameters`: parameters are variables that can be modified at execution.
-
-  For example,
-
-  .. code:: yaml
-
-    parameters:
-      hubble_constant: 70
-      omega_matter: 0.3
-
-* The `cosmology` to be used by functions within the pipeline only needs to be set up at the top. If a function needs ``cosmology`` as an input, you need not define it again, it is automatically detected.
-
-  .. code:: yaml
-
-    parameters:
-      hubble_constant: 70
-      omega_matter: 0.3
-    cosmology: !astropy.cosmology.FlatLambdaCDM
-      H0: $hubble_constant
-      Om0: $omega_matter
 
 
 
