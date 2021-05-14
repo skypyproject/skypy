@@ -150,6 +150,19 @@ Variables
       cosmo1: !astropy.cosmology.Planck13 # import the Planck13 object and bind to cosmo1
       cosmo2: !astropy.cosmology.default_cosmology.get [] # call default_cosmology.get() and bind to cosmo2
 
+Parameters
+^^^^^^^^^^
+
+* `Define parameters`: parameters are variables that can be modified at execution.
+
+  For example,
+
+  .. code:: yaml
+
+      parameters:
+        hubble_constant: 70
+        omega_matter: 0.3
+        
 
 Functions
 ^^^^^^^^^
