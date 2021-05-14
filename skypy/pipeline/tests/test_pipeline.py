@@ -288,6 +288,7 @@ def test_depends():
 
     pipeline = Pipeline(config)
     pipeline.execute()
+    assert np.all(pipeline['table_1'] == pipeline['table_2'])
 
 
 def teardown_module(module):
