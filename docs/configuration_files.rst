@@ -339,8 +339,6 @@ Tables
           .depends: [ halos.complete, galaxies.complete ]
 
 
-
-
 .. _YAML: https://yaml.org
 .. _NumPy: https://numpy.org
 .. _Quantities: https://docs.astropy.org/en/stable/units/
