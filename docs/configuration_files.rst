@@ -1,5 +1,5 @@
 ###################
-Configuration files
+Configuration Files
 ###################
 
 This page outlines how to construct configuration files to run your own routines
