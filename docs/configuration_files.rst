@@ -30,7 +30,7 @@ Also, ``noise`` is an optional parameter and you could use its default value by 
 
   .. code:: yaml
 
-    cosmology: !astropy.cosmology.default_cosmology.get
+    cosmology: !astropy.cosmology.default_cosmology.get []
     z_range: !numpy.linspace [0, 2, 21]
     M_star: !astropy.modeling.models.Linear1D [-0.9, -20.4]
     phi_star: !astropy.modeling.models.Exponential1D [3e-3, -9.7]
