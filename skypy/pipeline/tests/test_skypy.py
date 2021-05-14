@@ -104,10 +104,10 @@ def test_init_depends():
 
     # Regression test for pull request #464
     # Previously the .depends keyword was also being passed to functions as a
-    # keyword argument. This was because of an inconsistency of how the config
-    # file was parsed and how the .depends keyword was handled by the Pipeline
-    # class during execution. The .depends keyword is now handled exclusively
-    # by the Call class.
+    # keyword argument. This was because Pipeline was executing Item.infer to
+    # handle additional function arguments from context before handling
+    # additional dependencies specified using the .depends keyword. The
+    # .depends keyword is now handled first.
 
     # Run skypy with default verbosity and check log is empty
     filename = get_pkg_data_filename('data/bug_464.yml')
