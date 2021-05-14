@@ -140,6 +140,17 @@ Variables
       distance: 300 kpc
 
 
+* `Import objects`:
+  the SkyPy configuration syntax allows objects to be imported directly from external
+  (sub)modules using the ``!`` tag and providing neither a list of arguments or a
+  dictionary of keywords. For example, this enables the import and usage of any Astropy cosmology:
+
+  .. code:: yaml
+
+      cosmo1: !astropy.cosmology.Planck13 # import the Planck13 object and bind to cosmo1
+      cosmo2: !astropy.cosmology.default_cosmology.get [] # call default_cosmology.get() and bind to cosmo2
+
+
 Functions
 ^^^^^^^^^
 * `Call a function`: functions are defined as tuples where the first entry is the fully qualified function name tagged with and exclamation mark ``!`` and the second entry is either a list of positional arguments or a dictionary of keyword arguments.
@@ -183,8 +194,6 @@ Functions
       redshift: !numpy.linspace [ 0, 1.3, 10 ]
       comoving_distance: !astropy.cosmology.Planck15.comoving_distance
         z: $redshift
-
-  Please, check below in the `cosmology`_ section how to use different cosmologies with the SkyPy pipeline.
 
 
 Tables
@@ -304,19 +313,6 @@ Tables
         .init: !astropy.table.vstack
           tables: [ $halos, $galaxies ]
           .depends: [ halos.complete, galaxies.complete ]
-
-
-Import objects
-^^^^^^^^^^^^^^
-* The SkyPy configuration syntax allows objects to be imported directly from external
-  (sub)modules using the ``!`` tag and providing neither a list of arguments or a
-  dictionary of keywords. For example, this enables the import and usage of any Astropy cosmology:
-
-  .. code:: yaml
-
-    cosmo1: !astropy.cosmology.Planck13 # import the Planck13 object and bind to cosmo1
-    cosmo2: !astropy.cosmology.default_cosmology.get [] # call default_cosmology.get() and bind to cosmo2
-
 
 
 Cosmology
