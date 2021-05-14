@@ -46,12 +46,12 @@ You can create a table ``blue_galaxies`` and for now add the columns for redshif
     tables:
       blue_galaxies:
         redshift, magnitude: !skypy.galaxies.schechter_lf
-      		redshift: $z_range
-      		M_star: $M_star
-      		phi_star: $phi_star
-      		alpha: -1.3
-      		m_lim: $magnitude_limit
-      		sky_area: $sky_area
+          redshift: $z_range
+      	  M_star: $M_star
+      	  phi_star: $phi_star
+      	  alpha: -1.3
+      	  m_lim: $magnitude_limit
+      	  sky_area: $sky_area
 
 `Important:` if cosmology is detected as a parameter but is not set, it automatically uses the cosmology variable defined at the top-level of the file.
 
