@@ -2,7 +2,7 @@ from astropy.cosmology import FlatLambdaCDM, default_cosmology
 from astropy.cosmology.core import Cosmology
 from astropy.io import fits
 from astropy.io.misc.hdf5 import read_table_hdf5
-from astropy.table import Table
+from astropy.table import Table, vstack
 from astropy.table.column import Column
 from astropy.units import Quantity
 from astropy.utils.data import get_pkg_data_filename
@@ -267,6 +267,27 @@ def test_hdf5():
     pipeline.write('output.hdf5')
     hdf_table = read_table_hdf5('output.hdf5', 'tables/test_table', character_as_bytes=False)
     assert np.all(hdf_table == pipeline['test_table'])
+
+
+def test_depends():
+
+    # Regression test for pull request #464
+    # Previously the .depends keyword was also being passed to functions as a
+    # keyword argument. This was because Pipeline was executing Item.infer to
+    # handle additional function arguments from context before handling
+    # additional dependencies specified using the .depends keyword. The
+    # .depends keyword is now handled first.
+
+    config = {'tables': {
+                'table_1': {
+                  'column1': Call(np.random.uniform, [0, 1, 10])},
+                'table_2': {
+                    '.init': Call(vstack, [], {
+                      'tables': [Ref('table_1')],
+                      '.depends': ['table_1.complete']})}}}
+
+    pipeline = Pipeline(config)
+    pipeline.execute()
 
 
 def teardown_module(module):
