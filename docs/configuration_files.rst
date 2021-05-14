@@ -198,7 +198,7 @@ Tables
 
       tables:
         telescope:
-          spectral_lines: !scipy.stats.norm
+          spectral_lines: !scipy.stats.norm.rvs
             loc: 550
             scale: 1.6
             size: 100
