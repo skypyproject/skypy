@@ -35,7 +35,7 @@ Also, ``noise`` is an optional parameter and you could use its default value by 
     M_star: !astropy.modeling.models.Linear1D [-0.9, -20.4]
     phi_star: !astropy.modeling.models.Exponential1D [3e-3, -9.7]
     magnitude_limit: 23
-    sky_area: 10 deg2
+    sky_area: 0.1 deg2
 
 - `Tables and columns`:
 
