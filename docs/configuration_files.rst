@@ -217,6 +217,7 @@ Tables
           collecting_surface: !numpy.random.uniform
             low: 6.9
             high: 7.1
+            size: 100
 
 * `Reference a column`: columns in the pipeline can be referenced by their full name tagged with a dollar sign ``$``.
   Example: the radius of cosmic voids seem to follow a lognormal distribution. You can create a table ``cosmic_voids``
