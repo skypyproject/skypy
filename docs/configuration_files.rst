@@ -268,34 +268,17 @@ Tables
           mean: $galaxies.mass
 
 
-* `Multi-column assignment`: if a function returns multiple columns, you can chose to assign them to multiple columns with different names or to a muti-column object.
+* `Multi-column assignment`: multi-column assignment is performed with any 2d-array, where one of the dimensions is interpreted
+  as the rows of the table and the second dimension, as separate columns. Or you can do it from a function that returns a tuple.
 
-  Imagine you want the distribution of the circular velocities of 1000 halos following a Maxwellian distribution.
-  The histogram NumPy_ returns a 2-dimensional object. Therefore, you can choose
-
-  .. code:: yaml
-
-    tables:
-      halos:
-        circular_velocities: !scipy.stats.maxwell.rvs
-          s: 250
-          size: 1000
-        hist, bin_edges: !numpy.histogram
-          a: $halos.circular_velocities
-          density: True
-
-  or a multi-column assignment
+  We use multi-column assignment in the following example where we sample different halo properties from a lognormal distribution (returns a tuple of three arrays):
 
   .. code:: yaml
 
     tables:
       halos:
-        circular_velocities: !scipy.stats.maxwell.rvs
-          s: 250
-          size: 1000
-        histogram: !numpy.histogram
-          a: $halos.circular_velocities
-          density: True
+        mass, radius, concentration: !numpy.random.lognormal
+          size: [10000, 3]
 
 
 * `Referencing tables: table.init and table.complete dependencies`.
