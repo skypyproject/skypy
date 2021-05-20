@@ -253,21 +253,19 @@ Tables
             size: 100
 
 * `Reference a column`: columns in the pipeline can be referenced by their full name tagged with a dollar sign ``$``.
-  Example: the radius of cosmic voids seem to follow a lognormal distribution. You can create a table ``cosmic_voids``
-  with a column ``radii`` where you sample 10000 void sizes and two other columns, ``mean`` and ``variance`` that reference
-  the first column
+  Example: the galaxy mass that follows a lognormal distribution. You can create a table ``galaxies``
+  with a column ``mass`` where you sample 10000 object and a second column, ``radius`` which also follows a lognormal distribution
+  but the mean depends on how massive the galaxies are:
 
   .. code:: yaml
 
     tables:
-      cosmic_voids:
-        radii: !scipy.stats.lognorm.rvs
-          s: 5.
+      galaxies:
+        mass: !numpy.random.lognormal
+          mean: 5.
           size: 10000
-        mean: !numpy.mean
-          a: $cosmic_voids.radii
-        variance: !numpy.var
-          a: $cosmic_voids.radii
+        radius: !numpy.random.lognormal
+          mean: $galaxies.mass
 
 
 * `Multi-column assignment`: if a function returns multiple columns, you can chose to assign them to multiple columns with different names or to a muti-column object.
