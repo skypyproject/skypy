@@ -219,6 +219,20 @@ Functions
       growth: !skypy.power-spectrum.growth_function
         redshift: 0.2
 
+* `Job completion`: ``.depends`` can be used to force any function call to wait for completion
+  of any other job.
+
+  A simple example:
+
+  .. code:: yaml
+
+    redshift: !numpy.linspace [ 0, 1.3, 10 ]
+    comoving_distance: !astropy.cosmology.Planck15.comoving_distance
+      z: $redshift
+      .depends: redshift
+
+  By doing so, you force the function call ``redshift`` to be completed before is used to compute the comoving distance.
+
 
 Tables
 ^^^^^^
