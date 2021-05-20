@@ -295,7 +295,7 @@ Tables
           size: [10000, 3]
 
 
-* `Table initialisation`: by default tables are initialised using ``astropy.table.Table()`` however this can be overridden using the `.init` keyword to initialise the table with any function call.
+* `Table initialisation`: by default tables are initialised using ``astropy.table.Table()`` however this can be overridden using the ``.init`` keyword to initialise the table with any function call.
 
   For example, you can stack galaxy properties such as radii and mass:
 
@@ -308,25 +308,12 @@ Tables
         galaxies: [ $radii, $mass ]
 
 
-* `Reference tables and table.complete`:
-
-  There are times when your function depends on tables. In these
-  cases, you need to ensure the referenced table has the necessary content and is not empty.
+* `Reference tables`: when a function call depends on tables, you need to ensure the referenced table has the necessary content and is not empty.
+  You can do that with ``.complete``.
 
   Example: you want to perform a very simple abundance matching, i.e. painting galaxies within your halos.
   You can create two tables ``halos`` and ``galaxies`` storing the halo mass and galaxy luminosities.
   Then you can stack these two tables and store it in a third table called ``matching``.
-
-  `Beware`: referencing tables is a bit different to variables or columns
-  -- where you simply tag a dollar sign.
-
-  The challenge: let ``tableA`` be a table with columns ``c1`` and ``c2``.
-  In configuration language, ``tableA`` is the name of the job.
-  *That means, when executing the configuration file, the first thing that happens is call ``tableA``, second,  call ``tableA.c1`` and third, call ``tableA.c2``.*
-  If you used the dollar sign to reference your ``tableA`` inside a function, this function might be called before the job ``tableA`` is complete, and the table will be empty.
-
-  `The solution`: to correctly reference tables, initialise your table with ``.init``, specify their dependences with the keyword ``.depends``
-  and ensure the tables are completed before calling the function with ``.complete``. Our example:
 
   .. code:: yaml
 
