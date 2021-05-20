@@ -295,7 +295,20 @@ Tables
           size: [10000, 3]
 
 
-* `Referencing tables: table.init and table.complete dependencies`.
+* `Table initialisation`: by default tables are initialised using ``astropy.table.Table()`` however this can be overridden using the `.init` keyword to initialise the table with any function call.
+
+  For example, you can stack galaxy properties such as radii and mass:
+
+  .. code:: yaml
+
+    radii: !numpy.logspace [ 1, 2, 100 ]
+    mass: !numpy.logspace [ 9, 12, 100 ]
+    tables:
+      .init: !astropy.table.vstack
+        galaxies: [ $radii, $mass ]
+
+
+* `Reference tables and table.complete`:
 
   There are times when your function depends on tables. In these
   cases, you need to ensure the referenced table has the necessary content and is not empty.
