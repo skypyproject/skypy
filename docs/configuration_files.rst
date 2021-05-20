@@ -119,7 +119,7 @@ Main keywords: ``parameters``, ``cosmology``, ``tables``.
 
 Variables
 ^^^^^^^^^
-* `Define a variable`: a variable is defined as a key-value pair at the top of the file.
+* `Variable definition`: a variable is defined as a key-value pair at the top of the file.
   YAML is able to interpret any numeric data with the appropriate type: integer, float, boolean.
   Similarly for lists and dictionaries.
   In addition, SkyPy has added extra functionality to interpret and store Astropy Quantities_.
@@ -154,7 +154,7 @@ Variables
 Parameters
 ^^^^^^^^^^
 
-* `Define parameters`: parameters are variables that can be modified at execution.
+* `Parameters definition`: parameters are variables that can be modified at execution.
 
   For example,
 
@@ -167,7 +167,7 @@ Parameters
 
 Functions
 ^^^^^^^^^
-* `Call a function`: functions are defined as tuples where the first entry is the fully qualified function name tagged with and exclamation mark ``!`` and the second entry is either a list of positional arguments or a dictionary of keyword arguments.
+* `Function call`: functions are defined as tuples where the first entry is the fully qualified function name tagged with and exclamation mark ``!`` and the second entry is either a list of positional arguments or a dictionary of keyword arguments.
 
   For example, if you need to call the ``log10()`` and ``linspace()`` NumPy_ functions, then you define the following key-value pairs:
 
@@ -200,7 +200,7 @@ Functions
       cosmo: !astropy.cosmology.default_cosmology.get []
 
 
-* `Reference a variable`: variables can be referenced by their full name tagged with a dollar sign ``$``.
+* `Variable reference`: variables can be referenced by their full name tagged with a dollar sign ``$``.
   In the previous example you could also define the variables at the top-level of the file and then reference them:
 
   .. code:: yaml
@@ -237,7 +237,7 @@ Functions
 Tables
 ^^^^^^
 
-* `Create a table`: a dictionary of table names, each resolving to a dictionary of column names for that table.
+* `Table creation`: a dictionary of table names, each resolving to a dictionary of column names for that table.
 
   Let us create a table called ``telescope`` with a column to store the width of spectral lines that follow a normal distribution
 
@@ -250,7 +250,7 @@ Tables
             scale: 1.6
             size: 100
 
-* `Add a column`: you can add as many columns to a table as you need.
+* `Column addition`: you can add as many columns to a table as you need.
     Imagine you want to add a column for the telescope collecting surface
 
   .. code:: yaml
@@ -266,7 +266,7 @@ Tables
             high: 7.1
             size: 100
 
-* `Reference a column`: columns in the pipeline can be referenced by their full name tagged with a dollar sign ``$``.
+* `Column reference`: columns in the pipeline can be referenced by their full name tagged with a dollar sign ``$``.
   Example: the galaxy mass that follows a lognormal distribution. You can create a table ``galaxies``
   with a column ``mass`` where you sample 10000 object and a second column, ``radius`` which also follows a lognormal distribution
   but the mean depends on how massive the galaxies are:
@@ -308,7 +308,7 @@ Tables
         galaxies: [ $radii, $mass ]
 
 
-* `Reference tables`: when a function call depends on tables, you need to ensure the referenced table has the necessary content and is not empty.
+* `Table reference`: when a function call depends on tables, you need to ensure the referenced table has the necessary content and is not empty.
   You can do that with ``.complete``.
 
   Example: you want to perform a very simple abundance matching, i.e. painting galaxies within your halos.
