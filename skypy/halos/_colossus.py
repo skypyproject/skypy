@@ -203,3 +203,137 @@ def colossus_mf(redshift, model, mdef, m_min, m_max, sky_area, cosmology,
                                         cosmology, sigma8, ns, size, resolution)
 
     return z, m
+
+
+def concentration(mass, mdef, redshift, model, cosmology, sigma8, ns):
+    r'''Halo concentration calculator.
+
+    This function calculates halo concentration(s) using the model of c-M relation
+    available in colossus.
+
+    Parameters
+    ----------
+    mass : float or array_like
+        Spherical overdensity halo mass in units of solar mass/h, corresponding
+        to the mass definition, mdef.
+    mdef : str
+        Halo mass definition for spherical overdensities used by colossus.
+    redshift : float
+        Halo redshift
+    model : string
+        The model of the c-M relation which is available in colossus.
+    cosmology : astropy.cosmology.Cosmology
+        Astropy cosmology object
+    sigma8 : float
+        Cosmology parameter, amplitude of the (linear) power spectrum on the
+        scale of 8 Mpc/h.
+    ns : float
+        Cosmology parameter, spectral index of scalar perturbation power spectrum.
+
+    Returns
+    -------
+    concentration : float or array_like
+        Halo concentration(s); has the same dimensions as mass.
+
+    '''
+    from colossus.cosmology.cosmology import fromAstropy
+    from colossus.halo import concentration
+
+    fromAstropy(cosmology, sigma8=sigma8, ns=ns)
+
+    c = concentration.concentration(mass, mdef, redshift, model)
+
+    return c
+
+
+def radius(mass, concentration, redshift, mdef, Delta, cosmology, sigma8, ns):
+    r'''Calculate the scale radius and the spherical overdensity radius of halo by assuming
+    the NFW model.
+
+    This function calculates the scale radius and any spherical overdensity radius
+    for NFW dark matter halo.
+
+    Parameters
+    ----------
+    mass : float
+        A spherical overdensity halo mass in units of solar mass/h, corresponding
+        to the mass definition, mdef.
+    concentration : float
+        The concentration corresponding to the given halo mass and mass definition.
+    redshift : float
+        The halo redshift value.
+    mdef : str
+        Halo mass definition for spherical overdensities used by colossus.
+    Delta : str
+        The mass definition for which the spherical overdensity radius is computed.
+    cosmology : astropy.cosmology.Cosmology
+        Astropy cosmology object
+    sigma8 : float
+        Cosmology parameter, amplitude of the (linear) power spectrum on the
+        scale of 8 Mpc/h.
+    ns : float
+        Cosmology parameter, spectral index of scalar perturbation power spectrum.
+
+    Returns
+    -------
+    rs : float
+        The scale radius in physical kpc/h.
+    RDelta : float
+        Spherical overdensity radius of a given mass definition Delta.
+
+    '''
+    from colossus.cosmology.cosmology import fromAstropy
+    from colossus.halo import profile_nfw
+
+    fromAstropy(cosmology, sigma8=sigma8, ns=ns)
+
+    prof = profile_nfw.NFWProfile(M=mass, c=concentration, z=redshift, mdef=mdef)
+    rs = prof.par['rs']
+    RDelta = prof.RDelta(redshift, Delta)
+
+    return rs, RDelta
+
+
+def Delta_Sigma(mass, concentration, redshift, mdef, radius, cosmology, sigma8, ns):
+    r'''The excess surface density at given radius by assuming the NFW model.
+
+    This function uses Colossus routines to compute the excess surface density profile,
+    which is defined as Delta_Sigma(R) = Sigma(<R) − Sigma(R).
+
+    Parameters
+    ----------
+    mass : float
+        A spherical overdensity halo mass in units of solar mass/h, corresponding
+        to the mass definition, mdef.
+    concentration : float
+        The concentration corresponding to the given halo mass and mass definition.
+    redshift : float
+        Halo redshift
+    mdef : str
+        Halo mass definition for spherical overdensities used by colossus.
+    radius : float or array_like
+        Radius in physical kpc/h.
+    cosmology : astropy.cosmology.Cosmology
+        Astropy cosmology object
+    sigma8 : float
+        Cosmology parameter, amplitude of the (linear) power spectrum on the
+        scale of 8 Mpc/h.
+    ns : float
+        Cosmology parameter, spectral index of scalar perturbation power spectrum.
+
+    Returns
+    -------
+    DeltaSigma: float or array_like
+        The excess surface density at the given radius, in units of h physical Msun/kpc^2;
+        has the same dimensions as radius.
+
+    '''
+    from colossus.cosmology.cosmology import fromAstropy
+    from colossus.halo import profile_nfw
+
+    fromAstropy(cosmology, sigma8=sigma8, ns=ns)
+
+    prof = profile_nfw.NFWProfile(M=mass, c=concentration, z=redshift, mdef=mdef)
+    deltaSigma = prof.deltaSigma(radius)
+
+    return deltaSigma
