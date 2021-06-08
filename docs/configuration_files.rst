@@ -292,7 +292,7 @@ Tables
 * `Multi-column assignment`: multi-column assignment is performed with any 2d-array, where one of the dimensions is interpreted
   as the rows of the table and the second dimension, as separate columns. Or you can do it from a function that returns a tuple.
 
-  We use multi-column assignment in the following example where we sample different halo properties from a lognormal distribution (returns a tuple of three arrays):
+  We use multi-column assignment in the following example where we sample a two-dimensional array of values from a lognormal distribution and then store them as three columns in a table:
 
   .. code:: yaml
 
