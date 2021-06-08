@@ -331,7 +331,7 @@ Tables
           high: 10.0
           size: 20
       matching:
-        .init: !astropy.table.vstack
+        .init: !astropy.table.hstack
           tables: [ $halos, $galaxies ]
           .depends: [ halos.complete, galaxies.complete ]
 
