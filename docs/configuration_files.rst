@@ -109,7 +109,7 @@ YAML syntax
 YAML_ is a file format designed to be readable by both computers and humans.
 Fundamentally, a file written in YAML consists of a set of key-value pairs.
 Each pair is written as ``key: value``, where whitespace after the ``:`` is optional.
-The hash character (#) denotes the start of a comment and all further text on that
+The hash character ``#`` denotes the start of a comment and all further text on that
 line is ignored by the parser.
 
 
