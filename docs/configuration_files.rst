@@ -211,27 +211,31 @@ Functions
 
 * The `cosmology` to be used by functions within the pipeline only needs to be set up at the top. If a function needs ``cosmology`` as an input, you need not define it again, it is automatically detected.
 
+  For example, calculate the angular size of a galaxy with a given physical size, at a fixed redshift and for a given cosmology:
+
   .. code:: yaml
 
       cosmology: !astropy.cosmology.FlatLambdaCDM
         H0: 70
         Om0: 0.3
-      growth: !skypy.power-spectrum.growth_function
+      size: !skypy.galaxies.morphology.angular_size
+        physical_size: 10 kpc
         redshift: 0.2
 
 * `Job completion`: ``.depends`` can be used to force any function call to wait for completion
   of any other job.
 
   A simple example where, for some reason, the comoving distance needs to be called after
-  completion of the growth function:
+  completion of the angular size function:
 
   .. code:: yaml
 
-    growth: !skypy.power-spectrum.growth_function
+    size: !skypy.galaxies.morphology.angular_size
+      physical_size: 10 kpc
       redshift: 0.2
     comoving_distance: !astropy.cosmology.Planck15.comoving_distance
       z: !numpy.linspace [ 0, 1.3, 10 ]
-      .depends: growth
+      .depends: size
 
   By doing so, you force the function call ``redshift`` to be completed before is used to compute the comoving distance.
 
