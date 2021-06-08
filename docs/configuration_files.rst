@@ -306,8 +306,8 @@ Tables
     radii: !numpy.logspace [ 1, 2, 100 ]
     mass: !numpy.logspace [ 9, 12, 100 ]
     tables:
-      .init: !astropy.table.vstack
-        galaxies: [ $radii, $mass ]
+      galaxies:
+        .init: !astropy.table.vstack [[ $radii, $mass ]]
 
 
 * `Table reference`: when a function call depends on tables, you need to ensure the referenced table has the necessary content and is not empty.
