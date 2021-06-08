@@ -147,8 +147,7 @@ Variables
 
   .. code:: yaml
 
-      cosmo1: !astropy.cosmology.Planck13 # import the Planck13 object and bind to cosmo1
-      cosmo2: !astropy.cosmology.default_cosmology.get [] # call default_cosmology.get() and bind to cosmo2
+      cosmology: !astropy.cosmology.Planck13 # import the Planck13 object and bind it to the variable named "cosmology"
 
 
 Parameters
