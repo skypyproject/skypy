@@ -18,6 +18,7 @@ Getting Started
 
    install
    feature_list
+   configuration_files
    examples/index
 
 .. _user-docs:
