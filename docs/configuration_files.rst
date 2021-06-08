@@ -230,6 +230,7 @@ Functions
 
   .. code:: yaml
 
+    cosmology: !astropy.cosmology.Planck15
     size: !skypy.galaxies.morphology.angular_size
       physical_size: 10 kpc
       redshift: 0.2
