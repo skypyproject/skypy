@@ -31,21 +31,6 @@ def classy(wavenumber, redshift, cosmology, **kwargs):
         spectrum parameters, cosmology. For nz redshifts and nk wavenumbers
         the returned array will have shape (nz, nk).
 
-    Examples
-    --------
-    >>> import numpy as np
-    >>> from astropy.cosmology import default_cosmology
-    >>> cosmology = default_cosmology.get()
-    >>> redshift = np.array([0, 1])
-    >>> wavenumber = np.array([1.e-2, 1.e-1, 1e0])
-    >>> A_s = 2.e-9
-    >>> n_s = 0.965
-    >>> z_reio = 10.
-    >>> classy(wavenumber, redshift, cosmology, A_s, n_s, z_reio)  # doctest: +SKIP
-    array([[2.34758952e+04, 8.70837957e+03],
-           [3.03660813e+03, 1.12836115e+03],
-           [2.53124880e+01, 9.40802814e+00]])
-
     References
     ----------
     doi : 10.1088/1475-7516/2011/07/034
