@@ -1,6 +1,7 @@
 from astropy.cosmology import FlatLambdaCDM, default_cosmology
 from astropy.cosmology.core import Cosmology
 from astropy.io import fits
+from astropy.io.misc.hdf5 import read_table_hdf5
 from astropy.table import Table
 from astropy.table.column import Column
 from astropy.units import Quantity
@@ -11,6 +12,13 @@ import os
 import pytest
 from skypy.pipeline import Pipeline
 from skypy.pipeline._items import Call, Ref
+
+try:
+    import h5py # noqa
+except ImportError:
+    HAS_H5PY = False
+else:
+    HAS_H5PY = True
 
 
 def test_pipeline():
@@ -36,17 +44,22 @@ def test_pipeline():
 
     pipeline = Pipeline(config)
     pipeline.execute()
-    pipeline.write(file_format='fits')
+    output_filename = 'output.fits'
+    pipeline.write(output_filename)
     assert len(pipeline['test_table']) == size
     assert np.all(pipeline['test_table.column1'] < pipeline['test_table.column2'])
-    with fits.open('test_table.fits') as hdu:
-        assert np.all(Table(hdu[1].data) == pipeline['test_table'])
+    with fits.open(output_filename) as hdu:
+        assert np.all(Table(hdu['test_table'].data) == pipeline['test_table'])
+
+    # Test invalid file extension
+    with pytest.raises(ValueError):
+        pipeline.write('output.invalid')
 
     # Check for failure if output files already exist and overwrite is False
     pipeline = Pipeline(config)
     pipeline.execute()
     with pytest.raises(OSError):
-        pipeline.write(file_format='fits', overwrite=False)
+        pipeline.write(output_filename, overwrite=False)
 
     # Check that the existing output files are modified if overwrite is True
     new_size = 2 * size
@@ -55,8 +68,8 @@ def test_pipeline():
     config['tables']['test_table']['column3'].args = [new_string]
     pipeline = Pipeline(config)
     pipeline.execute()
-    pipeline.write(file_format='fits', overwrite=True)
-    with fits.open('test_table.fits') as hdu:
+    pipeline.write(output_filename, overwrite=True)
+    with fits.open(output_filename) as hdu:
         assert len(hdu[1].data) == new_size
 
     # Check for failure if 'column1' requires itself creating a cyclic
@@ -202,7 +215,7 @@ def test_pipeline_read():
     assert isinstance(pipeline['test_int'], int)
     assert isinstance(pipeline['test_float'], float)
     assert isinstance(pipeline['test_str'], str)
-    assert isinstance(pipeline['test_cosmology'], Cosmology)
+    assert isinstance(pipeline['cosmology'], Cosmology)
     assert isinstance(pipeline['test_table_1'], Table)
     assert isinstance(pipeline['test_table_1']['test_column_3'], Column)
 
@@ -237,7 +250,30 @@ def test_column_quantity():
     np.testing.assert_array_less(pipeline['test_table.lengths_in_cm'], 100)
 
 
+@pytest.mark.skipif(not HAS_H5PY, reason='Requires h5py')
+def test_hdf5():
+    size = 100
+    string = size*'a'
+    config = {'tables': {
+              'test_table': {
+                'column1': Call(np.random.uniform, [], {
+                  'size': size}),
+                'column2': Call(np.random.uniform, [], {
+                  'low': Ref('test_table.column1')}),
+                'column3': Call(list, [string], {})}}}
+
+    pipeline = Pipeline(config)
+    pipeline.execute()
+    pipeline.write('output.hdf5')
+    hdf_table = read_table_hdf5('output.hdf5', 'tables/test_table', character_as_bytes=False)
+    assert np.all(hdf_table == pipeline['test_table'])
+
+
 def teardown_module(module):
 
     # Remove fits file generated in test_pipeline
-    os.remove('test_table.fits')
+    os.remove('output.fits')
+
+    # Remove hdf5 file generated in test_hdf5
+    if HAS_H5PY:
+        os.remove('output.hdf5')
