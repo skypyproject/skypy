@@ -22,7 +22,7 @@ visit the SkyPy Collaboration website: `http://skypyproject.org`_
 
 .. _Galaxies: https://skypy.readthedocs.io/en/latest/galaxies.html
 .. _Pipelines: https://skypy.readthedocs.io/en/latest/pipeline/index.html
-.. _full list of features: https://skypy.readthedocs.io/en/latest/main_functionalities.html
+.. _full list of features: https://skypy.readthedocs.io/en/latest/feature_list.html
 .. _SkyPy Documentation: https://skypy.readthedocs.io/en/latest/
 .. _http://skypyproject.org: http://skypyproject.org
 
