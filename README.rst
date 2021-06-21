@@ -10,7 +10,7 @@ random realisations of intrinsic and observed properties, with the
 intention the simulations can then be compared to data as part of an inference
 pipeline.
 
-Currently, SkyPy involves the following modules:
+Currently, SkyPy implements the following modules:
 
 * Galaxies_: morphology, luminosity and redshift distributions
 * Pipelines_ to generate populations of astronomical objects
