@@ -64,15 +64,12 @@ Examples_ that demonstrate how to use it.
 Get in Touch
 ------------
 
-You are welcome to get in touch about the SkyPy package and code
-using our `Discussions page`_.
+You are welcome to talk about the SkyPy package and code using our
+`Discussions Page`_. For any other questions about the project in general,
+please get in touch with the `SkyPy Co-ordinators`_.
 
-Or for any other questions about the project in general, please get in touch with
-the current SkyPy co-ordinators:
-`coordinators@skypyroject.org`_.
-
- .. _Discussions page: https://github.com/skypyproject/skypy/discussions 
- .. _coordinators@skypyroject.org: mailto:skypy-coordinators@googlegroups.com
+ .. _Discussions Page: https://github.com/skypyproject/skypy/discussions 
+ .. _SkyPy Co-ordinators: mailto:skypy-coordinators@googlegroups.com
 
 Contributing
 ------------
