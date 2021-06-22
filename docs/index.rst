@@ -22,12 +22,6 @@ as well as synthetic observed data based on those objects.
 Getting Started
 ***************
 
-.. toctree::
-   :maxdepth: 1
-
-   install
-   importing_skypy
-   running_skypy
 
 .. _user-docs:
 
@@ -49,8 +43,6 @@ Packages
    supernova/index
    utils/index
 
-.. _pipeline-driver-docs:
-
 Pipeline
 --------
 
@@ -66,15 +58,6 @@ Pipeline
 Developer Documentation
 ***********************
 
-The developer documentation contains instructions for how to contribute to
-SkyPy, as well as coding, documentation and testing guidelines
-
-.. toctree::
-   :maxdepth: 1
-
-   Contributing to SkyPy <https://github.com/skypyproject/skypy/blob/master/CONTRIBUTING.md>
-   SkyPy Code of Conduct <https://github.com/skypyproject/skypy/blob/master/CODE_OF_CONDUCT.md>
-   How to Cite SkyPy <https://github.com/skypyproject/skypy/blob/master/CITATION>
 
 .. _project-details:
 
