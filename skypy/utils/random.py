@@ -41,14 +41,6 @@ def schechter(alpha, x_min, x_max, resolution=100, size=None, scale=1.):
     x_sample : array_like
         Samples drawn from the Schechter function.
 
-    Examples
-    --------
-    >>> import skypy.utils.random as random
-    >>> alpha = -1.3
-    >>> sample = random.schechter(alpha, x_min=1e-10, x_max=1e2,
-    ...                           resolution=100, size=1000)
-
-
     References
     ----------
     .. [1] https://en.wikipedia.org/wiki/Luminosity_function_(astronomy)

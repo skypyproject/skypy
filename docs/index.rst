@@ -4,8 +4,15 @@
 SkyPy Documentation
 ###################
 
-This package contains methods for modelling the Universe, galaxies and the Milky Way. Also included are methods for generating observed data.
+This package contains methods for modelling the Universe, galaxies and the
+Milky Way. SkyPy simulates populations of astronomical objects, generating
+random realisations of intrinsic and observed properties, with the
+intention the simulations can then be compared to data as part of an inference
+pipeline.
 
+.. Important:: If you use SkyPy for work presented in a publication or talk
+   please help the project via proper `citation or acknowledgement
+   <https://github.com/skypyproject/skypy/blob/main/CITATION.rst>`_.
 
 .. _getting-started:
 
@@ -18,6 +25,7 @@ Getting Started
 
    install
    feature_list
+   configuration_files
    examples/index
 
 .. _user-docs:
