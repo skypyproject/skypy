@@ -6,6 +6,7 @@ SPHINXOPTS    =
 SPHINXBUILD   = sphinx-build
 PAPER         =
 BUILDDIR      = _build
+GALLERYDIRS   = $(shell python -c 'import conf; print(conf.sphinx_gallery_conf["gallery_dirs"])')
 
 # Internal variables.
 PAPEROPT_a4     = -D latex_paper_size=a4
@@ -39,6 +40,7 @@ clean:
 	-rm -rf $(BUILDDIR)
 	-rm -rf api
 	-rm -rf generated
+	-rm -rf $(GALLERYDIRS)
 
 html:
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html

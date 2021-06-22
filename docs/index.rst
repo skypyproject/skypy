@@ -22,6 +22,13 @@ as well as synthetic observed data based on those objects.
 Getting Started
 ***************
 
+.. toctree::
+   :maxdepth: 1
+
+   install
+   feature_list
+   configuration_files
+   examples/index
 
 .. _user-docs:
 
@@ -35,12 +42,7 @@ Packages
 .. toctree::
    :maxdepth: 1
 
-   cluster/index
-   galaxy
-   gravitational_wave/index
-   halo/index
-   power_spectrum/index
-   supernova/index
+   galaxies
    utils/index
 
 Pipeline
@@ -58,12 +60,22 @@ Pipeline
 Developer Documentation
 ***********************
 
+.. toctree::
+   :maxdepth: 1
+
+   developer/contributing
+
 
 .. _project-details:
 
 ***************
 Project details
 ***************
+
+.. toctree::
+   :maxdepth: 1
+
+   project/code_of_conduct
 
 
 *****

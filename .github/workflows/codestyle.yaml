@@ -2,27 +2,25 @@ name: Code Style
 on:
   push:
     branches:
-      - master
+    - main
+    - module/*
   pull_request:
     branches:
-      - master
+    - main
+    - module/*
 jobs:
-  codestyle:
+  flake8:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v2
-    - name: Install Python 3.6
+    - name: Install Python 3.x
       uses: actions/setup-python@v2
       with:
-        python-version: 3.6
+        python-version: 3.x
     - name: Install Dependencies
       run: |
-        python -m pip install --upgrade pip
         pip install tox
-    - name: Add flake8 Matcher
-      run: |
-        echo ::add-matcher::.github/problem_matchers/flake8.json
     - name: Check Code Style
       run: |
         tox -e codestyle

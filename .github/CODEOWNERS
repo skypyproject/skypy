@@ -1,8 +1,3 @@
 skypy @skypyproject/skypy-infrastructure
-skypy/cluster @skypyproject/cluster-developers
 skypy/galaxy @skypyproject/galaxy-developers
-skypy/gravitational_wave @skypyproject/gravitational-wave-developers
-skypy/halo @skypyproject/halo-developers
-skypy/power_spectrum @skypyproject/power-spectrum-developers
-skypy/supernova @skypyproject/supernova-developers
 CODE_OF_CONDUCT.md @skypyproject/skypy-board
