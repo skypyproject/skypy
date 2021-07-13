@@ -216,12 +216,6 @@ def redshifts_from_comoving_density(redshift, density, sky_area, cosmology, nois
     If the `noise` parameter is set to true, the number of galaxies has Poisson
     noise. If `noise` is false, the expected number of galaxies is used.
 
-    .. warning::
-        The inverse cumulative distribution function is approximated from the
-        number density and comoving volume calculated at the given `redshift`
-        values. The user must choose suitable `redshift` values to satisfy
-        their desired numerical accuracy.
-
     Parameters
     ----------
     redshift : array_like
@@ -240,6 +234,13 @@ def redshifts_from_comoving_density(redshift, density, sky_area, cosmology, nois
     redshifts : array_like
         Sampled redshifts such that the comoving number density of galaxies
         corresponds to the input distribution.
+
+    Warnings
+    --------
+    The inverse cumulative distribution function is approximated from the
+    number density and comoving volume calculated at the given `redshift`
+    values. The user must choose suitable `redshift` values to satisfy their
+    desired numerical accuracy.
 
     '''
 

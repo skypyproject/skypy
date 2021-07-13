@@ -21,12 +21,6 @@ import numpy as np
 def schechter(alpha, x_min, x_max, resolution=100, size=None, scale=1.):
     """Sample from the Schechter function.
 
-    .. warning::
-        The inverse cumulative distribution function is approximated from the
-        Schechter function evaluated on a logarithmically-spaced grid. The user
-        must choose the `resolution` of this grid to satisfy their desired
-        numerical accuracy.
-
     Parameters
     ----------
     alpha : float or int
@@ -46,6 +40,13 @@ def schechter(alpha, x_min, x_max, resolution=100, size=None, scale=1.):
     -------
     x_sample : array_like
         Samples drawn from the Schechter function.
+
+    Warnings
+    --------
+    The inverse cumulative distribution function is approximated from the
+    Schechter function evaluated on a logarithmically-spaced grid. The user
+    must choose the `resolution` of this grid to satisfy their desired
+    numerical accuracy.
 
     References
     ----------
