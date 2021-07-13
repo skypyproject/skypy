@@ -235,6 +235,13 @@ def redshifts_from_comoving_density(redshift, density, sky_area, cosmology, nois
         Sampled redshifts such that the comoving number density of galaxies
         corresponds to the input distribution.
 
+    Warnings
+    --------
+    The inverse cumulative distribution function is approximated from the
+    number density and comoving volume calculated at the given `redshift`
+    values. The user must choose suitable `redshift` values to satisfy their
+    desired numerical accuracy.
+
     '''
 
     # redshift number density
