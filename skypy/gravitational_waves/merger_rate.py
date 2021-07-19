@@ -146,6 +146,7 @@ def m_star_merger_rate(redshift,
     Sample 100 stellar masses values near 10^9 solar masses.
 
     >>> stellar_masses = 10.**(9.0 + np.random.randn(100))
+    >>> redshifts = np.random.uniform(0., 3., 100)
 
     Generate merger rates for these luminosities.
 
