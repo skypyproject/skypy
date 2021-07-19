@@ -10,6 +10,7 @@ Merger Rates
    :toctree: ../api/
 
    b_band_merger_rate
+   m_star_merger_rate
 
 """
 
