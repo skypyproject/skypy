@@ -18,18 +18,19 @@ def test_abadie_rates():
     table_value = abadie_table_III['NS-NS']['low']
     assert np.isclose(L_B_rate.to_value(1/units.year), table_value, rtol=1e-5)
 
+
 def test_artale_rates():
 
     # Check the number of merger rates returned
     redshifts = np.random.uniform(0., 3., 100)
     stellar_masses = 10.**(9.0 + np.random.randn(100))
-    rates = m_star_merger_rate(redshifts, stellar_masses, population='NS-NS')
+    rates = m_star_merger_rate(redshifts, stellar_masses * units.Msun, population='NS-NS')
     assert len(rates) == len(stellar_masses)
 
     # Test that a luminosity of M_sol  returns a
     # rate that matches the value in Artale Table I
-    m_sol = constants.Msun.to_value('Msun')
-    m_sol_rate = m_star_merger_rate(0.0, m_sol, population='NS-NS')
+    m_sol = constants.M_sun.to_value('M_sun')
+    m_sol_rate = m_star_merger_rate(0.0, m_sol * units.Msun, population='NS-NS')
     alpha1 = artale_tables['NS-NS']['alpha1'][0]
     alpha2 = artale_tables['NS-NS']['alpha2'][0]
     table_value = 10.**(alpha1 * np.log10(m_sol) + alpha2)

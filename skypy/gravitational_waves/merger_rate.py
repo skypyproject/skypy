@@ -32,7 +32,7 @@ abadie_table_III = {
 }
 
 artale_tables = {
-    'NS-NS' : {
+    'NS-NS': {
             'redshift': [0.1, 1.0, 2.0, 6.0],
             'alpha1': [1.038, 1.109, 1.050, 1.027],
             'alpha1_err': [0.001, 0.001, 0.001, 0.003],
@@ -52,8 +52,8 @@ artale_tables = {
             'gamma3_err': [0.005, 0.003, 0.002, 0.004],
             'gamma4': [-1.968, -3.795, -5.451, -6.104],
             'gamma4_err': [0.026, 0.019, 0.017, 0.037],
-    }
-    'NS-BH' : {
+    },
+    'NS-BH': {
             'redshift': [0.1, 1.0, 2.0, 6.0],
             'alpha1': [0.824, 0.873, 0.913, 0.965],
             'alpha1_err': [0.001, 0.001, 0.001, 0.002],
@@ -73,8 +73,8 @@ artale_tables = {
             'gamma3_err': [0.004, 0.004, 0.003, 0.004],
             'gamma4': [-5.434, -7.733, -7.055, -4.386],
             'gamma4_err': [0.022, 0.023, 0.018, 0.034],
-    }
-    'BH-BH' : {
+    },
+    'BH-BH': {
             'redshift': [0.1, 1.0, 2.0, 6.0],
             'alpha1': [0.807, 0.813, 0.831, 0.933],
             'alpha1_err': [0.001, 0.001, 0.001, 0.004],
@@ -154,57 +154,60 @@ def m_star_merger_rate(redshift,
     ...                            population='NS-NS')
 
     """
-    
+
     alpha1 = np.interp(redshift,
-                         artale_tables[population]['redshift'],
-                         artale_tables[population]['alpha1'])
+                       artale_tables[population]['redshift'],
+                       artale_tables[population]['alpha1'])
     alpha2 = np.interp(redshift,
-                         artale_tables[population]['redshift'],
-                         artale_tables[population]['alpha2'])
+                       artale_tables[population]['redshift'],
+                       artale_tables[population]['alpha2'])
 
     return _m_star_merger_rate(m_star, alpha1, alpha2)
+
 
 def m_star_sfr_merger_rate(redshift,
                            m_star,
                            sfr,
                            population):
-    
+
     beta1 = np.interp(redshift,
-                         artale_tables[population]['redshift'],
-                         artale_tables[population]['beta1'])
+                      artale_tables[population]['redshift'],
+                      artale_tables[population]['beta1'])
     beta2 = np.interp(redshift,
-                         artale_tables[population]['redshift'],
-                         artale_tables[population]['beta2'])
+                      artale_tables[population]['redshift'],
+                      artale_tables[population]['beta2'])
     beta3 = np.interp(redshift,
-                         artale_tables[population]['redshift'],
-                         artale_tables[population]['beta3'])
+                      artale_tables[population]['redshift'],
+                      artale_tables[population]['beta3'])
 
     return _m_star_sfr_merger_rate(m_star, sfr, beta1, beta2, beta3)
 
+
 def m_star_sfr_metallicity_merger_rate(redshift,
-                           m_star,
-                           sfr,
-                           Z,
-                           population):
-    
+                                       m_star,
+                                       sfr,
+                                       Z,
+                                       population):
+
     gamma1 = np.interp(redshift,
-                         artale_table_I[population]['redshift'],
-                         artale_table_I[population]['gamma1'])
+                       artale_tables[population]['redshift'],
+                       artale_tables[population]['gamma1'])
     gamma2 = np.interp(redshift,
-                         artale_table_I[population]['redshift'],
-                         artale_table_I[population]['gamma2'])
+                       artale_tables[population]['redshift'],
+                       artale_tables[population]['gamma2'])
     gamma3 = np.interp(redshift,
-                         artale_table_I[population]['redshift'],
-                         artale_table_I[population]['gamma3'])
+                       artale_tables[population]['redshift'],
+                       artale_tables[population]['gamma3'])
     gamma4 = np.interp(redshift,
-                         artale_table_I[population]['redshift'],
-                         artale_table_I[population]['gamma4'])
+                       artale_tables[population]['redshift'],
+                       artale_tables[population]['gamma4'])
 
     return _m_star_sfr_metallicity_merger_rate(m_star, sfr, Z, gamma1, gamma2, gamma3, gamma4)
 
+
 def _m_star_merger_rate(m_star,
-                       alpha1,
-                       alpha2):
+                        alpha1,
+                        alpha2):
 
     m_star = m_star.to(units.Msun).value
 
@@ -212,11 +215,12 @@ def _m_star_merger_rate(m_star,
 
     return n_gw / units.Gyr
 
+
 def _m_star_sfr_merger_rate(m_star,
-                           sfr,
-                           beta1,
-                           beta2,
-                           beta3):
+                            sfr,
+                            beta1,
+                            beta2,
+                            beta3):
 
     m_star = m_star.to(units.Msun).value
     sfr = sfr.to(units.Msun / units.year)
@@ -225,13 +229,14 @@ def _m_star_sfr_merger_rate(m_star,
 
     return n_gw / units.Gyr
 
+
 def _m_star_sfr_metallicity_merger_rate(m_star,
-                                       sfr,
-                                       Z,
-                                       gamma1,
-                                       gamma2,
-                                       gamma3,
-                                       gamma4):
+                                        sfr,
+                                        Z,
+                                        gamma1,
+                                        gamma2,
+                                        gamma3,
+                                        gamma4):
 
     m_star = m_star.to(units.Msun).value
     sfr = sfr.to(units.Msun / units.year)
@@ -239,6 +244,7 @@ def _m_star_sfr_metallicity_merger_rate(m_star,
     n_gw = 10.**(gamma1 * np.log10(m_star) + gamma2 * np.log10(sfr) + gamma3 * np.log10(Z) + gamma4)
 
     return n_gw / units.Gyr
+
 
 def b_band_merger_rate(luminosity,
                        population='NS-NS',
