@@ -4,18 +4,27 @@ SkyPy: A package for modelling the Universe
 
 |Read the Docs| |GitHub| |Codecov|
 
-This package contains methods for modelling the Universe, galaxies and the Milky
-Way. Also included are methods for generating observed data.
+This package contains methods for modelling the Universe, galaxies and the
+Milky Way. SkyPy simulates populations of astronomical objects, generating
+random realisations of intrinsic and observed properties, with the
+intention the simulations can then be compared to data as part of an inference
+pipeline.
+
+Currently, SkyPy implements the following modules:
 
 * Galaxies_: morphology, luminosity and redshift distributions
 * Pipelines_ to generate populations of astronomical objects
 
-The full list of features can be found in the `SkyPy Documentation`_.
+The `full list of features`_ can be found in the `SkyPy Documentation`_.
+
+For more information on the people involved and how SkyPy is developed, please
+visit the SkyPy Collaboration website: `http://skypyproject.org`_
 
 .. _Galaxies: https://skypy.readthedocs.io/en/latest/galaxies.html
 .. _Pipelines: https://skypy.readthedocs.io/en/latest/pipeline/index.html
+.. _full list of features: https://skypy.readthedocs.io/en/latest/feature_list.html
 .. _SkyPy Documentation: https://skypy.readthedocs.io/en/latest/
-
+.. _http://skypyproject.org: http://skypyproject.org
 
 Citation
 --------
@@ -51,6 +60,16 @@ Examples_ that demonstrate how to use it.
 .. _Pipeline: https://skypy.readthedocs.io/en/stable/pipeline/index.html
 .. _Examples: https://skypy.readthedocs.io/en/stable/examples/index.html
 
+
+Get in Touch
+------------
+
+You are welcome to talk about the SkyPy package and code using our
+`Discussions Page`_. For any other questions about the project in general,
+please get in touch with the `SkyPy Co-ordinators`_.
+
+ .. _Discussions Page: https://github.com/skypyproject/skypy/discussions 
+ .. _SkyPy Co-ordinators: mailto:skypy-coordinators@googlegroups.com
 
 Contributing
 ------------
