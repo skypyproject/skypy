@@ -141,6 +141,7 @@ def m_star_merger_rate(redshift,
     Examples
     --------
     >>> import numpy as np
+    >>> from astropy import units
     >>> from skypy.gravitational_waves import m_star_merger_rate
 
     Sample 100 stellar masses values near 10^9 solar masses.
@@ -151,7 +152,7 @@ def m_star_merger_rate(redshift,
     Generate merger rates for these luminosities.
 
     >>> rates = m_star_merger_rate(redshifts,
-    ...                            stellar_masses,
+    ...                            stellar_masses * units.Msun,
     ...                            population='NS-NS')
 
     """
