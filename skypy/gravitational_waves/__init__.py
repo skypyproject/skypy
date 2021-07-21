@@ -12,6 +12,7 @@ Merger Rates
    b_band_merger_rate
    m_star_merger_rate
    m_star_sfr_merger_rate
+   m_star_sfr_metallicity_merger_rate
 
 """
 
