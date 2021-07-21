@@ -220,7 +220,7 @@ def m_star_sfr_merger_rate(redshift,
     --------
     >>> import numpy as np
     >>> from astropy import units
-    >>> from skypy.gravitational_waves import m_star_merger_rate
+    >>> from skypy.gravitational_waves import m_star_sfr_merger_rate
 
     Sample 100 redshifts.
 
@@ -236,10 +236,10 @@ def m_star_sfr_merger_rate(redshift,
 
     Generate merger rates for these luminosities.
 
-    >>> rates = m_star_merger_rate(redshifts,
-    ...                            stellar_masses * units.Msun,
-    ...                            sfrs * units.Msun / units.year,
-    ...                            population='NS-NS')
+    >>> rates = m_star_sfr_merger_rate(redshifts,
+    ...                                stellar_masses * units.Msun,
+    ...                                sfrs * units.Msun / units.year,
+    ...                                population='NS-NS')
 
     """
 
