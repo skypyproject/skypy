@@ -25,13 +25,13 @@ in SkyPy.
 #
 # In ``SkyPy``, we can sample 3D ellipticities using the
 # :func:`skypy.galaxies.morphology.ryden04_ellipticity()` distribution
-# described above [1]_.
+# described above [1].
 #
 # Validation plot with SDSS Data
 # ------------------------------
 #
 # Here we validate our function by comparing our ``SkyPy`` simulated galaxy
-# ellipticities against observational data from SDSS DR1 in Figure 1 [1]_.
+# ellipticities against observational data from SDSS DR1 in Figure 1 [1].
 # You can download the data file
 # :download:`SDSS_ellipticity <../../../examples/galaxies/SDSS_ellipticity.txt>`,
 # stored as a 2D array: ellipticity_X, ellipticity_T.
@@ -52,7 +52,7 @@ q_amSDSS = np.sqrt((1 - e)/(1 + e))
 # ``SkyPy`` function
 # :func:`skypy.galaxies.morphology.ryden04_ellipticity()` and the
 # best fit parameters
-# given in Ryden 2004 [1]_:
+# given in Ryden 2004 [1]:
 # :math:`\mu_\gamma =0.222`, :math:`\sigma_\gamma=0.057`, :math:`\mu =-1.85`
 # and :math:`\sigma=0.89`.
 #
