@@ -35,7 +35,7 @@ in SkyPy.
 # Here we validate our function by comparing our ``SkyPy`` simulated galaxy
 # ellipticities against observational data from SDSS DR1 in Figure 1 [1].
 # You can download the data file
-# :download:`SDSS_ellipticity <../../../examples/galaxies/SDSS_ellipticity.txt>`,
+# :download:`SDSS_ellipticity <../../../examples/galaxies/SDSS_ellipticity.npz>`,
 # stored as a 2D array: :math:`e_1`, :math:`e_2`.
 #
 
