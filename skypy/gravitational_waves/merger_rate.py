@@ -255,7 +255,7 @@ def m_star_sfr_metallicity_merger_rate(redshift,
 
     Parameters
     ----------
-    redshift : (ngal,) array-like
+    redshift : (ngal,) array_like
         The redshifts of the galaxies to generate merger
         rates for.
     m_star : (ngal,) array-like
