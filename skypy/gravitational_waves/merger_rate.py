@@ -275,7 +275,7 @@ def m_star_sfr_metallicity_merger_rate(redshift,
 
     Returns
     -------
-    merger_rate : array_like
+    merger_rate : (ngal,) array_like
         Merger rates for the galaxies in units of Gigayear^-1
 
     Notes
