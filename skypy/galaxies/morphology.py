@@ -251,6 +251,11 @@ def ryden04_ellipticity(mu_gamma, sigma_gamma, mu, sigma, size=None):
     size : int or tuple of ints or None
         Size of the sample. If `None` the size is inferred from the parameters.
 
+    Returns
+    -------
+    ellipticity: (ng,) array_like
+        Ellipticity distribution sampled from the Ryden 2004 model [1].
+
     References
     ----------
     .. [1] Ryden B. S., 2004, ApJ, 601, 214
