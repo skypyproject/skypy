@@ -23,9 +23,11 @@ in SkyPy.
 # with mean :math:`\mu` and standard deviation :math:`\sigma`.
 #
 #
-# In ``SkyPy``, we can sample 3D ellipticities using the
-# :func:`skypy.galaxies.morphology.ryden04_ellipticity()` distribution
-# described above [1].
+# The func:`skypy.galaxies.morphology.ryden04_ellipticity()` model samples
+# projected 2D axis ratios. Specifically, it samples the axis ratios of the
+# 3D ellipsoid according to the description above [1] and
+# then randomly projects them using triaxial_axis_ratio().
+#
 #
 # Validation plot with SDSS Data
 # ------------------------------
