@@ -31,7 +31,7 @@ def test_artale_rates():
     rates = m_star_merger_rate(redshifts, stellar_masses * units.Msun, population='NS-NS')
     assert len(rates) == len(stellar_masses)
 
-    # Test that a luminosity of M_sol  returns a
+    # Test that a luminosity of M_sol returns a
     # rate that matches the value in Artale Table I
     m_sol = constants.M_sun.to_value('M_sun')
     sol_rate = m_star_merger_rate(0.0, m_sol * units.Msun, population='NS-NS')
