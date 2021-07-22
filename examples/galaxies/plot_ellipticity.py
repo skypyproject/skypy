@@ -26,7 +26,8 @@ in SkyPy.
 # The func:`skypy.galaxies.morphology.ryden04_ellipticity()` model samples
 # projected 2D axis ratios. Specifically, it samples the axis ratios of the
 # 3D ellipsoid according to the description above [1] and
-# then randomly projects them using triaxial_axis_ratio().
+# then randomly projects them using
+# :func:`skypy.utils.random.triaxial_axis_ratio()`.
 #
 #
 # Validation plot with SDSS Data
