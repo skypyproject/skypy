@@ -103,7 +103,8 @@ artale_tables = {
 def m_star_merger_rate(redshift,
                        m_star,
                        population):
-    r"""Model of Artale et al (2020), equation (1) with parameters
+    r"""M_star merger rate.
+    Model of Artale et al (2020), equation (1) with parameters
     from Tables I, II and III.
 
     Compact binary merger rates as a log-log function of a galaxy's
