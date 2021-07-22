@@ -253,7 +253,7 @@ def ryden04_ellipticity(mu_gamma, sigma_gamma, mu, sigma, size=None):
 
     Returns
     -------
-    ellipticity: (ng,) array_like
+    ellipticity: (size,) array_like
         Ellipticity distribution sampled from the Ryden 2004 model [1].
 
     References
