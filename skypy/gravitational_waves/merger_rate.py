@@ -118,7 +118,7 @@ def m_star_merger_rate(redshift,
     redshift : (ngal,) array-like
         The redshifts of the galaxies to generate merger
         rates for.
-    m_star : (ngal,) array-like
+    m_star : (ngal,) array_like
         The stellar mass of the galaxies to generate merger
         rates for, in units of stellar mass.
     population : {'NS-NS', 'NS-BH', 'BH-BH'}
