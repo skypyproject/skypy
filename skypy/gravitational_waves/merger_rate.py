@@ -261,7 +261,7 @@ def m_star_sfr_metallicity_merger_rate(redshift,
     m_star : (ngal,) array-like
         The stellar mass of the galaxies to generate merger
         rates for, in units of stellar mass.
-    sfr : (ngal,) array-like
+    sfr : (ngal,) array_like
         The star formation rate of the galaxies to generate
         merger rates for, in units of stellar mass per year
     Z : (ngal,) array-like
