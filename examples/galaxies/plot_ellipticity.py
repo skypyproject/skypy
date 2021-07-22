@@ -36,15 +36,17 @@ in SkyPy.
 # ellipticities against observational data from SDSS DR1 in Figure 1 [1].
 # You can download the data file
 # :download:`SDSS_ellipticity <../../../examples/galaxies/SDSS_ellipticity.txt>`,
-# stored as a 2D array: ellipticity_X, ellipticity_T.
+# stored as a 2D array: :math:`e_1`, :math:`e_2`.
 #
 
 import numpy as np
 
 # Load SDSS data from Fig. 1 in Ryden 2004
-eX, eT = np.loadtxt('SDSS_ellipticity.txt', unpack=True)
-Ngal = len(eX)
-e = np.hypot(eX, eT)
+data = np.load('SDSS_ellipticity.npz')
+e1, e2 = data['sdss']['e1'], data['sdss']['e2']
+
+Ngal = len(e1)
+e = np.hypot(e1, e2)
 q_amSDSS = np.sqrt((1 - e)/(1 + e))
 
 
