@@ -161,7 +161,8 @@ def m_star_sfr_merger_rate(redshift,
                            m_star,
                            sfr,
                            population):
-    r"""Model of Artale et al (2020), equation (2) with parameters
+    r"""M_star SFR merger rate.
+    Model of Artale et al (2020), equation (2) with parameters
     from Tables I, II and III.
 
     Compact binary merger rates as a power law function of a galaxy's
@@ -172,13 +173,13 @@ def m_star_sfr_merger_rate(redshift,
 
     Parameters
     ----------
-    redshift : (ngal,) array-like
+    redshift : (ngal,) array_like
         The redshifts of the galaxies to generate merger
         rates for.
-    m_star : (ngal,) array-like
+    m_star : (ngal,) array_like
         The stellar mass of the galaxies to generate merger
         rates for, in units of stellar mass.
-    sfr : (ngal,) array-like
+    sfr : (ngal,) array_like
         The star formation rate of the galaxies to generate
         merger rates for, in units of stellar mass per year
     population : {'NS-NS', 'NS-BH', 'BH-BH'}
@@ -226,7 +227,8 @@ def m_star_sfr_metallicity_merger_rate(redshift,
                                        sfr,
                                        Z,
                                        population):
-    r"""Model of Artale et al (2020), equation (3) with parameters
+    r"""M_star SFR Metallicity merger rate.
+    Model of Artale et al (2020), equation (3) with parameters
     from Tables I, II and III.
 
     Compact binary merger rates as a power law function of a galaxy's
@@ -240,7 +242,7 @@ def m_star_sfr_metallicity_merger_rate(redshift,
     redshift : (ngal,) array_like
         The redshifts of the galaxies to generate merger
         rates for.
-    m_star : (ngal,) array-like
+    m_star : (ngal,) array_like
         The stellar mass of the galaxies to generate merger
         rates for, in units of stellar mass.
     sfr : (ngal,) array_like
@@ -303,7 +305,7 @@ def b_band_merger_rate(luminosity,
 
     Parameters
     ----------
-    luminosity : (ngal,) array-like
+    luminosity : (ngal,) array_like
         The B-band luminosity of the galaxies to generate merger
         rates for, in units of solar luminosity.
     population : {'NS-NS', 'NS-BH', 'BH-BH'}
