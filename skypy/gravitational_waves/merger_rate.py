@@ -107,7 +107,7 @@ def m_star_merger_rate(redshift,
     Model of Artale et al (2020), equation (1) with parameters
     from Tables I, II and III.
 
-    Compact binary merger rates as a log-log function of a galaxy's
+    Compact binary merger rates as a power law function of a galaxy's
     stellar mass.
 
     Parameters are redshift dependent, with linear interpolation
@@ -141,8 +141,6 @@ def m_star_merger_rate(redshift,
         Volume 491, Issue 3, p.3419-3434 (2020)
         https://arxiv.org/abs/1910.04890
 
-   
-
     """
 
     alpha1 = np.interp(redshift,
@@ -152,7 +150,11 @@ def m_star_merger_rate(redshift,
                        artale_tables[population]['redshift'],
                        artale_tables[population]['alpha2'])
 
-    return _m_star_merger_rate(m_star, alpha1, alpha2)
+    m_star = m_star.to(units.Msun).value
+
+    n_gw = 10.**(alpha1 * np.log10(m_star) + alpha2)
+
+    return n_gw / units.Gyr
 
 
 def m_star_sfr_merger_rate(redshift,
@@ -162,7 +164,7 @@ def m_star_sfr_merger_rate(redshift,
     r"""Model of Artale et al (2020), equation (2) with parameters
     from Tables I, II and III.
 
-    Compact binary merger rates as a log-log function of a galaxy's
+    Compact binary merger rates as a power law function of a galaxy's
     stellar mass.
 
     Parameters are redshift dependent, with linear interpolation
@@ -199,31 +201,6 @@ def m_star_sfr_merger_rate(redshift,
         Volume 491, Issue 3, p.3419-3434 (2020)
         https://arxiv.org/abs/1910.04890
 
-    Examples
-    --------
-    >>> import numpy as np
-    >>> from astropy import units
-    >>> from skypy.gravitational_waves import m_star_sfr_merger_rate
-
-    Sample 100 redshifts.
-
-    >>> redshifts = np.random.uniform(0., 3., 100)
-
-    Sample 100 stellar masses values near 10^9 solar masses.
-
-    >>> stellar_masses = 10.**(9.0 + np.random.randn(100))
-
-    Sample 100 star formation rates.
-
-    >>> sfrs = 10.**(np.random.randn(100))
-
-    Generate merger rates for these luminosities.
-
-    >>> rates = m_star_sfr_merger_rate(redshifts,
-    ...                                stellar_masses * units.Msun,
-    ...                                sfrs * units.Msun / units.year,
-    ...                                population='NS-NS')
-
     """
 
     beta1 = np.interp(redshift,
@@ -236,7 +213,12 @@ def m_star_sfr_merger_rate(redshift,
                       artale_tables[population]['redshift'],
                       artale_tables[population]['beta3'])
 
-    return _m_star_sfr_merger_rate(m_star, sfr, beta1, beta2, beta3)
+    m_star = m_star.to(units.Msun).value
+    sfr = sfr.to(units.Msun / units.year).value
+
+    n_gw = 10.**(beta1 * np.log10(m_star) + beta2 * np.log10(sfr) + beta3)
+
+    return n_gw / units.Gyr
 
 
 def m_star_sfr_metallicity_merger_rate(redshift,
@@ -247,7 +229,7 @@ def m_star_sfr_metallicity_merger_rate(redshift,
     r"""Model of Artale et al (2020), equation (3) with parameters
     from Tables I, II and III.
 
-    Compact binary merger rates as a log-log function of a galaxy's
+    Compact binary merger rates as a power law function of a galaxy's
     stellar mass.
 
     Parameters are redshift dependent, with linear interpolation
@@ -287,8 +269,6 @@ def m_star_sfr_metallicity_merger_rate(redshift,
         Volume 491, Issue 3, p.3419-3434 (2020)
         https://arxiv.org/abs/1910.04890
 
-    
-
     """
 
     gamma1 = np.interp(redshift,
@@ -303,42 +283,6 @@ def m_star_sfr_metallicity_merger_rate(redshift,
     gamma4 = np.interp(redshift,
                        artale_tables[population]['redshift'],
                        artale_tables[population]['gamma4'])
-
-    return _m_star_sfr_metallicity_merger_rate(m_star, sfr, Z, gamma1, gamma2, gamma3, gamma4)
-
-
-def _m_star_merger_rate(m_star,
-                        alpha1,
-                        alpha2):
-
-    m_star = m_star.to(units.Msun).value
-
-    n_gw = 10.**(alpha1 * np.log10(m_star) + alpha2)
-
-    return n_gw / units.Gyr
-
-
-def _m_star_sfr_merger_rate(m_star,
-                            sfr,
-                            beta1,
-                            beta2,
-                            beta3):
-
-    m_star = m_star.to(units.Msun).value
-    sfr = sfr.to(units.Msun / units.year).value
-
-    n_gw = 10.**(beta1 * np.log10(m_star) + beta2 * np.log10(sfr) + beta3)
-
-    return n_gw / units.Gyr
-
-
-def _m_star_sfr_metallicity_merger_rate(m_star,
-                                        sfr,
-                                        Z,
-                                        gamma1,
-                                        gamma2,
-                                        gamma3,
-                                        gamma4):
 
     m_star = m_star.to(units.Msun).value
     sfr = sfr.to(units.Msun / units.year).value
@@ -384,21 +328,6 @@ def b_band_merger_rate(luminosity,
     .. Abadie et al. 2010, Classical and Quantum Gravity,
         Volume 27, Issue 17, article id. 173001 (2010)
         https://arxiv.org/abs/1003.2480
-
-    Examples
-    --------
-    >>> import numpy as np
-    >>> from skypy.gravitational_waves import b_band_merger_rate
-
-    Sample 100 luminosity values near absolute magnitude -20.5.
-
-    >>> luminosities = 10.**(-0.4*(-20.5 + np.random.randn(100)))
-
-    Generate merger rates for these luminosities.
-
-    >>> rates = b_band_merger_rate(luminosities,
-    ...                            population='NS-NS',
-    ...                            optimism='low')
 
     """
 

@@ -28,10 +28,23 @@ def test_artale_rates():
     # Check the number of merger rates returned
     redshifts = np.random.uniform(0., 3., 100)
     stellar_masses = 10.**(9.0 + np.random.randn(100))
+    sfrs = 10.**(np.random.randn(100))
+    metallicities = 10.**(-2.0 + np.random.randn(100))
     rates = m_star_merger_rate(redshifts, stellar_masses * units.Msun, population='NS-NS')
     assert len(rates) == len(stellar_masses)
+    rates = m_star_sfr_merger_rate(redshifts,
+                                   stellar_masses * units.Msun,
+                                   sfrs * units.Msun / units.year,
+                                   population='NS-NS')
+    assert len(rates) == len(stellar_masses)
+    rates = m_star_sfr_metallicity_merger_rate(redshifts,
+                                               stellar_masses * units.Msun,
+                                               sfrs * units.Msun / units.year,
+                                               metallicities,
+                                               population='NS-NS')
+    assert len(rates) == len(stellar_masses)
 
-    # Test that a luminosity of M_sol returns a
+    # Test that a stellar mass of M_sol returns a
     # rate that matches the value in Artale Table I
     m_sol = constants.M_sun.to_value('M_sun')
     sol_rate = m_star_merger_rate(0.0, m_sol * units.Msun, population='NS-NS')
@@ -40,7 +53,7 @@ def test_artale_rates():
     table_value = 10.**(alpha1 * np.log10(m_sol) + alpha2)
     assert np.isclose(sol_rate.to_value(1/units.Gyr), table_value, rtol=1e-5)
 
-    # Test that a luminosity of M_sol and SFR of 1 returns a
+    # Test that a stellar mass of M_sol and SFR of 1 returns a
     # rate that matches the value in Artale Table I
     m_sol = constants.M_sun.to_value('M_sun')
     sfr_1 = 1.
@@ -53,7 +66,7 @@ def test_artale_rates():
     table_value = 10.**(beta1 * np.log10(m_sol) + beta2 * np.log10(sfr_1) + beta3)
     assert np.isclose(sol_rate.to_value(1/units.Gyr), table_value, rtol=1e-5)
 
-    # Test that a luminosity of M_sol, SFR of 1 and Z of 0.012 returns a
+    # Test that a stellar mass of M_sol, SFR of 1 and Z of 0.012 returns a
     # rate that matches the value in Artale Table I
     m_sol = constants.M_sun.to_value('M_sun')
     sfr_1 = 1.
