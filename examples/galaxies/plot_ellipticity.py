@@ -12,23 +12,21 @@ in SkyPy.
 # 3D ellipticity istribution
 # --------------------------
 #
-# In Ryden 2004 [1]_, ...
+# In Ryden 2004 [1]_, the ellipticity is sampled by randomly projecting
+# a 3D ellipsoid with principal axes :math:`A > B > C`.
 #
-# .. math::
+# The distribution of the axis ratio :math:`\gamma = C/A` is a truncated
+# normal with mean :math:`\mu_\gamma` and standard deviation
+# :math:`\sigma_\gamma`.
 #
-#    \log_{10} (\bar{R}/{\rm kpc}) = -0.4aM + b,
+# The distribution of :math:`\epsilon = \log(1 - B/A)` is truncated normal
+# with mean :math:`\mu` and standard deviation :math:`\sigma`.
 #
-# with :math:`a` and :math:`b` fitting constants. Likewise, late-type galaxies
-# follow Equation 15:
 #
-
-import numpy as np
-import matplotlib.pyplot as plt
-from skypy.galaxies.morphology import ryden04_ellipticity
-
-# %%
 # Ellipticity SDSS Data
 # ---------------------
+
+import numpy as np
 
 # Load SDSS data from Fig. 1 in Ryden 2004
 result_e1, result_e2 = np.loadtxt('SDSS_ellipticity.txt', unpack=True)
@@ -47,6 +45,8 @@ mu_gamma, sigma_gamma, mu, sigma = 0.222, 0.057, -1.85, 0.89
 #
 # We use the Ryden04 model in SkyPy.
 
+from skypy.galaxies.morphology import ryden04_ellipticity
+
 # Binning scheme of Fig. 1
 bins = np.linspace(0, 1, 41)
 mid = 0.5 * (bins[:-1] + bins[1:])
@@ -55,8 +55,8 @@ mid = 0.5 * (bins[:-1] + bins[1:])
 mean = np.zeros(len(bins)-1)
 var = np.zeros(len(bins)-1)
 
-# Create 16,000 SkyPy realisations
-for i in range(16000):
+# Create 100 SkyPy realisations
+for i in range(100):
     # sample ellipticity
     e = ryden04_ellipticity(mu_gamma, sigma_gamma, mu, sigma, size=Ngal)
     # recover axis ratio from ellipticity
@@ -78,6 +78,8 @@ std = np.sqrt(var)
 # Plot
 # ----
 #
+
+import matplotlib.pyplot as plt
 
 plt.hist(q_amSDSS, range=[0, 1], bins=40, histtype='step',
          ec='k', lw=0.5, label='SDSS data')
