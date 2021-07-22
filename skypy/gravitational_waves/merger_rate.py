@@ -287,35 +287,7 @@ def m_star_sfr_metallicity_merger_rate(redshift,
         Volume 491, Issue 3, p.3419-3434 (2020)
         https://arxiv.org/abs/1910.04890
 
-    Examples
-    --------
-    >>> import numpy as np
-    >>> from astropy import units
-    >>> from skypy.gravitational_waves import m_star_sfr_metallicity_merger_rate
-
-    Sample 100 redshifts.
-
-    >>> redshifts = np.random.uniform(0., 3., 100)
-
-    Sample 100 stellar masses values near 10^9 solar masses.
-
-    >>> stellar_masses = 10.**(9.0 + np.random.randn(100))
-
-    Sample 100 star formation rates.
-
-    >>> sfrs = 10.**(np.random.randn(100))
-
-    Sample 100 metallicities.
-
-    >>> metallicities = 10.**(-2.0 + np.random.randn(100))
-
-    Generate merger rates for these luminosities.
-
-    >>> rates = m_star_sfr_metallicity_merger_rate(redshifts,
-    ...                                            stellar_masses * units.Msun,
-    ...                                            sfrs * units.Msun / units.year,
-    ...                                            metallicities,
-    ...                                            population='NS-NS')
+    
 
     """
 
