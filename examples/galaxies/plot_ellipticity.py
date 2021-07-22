@@ -25,14 +25,22 @@ in SkyPy.
 #
 # Ellipticity SDSS Data
 # ---------------------
+#
+# Here we reproduce Figure 1 from [1]_, comparing our simulated galaxy
+# ellipticities against observational data from SDSS DR1.
+# You can download the data file
+# :download:`SDSS_ellipticity <../../../examples/galaxies/SDSS_ellipticity.txt>`.
+# stored as a 2D array: ellipticity_X, ellipticity_T.
+#
+# The best fit parameters [1]_:
+# :math:`\mu_\gamma, \sigma_\gamma, \mu, \sigma = 0.222, 0.057, -1.85, 0.89`.
 
 import numpy as np
 
 # Load SDSS data from Fig. 1 in Ryden 2004
-result_e1, result_e2 = np.loadtxt('SDSS_ellipticity.txt', unpack=True)
-
-Ngal = len(result_e1)
-e = np.hypot(result_e1, result_e2)
+eX, eT = np.loadtxt('SDSS_ellipticity.txt', unpack=True)
+Ngal = len(eX)
+e = np.hypot(eX, eT)
 q_amSDSS = np.sqrt((1 - e)/(1 + e))
 
 # Best fit parameters from Fig. 1 in Ryden 2004
@@ -86,7 +94,7 @@ plt.hist(q_amSDSS, range=[0, 1], bins=40, histtype='step',
 plt.errorbar(mid, mean, yerr=std, fmt='.r', ms=4, capsize=3,
              lw=0.5, mew=0.5, label='SkyPy model')
 
-plt.xlabel(r'Axis ratio, ${\rm q}_{\rm am}$')
+plt.xlabel(r'Axis ratio, $q_{am}$')
 plt.ylabel(r'N')
 plt.legend(frameon=False)
 plt.show()
