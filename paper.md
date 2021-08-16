@@ -30,6 +30,9 @@ authors:
   - name: Ian W. Harry
     orcid: 0000-0002-5304-9372
     affiliation: 1
+  - name: William G. Hartley
+    orcid: 0000-0002-5304-9372
+    affiliation: 6
   - name: Coleman Krawczyk
     orcid: 0000-0001-9233-2341
     affiliation: 1
@@ -38,28 +41,28 @@ authors:
     affiliation: 1
   - name: Brian Nord
     orcid: 0000-0001-6706-8972
-    affiliation: "6, 7, 8"
+    affiliation: "7, 8, 9"
   - name: Laura K. Nuttall
     orcid: 0000-0002-8599-8791
     affiliation: 1
   - name: Richard P. Rollins^[richard.rollins\@ed.ac.uk]
     orcid: 0000-0003-1291-1023
-    affiliation: "9, 2"
+    affiliation: "10, 2"
   - name: Philipp Sudek
     orcid: 0000-0001-8685-2308
     affiliation: 1
   - name: Sut-Ieng Tam
     orcid: 0000-0002-6724-833X
-    affiliation: 10
+    affiliation: 11
   - name: Nicolas Tessore
     orcid: 0000-0002-9696-7931
-    affiliation: 11
+    affiliation: 12
   - name: Arthur E. Tolley
     orcid: 0000-0001-9841-943X
     affiliation: 1
   - name: Keiichi Umetsu
     orcid: 0000-0002-7196-4822
-    affiliation: 10
+    affiliation: 11
   - name: Andrew R. Williamson
     orcid: 0000-0002-7627-8688
     affiliation: 1
@@ -77,20 +80,22 @@ affiliations:
     index: 4
   - name: Department of Physics, University of Oxford
     index: 5
-  - name: Fermi National Accelerator Laboratory
+  - name: Department of Astronomy, University of Geneva
     index: 6
-  - name: Kavli Institute for Cosmological Physics, University of Chicago
+  - name: Fermi National Accelerator Laboratory
     index: 7
-  - name: Department of Astronomy and Astrophysics, University of Chicago
+  - name: Kavli Institute for Cosmological Physics, University of Chicago
     index: 8
-  - name: Institute for Astronomy, University of Edinburgh
+  - name: Department of Astronomy and Astrophysics, University of Chicago
     index: 9
-  - name: Institute of Astronomy and Astrophysics, Academia Sinica
+  - name: Institute for Astronomy, University of Edinburgh
     index: 10
-  - name: Department of Physics and Astronomy, University College London
+  - name: Institute of Astronomy and Astrophysics, Academia Sinica
     index: 11
+  - name: Department of Physics and Astronomy, University College London
+    index: 12
 
-date: 30 June 2021
+date: 31 August 2021
 bibliography: paper.bib
 
 ---
@@ -103,7 +108,7 @@ Version `0.4` implements functions that model various properties of galaxies inc
 
 # Statement of need
 
-An open-data revolution in astronomy led by past, ongoing, and future legacy surveys such as *Euclid* [@Euclid2011], the Rubin Observatory Legacy Survey of Space and Time [@LSST2019], *Planck* [@Planck2020] and the Laser Interferometer Gravitational-Wave Observatory [@LIGO2015] means access to data is no longer the primary barrier to research. Instead, access to increasingly sophisticated analysis methods is becoming a significant challenge. Researchers frequently need to model multiple astronomical probes and systematics to perform a statistically rigorous analysis that fully exploits the available data. In particular, forward modelling and machine learning have emerged as important techniques for the next generation of surveys and both depend on realistic simulations. However, existing software is frequently closed-source, outdated, unmaintained or developed for specific projects and surveys making it unsuitable for the wider research community. As a consequence astronomers routinely expend significant effort replicating or re-developing existing code. The growing need for skill development and knowledge sharing in astronomy is evidenced by a number of open initiatives focused on software, statistics and machine learning e.g., Astropy [@Astropy2013; @Astropy2018], OpenAstronomy (https://openastronomy.org), Dark Machines (http://darkmachines.org), The Deep Skies Lab (https://deepskieslab.com), and the Cosmo-Statistics Initiative (https://cosmostatistics-initiative.org). `SkyPy` was established as a part of this open ecosystem to meet the research community’s need for realistic simulations and enable forward modelling and machine learning applications.
+An open-data revolution in astronomy led by past, ongoing, and future legacy surveys such as *Euclid* [@Euclid2011], the Rubin Observatory Legacy Survey of Space and Time [@LSST2019], *Planck* [@Planck2020] and the Laser Interferometer Gravitational-Wave Observatory [@LIGO2015] means access to data is no longer the primary barrier to research. Instead, access to increasingly sophisticated analysis methods is becoming a significant challenge. Researchers frequently need to model multiple astronomical probes and systematics to perform a statistically rigorous analysis that fully exploits the available data. In particular, forward modelling and machine learning have emerged as important techniques for the next generation of surveys and both depend on realistic simulations. However, existing software is frequently closed-source, outdated, unmaintained or developed for specific projects and surveys making it unsuitable for the wider research community. As a consequence astronomers routinely expend significant effort replicating or re-developing existing code. The growing need for skill development and knowledge sharing in astronomy is evidenced by a number of open initiatives focused on software, statistics and machine learning e.g., Astropy [@Astropy2013; @Astropy2018], OpenAstronomy (https://openastronomy.org), Dark Machines (http://darkmachines.org), The Deep Skies Lab (https://deepskieslab.com), and the Cosmo-Statistics Initiative (https://cosmostatistics-initiative.org). Recently, the research community has developed a number of important open-source python packages that address individual aspects of modelling astronomical surveys e.g. `GalSim` [@Galsim2015], `Halotools` [@halotools2017] and `popsynth` [@popsynth2021]. `SkyPy` was established as a part of this software ecosystem to meet the need for realistic end-to-end simulations and enable forward modelling and machine learning applications.
 
 # Acknowledgements
 
