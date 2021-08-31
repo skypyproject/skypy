@@ -14,7 +14,7 @@ __all__ = [
 
 
 @units.quantity_input(sky_area=units.sr)
-def schechter_lf(redshift, M_star, phi_star, alpha, m_lim, sky_area, cosmology, noise=True):
+def schechter_lf(redshift, M_star, phi_star, alpha, m_lim, sky_area, cosmology, shot_noise=True):
     r'''Sample redshifts and magnitudes from a Schechter luminosity function.
 
     Sample the redshifts and magnitudes of galaxies following a Schechter
@@ -42,8 +42,9 @@ def schechter_lf(redshift, M_star, phi_star, alpha, m_lim, sky_area, cosmology, 
         Sky area over which galaxies are sampled. Must be in units of solid angle.
     cosmology : Cosmology
         Cosmology object to convert apparent to absolute magnitudes.
-    noise : bool, optional
-        Poisson-sample the number of galaxies. Default is `True`.
+    shot_noise : bool, optional
+        Wether to Poisson-sample the number of galaxies, or else use the mean
+        number. Default is `True`.
 
     Notes
     -----
@@ -61,7 +62,7 @@ def schechter_lf(redshift, M_star, phi_star, alpha, m_lim, sky_area, cosmology, 
     '''
 
     # sample galaxy redshifts
-    z = schechter_lf_redshift(redshift, M_star, phi_star, alpha, m_lim, sky_area, cosmology, noise)
+    z = schechter_lf_redshift(redshift, M_star, phi_star, alpha, m_lim, sky_area, cosmology, shot_noise)
 
     # if a function is NOT given for M_star, phi_star, alpha, interpolate to z
     if not callable(M_star) and np.ndim(M_star) > 0:
