@@ -150,7 +150,6 @@ All public classes, methods and functions require docstrings. You can build docu
   - Description
   - Parameters
   - Notes
-  - Examples
   - References
 
 For more information see the Astropy guide to `Writing Documentation <https://docs.astropy.org/en/stable/development/docguide.html>`_.
