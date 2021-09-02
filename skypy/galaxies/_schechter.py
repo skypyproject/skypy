@@ -62,7 +62,8 @@ def schechter_lf(redshift, M_star, phi_star, alpha, m_lim, sky_area, cosmology, 
     '''
 
     # sample galaxy redshifts
-    z = schechter_lf_redshift(redshift, M_star, phi_star, alpha, m_lim, sky_area, cosmology, shot_noise)
+    z = schechter_lf_redshift(redshift, M_star, phi_star, alpha, m_lim, sky_area, cosmology,
+                              shot_noise)
 
     # if a function is NOT given for M_star, phi_star, alpha, interpolate to z
     if not callable(M_star) and np.ndim(M_star) > 0:
