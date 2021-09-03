@@ -2,7 +2,6 @@ from astropy.table import Table
 from astropy.utils.data import get_pkg_data_filename
 from contextlib import redirect_stdout
 from io import StringIO
-import os
 import pytest
 from skypy import __version__ as skypy_version
 from skypy.pipeline import load_skypy_yaml

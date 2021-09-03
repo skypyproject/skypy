@@ -8,7 +8,6 @@ from astropy.units import Quantity
 from astropy.utils.data import get_pkg_data_filename
 import networkx
 import numpy as np
-import os
 import pytest
 from skypy.pipeline import Pipeline
 from skypy.pipeline._items import Call, Ref
