@@ -21,7 +21,7 @@ else:
     HAS_H5PY = True
 
 
-def test_pipeline():
+def test_pipeline(tmp_path):
 
     # Evaluate and store the default astropy cosmology.
     config = {'test_cosmology': Call(default_cosmology.get)}
@@ -44,7 +44,7 @@ def test_pipeline():
 
     pipeline = Pipeline(config)
     pipeline.execute()
-    output_filename = 'output.fits'
+    output_filename = str(tmp_path / 'output.fits')
     pipeline.write(output_filename)
     assert len(pipeline['test_table']) == size
     assert np.all(pipeline['test_table.column1'] < pipeline['test_table.column2'])
@@ -251,7 +251,7 @@ def test_column_quantity():
 
 
 @pytest.mark.skipif(not HAS_H5PY, reason='Requires h5py')
-def test_hdf5():
+def test_hdf5(tmp_path):
     size = 100
     string = size*'a'
     config = {'tables': {
@@ -264,16 +264,7 @@ def test_hdf5():
 
     pipeline = Pipeline(config)
     pipeline.execute()
-    pipeline.write('output.hdf5')
-    hdf_table = read_table_hdf5('output.hdf5', 'tables/test_table', character_as_bytes=False)
+    output_filename = str(tmp_path / 'output.hdf5')
+    pipeline.write(output_filename)
+    hdf_table = read_table_hdf5(output_filename, 'tables/test_table', character_as_bytes=False)
     assert np.all(hdf_table == pipeline['test_table'])
-
-
-def teardown_module(module):
-
-    # Remove fits file generated in test_pipeline
-    os.remove('output.fits')
-
-    # Remove hdf5 file generated in test_hdf5
-    if HAS_H5PY:
-        os.remove('output.hdf5')
