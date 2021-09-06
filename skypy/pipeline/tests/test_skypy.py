@@ -93,7 +93,7 @@ def test_logging(capsys, tmp_path):
     assert(f"[INFO] skypy: Writing {output_filename}" in err)
 
     # Check error for existing output file is in the log
-    assert(f"[ERROR] skypy: File '{output_filename}' already exists." in err)
+    assert(f"[ERROR] skypy: File {output_filename!r} already exists." in err)
 
     # Run again with decreased verbosity and check the log is empty
     with pytest.raises(SystemExit):
