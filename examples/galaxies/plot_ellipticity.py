@@ -81,11 +81,9 @@ var = np.zeros(len(bins)-1)
 # Create 100 SkyPy realisations
 for i in range(100):
     # sample ellipticity
-    e = ryden04_ellipticity(mu_gamma, sigma_gamma, mu, sigma, size=Ngal)
-    # recover axis ratio from ellipticity
-    q = (1 - e)/(1 + e)
-    # bin
-    n, _ = np.histogram(q, bins=bins)
+    ellipticity = ryden04_ellipticity(mu_gamma, sigma_gamma, mu, sigma, size=Ngal)
+    axis_ratio = (1 - ellipticity) / (1 + ellipticity)
+    n, _ = np.histogram(axis_ratio, bins=bins)
 
     # update mean and variance
     x = n - mean
