@@ -271,7 +271,7 @@ def test_hdf5(tmp_path):
 
 def test_depends():
 
-    # Regression test for pull request #464
+    # Regression test for GitHub Issue #464
     # Previously the .depends keyword was also being passed to functions as a
     # keyword argument. This was because Pipeline was executing Item.infer to
     # handle additional function arguments from context before handling
