@@ -1,7 +1,7 @@
 from astropy.cosmology import FlatLambdaCDM, default_cosmology
 from astropy.cosmology.core import Cosmology
 from astropy.io import fits
-from astropy.table import Table
+from astropy.table import Table, vstack
 from astropy.table.column import Column
 from astropy.units import Quantity
 from astropy.utils.data import get_pkg_data_filename
@@ -235,6 +235,28 @@ def test_column_quantity():
     assert isinstance(pipeline['test_table.lengths_in_cm'], np.ndarray)
     np.testing.assert_array_less(0, pipeline['test_table.lengths_in_cm'])
     np.testing.assert_array_less(pipeline['test_table.lengths_in_cm'], 100)
+
+
+def test_depends():
+
+    # Regression test for GitHub Issue #464
+    # Previously the .depends keyword was also being passed to functions as a
+    # keyword argument. This was because Pipeline was executing Item.infer to
+    # handle additional function arguments from context before handling
+    # additional dependencies specified using the .depends keyword. The
+    # .depends keyword is now handled first.
+
+    config = {'tables': {
+                'table_1': {
+                  'column1': Call(np.random.uniform, [0, 1, 10])},
+                'table_2': {
+                    '.init': Call(vstack, [], {
+                      'tables': [Ref('table_1')],
+                      '.depends': ['table_1.complete']})}}}
+
+    pipeline = Pipeline(config)
+    pipeline.execute()
+    assert np.all(pipeline['table_1'] == pipeline['table_2'])
 
 
 def teardown_module(module):
