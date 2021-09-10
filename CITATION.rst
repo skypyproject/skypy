@@ -26,7 +26,7 @@ can be found on Zenodo_.
 
       .. container:: sphx-glr-download sphx-glr-download-python
 
-         :download:`Download BibTeX <main.bib>`
+         :download:`Download BibTeX <../../main.bib>`
 
 
 .. _Amara et al., (2021): https://doi.org/10.21105/joss.03056
