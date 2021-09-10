@@ -102,8 +102,6 @@ class Pipeline:
             self.dag.add_node(job, skip=False)
             if isinstance(settings, Item):
                 items[job] = settings
-                # infer additional item properties from context
-                settings.infer(context)
         for table, columns in self.table_config.items():
             table_complete = '.'.join((table, 'complete'))
             self.dag.add_node(table_complete)
@@ -115,8 +113,6 @@ class Pipeline:
                 self.dag.add_edge(job, table_complete)
                 if isinstance(settings, Item):
                     items[job] = settings
-                    # infer additional item properties from context
-                    settings.infer(context)
                 # DAG nodes for individual columns in multi-column assignment
                 names = [n.strip() for n in column.split(',')]
                 if len(names) > 1:
@@ -138,6 +134,8 @@ class Pipeline:
                 while c:
                     self.dag.add_edge(c, d)
                     c, d = c.rpartition('.')[0], c
+            # infer additional item properties from context
+            settings.infer(context)
 
     def execute(self, parameters={}):
         r'''Run a pipeline.
