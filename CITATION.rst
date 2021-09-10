@@ -18,5 +18,15 @@ specific version that you used. We also encourage you to cite the software DOI
 in the main text wherever appropriate. DOIs and BibTeX keys for each release
 can be found on Zenodo_.
 
+  .. only :: builder_html
+
+     .. container:: sphx-glr-footer
+        :class: sphx-glr-footer-gallery
+
+      .. container:: sphx-glr-download sphx-glr-download-python
+
+         :download:`Download BibTeX <main.bib>`
+
+
 .. _Amara et al. (2021): https://doi.org/10.21105/joss.03056
 .. _Zenodo: https://zenodo.org/record/3755531
