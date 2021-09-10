@@ -12,7 +12,7 @@ pipeline.
 
 .. Important:: If you use SkyPy for work presented in a publication or talk
    please help the project via proper :doc:`citation or acknowledgement
-   <developer/citation>`.
+   <project/citation>`.
 
 
 
