@@ -10,7 +10,7 @@ jobs:
       - name: TeX and PDF
         uses: docker://openjournals/paperdraft:latest
         with:
-          args: '-k paper/paper.md'
+          args: '-k paper.md'
         env:
            GIT_SHA: $GITHUB_SHA
            JOURNAL: joss
@@ -18,4 +18,4 @@ jobs:
         uses: actions/upload-artifact@v1
         with:
           name: paper
-          path: paper/
+          path: ./
