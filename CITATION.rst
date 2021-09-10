@@ -1,3 +1,6 @@
+Citation Guidelines
+===================
+
 If you use SkyPy for work or research presented in a publication (whether
 directly, or as a dependency to another package) we recommend and encourage
 the citation to the following paper in the main text (wherever appropriate):
