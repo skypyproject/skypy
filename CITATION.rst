@@ -5,7 +5,7 @@ If you use SkyPy for work or research presented in a publication (whether
 directly, or as a dependency to another package) we recommend and encourage
 the citation to the following paper in the main text (wherever appropriate):
 
-  Amara et al. (2021)_ Amara et al., (2021). SkyPy: A package for modelling the Universe.
+  `Amara et al., (2021)`_. SkyPy: A package for modelling the Universe.
   Journal of Open Source Software, 6(65), 3056.
 
 and the following acknowledgment:
@@ -28,5 +28,5 @@ can be found on Zenodo_.
          :download:`Download BibTeX <main.bib>`
 
 
-.. _Amara et al. (2021): https://doi.org/10.21105/joss.03056
+.. _Amara et al., (2021): https://doi.org/10.21105/joss.03056
 .. _Zenodo: https://zenodo.org/record/3755531
