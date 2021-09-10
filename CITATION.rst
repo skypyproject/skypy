@@ -1,6 +1,7 @@
 Citation Guidelines
 ===================
 
+
 If you use SkyPy for work or research presented in a publication (whether
 directly, or as a dependency to another package) we recommend and encourage
 the citation to the following paper in the main text (wherever appropriate):
@@ -18,7 +19,7 @@ specific version that you used. We also encourage you to cite the software DOI
 in the main text wherever appropriate. DOIs and BibTeX keys for each release
 can be found on Zenodo_.
 
-  .. only :: builder_html
+  .. only:: builder_html
 
      .. container:: sphx-glr-footer
         :class: sphx-glr-footer-gallery
