@@ -76,6 +76,7 @@ Project details
    :maxdepth: 1
 
    project/code_of_conduct
+   project/citation
 
 
 *****
