@@ -21,11 +21,7 @@ appropriate. DOIs and BibTeX keys are available through the links above.
 
 
 .. |JOSS| image:: https://joss.theoj.org/papers/10.21105/joss.03056/status.svg
-    :alt: JOSS
-    :scale: 100%
     :target: https://doi.org/10.21105/joss.03056
 
 .. |Zenodo| image:: https://zenodo.org/badge/doi/10.5281/zenodo.4475347.svg
-    :alt: Zenodo
-    :scale: 100%
     :target: https://doi.org/10.5281/zenodo.3755531
