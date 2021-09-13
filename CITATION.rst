@@ -1,7 +1,8 @@
 Citation Guidelines
 ===================
 
-[![JOSS](https://joss.theoj.org/papers/10.21105/joss.03056/status.svg)](https://doi.org/10.21105/joss.03056) [![Zenodo](https://zenodo.org/badge/doi/10.5281/zenodo.4475347.svg)](https://doi.org/10.5281/zenodo.3755531)
+|JOSS| |Zenodo|
+
 
 If you use SkyPy for work or research presented in a publication (whether
 directly, or as a dependency of another package) we recommend and encourage
@@ -17,3 +18,14 @@ appropriate. DOIs and BibTeX keys are available through the links above.
 
 .. _Journal of Open Source Software: https://joss.theoj.org/papers/10.21105/joss.03056
 .. _Zenodo DOI: https://zenodo.org/record/3755531
+
+
+.. |JOSS| image:: https://joss.theoj.org/papers/10.21105/joss.03056/status.svg
+    :alt: JOSS
+    :scale: 100%
+    :target: https://doi.org/10.21105/joss.03056
+
+.. |Zenodo| image:: https://zenodo.org/badge/doi/10.5281/zenodo.4475347.svg
+    :alt: Zenodo
+    :scale: 100%
+    :target: https://doi.org/10.5281/zenodo.3755531
