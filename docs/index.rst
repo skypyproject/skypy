@@ -11,8 +11,7 @@ intention the simulations can then be compared to data as part of an inference
 pipeline.
 
 .. Important:: If you use SkyPy for work presented in a publication or talk
-   please help the project via proper :doc:`citation or acknowledgement
-   <project/citation>`.
+   please follow our :doc:`citation guidelines <project/citation>`.
 
 
 
