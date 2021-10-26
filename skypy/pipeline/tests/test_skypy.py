@@ -93,7 +93,14 @@ def test_logging(capsys, tmp_path):
     assert(f"[INFO] skypy: Writing {output_filename}" in err)
 
     # Check error for existing output file is in the log
-    assert(f"[ERROR] skypy: File {output_filename!r} already exists." in err)
+    try:
+        # New error message introduced in astropy PR #12179
+        from astropy.utils.misc import NOT_OVERWRITING_MSG
+        error_string = NOT_OVERWRITING_MSG.format(output_filename)
+    except ImportError:
+        # Fallback on old error message from astropy v4.x
+        error_string = f"[ERROR] skypy: File {output_filename!r} already exists."
+    assert(error_string in err)
 
     # Run again with decreased verbosity and check the log is empty
     with pytest.raises(SystemExit):
