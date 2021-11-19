@@ -9,15 +9,15 @@
 # - name: magnitude
 #   datatype: float32
 # - name: dered_u
-#   datatype: int
+#   datatype: uint16
 # - name: dered_g
-#   datatype: int
+#   datatype: uint16
 # - name: dered_r
-#   datatype: int
+#   datatype: uint16
 # - name: dered_i
-#   datatype: int
+#   datatype: uint16
 # - name: dered_z
-#   datatype: int
+#   datatype: uint16
 magnitude dered_u dered_g dered_r dered_i dered_z
 15.0 5 6 5 9 9
 15.1 4 5 11 8 17
