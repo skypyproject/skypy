@@ -118,7 +118,7 @@ def m_star_merger_rate(redshift,
     redshift : (ngal,) array_like
         The redshifts of the galaxies to generate merger
         rates for.
-    m_star : (ngal,) array_like
+    m_star : (ngal,) astropy.Quantity
         The stellar mass of the galaxies to generate merger
         rates for, in units of stellar mass.
     population : {'NS-NS', 'NS-BH', 'BH-BH'}
@@ -129,7 +129,7 @@ def m_star_merger_rate(redshift,
 
     Returns
     -------
-    merger_rate : (ngal,) array_like
+    merger_rate : (ngal,) astropy.Quantity
         Merger rates for the galaxies in units of Gigayear^-1
 
     Notes
@@ -176,10 +176,10 @@ def m_star_sfr_merger_rate(redshift,
     redshift : (ngal,) array_like
         The redshifts of the galaxies to generate merger
         rates for.
-    m_star : (ngal,) array_like
+    m_star : (ngal,) astropy.Quantity
         The stellar mass of the galaxies to generate merger
         rates for, in units of stellar mass.
-    sfr : (ngal,) array_like
+    sfr : (ngal,) astropy.Quantity
         The star formation rate of the galaxies to generate
         merger rates for, in units of stellar mass per year
     population : {'NS-NS', 'NS-BH', 'BH-BH'}
@@ -190,7 +190,7 @@ def m_star_sfr_merger_rate(redshift,
 
     Returns
     -------
-    merger_rate : array_like
+    merger_rate : astropy.Quantity
         Merger rates for the galaxies in units of Gigayear^-1
 
     Notes
@@ -242,10 +242,10 @@ def m_star_sfr_metallicity_merger_rate(redshift,
     redshift : (ngal,) array_like
         The redshifts of the galaxies to generate merger
         rates for.
-    m_star : (ngal,) array_like
+    m_star : (ngal,) astropy.Quantity
         The stellar mass of the galaxies to generate merger
         rates for, in units of stellar mass.
-    sfr : (ngal,) array_like
+    sfr : (ngal,) astropy.Quantity
         The star formation rate of the galaxies to generate
         merger rates for, in units of stellar mass per year
     Z : (ngal,) array_like
@@ -259,7 +259,7 @@ def m_star_sfr_metallicity_merger_rate(redshift,
 
     Returns
     -------
-    merger_rate : (ngal,) array_like
+    merger_rate : (ngal,) astropy.Quantity
         Merger rates for the galaxies in units of Gigayear^-1
 
     Notes
@@ -305,7 +305,7 @@ def b_band_merger_rate(luminosity,
 
     Parameters
     ----------
-    luminosity : (ngal,) array_like
+    luminosity : (ngal,) astropy.Quantity
         The B-band luminosity of the galaxies to generate merger
         rates for, in units of solar luminosity.
     population : {'NS-NS', 'NS-BH', 'BH-BH'}
@@ -319,7 +319,7 @@ def b_band_merger_rate(luminosity,
 
     Returns
     -------
-    merger_rate : array_like
+    merger_rate : astropy.Quantity
         Merger rates for the galaxies in units of year^-1
 
     Notes
