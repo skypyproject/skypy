@@ -19,7 +19,7 @@ jobs:
 
           - name: latest supported versions
             os: ubuntu-latest
-            python: 3.10
+            python: '3.10'
             toxenv: py310-test-all-latest-cov
             toxposargs: --cov-report=xml:${GITHUB_WORKSPACE}/coverage.xml
 
@@ -30,12 +30,12 @@ jobs:
 
           - name: macOS latest supported
             os: macos-latest
-            python: 3.10
+            python: '3.10'
             toxenv: py310-test-latest
 
           - name: Windows latest supported
             os: windows-latest
-            python: 3.10
+            python: '3.10'
             toxenv: py310-test-latest
 
     steps:
