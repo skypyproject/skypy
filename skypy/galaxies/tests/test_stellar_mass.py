@@ -60,3 +60,7 @@ def test_stellar_masses():
                                              size=1000, resolution=100)
     p_value = scipy.stats.kstest(sample, calc_cdf)[1]
     assert p_value >= 0.01
+
+
+def test_schechter_smf_parameters()
+    # placeholder for test
