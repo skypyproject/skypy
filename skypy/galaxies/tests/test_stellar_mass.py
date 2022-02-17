@@ -62,5 +62,6 @@ def test_stellar_masses():
     assert p_value >= 0.01
 
 
-def test_schechter_smf_parameters()
+def test_schechter_smf_parameters():
     # placeholder for test
+    return 0
