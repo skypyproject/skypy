@@ -90,7 +90,7 @@ def test_schechter_smf_parameters():
             assert type(sp_array[p][k]) != np.ndarray, \
                 '{} slope or mstar not a scalar {}'.format(p, type(sp_array[p][k]))
 
-    # Check array input for the satellite fraction
+    # Check array input for the amplitude
     amplitude_array = np.array([10**-2.4, 10**-2.3])
     blue_array = (amplitude_array, 10**10.60, -1.21)
     sp_array = schechter_smf_parameters(blue_array, fsat_scalar, frho)
