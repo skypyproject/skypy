@@ -116,5 +116,5 @@ def test_schechter_smf_parameters():
 
     # Case II: no satellite-quenched galaxies
     sp_rho0 = schechter_smf_parameters(blue, fsat_scalar, 0)
-    assert - sp_rho0['satellite_quenched'][0] == 0, \
+    assert sp_rho0['satellite_quenched'][0] == 0, \
         'The satellite-quenched is not zero {}'.format(sp_rho0['satellite_quenched'][0])
