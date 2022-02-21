@@ -89,6 +89,8 @@ def schechter_smf_parameters(active_parameters, fsatellite, fenvironment):
     active_parameters: tuple
         Schechter mass function parameters for the entire active
         sample of galaxies: :math:`(\phi_b, \alpha_b, m_{*})`.
+        Note: in [1], :math:`\alpha_b` and :math:`m_{*}` are
+        constants. The elements of the tuple should be scalars.
 
     fsatellite: float, (n, ) array_like
         Fraction of active satellite galaxies between 0 and 1.
