@@ -125,7 +125,7 @@ def schechter_smf_parameters(active_parameters, fsatellite, fenvironment):
 
     centrals = (phic, alpha, mstar)
     satellites = (phis, alpha, mstar)
-    mass_quenched = (phi, alpha + 1, mstar)
+    mass_quenched = (phic + phis, alpha + 1, mstar)
     satellite_quenched = (- np.log(1 - fenvironment) * phis, alpha, mstar)
 
     return {'centrals': centrals, 'satellites': satellites,
