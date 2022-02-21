@@ -92,7 +92,7 @@ def schechter_smf_parameters(active_parameters, fsatellite, fenvironment):
         Note: in [1], :math:`\alpha_b` and :math:`m_{*}` are
         constants. The elements of the tuple should be scalars.
         Exception: :math:`\phi_b` can be array only when
-        fsatellite is scalar. 
+        fsatellite is scalar.
 
     fsatellite: float, (n, ) array_like
         Fraction of active satellite galaxies between 0 and 1.
