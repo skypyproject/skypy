@@ -26,6 +26,8 @@ from skypy.galaxies import *
 # ----------
 #
 #
-# .. [1] de la Bella+2021.
+# .. [1] de la Bella et al. 2021, Quenching and Galaxy Demographics, arXiv 2112.11110.
 # 
 # .. [2] Weigel 2016
+# 
+#  .. [3] Trayford J., 2021, james-trayford/strauss: v0.1.0 Pre-release, doi:10.5281/zenodo.5776280, https://doi.org/10.5281/ zenodo.5776280
