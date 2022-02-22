@@ -75,10 +75,55 @@ passive = gmq + gsq
 total = active + passive 
 
 # %%
-# Weigel et al 2016 Model
-# -----------------------
-#
+# Validation against SSD DR7 data
+# -------------------------------
+# 
+# Weigel et al 2016 Model.
 # Here we compare our sampled galaxies.
+
+# Load the rest of data
+wred = Table.read('weigel16_quiescent.csv', format='csv')
+wblue = Table.read('weigel16_active.csv', format='csv')
+wcentral = Table.read('weigel16_central.csv', format='csv')
+
+# This factor allows us to go from :math:`\phi` to a :math: `\log \phi` plot
+# and compare with Weigel et al 2016 best-fit model
+factor = np.log(10) * 10**logm / mstarb
+lblue, lcentrals, lsats = np.log10(gb * factor), np.log10(gc * factor), np.log10(gs * factor)
+lred, lmq, lsq = np.log10(passive * factor), np.log10(gmq * factor), np.log10(gsq * factor)
+ltotal = np.log10(total * factor)
+
+# Plot
+fig, (ax1, ax2, ax3) = plt.subplots(1,3, figsize=(16,6), sharex=True, sharey=True)
+fig.suptitle('Galaxy Demographics', fontsize=26)
+
+ax1.plot(wblue['logm'], wblue['logphi'], color='k', label='Weigel+16', lw=1)
+ax1.plot(logm, lblue, color='blue', label='SkyPy Active', lw=1)
+ax1.plot(logm, lcentrals, '--', color='royalblue', label='SkyPy Centrals', lw=1)
+ax1.plot(logm, lsats, '--', color='cyan', label='SkyPy Satellites', lw=1)
+
+ax2.plot(wred['logm'], wred['logphi'], color='k', label='Weigel+16', lw=1)
+ax2.fill_between(wred['logm'], wred['upper_error'], wred['lower_error'], color='salmon', alpha=0.1)
+ax2.plot(logm, lred, color='red', label='SkyPy Passive', lw=1)
+ax2.plot(logm, lmq, '--', color='coral', label='SkyPy MassQ', lw=1)
+ax2.plot(logm, lsq, '--', color='maroon', label='SkyPy SatQ', lw=1)
+
+ax3.plot(wtotal['logm'], wtotal['logphi'], color='k', label='Weigel+16', lw=1)
+ax3.plot(wcentral['logm'], wcentral['logphi'], '--', color='grey', label='Centrals', lw=1)
+ax3.plot(wsatellite['logm'], wsatellite['logphi'], '--', color='grey', label='Satellites', lw=1)
+ax3.fill_between(wtotal['logm'], wtotal['upper_error'], wtotal['lower_error'], color='plum', alpha=0.1)
+ax3.plot(logm, ltotal, color='purple', label='SkyPy Total', lw=1)
+
+
+for ax in [ax1, ax2,ax3]:
+    ax.legend(loc='lower left', frameon=False, fontsize=14)
+    ax.set_xlabel(r'Stellar mass, $log (M/M_{\odot})$', fontsize=18)
+    ax.set_ylim(-5.5)
+
+
+ax1.set_ylabel(r'$log(\phi /h^3 Mpc^{-3}dex^{-1} )$', fontsize=18)
+plt.tight_layout()
+plt.show()
 
 # %%
 # Sonification
