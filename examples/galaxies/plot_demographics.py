@@ -19,6 +19,21 @@ import matplotlib.pyplot as plt
 from skypy.galaxies.stellar_mass import schechter_smf_parameters
 from astropy.table import Table
 
+# Weigel et al. 2016 parameters for the active population
+phiblue = 10**-2.423
+mstarb = 10**10.60
+alphab = -1.21
+blue_params = (phiblue, alphab, mstarb)
+
+# Choose a fraction of satellite-quenched galaxies
+frho = 0.5
+
+# Compute the fraction of satellite galaxies
+wtotal = Table.read('weigel16_total.csv', format='csv')
+wsatellite = Table.read('weigel16_satellite.csv', format='csv')
+logm = wtotal['logm']
+fsat = 10**wsatellite['logphi']/10**wtotal['logphi']
+
 # %%
 # Weigel et al 2016 Model
 # -----------------------
