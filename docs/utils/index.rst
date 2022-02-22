@@ -157,6 +157,12 @@ Special functions (`skypy.utils.special`)
 .. automodule:: skypy.utils.special
 
 
+Completeness functions (`skypy.utils.completeness_function`)
+============================================================
+
+.. automodule:: skypy.utils.completeness_function
+
+
 Reference/API
 =============
 
