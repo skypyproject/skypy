@@ -8,15 +8,26 @@ from a general Schechter mass function as implemented in SkyPy.
 # %%
 # Schechter Parameters
 # --------------------
+# 
+# We use the blue parameters in Wiegel et al. 2016 [1]_.
+# Also the fraction of satellite galaxies from [1].
+# We use a fixed value for the fraction of satellite-quenched galaxies
+# :math:`f_{\rho} = 0.5`.
 
 import numpy as np
-from skypy.galaxies import *
+import matplotlib.pyplot as plt
+from skypy.galaxies.stellar_mass import schechter_smf_parameters
+from astropy.table import Table
 
 # %%
 # Weigel et al 2016 Model
 # -----------------------
 #
 # Here we compare our sampled galaxies.
+
+# %%
+# Sonification
+# ------------
 # STRAUSS clip!
 
 
