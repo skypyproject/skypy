@@ -12,9 +12,6 @@ This module computes completeness functions of cosmological surveys.
 
 import numpy as np
 
-#__all__ = [
- #   'logistic_completeness_function',
-#]
 
 def logistic_completeness_function(m, m95, m50):
     r'''Compute logistic completeness function.
@@ -25,8 +22,8 @@ def logistic_completeness_function(m, m95, m50):
 
         p(m) = \frac{1}{1 + \exp\left[\frac{\ln(1/19)}{m_{95} - m_{50}} (m - m_{50})\right]}\;.
 
-    which describes the probability :math:`p(m)` that an object of magnitude :math:`m` is detected in
-    the band.
+    which describes the probability :math:`p(m)` that an object of magnitude :math:`m` is detected
+    in the band.
 
     Parameters
     ----------

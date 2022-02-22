@@ -35,4 +35,3 @@ def test_logistic_completeness_function():
     m50 = 25
     p = logistic_completeness_function([m95, m50], m95, m50)
     np.testing.assert_array_almost_equal(p, np.array([0.95, 0.5]))
-
