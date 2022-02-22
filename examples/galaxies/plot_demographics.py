@@ -16,8 +16,27 @@ from a general Schechter mass function as implemented in SkyPy.
 
 import numpy as np
 import matplotlib.pyplot as plt
-from skypy.galaxies.stellar_mass import schechter_smf_parameters
+# from skypy.galaxies.stellar_mass import schechter_smf_parameters
 from astropy.table import Table
+
+# Replace by the SkyPy function once it's merged
+
+def schechter_smf_parameters(active_parameters, fsatellite, fenvironment):
+    phi, alpha, mstar = active_parameters
+    
+    sum_phics = (1 - fsatellite) * (1 -  np.log(1 - fsatellite))
+    
+    phic = (1 - fsatellite) * phi / sum_phics
+    phis = phic * np.log(1 / (1 - fsatellite))
+    
+    centrals = (phic, alpha, mstar)
+    satellites = (phis, alpha, mstar)
+    mass_quenched = (phic + phis, alpha + 1, mstar)
+    satellite_quenched = (- np.log(1 - fenvironment) * phis, alpha, mstar)
+    
+    return {'centrals': centrals, 'satellites': satellites,
+            'mass_quenched': mass_quenched, 'satellite_quenched': satellite_quenched}
+
 
 # Weigel et al. 2016 parameters for the active population
 phiblue = 10**-2.423
@@ -33,6 +52,27 @@ wtotal = Table.read('weigel16_total.csv', format='csv')
 wsatellite = Table.read('weigel16_satellite.csv', format='csv')
 logm = wtotal['logm']
 fsat = 10**wsatellite['logphi']/10**wtotal['logphi']
+
+# Generate the Schechter parameters for all populations
+sp = schechter_smf_parameters(blue_params, fsat, frho)
+
+# Compute the Schechter mass functions for all populations
+# SMF ideally from SkyPy
+def schechter_dndm(mass, params):
+    phi, alpha, mstar = params
+    x = mass / mstar
+    return phi * x**alpha * np.exp(-x)
+
+m = 10**logm
+gb = schechter_dndm(m, blue_params)
+gc = schechter_dndm(m, sp['centrals'])
+gs = schechter_dndm(m, sp['satellites'])
+gmq = schechter_dndm(m, sp['mass_quenched'])
+gsq = schechter_dndm(m, sp['satellite_quenched'])
+
+active = gc + gs
+passive = gmq + gsq
+total = active + passive 
 
 # %%
 # Weigel et al 2016 Model
