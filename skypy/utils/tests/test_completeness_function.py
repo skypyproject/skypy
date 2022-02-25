@@ -4,34 +4,61 @@ import numpy as np
 def test_logistic_completeness_function():
     from skypy.utils.completeness_function import logistic_completeness_function
 
-    # Test that (nb, nm) array is returned if m in (mb, nm) and m95 and m50 in (nb, ) are given
-    m = np.ndarray((5, 50))
-    m[:] = np.linspace(18, 28, 50)
-    m = m.T
-    m50 = np.array([24.7, 25, 23, 23.5, 28])
-    m95 = np.array([24, 23, 22, 22.3, 25])
-    p = logistic_completeness_function(m, m95, m50)
-    assert m.shape == p.shape
+    # Test that (nm, nb) array is returned if magnitude in (nm, nb) and
+    # magnitude_95 and magnitude_50 in (nb, ) are given
+    magnitude = np.ndarray((5, 50))
+    magnitude[:] = np.linspace(18, 28, 50)
+    magnitude = np.reshape(magnitude, (50, 5))
+    magnitude_50 = np.array([24.7, 25, 23, 23.5, 28])
+    magnitude_95 = np.array([24, 23, 22, 22.3, 25])
+    p = logistic_completeness_function(magnitude, magnitude_95, magnitude_50)
+    assert magnitude.shape == p.shape
 
-    # Test that returned shape is equal to shape of m if it is 1D array and m05 and m50 floats
-    m = np.linspace(18, 28, 50)
-    m50 = 24.7
-    m95 = 24
-    p = logistic_completeness_function(m, m95, m50)
-    assert m.shape == p.shape
+    # Test that returned shape is equal to shape of magnitude if it is 1D array
+    # and magnitude_95 and magnitude_50 scalars
+    magnitude = np.linspace(18, 28, 50)
+    magnitude_50 = 24.7
+    magnitude_95 = 24
+    p = logistic_completeness_function(magnitude, magnitude_95, magnitude_50)
+    assert magnitude.shape == p.shape
 
-    # Test that returned shape is equal to shape of m if it is 2D array and m05 and m50 floats
-    # array
-    m = np.ndarray((5, 50))
-    m[:] = np.linspace(18, 28, 50)
-    m = m.T
-    m50 = 24.7
-    m95 = 24
-    p = logistic_completeness_function(m, m95, m50)
-    assert m.shape == p.shape
+    # Test that returned shape is equal to shape of magnitude_50
+    # and m_agnitude_95 if magnitude is a scalar
+    magnitude = 20
+    magnitude_50 = np.array([24.7, 25, 23, 23.5, 28])
+    magnitude_95 = np.array([24, 23, 22, 22.3, 25])
+    p = logistic_completeness_function(magnitude, magnitude_95, magnitude_50)
+    assert p.shape == magnitude_50.shape == magnitude_95.shape
 
-    # Test completeness is 0.95 for m=m95 and 0.50 for m=m50
-    m95 = 24
-    m50 = 25
-    p = logistic_completeness_function([m95, m50], m95, m50)
+    # Test that returned shape is equal to shape of magnitude_50
+    # if magnitude_95 and magnitude are scalar
+    magnitude = 20
+    magnitude_50 = np.array([24.7, 25, 23, 23.5, 28])
+    magnitude_95 = 21
+    p = logistic_completeness_function(magnitude, magnitude_95, magnitude_50)
+    assert p.shape == magnitude_50.shape
+
+    # Test that returned shape is equal to shape of magnitude_95
+    # if magnitude_50 and magnitude are scalar
+    magnitude = 20
+    magnitude_50 = 28
+    magnitude_95 = np.array([24, 23, 22, 22.3, 25])
+    p = logistic_completeness_function(magnitude, magnitude_95, magnitude_50)
+    assert p.shape == magnitude_95.shape
+
+    # Test that returned shape is equal to shape of magnitude if it is 2D array
+    # and magnitude_95 and magnitude_50 are scalar
+    magnitude = np.ndarray((5, 50))
+    magnitude[:] = np.linspace(18, 28, 50)
+    magnitude = np.reshape(magnitude, (50, 5))
+    magnitude_50 = 24.7
+    magnitude_95 = 24
+    p = logistic_completeness_function(magnitude, magnitude_95, magnitude_50)
+    assert magnitude.shape == p.shape
+
+    # Test completeness is 0.95 for mmagnitude=magnitude_95
+    # and 0.5 for magnitude=magnitude_50
+    magnitude_95 = 24
+    magnitude_50 = 25
+    p = logistic_completeness_function([magnitude_95, magnitude_50], magnitude_95, magnitude_50)
     np.testing.assert_array_almost_equal(p, np.array([0.95, 0.5]))
