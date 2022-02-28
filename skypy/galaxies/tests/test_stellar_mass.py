@@ -3,6 +3,7 @@ import scipy.stats
 import scipy.integrate
 from scipy.special import gammaln
 import pytest
+from astropy.modeling.models import Exponential1D
 
 from skypy.galaxies import stellar_mass
 from skypy.utils import special
@@ -25,11 +26,50 @@ def test_stellar_masses():
     with pytest.raises(ValueError):
         stellar_mass.schechter_smf_mass(0., -1.4, np.array([1e10, 2e10]), 1.e7, 1.e13, size=3)
 
-    # Test that an array with the sme shape as m_star is returned if m_star is
+    # Test that an array with the same shape as m_star is returned if m_star is
     # an array and size = None
     m_star = np.array([1e10, 2e10])
     sample = stellar_mass.schechter_smf_mass(0., -1.4, m_star, 1.e7, 1.e13, size=None)
     assert m_star.shape == sample.shape
+
+    # Test m_star can be callable
+    redshift = np.linspace(0, 2, 100)
+    alpha = 0.357
+    m_min = 10 ** 7
+    m_max = 10 ** 14
+    m_star = Exponential1D(10**10.626, np.log(10)*1/0.095)
+    try:
+        sample = stellar_mass.schechter_smf_mass(redshift, alpha, m_star,
+                                                 m_min, m_max)
+    except Exception as exc:
+        pytest.fail(f"Unexpected exception {exc} for test that m_star is a callable.")
+
+    # Test alpha can be scalar returning callable.
+    redshift = np.linspace(0, 2, 100)
+
+    def alpha(z):
+        return 0.357 + 0
+
+    m_min = 10 ** 7
+    m_max = 10 ** 14
+    m_star = 10**10.626
+    try:
+        sample = stellar_mass.schechter_smf_mass(redshift, alpha, m_star,
+                                                 m_min, m_max)
+    except Exception as exc:
+        pytest.fail(f"Unexpected exception {exc} for test that alpha is a "
+                    "scalar returning callable.")
+
+    # sample with array for alpha
+    # not implemented at the moment
+    redshift = np.linspace(0, 2, 100)
+    alpha = np.linspace(0, 0.357, 20)
+    m_min = 10 ** 7
+    m_max = 10 ** 14
+    m_star = 10**10.626
+    with pytest.raises(NotImplementedError):
+        sample = stellar_mass.schechter_smf_mass(redshift, alpha, m_star,
+                                                 m_min, m_max)
 
     # Test that sampling corresponds to sampling from the right pdf.
     # For this, we sample an array of luminosities for redshift z = 1.0 and we

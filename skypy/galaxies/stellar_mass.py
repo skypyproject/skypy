@@ -4,6 +4,7 @@
 import numpy as np
 
 from ..utils.random import schechter
+from ..utils import dependent_argument
 
 
 __all__ = [
@@ -11,6 +12,8 @@ __all__ = [
 ]
 
 
+@dependent_argument('m_star', 'redshift')
+@dependent_argument('alpha', 'redshift')
 def schechter_smf_mass(redshift, alpha, m_star, m_min, m_max, size=None,
                        resolution=1000):
     r""" Stellar masses following the Schechter mass function [1]_.
@@ -19,9 +22,9 @@ def schechter_smf_mass(redshift, alpha, m_star, m_min, m_max, size=None,
     ----------
     redshift : array_like
         Galaxy redshifts for which to sample magnitudes.
-    alpha : float
+    alpha : float or function
         The alpha parameter in the Schechter stellar mass function.
-    m_star : (nm,) array-like
+    m_star : (nm,) array-like or function
         Characteristic stellar mass m_*.
     size: int, optional
          Output shape of stellar mass samples. If size is None and m_star
