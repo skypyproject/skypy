@@ -2,16 +2,13 @@
 
 This module provides a set of completeness functions for different cosmological surveys.
 
-.. autosummary::
-   :nosignatures:
-   :toctree: ../api/
-
-   logistic_completeness_function
-
 """
 
 import numpy as np
 
+__all__ = [
+    'logistic_completeness_function',
+]
 
 def logistic_completeness_function(magnitude, magnitude_95, magnitude_50):
     r'''Compute logistic completeness function.

@@ -160,7 +160,14 @@ Special functions (`skypy.utils.special`)
 Completeness functions (`skypy.utils.completeness_function`)
 ============================================================
 
-.. automodule:: skypy.utils.completeness_function
+This module contains methods that calculates the completeness of different
+cosmological surveys.
+
+.. currentmodule:: skypy.utils.completeness_function
+.. autosummary::
+   :nosignatures:
+
+   logistic_completeness_function
 
 
 Reference/API
