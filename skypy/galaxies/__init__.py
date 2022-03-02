@@ -12,6 +12,7 @@ from . import morphology  # noqa F401,F403
 from . import redshift  # noqa F401,F403
 from . import spectrum  # noqa F401,F403
 from . import stellar_mass  # noqa F401,F403
+from . import magnitude_error # noqa F401,F403
 
 from ._schechter import schechter_lf  # noqa
 from ._schechter import schechter_smf  # noqa
