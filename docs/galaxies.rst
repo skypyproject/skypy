@@ -114,4 +114,3 @@ Reference/API
    :include-all-objects:
 .. automodapi:: skypy.galaxies.stellar_mass
 .. automodapi:: skypy.galaxies.magnitude_error
-   :include-all-objects:
