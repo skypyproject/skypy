@@ -10,6 +10,7 @@ __all__ = [
     'logistic_completeness_function',
 ]
 
+
 def logistic_completeness_function(magnitude, magnitude_95, magnitude_50):
     r'''Compute logistic completeness function.
 
@@ -20,7 +21,14 @@ def logistic_completeness_function(magnitude, magnitude_95, magnitude_50):
         p(m) = \frac{1}{1 + \exp[\kappa (m - m_{50})]}\;,
 
     which describes the probability :math:`p(m)` that an object of magnitude :math:`m` is detected
-    in the band and with :math:`\kappa = \frac{\ln(1/19)}{m_{95} - m_{50}}`.
+    in a specific band and with
+
+    .. math::
+
+        \kappa = \frac{\ln(\frac{1}{19})}{m_{95} - m_{50}}\;.
+
+    Here, :math:`m_{95}` and :math:`m_{50}` are the 95% and 50% completeness
+    magnitudes, respectively.
 
     Parameters
     ----------
@@ -28,22 +36,22 @@ def logistic_completeness_function(magnitude, magnitude_95, magnitude_50):
         Magnitudes. Can be multidimensional for computing with multiple filter bands.
     magnitude_95 : scalar or 1-D array_like
         95% completeness magnitude.
-        If magnitude_50 is 1-D array it has to be scalar or 1-D array of the same shape.
+        If `magnitude_50` is 1-D array it has to be scalar or 1-D array of the same shape.
     magnitude_50 : scalar or 1-D array_like
         50% completeness magnitude.
-        If magnitude_95 is 1-D array it has to be scalar or 1-D array of the same shape.
+        If `magnitude_95` is 1-D array it has to be scalar or 1-D array of the same shape.
 
     Returns
     -------
     probability : scalar or array_like
         Probability of detecting an object with magnitude :math:`m`.
         Returns array_like of the same shape as magnitude.
-        Exemption: If magnitude is scalar and magnitude_95 or magnitude_50
+        Exemption: If magnitude is scalar and `magnitude_95` or `magnitude_50`
         is array_like of shape (nb, ) it returns array_like of shape (nb, ).
 
     References
     -----------
-    ..[1] Lopez-Sanjuan C. et al., 2017, A&A, 599, A62
+    .. [1] Lopez-Sanjuan C. et al., 2017, A&A, 599, A62
 
     '''
 

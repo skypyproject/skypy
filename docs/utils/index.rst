@@ -175,3 +175,4 @@ Reference/API
 
 .. automodapi:: skypy.utils
 .. automodapi:: skypy.utils.photometry
+.. automodapi:: skypy.utils.completeness_function
