@@ -86,9 +86,10 @@ The following models are found in the `skypy.galaxies.stellar_mass` package.
 
 .. currentmodule:: skypy.galaxies.stellar_mass
 .. autosummary::
-  :nosignatures:
+   :nosignatures:
 
   schechter_smf_mass
+
 
 Magnitude error
 ---------------
@@ -97,9 +98,10 @@ The following models are found in the `skypy.galaxies.magnitude_error` package.
 
 .. currentmodule:: skypy.galaxies.magnitude_error
 .. autosummary::
-  :nosignatures:
+   :nosignatures:
 
   rykoff_error
+
 
 Reference/API
 =============

@@ -1,5 +1,4 @@
-r"""Models of galaxy magnitude errors.
-
+"""Models of galaxy magnitude errors.
 """
 
 import numpy as np
@@ -11,10 +10,10 @@ __all__ = [
 
 
 def rykoff_error(magnitude, magnitude_limit, magnitude_zp, a, b, error_limit=None):
-    r'''Magnitude error acoording to the model from Rykoff et al. (2015).
+    r"""Magnitude error acoording to the model from Rykoff et al. (2015).
 
-    Given the apparent magnitude of a galaxy calculate the magnitude error introduced
-    through the measuring survey according to the model described in [1]_.
+    Given the apparent magnitude of a galaxy calculate the magnitude error that is introduced
+    by the survey specifications and follows the model described in [1]_.
 
     Parameters
     ----------
@@ -22,7 +21,7 @@ def rykoff_error(magnitude, magnitude_limit, magnitude_zp, a, b, error_limit=Non
         Galaxy apparent magnitude. This and the other array_like parameters must
         be broadcastable to the same shape.
     magnitude_limit: array_like
-        10 :math:`\sigma` limiting magnitude of the survey. This and the other
+        :math:`10\sigma` limiting magnitude of the survey. This and the other
         array_like parameters must be broadcastable to the same shape.
     magnitude_zp: array_like
         Zero-point magnitude of the survey. This and the other array_like parameters must
@@ -43,32 +42,32 @@ def rykoff_error(magnitude, magnitude_limit, magnitude_zp, a, b, error_limit=Non
 
     Notes
     -----
-    Rykoff et al. (2018) (see [1]_) describe the error of the apparent magnitude as
+    Rykoff et al. (2018) (see [1]_) describe the error of the apparent magnitude :math:`m` as
 
     .. math::
 
-        \sigma_m(m;m_\mathrm{lim}, t_\mathrm{eff}) &=
-            \sigma_m(F(m);F_\mathrm{noise}(m_\mathrm{lim}), t_\mathrm{eff}) \\
-        &= \frac{2.5}{\ln{10}} \left[ \frac{1}{Ft_\mathrm{eff}}
-            \left( 1 + \frac{F_\mathrm{noise}}{F} \right) \right]^{1/2} \;,
+        \sigma_m(m;m_{\mathrm{lim}}, t_{\mathrm{eff}}) &=
+            \sigma_m(F(m);F_{\mathrm{noise}}(m_{\mathrm{lim}}), t_{\mathrm{eff}}) \\
+        &= \frac{2.5}{\ln(10)} \left[ \frac{1}{Ft_{\mathrm{eff}}}
+            \left( 1 + \frac{F_{\mathrm{noise}}}{F} \right) \right]^{1/2} \;,
 
     where
 
     .. math::
 
-        F=10^{-0.4(m - m_\mathrm{ZP})}
+        F=10^{-0.4(m - m_{\mathrm{ZP}})}
 
     is the galaxy's flux,
 
     .. math::
 
-        F_\mathrm{noise} = \frac{F_\mathrm{lim}^2 t_\mathrm{eff}}{10^2} - F_\mathrm{lim}
+        F_\mathrm{noise} = \frac{F_{\mathrm{lim}}^2 t_{\mathrm{eff}}}{10^2} - F_{\mathrm{lim}}
 
     is the effective noise flux and :math:`t_\mathrm{eff}` is the effective exposure time
     (we absorbed the normalisation constant :math:`k` in the definition of
     :math:`t_\mathrm{eff}`).
-    Furthermore, :math:`m` is the galaxy's magnitude, :math:`m_\mathrm{ZP}` is the zero-point
-    magnitude of the survey and :math:`F_\mathrm{lim}` is the :math:`10\sigma` limiting flux.
+    Furthermore, :math:`m_\mathrm{ZP}` is the zero-point magnitude of the survey and
+    :math:`F_\mathrm{lim}` is the :math:`10\sigma` limiting flux.
     Accordingly, :math:`m_\mathrm{lim}` is the :math:`10\sigma` limiting magnitud
     associated with :math:`F_\mathrm{lim}`.
 
@@ -84,7 +83,8 @@ def rykoff_error(magnitude, magnitude_limit, magnitude_zp, a, b, error_limit=Non
     ----------
     .. [1] Rykoff E. S., Rozo E., Keisler R., 2015, eprint arXiv:1509.00870
 
-    '''
+    """
+
     flux = 10 ** (-0.4 * (np.subtract(magnitude, magnitude_zp)))
     flux_limit = 10 ** (-0.4 * (np.subtract(magnitude_limit, magnitude_zp)))
     t_eff = np.exp(a + b * (np.subtract(magnitude_limit, 21.0)))
