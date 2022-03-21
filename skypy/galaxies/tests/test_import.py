@@ -5,4 +5,3 @@ def test_import():
     import skypy.galaxies.redshift  # noqa: F401
     import skypy.galaxies.spectrum  # noqa: F401
     import skypy.galaxies.stellar_mass  # noqa: F401
-    import skypy.galaxies.magnitude_error  # noqa: F401
