@@ -1,0 +1,14 @@
+parameters:
+  hubble_constant: 70
+  omega_matter: 0.3
+cosmology: !astropy.cosmology.FlatLambdaCDM
+  H0: $hubble_constant
+  Om0: $omega_matter
+n_galaxies: 1000
+tables:
+  galaxies:
+    redshift: !skypy.galaxies.redshift.smail
+      z_median: 1.0
+      alpha: 1.5
+      beta: 2.0
+      size: $n_galaxies

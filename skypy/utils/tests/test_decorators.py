@@ -1,22 +1,4 @@
 import numpy as np
-import pytest
-from skypy.galaxy.spectrum import HAS_SPECUTILS, HAS_SKYPY_DATA
-
-
-def test_uses_default_cosmology():
-
-    from astropy.cosmology import default_cosmology, WMAP9
-
-    from skypy.utils import uses_default_cosmology
-
-    @uses_default_cosmology
-    def function_with_cosmology(cosmology):
-        return cosmology
-
-    assert function_with_cosmology() == default_cosmology.get()
-
-    assert WMAP9 != default_cosmology.get()
-    assert function_with_cosmology(WMAP9) == WMAP9
 
 
 def test_broadcast_arguments():
@@ -80,26 +62,4 @@ def test_dependent_argument():
     with raises(ValueError):
         @dependent_argument('x', 'y', 'z')
         def argument_z_does_not_exist(x, y):
-            pass
-
-
-@pytest.mark.skipif(not HAS_SPECUTILS or not HAS_SKYPY_DATA,
-                    reason='test requires specutils and skypy-data')
-def test_spectral_data_input():
-
-    from astropy import units
-    from skypy.utils import spectral_data_input
-
-    @spectral_data_input(bandpass=units.dimensionless_unscaled)
-    def my_bandpass_function(bandpass):
-        pass
-
-    my_bandpass_function('Johnson_B')
-
-    with pytest.raises(units.UnitConversionError):
-        my_bandpass_function('kcorrect_spec')
-
-    with pytest.raises(ValueError):
-        @spectral_data_input(invalid=units.Jy)
-        def my_spectrum_function(spectrum):
             pass

@@ -1,7 +1,8 @@
 from astropy.utils.data import get_pkg_data_filename
-from collections.abc import Callable
 import pytest
 from skypy.pipeline import load_skypy_yaml
+from skypy.pipeline._items import Call
+from astropy import units
 
 
 def test_load_skypy_yaml():
@@ -16,11 +17,9 @@ def test_load_skypy_yaml():
     assert isinstance(config['test_int'], int)
     assert isinstance(config['test_float'], float)
     assert isinstance(config['test_str'], str)
-    assert isinstance(config['test_func'], tuple)
-    assert isinstance(config['test_cosmology'][0], Callable)
-    assert isinstance(config['test_cosmology'][1], dict)
-    assert isinstance(config['tables']['test_table_1']['test_column_3'][0], Callable)
-    assert isinstance(config['tables']['test_table_1']['test_column_3'][1], list)
+    assert isinstance(config['test_func'], Call)
+    assert isinstance(config['test_cosmology'], Call)
+    assert isinstance(config['tables']['test_table_1']['test_column_3'], Call)
 
     # Bad function
     filename = get_pkg_data_filename('data/bad_function.yml')
@@ -30,4 +29,28 @@ def test_load_skypy_yaml():
     # Bad module
     filename = get_pkg_data_filename('data/bad_module.yml')
     with pytest.raises(ImportError):
+        load_skypy_yaml(filename)
+
+
+def test_empty_ref():
+    filename = get_pkg_data_filename('data/test_empty_ref.yml')
+    with pytest.raises(ValueError, match='empty reference'):
+        load_skypy_yaml(filename)
+
+
+def test_yaml_quantities():
+    # config with quantities
+    filename = get_pkg_data_filename('data/quantities.yml')
+    config = load_skypy_yaml(filename)
+
+    assert config['42_km'] == units.Quantity('42 km')
+    assert config['1_deg2'] == units.Quantity('1 deg2')
+
+
+@pytest.mark.parametrize('config', ['numeric_key',
+                                    'numeric_nested_key',
+                                    'numeric_kwarg'])
+def test_keys_must_be_strings(config):
+    filename = get_pkg_data_filename(f'data/{config}.yml')
+    with pytest.raises(ValueError, match='key ".*" is of non-string type ".*"'):
         load_skypy_yaml(filename)

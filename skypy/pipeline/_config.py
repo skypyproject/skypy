@@ -1,6 +1,9 @@
 import builtins
 from importlib import import_module
 import yaml
+import re
+from astropy.units import Quantity
+from ._items import Ref, Call
 
 __all__ = [
     'load_skypy_yaml',
@@ -32,29 +35,61 @@ class SkyPyLoader(yaml.SafeLoader):
         finally:
             loader.dispose()
 
-    def construct_function(self, name, node):
-        '''load function from !function tag
+    def construct_mapping(self, node, deep=False):
+        mapping = super().construct_mapping(node, deep)
+        for key in mapping:
+            if not isinstance(key, str):
+                raise ValueError(f'key "{key}" is of non-string type "{type(key).__name__}"\n'
+                                 f'{node.start_mark}')
+        return mapping
 
-        tags are stored as a tuple `(function, args)`
-        '''
+    def construct_ref(self, node):
+        ref = self.construct_scalar(node)
+        if ref[:1] == '$':
+            ref = ref[1:]
+        if not ref:
+            raise ValueError(f'empty reference\n{node.start_mark}')
+        return Ref(ref)
 
+    def construct_call(self, name, node):
         if isinstance(node, yaml.ScalarNode):
-            args = self.construct_scalar(node)
+            arg = self.construct_scalar(node)
+            args = [arg] if arg != '' else []
+            kwargs = {}
         elif isinstance(node, yaml.SequenceNode):
             args = self.construct_sequence(node)
+            kwargs = {}
         elif isinstance(node, yaml.MappingNode):
-            args = self.construct_mapping(node)
+            args = []
+            kwargs = self.construct_mapping(node)
 
         try:
             function = import_function(name)
         except (ModuleNotFoundError, AttributeError) as e:
             raise ImportError(f'{e}\n{node.start_mark}') from e
 
-        return (function,) if args == '' else (function, args)
+        return Call(function, args, kwargs)
+
+    def construct_quantity(self, node):
+        value = self.construct_scalar(node)
+        return Quantity(value)
 
 
-# constructor for generic functions
-SkyPyLoader.add_multi_constructor('!', SkyPyLoader.construct_function)
+# constructor for references
+SkyPyLoader.add_constructor('!ref', SkyPyLoader.construct_ref)
+# implicitly resolve $references
+SkyPyLoader.add_implicit_resolver('!ref', re.compile(r'\$\w+'), ['$'])
+
+# constructor for generic function calls
+SkyPyLoader.add_multi_constructor('!', SkyPyLoader.construct_call)
+
+# constructor for quantities
+SkyPyLoader.add_constructor('!quantity', SkyPyLoader.construct_quantity)
+# Implicitly resolve quantities using the regex from astropy
+SkyPyLoader.add_implicit_resolver('!quantity', re.compile(r'''
+    \s*[+-]?((\d+\.?\d*)|(\.\d+)|([nN][aA][nN])|
+    ([iI][nN][fF]([iI][nN][iI][tT][yY]){0,1}))([eE][+-]?\d+)?[.+-]? \w* \W+
+''', re.VERBOSE), list('-+0123456789.'))
 
 
 def load_skypy_yaml(filename):
