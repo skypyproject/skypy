@@ -58,14 +58,6 @@ def smail(z_median, alpha, beta, size=None):
     .. [1] Smail I., Ellis R. S., Fitchett M. J., 1994, MNRAS, 270, 245
     .. [2] Amara A., Refregier A., 2007, MNRAS, 381, 1018
 
-    Examples
-    --------
-    Sample 10 random variates from the Smail model with `alpha = 1.5` and
-    `beta = 2` and median redshift `z_median = 1.2`.
-
-    >>> from skypy.galaxies.redshift import smail
-    >>> redshift = smail(1.2, 1.5, 2.0, size=10)
-
     '''
 
     k = (alpha+1)/beta
@@ -116,23 +108,6 @@ def schechter_lf_redshift(redshift, M_star, phi_star, alpha, m_lim, sky_area,
     redshifts : array_like
         Redshifts of the galaxy sample described by the Schechter luminosity
         function.
-
-    Examples
-    --------
-    Compute the number density of galaxies with redshifts between 0 and 5
-    for typical values of the "blue" galaxy luminosity function above an
-    apparent magnitude cut of 22 for a survey of 1 square degree = 1/41253 of
-    the sky.
-
-    >>> from skypy.galaxies.redshift import schechter_lf_redshift
-    >>> from astropy import units
-    >>> from astropy.cosmology import Planck15
-    >>> z = [0., 5.]
-    >>> M_star = -20.5
-    >>> phi_star = 3.5e-3
-    >>> alpha = -1.3
-    >>> sky_area = 1*units.deg**2
-    >>> z_gal = schechter_lf_redshift(z, M_star, phi_star, alpha, 22, sky_area, Planck15)
 
     '''
 
@@ -260,17 +235,12 @@ def redshifts_from_comoving_density(redshift, density, sky_area, cosmology, nois
         Sampled redshifts such that the comoving number density of galaxies
         corresponds to the input distribution.
 
-    Examples
+    Warnings
     --------
-    Sample redshifts with a constant comoving number density 1e-3/Mpc3 up to
-    redshift 1 for a survey of 1 square degree = 1/41253 of the sky.
-
-    >>> from skypy.galaxies.redshift import redshifts_from_comoving_density
-    >>> from astropy import units
-    >>> from astropy.cosmology import Planck15
-    >>> z_range = np.arange(0, 1.01, 0.1)
-    >>> sky_area = 1*units.deg**2
-    >>> z_gal = redshifts_from_comoving_density(z_range, 1e-3, sky_area, Planck15)
+    The inverse cumulative distribution function is approximated from the
+    number density and comoving volume calculated at the given `redshift`
+    values. The user must choose suitable `redshift` values to satisfy their
+    desired numerical accuracy.
 
     '''
 

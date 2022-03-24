@@ -9,8 +9,8 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
-        python: [3.9]
-        toxenv: [py39-test, py39-test-dev]
+        python: ['3.10']
+        toxenv: [py310-test, py310-test-dev]
         release: [main, latest]
     steps:
     - name: Checkout Repository

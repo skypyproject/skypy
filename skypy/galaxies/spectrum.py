@@ -73,20 +73,6 @@ def dirichlet_coefficients(redshift, alpha0, alpha1, z1=1., weight=None):
     .. [2] Blanton M. R., Roweis S., 2007, The Astronomical Journal,
            Volume 133, Page 734
 
-    Examples
-    --------
-    >>> from skypy.galaxies.spectrum import dirichlet_coefficients
-    >>> import numpy as np
-
-    Sample the coefficients according to [1]_ for n blue galaxies with
-    redshifts between 0 and 1.
-
-    >>> n = 100000
-    >>> alpha0 = np.array([2.079, 3.524, 1.917, 1.992, 2.536])
-    >>> alpha1 = np.array([2.265, 3.862, 1.921, 1.685, 2.480])
-    >>> redshift = np.linspace(0,2, n)
-    >>> coefficients = dirichlet_coefficients(redshift, alpha0, alpha1)
-
     """
 
     if np.ndim(alpha0) != 1 or np.ndim(alpha1) != 1:

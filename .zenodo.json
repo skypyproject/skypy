@@ -25,7 +25,7 @@
         },
         {
             "orcid": "0000-0002-1064-3400",
-            "affiliation": "University of Manchester",
+            "affiliation": "University of Portsmouth",
             "name": "Lucia F. de la Bella"
         },
         {
@@ -50,13 +50,18 @@
         },
         {
             "orcid": "0000-0002-4437-0770",
-            "affiliation": "University of Manchester",
+            "affiliation": "University of Oxford, University of Manchester",
             "name": "Ian Harrison"
         },
         {
             "orcid": "0000-0002-5304-9372",
             "affiliation": "University of Portsmouth",
             "name": "Ian Harry"
+        },
+        {
+            "orcid": "0000-0001-9994-1115",
+            "affiliation": "University of Geneva",
+            "name": "William G. Hartley"
         },
         {
             "orcid": "0000-0001-9233-2341",
@@ -80,13 +85,18 @@
         },
         {
             "orcid": "0000-0003-1291-1023",
-            "affiliation": "University of Manchester",
-            "name": "Richard Rollins"
+            "affiliation": "University of Edinburgh",
+            "name": "Richard P. Rollins"
         },
         {
             "orcid": "0000-0001-8685-2308",
             "affiliation": "University of Portsmouth",
             "name": "Philipp Sudek"
+        },
+        {
+            "orcid": "0000-0002-6724-833X",
+            "affiliation": "Institute of Astronomy and Astrophysics Academia Sinica",
+            "name": "Sut-Ieng Tam"
         },
         {
             "orcid": "0000-0002-9696-7931",
@@ -99,9 +109,19 @@
             "name": "Keiichi Umetsu"
         },
         {
+            "orcid": "0000-0001-9841-943X",
+            "affiliation": "University of Portsmouth",
+            "name": "Arthur E. Tolley"
+        },
+        {
             "orcid": "0000-0002-7627-8688",
             "affiliation": "University of Portsmouth",
             "name": "Andrew R. Williamson"
+        },
+        {
+            "orcid": "0000-0003-3334-3037",
+            "affiliation": "University of Manchester",
+            "name": "Laura Wolz"
         }
     ],
     "contributors": [
