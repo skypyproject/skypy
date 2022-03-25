@@ -201,6 +201,14 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
     return pknl.reshape(return_shape)
 
 
+# Smith et. al. 2003  model
 halofit_smith = partial(halofit, parameters=_smith_parameters)
+halofit_smith.__name__ = "halofit_smith"
+
+# Takahashi et al. 2012 model
 halofit_takahashi = partial(halofit, parameters=_takahashi_parameters)
+halofit_takahashi.__name__ = "halofit_takahashi"
+
+# Bird et al. 2012 model
 halofit_bird = partial(halofit, parameters=_bird_parameters)
+halofit_bird.__name__ = "halofit_bird"
