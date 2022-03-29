@@ -14,8 +14,8 @@ ideas or follow up an existing conversation on a feature of the roadmap.
 2. Upon agreement, open an issue describing the feature you will contribute with and 
 follow the guidelines in this page.
 
-.. _Code of Conduct: https://skypy.readthedocs.io/en/stable/project/code_of_conduct.html
-
+ .. _Discussions Page: https://github.com/skypyproject/skypy/discussions
+ 
 
 GitHub Workflow
 ---------------
