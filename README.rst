@@ -61,6 +61,34 @@ Examples_ that demonstrate how to use it.
 .. _Examples: https://skypy.readthedocs.io/en/stable/examples/index.html
 
 
+Contributing
+------------
+
+We love contributions! 
+SkyPy is open source,
+built on open source, and we'd love to have you hang out in our community.
+
+How to contribute
+^^^^^^^^^^^^^^^^^
+
+Whether you would like to contribute to SkyPy with your own piece of code or
+helping SkyPy develop a concrete feature of the SkyPy roadmap
+
+1. Read through our `Discussions Page`_ to start a new conversation and share your
+ideas or follow up an existing conversation on a feature of the roadmap.
+
+2. Upon agreement, open an issue describing the feature you will contribute with and 
+follow the `Contributor Guidelines`_.
+
+
+For information on how to contribute see our `Contributor Guidelines`_.
+All communication relating to The SkyPy Project must meet the standards set out
+in the `Code of Conduct`_.
+
+.. _Contributor Guidelines: https://skypy.readthedocs.io/en/latest/developer/contributing.html
+.. _Code of Conduct: https://skypy.readthedocs.io/en/stable/project/code_of_conduct.html
+
+
 Get in Touch
 ------------
 
@@ -70,18 +98,6 @@ please get in touch with the `SkyPy Co-ordinators`_.
 
  .. _Discussions Page: https://github.com/skypyproject/skypy/discussions
  .. _SkyPy Co-ordinators: mailto:skypy-coordinators@googlegroups.com
-
-Contributing
-------------
-
-We love contributions! SkyPy is open source,
-built on open source, and we'd love to have you hang out in our community.
-For information on how to contribute see our `Contributor Guidelines`_.
-All communication relating to The SkyPy Project must meet the standards set out
-in the `Code of Conduct`_.
-
-.. _Contributor Guidelines: https://skypy.readthedocs.io/en/latest/developer/contributing.html
-.. _Code of Conduct: https://skypy.readthedocs.io/en/stable/project/code_of_conduct.html
 
 .. |PyPI| image:: https://img.shields.io/pypi/v/skypy?label=PyPI&logo=pypi
     :target: https://pypi.python.org/pypi/skypy
