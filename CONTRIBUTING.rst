@@ -1,6 +1,22 @@
 Contributor Guidelines
 ======================
 
+How to contribute
+-----------------
+We love contributions! SkyPy is open source,
+built on open source, and we'd love to have you hang out in our community.
+Whether you would like to contribute to SkyPy with your own piece of code or
+helping SkyPy develop a concrete feature of the SkyPy roadmap:
+
+1. Read through our `Discussions Page`_ to start a new conversation and share your
+ideas or follow up an existing conversation on a feature of the roadmap.
+
+2. Upon agreement, open an issue describing the feature you will contribute with and 
+follow the guidelines in this page.
+
+.. _Code of Conduct: https://skypy.readthedocs.io/en/stable/project/code_of_conduct.html
+
+
 GitHub Workflow
 ---------------
 
