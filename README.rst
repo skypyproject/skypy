@@ -72,7 +72,7 @@ How to contribute
 ^^^^^^^^^^^^^^^^^
 
 Whether you would like to contribute to SkyPy with your own piece of code or
-helping SkyPy develop a concrete feature of the SkyPy roadmap
+helping SkyPy develop a concrete feature of the SkyPy roadmap:
 
 1. Read through our `Discussions Page`_ to start a new conversation and share your
 ideas or follow up an existing conversation on a feature of the roadmap.
@@ -81,7 +81,7 @@ ideas or follow up an existing conversation on a feature of the roadmap.
 follow the `Contributor Guidelines`_.
 
 
-For information on how to contribute see our `Contributor Guidelines`_.
+For further information on how to contribute see our `Contributor Guidelines`_.
 All communication relating to The SkyPy Project must meet the standards set out
 in the `Code of Conduct`_.
 
