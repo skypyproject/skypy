@@ -72,7 +72,7 @@ How to contribute
 ^^^^^^^^^^^^^^^^^
 
 Whether you would like to contribute to SkyPy with your own piece of code or
-helping SkyPy develop a concrete feature of the SkyPy roadmap:
+helping develop a concrete feature in SkyPy:
 
 1. Read through our `Discussions Page`_ to start a new conversation and share your
 ideas or follow up an existing conversation on a feature of the roadmap.
