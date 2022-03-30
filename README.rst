@@ -77,14 +77,17 @@ helping develop a concrete feature in SkyPy:
 1. Read through our `Discussions Page`_ to start a new conversation and share your
 ideas or follow up an existing conversation on a feature of the roadmap.
 
-2. Upon agreement, open an issue describing the feature you will contribute with and 
-follow the `Contributor Guidelines`_.
+2. Following the discussions, when you have a good idea of the specifics 
+of the feature you wish to contribute, open an `Issue`_ describing the feature. 
 
+3. Then follow the `Contributor Guidelines`_ to open a Pull Request to contribute
+the code implementing the new feature.
 
 For further information on how to contribute see our `Contributor Guidelines`_.
 All communication relating to The SkyPy Project must meet the standards set out
 in the `Code of Conduct`_.
 
+.. _Issue: https://github.com/skypyproject/skypy/issues
 .. _Contributor Guidelines: https://skypy.readthedocs.io/en/latest/developer/contributing.html
 .. _Code of Conduct: https://skypy.readthedocs.io/en/stable/project/code_of_conduct.html
 

@@ -6,16 +6,18 @@ How to contribute
 We love contributions! SkyPy is open source,
 built on open source, and we'd love to have you hang out in our community.
 Whether you would like to contribute to SkyPy with your own piece of code or
-helping SkyPy develop a concrete feature of the SkyPy roadmap:
+helping develop a concrete feature in SkyPy:
 
 1. Read through our `Discussions Page`_ to start a new conversation and share your
 ideas or follow up an existing conversation on a feature of the roadmap.
 
-2. Upon agreement, open an issue describing the feature you will contribute with and 
-follow the guidelines in this page.
+2. Following the discussions, when you have a good idea of the specifics 
+of the feature you wish to contribute, open an `Issue`_ describing the feature. 
+
+3. Then follow the `Contributor Guidelines`_ on the rest of this page to open a Pull Request to contribute the code implementing the new feature.
 
  .. _Discussions Page: https://github.com/skypyproject/skypy/discussions
- 
+ .. _Issue: https://github.com/skypyproject/skypy/issues
 
 GitHub Workflow
 ---------------
