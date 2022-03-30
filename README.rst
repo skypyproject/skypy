@@ -75,7 +75,7 @@ Whether you would like to contribute to SkyPy with your own piece of code or
 helping develop a concrete feature in SkyPy:
 
 1. Read through our `Discussions Page`_ to start a new conversation and share your
-ideas or follow up an existing conversation on a feature of the roadmap.
+ideas or follow up an existing conversation on a particular feature.
 
 2. Following the discussions, when you have a good idea of the specifics 
 of the feature you wish to contribute, open an `Issue`_ describing the feature. 
