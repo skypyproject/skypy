@@ -15,10 +15,11 @@ ideas or follow up an existing conversation on a particular feature.
 of the feature you wish to contribute, open an `Issue`_ describing the feature. 
 
 3. Then follow the `Contributor Guidelines`_ on the rest of this page to open
-a Pull Request to contribute the code implementing the new feature.
+a `Pull Request`_ to contribute the code implementing the new feature.
 
  .. _Discussions Page: https://github.com/skypyproject/skypy/discussions
  .. _Issue: https://github.com/skypyproject/skypy/issues
+ .. _Pull Request: https://github.com/skypyproject/skypy/pulls
 
 GitHub Workflow
 ---------------
