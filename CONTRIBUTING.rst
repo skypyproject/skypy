@@ -17,6 +17,19 @@ of the feature you wish to contribute, open an `Issue`_ describing the feature.
 3. Then follow the `Contributor Guidelines`_ on the rest of this page to open
 a `Pull Request`_ to contribute the code implementing the new feature.
 
+Members vs External contributions
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+In terms of contributing, there is very little difference between SkyPy members and external contributions!
+
+1. SkyPy members go through a simple onboarding process where their contributions are previously
+defined, they have access to internal communication channels, they are involved in decission making
+processes and attend quarterly meetings. Member's contributions
+will be acknowledged in the main author list of Zenodo.
+
+2. External contributors can develop as much code as any of the SkyPy members! And their contributions
+will be acknowledged as *''external contributions''* in Zenodo.
+
  .. _Discussions Page: https://github.com/skypyproject/skypy/discussions
  .. _Issue: https://github.com/skypyproject/skypy/issues
  .. _Pull Request: https://github.com/skypyproject/skypy/pulls

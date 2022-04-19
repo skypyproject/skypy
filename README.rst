@@ -92,6 +92,18 @@ in the `Code of Conduct`_.
 .. _Contributor Guidelines: https://skypy.readthedocs.io/en/latest/developer/contributing.html
 .. _Code of Conduct: https://skypy.readthedocs.io/en/stable/project/code_of_conduct.html
 
+Members vs External contributions
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+In terms of contributing, there is very little difference between SkyPy members and external contributions!
+
+1. SkyPy members go through a simple onboarding process where their contributions are previously
+defined, they have access to internal communication channels, they are involved in decission making
+processes and attend quarterly meetings. Member's contributions
+will be acknowledged in the main author list of Zenodo.
+
+2. External contributors can develop as much code as any of the SkyPy members! And their contributions
+will be acknowledged as ''external contributions'' in Zenodo.
 
 Get in Touch
 ------------
