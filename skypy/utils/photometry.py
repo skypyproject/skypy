@@ -316,7 +316,7 @@ def magnitude_error_rykoff(magnitude, magnitude_limit, magnitude_zp, a, b, error
     Parameters
     ----------
     magnitude: array_like
-        Galaxy apparent magnitude. This and the other array_like parameters must
+        Apparent magnitude. This and the other array_like parameters must
         be broadcastable to the same shape.
     magnitude_limit: array_like
         :math:`10\sigma` limiting magnitude of the survey. This and the other
@@ -355,7 +355,7 @@ def magnitude_error_rykoff(magnitude, magnitude_limit, magnitude_zp, a, b, error
 
         F=10^{-0.4(m - m_{\mathrm{ZP}})}
 
-    is the galaxy's flux,
+    is the source's flux,
 
     .. math::
 

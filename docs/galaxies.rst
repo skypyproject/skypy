@@ -86,7 +86,7 @@ The following models are found in the `skypy.galaxies.stellar_mass` package.
 
 .. currentmodule:: skypy.galaxies.stellar_mass
 .. autosummary::
-   :nosignatures:
+  :nosignatures:
 
   schechter_smf_mass
 
