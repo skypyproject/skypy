@@ -13,7 +13,7 @@ __all__ = [
     'luminosity_in_band',
     'mag_ab',
     'SpectrumTemplates',
-    'rykoff_error',
+    'magnitude_error_rykoff',
 ]
 
 try:
@@ -307,11 +307,11 @@ def absolute_magnitude_from_luminosity(luminosity, zeropoint=None):
     return -2.5*np.log10(luminosity) - zeropoint
 
 
-def rykoff_error(magnitude, magnitude_limit, magnitude_zp, a, b, error_limit=None):
+def magnitude_error_rykoff(magnitude, magnitude_limit, magnitude_zp, a, b, error_limit=np.inf):
     r"""Magnitude error acoording to the model from Rykoff et al. (2015).
 
-    Given the apparent magnitude of a galaxy calculate the magnitude error that is introduced
-    by the survey specifications and follows the model described in [1]_.
+    Given an apparent magnitude calculate the magnitude error that is introduced
+    by the survey specifications and follows the model described in Rykoff et al. (2015).
 
     Parameters
     ----------
@@ -335,12 +335,12 @@ def rykoff_error(magnitude, magnitude_limit, magnitude_zp, a, b, error_limit=Non
     Returns
     -------
     error: ndarray
-        The apparent magnitude error in the Rykoff et al. (2018) model. This is a scalar
+        The apparent magnitude error in the Rykoff et al. (2015) model. This is a scalar
         if magnitude, magnitude_limit, magnitude_zp, a and b are scalars.
 
     Notes
     -----
-    Rykoff et al. (2018) (see [1]_) describe the error of the apparent magnitude :math:`m` as
+    Rykoff et al. (2015) (see [1]_) describe the error of the apparent magnitude :math:`m` as
 
     .. math::
 
@@ -377,20 +377,18 @@ def rykoff_error(magnitude, magnitude_limit, magnitude_zp, a, b, error_limit=Non
 
     where :math:`a` and :math:`b` are free parameters.
 
+    Further note that the model was originally used for SDSS galaxy photometry.
+
     References
     ----------
     .. [1] Rykoff E. S., Rozo E., Keisler R., 2015, eprint arXiv:1509.00870
 
     """
 
-    flux = np.power(10, -0.4 * (np.subtract(magnitude, magnitude_zp)))
-    flux_limit = np.power(10, -0.4 * (np.subtract(magnitude_limit, magnitude_zp)))
-    t_eff = np.exp(a + b * (np.subtract(magnitude_limit, 21.0)))
-    flux_noise = np.square(flux_limit) * t_eff / np.square(10) - flux_limit
-    error = 2.5 / np.log(10) * np.sqrt(1 / (flux * t_eff) * (1 + flux_noise / flux))
+    flux = luminosity_from_absolute_magnitude(magnitude, -magnitude_zp)
+    flux_limit = luminosity_from_absolute_magnitude(magnitude_limit, -magnitude_zp)
+    t_eff = np.exp(a + b * np.subtract(magnitude_limit, 21.0))
+    flux_noise = np.square(flux_limit / 10) * t_eff - flux_limit
+    error = 2.5 / np.log(10) * np.sqrt((1 + flux_noise / flux) / (flux * t_eff))
 
-    # replace the values larger than the error limit with the error_limit
-    if error_limit is not None:
-        error = np.where(error > error_limit, error_limit, error)
-
-    return error
+    return np.minimum(error, error_limit)
