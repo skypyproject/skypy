@@ -95,15 +95,21 @@ in the `Code of Conduct`_.
 Members vs External contributions
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-In terms of contributing, there is very little difference between SkyPy members and external contributions!
+SkyPy allows contributions from two types of contributor: *Members* and *External Contributors*.
+These two categories are intended to allow contributions both from those who are willing and
+able to commit to being part of the SkyPy community and actively involved in the steering of the project,
+and those who wish to simply contribute code where a need has been identified.
 
-1. SkyPy members go through a simple onboarding process where their contributions are previously
-defined, they have access to internal communication channels, they are involved in decission making
-processes and attend quarterly meetings. Member's contributions
-will be acknowledged in the main author list of Zenodo.
+1. SkyPy *Members* go through a simple onboarding process where their expertise and expected contributions
+are discussed and defined. Members have access to internal communication channels, they are involved in
+SkyPy decision making processes and attend quarterly meetings.
+Members are listed as a separate tier in author lists for SkyPy publications,
+with the classification of "Project Members" in the Zenodo DoI.
 
-2. External contributors can develop as much code as any of the SkyPy members! And their contributions
-will be acknowledged as ''external contributions'' in Zenodo.
+2. *External Contributors* are able to develop, discuss and commit code in the same way as *Members*,
+but do not have the same responsibilities and opportunities for contributing to the guidance and management
+of SkyPy as a project. *External Contributors* are listed as a separate tier in author lists for SkyPy publications,
+with the classification of "Others" in the Zenodo version DoI.
 
 Get in Touch
 ------------
