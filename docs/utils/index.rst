@@ -144,6 +144,7 @@ create their own named `speclite.filters.FilterResponse`.
    mag_ab
    SpectrumTemplates
    magnitude_error_rykoff
+   logistic_completeness_function
 
 
 Random sampling (`skypy.utils.random`)
@@ -158,22 +159,8 @@ Special functions (`skypy.utils.special`)
 .. automodule:: skypy.utils.special
 
 
-Completeness functions (`skypy.utils.completeness_function`)
-============================================================
-
-This module contains methods that calculates the completeness of different
-cosmological surveys.
-
-.. currentmodule:: skypy.utils.completeness_function
-.. autosummary::
-   :nosignatures:
-
-   logistic_completeness_function
-
-
 Reference/API
 =============
 
 .. automodapi:: skypy.utils
 .. automodapi:: skypy.utils.photometry
-.. automodapi:: skypy.utils.completeness_function

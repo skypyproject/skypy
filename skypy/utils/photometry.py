@@ -5,6 +5,7 @@
 
 from abc import ABCMeta, abstractmethod
 import numpy as np
+import scipy.special
 
 
 __all__ = [
@@ -14,6 +15,7 @@ __all__ = [
     'mag_ab',
     'SpectrumTemplates',
     'magnitude_error_rykoff',
+    'logistic_completeness_function',
 ]
 
 try:
@@ -392,3 +394,53 @@ def magnitude_error_rykoff(magnitude, magnitude_limit, magnitude_zp, a, b, error
     error = 2.5 / np.log(10) * np.sqrt((1 + flux_noise / flux) / (flux * t_eff))
 
     return np.minimum(error, error_limit)
+
+
+def logistic_completeness_function(magnitude, magnitude_95, magnitude_50):
+    r'''Compute logistic completeness function.
+
+    This function calculates the logistic completeness function (based on eq. (7) in
+    Lopez-Sanjuan C. et al. (2017))
+
+    .. math::
+
+        p(m) = \frac{1}{1 + \exp[\kappa (m - m_{50})]}\;,
+
+    which describes the probability :math:`p(m)` that an object of magnitude :math:`m` is detected
+    in a specific band and with
+
+    .. math::
+
+        \kappa = \frac{\ln(\frac{1}{19})}{m_{95} - m_{50}}\;.
+
+    Here, :math:`m_{95}` and :math:`m_{50}` are the 95% and 50% completeness
+    magnitudes, respectively.
+
+    Parameters
+    ----------
+    magnitude : array_like
+        Magnitudes. Can be multidimensional for computing with multiple filter bands.
+    magnitude_95 : scalar or 1-D array_like
+        95% completeness magnitude.
+        If `magnitude_50` is 1-D array it has to be scalar or 1-D array of the same shape.
+    magnitude_50 : scalar or 1-D array_like
+        50% completeness magnitude.
+        If `magnitude_95` is 1-D array it has to be scalar or 1-D array of the same shape.
+
+    Returns
+    -------
+    probability : scalar or array_like
+        Probability of detecting an object with magnitude :math:`m`.
+        Returns array_like of the same shape as magnitude.
+        Exemption: If magnitude is scalar and `magnitude_95` or `magnitude_50`
+        is array_like of shape (nb, ) it returns array_like of shape (nb, ).
+
+    References
+    -----------
+    .. [1] Lopez-Sanjuan C. et al., 2017, A&A, 599, A62
+
+    '''
+
+    kappa = np.log(1. / 19) / np.subtract(magnitude_95, magnitude_50)
+    arg = kappa * np.subtract(magnitude, magnitude_50)
+    return scipy.special.expit(-arg)
