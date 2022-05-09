@@ -29,12 +29,12 @@ and those who wish to simply contribute code where a need has been identified.
 are discussed and defined. Members have access to internal communication channels, they are involved in
 SkyPy decision making processes and attend quarterly meetings.
 Members are listed as a separate tier in author lists for SkyPy publications,
-with the classification of "Project Members" in the Zenodo DoI.
+with the classification of "Creators" in the Zenodo DoI.
 
 2. *External Contributors* are able to develop, discuss and commit code in the same way as *Members*,
 but do not have the same responsibilities and opportunities for contributing to the guidance and management
 of SkyPy as a project. *External Contributors* are listed as a separate tier in author lists for SkyPy publications,
-with the classification of "Others" in the Zenodo version DoI.
+with the classification of "Others" in the Zenodo DoI.
 
  .. _Discussions Page: https://github.com/skypyproject/skypy/discussions
  .. _Issue: https://github.com/skypyproject/skypy/issues
