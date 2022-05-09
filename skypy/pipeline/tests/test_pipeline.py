@@ -2,13 +2,12 @@ from astropy.cosmology import FlatLambdaCDM, default_cosmology
 from astropy.cosmology.core import Cosmology
 from astropy.io import fits
 from astropy.io.misc.hdf5 import read_table_hdf5
-from astropy.table import Table
+from astropy.table import Table, vstack
 from astropy.table.column import Column
 from astropy.units import Quantity
 from astropy.utils.data import get_pkg_data_filename
 import networkx
 import numpy as np
-import os
 import pytest
 from skypy.pipeline import Pipeline
 from skypy.pipeline._items import Call, Ref
@@ -21,7 +20,7 @@ else:
     HAS_H5PY = True
 
 
-def test_pipeline():
+def test_pipeline(tmp_path):
 
     # Evaluate and store the default astropy cosmology.
     config = {'test_cosmology': Call(default_cosmology.get)}
@@ -44,7 +43,7 @@ def test_pipeline():
 
     pipeline = Pipeline(config)
     pipeline.execute()
-    output_filename = 'output.fits'
+    output_filename = str(tmp_path / 'output.fits')
     pipeline.write(output_filename)
     assert len(pipeline['test_table']) == size
     assert np.all(pipeline['test_table.column1'] < pipeline['test_table.column2'])
@@ -251,7 +250,7 @@ def test_column_quantity():
 
 
 @pytest.mark.skipif(not HAS_H5PY, reason='Requires h5py')
-def test_hdf5():
+def test_hdf5(tmp_path):
     size = 100
     string = size*'a'
     config = {'tables': {
@@ -264,16 +263,29 @@ def test_hdf5():
 
     pipeline = Pipeline(config)
     pipeline.execute()
-    pipeline.write('output.hdf5')
-    hdf_table = read_table_hdf5('output.hdf5', 'tables/test_table', character_as_bytes=False)
+    output_filename = str(tmp_path / 'output.hdf5')
+    pipeline.write(output_filename)
+    hdf_table = read_table_hdf5(output_filename, 'tables/test_table', character_as_bytes=False)
     assert np.all(hdf_table == pipeline['test_table'])
 
 
-def teardown_module(module):
+def test_depends():
 
-    # Remove fits file generated in test_pipeline
-    os.remove('output.fits')
+    # Regression test for GitHub Issue #464
+    # Previously the .depends keyword was also being passed to functions as a
+    # keyword argument. This was because Pipeline was executing Item.infer to
+    # handle additional function arguments from context before handling
+    # additional dependencies specified using the .depends keyword. The
+    # .depends keyword is now handled first.
 
-    # Remove hdf5 file generated in test_hdf5
-    if HAS_H5PY:
-        os.remove('output.hdf5')
+    config = {'tables': {
+                'table_1': {
+                  'column1': Call(np.random.uniform, [0, 1, 10])},
+                'table_2': {
+                    '.init': Call(vstack, [], {
+                      'tables': [Ref('table_1')],
+                      '.depends': ['table_1.complete']})}}}
+
+    pipeline = Pipeline(config)
+    pipeline.execute()
+    assert np.all(pipeline['table_1'] == pipeline['table_2'])

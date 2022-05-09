@@ -2,7 +2,7 @@
 SkyPy: A package for modelling the Universe
 ===========================================
 
-|Read the Docs| |GitHub| |Codecov|
+|Read the Docs| |GitHub| |Codecov| |Compatibility|
 
 This package contains methods for modelling the Universe, galaxies and the
 Milky Way. SkyPy simulates populations of astronomical objects, generating
@@ -68,7 +68,7 @@ You are welcome to talk about the SkyPy package and code using our
 `Discussions Page`_. For any other questions about the project in general,
 please get in touch with the `SkyPy Co-ordinators`_.
 
- .. _Discussions Page: https://github.com/skypyproject/skypy/discussions 
+ .. _Discussions Page: https://github.com/skypyproject/skypy/discussions
  .. _SkyPy Co-ordinators: mailto:skypy-coordinators@googlegroups.com
 
 Contributing
@@ -81,7 +81,7 @@ All communication relating to The SkyPy Project must meet the standards set out
 in the `Code of Conduct`_.
 
 .. _Contributor Guidelines: https://skypy.readthedocs.io/en/latest/developer/contributing.html
-.. _Code of Conduct: https://skypy.readthedocs.io/en/stable/project/CODE_OF_CONDUCT.html
+.. _Code of Conduct: https://skypy.readthedocs.io/en/stable/project/code_of_conduct.html
 
 .. |PyPI| image:: https://img.shields.io/pypi/v/skypy?label=PyPI&logo=pypi
     :target: https://pypi.python.org/pypi/skypy
@@ -94,6 +94,9 @@ in the `Code of Conduct`_.
 
 .. |GitHub| image:: https://github.com/skypyproject/skypy/workflows/Tests/badge.svg
     :target: https://github.com/skypyproject/skypy/actions
+
+.. |Compatibility| image:: https://github.com/skypyproject/skypy/actions/workflows/compatibility.yaml/badge.svg
+    :target: https://github.com/skypyproject/skypy/actions/workflows/compatibility.yaml
 
 .. |Codecov| image:: https://codecov.io/gh/skypyproject/skypy/branch/main/graph/badge.svg
     :target: https://codecov.io/gh/skypyproject/skypy

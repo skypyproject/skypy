@@ -100,7 +100,7 @@ for ax, (z_min, z_max) in zip([a1, a2, a3, a4], z_slices):
     ax.plot(bins, phi_model, label='Model', color='b')
     ax.text(-14.3, 5e-7, r'${:.2f} \leq z < {:.2f}$'.format(z_min, z_max))
     ax.set_xlabel(r'$M_B$')
-    ax.set_ylabel(r'$\log_{10} \Phi \, [\mathrm{Mpc}^{-3} \, \mathrm{mag}^{-1}]$')
+    ax.set_ylabel(r'$\Phi \, [\mathrm{Mpc}^{-3} \, \mathrm{mag}^{-1}]$')
     ax.set_yscale('log')
     ax.set_xlim([-14, -24])
     ax.set_ylim([3e-7, 3e-2])
