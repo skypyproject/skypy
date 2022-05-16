@@ -397,7 +397,7 @@ def magnitude_error_rykoff(magnitude, magnitude_limit, magnitude_zp, a, b, error
 
 
 def logistic_completeness_function(magnitude, magnitude_95, magnitude_50):
-    r'''Compute logistic completeness function.
+    r'''Logistic completeness function.
 
     This function calculates the logistic completeness function (based on eq. (7) in
     Lopez-Sanjuan C. et al. (2017))
