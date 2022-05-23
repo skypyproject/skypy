@@ -287,3 +287,75 @@ def ryden04_ellipticity(mu_gamma, sigma_gamma, mu, sigma, size=None):
 
     # return the ellipticity
     return (1-q)/(1+q)
+
+
+def dust_extincted_ellipticity(mu_gamma, sigma_gamma, mu, sigma,
+                               M_star, alpha, M_lim, E0, size=None):
+    r'''Ellipticity distribution of Padilla & Strauss (2008).
+
+    The ellipticity is sampled by randomly projecting a 3D ellipsoid with
+    principal axes :math:`A > B > C` [1]_. The distribution of the axis ratio
+    :math:`\gamma = C/A` is a truncated normal with mean :math:`\mu_\gamma` and
+    standard deviation :math:`\sigma_\gamma`. The distribution of
+    :math:`\epsilon = \log(1 - B/A)` is truncated normal with mean :math:`\mu`
+    and standard deviation :math:`\sigma`.
+
+
+    Parameters
+    ----------
+    mu_gamma : array_like
+        Mean of the truncated Gaussian for :math:`\gamma`.
+    sigma_gamma : array_like
+        Standard deviation for :math:`\gamma`.
+    mu : array_like
+        Mean of the truncated Gaussian for :math:`\epsilon`.
+    sigma : array_like
+        Standard deviation for :math:`\epsilon`.
+    M_star : float
+        Characteristic absolute magnitude.
+    alpha : float
+        Schechter function index.
+    E0 : float
+        Edge on magnitude extinction.
+    M_lim : float
+        Absolute magnitude limit
+    size : int or tuple of ints or None
+        Size of the sample. If `None` the size is inferred from the parameters.
+
+    Returns
+    -------
+    ellipticity: (size,) array_like
+        Ellipticities sampled from the Padilla & Strauss 2008 model.
+
+    References
+    ----------
+    .. [1] Ryden B. S., 2004, ApJ, 601, 214
+    .. [2] Padilla N. D., Strauss M. A., MNRAS, 288, 1321
+
+    '''
+
+    if size is None:
+        size = np.broadcast(mu_gamma, sigma_gamma, mu, sigma).shape
+
+    # truncation for gamma standard normal
+    a_gam = np.divide(np.negative(mu_gamma), sigma_gamma)
+    b_gam = np.divide(np.subtract(1, mu_gamma), sigma_gamma)
+
+    # truncation for log(epsilon) standard normal
+    a_eps = -np.inf
+    b_eps = np.divide(np.negative(mu), sigma)
+
+    # draw gamma and epsilon from truncated normal -- eq.s (10)-(11)
+    gam = stats.truncnorm.rvs(a_gam, b_gam, mu_gamma, sigma_gamma, size=size)
+    eps = np.exp(stats.truncnorm.rvs(a_eps, b_eps, mu, sigma, size=size))
+
+    # scipy 1.5.x bug: make scalar if size is empty
+    if size == () and not np.isscalar(gam):  # pragma: no cover
+        gam, eps = gam.item(), eps.item()
+
+    # random projection of random triaxial ellipsoid
+    q = random.triaxial_axis_ratio_extincted(1-eps, gam, M_star, alpha, E0,
+                                             M_lim)
+
+    # return the ellipticity
+    return (1-q)/(1+q)
