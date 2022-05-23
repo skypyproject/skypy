@@ -143,6 +143,28 @@ class KCorrectTemplates(SpectrumTemplates):
         Mt = self.absolute_magnitudes(coefficients, filter)
         return np.power(10, 0.4*(Mt-magnitudes))
 
+    def stellar_mass_remain(self, coefficients, magnitudes, filter):
+        r'''Compute total surviving stellar mass from absolute magnitudes.
+
+        Parameters
+        ----------
+        coefficients : (ng, nt) array_like
+            Array of template coefficients.
+        magnitudes : (ng,) array_like
+            The magnitudes to match in the reference bandpass.
+        filter : str
+            A single reference bandpass filter specification for
+            `~speclite.filters.load_filters`.
+
+        Returns
+        -------
+        stellar_mass : (ng,) array_like
+            Total surviving stellar mass of each galaxy in template units.
+        '''
+        m = self.stellar_mass(coefficients, magnitudes, filter)
+        m *= np.dot(coefficients, self.mremain)
+        return m
+
     def metallicity(self, coefficients):
         r'''Galaxy metallicities from kcorrect templates.
 
