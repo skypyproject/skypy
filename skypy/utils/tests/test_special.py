@@ -1,7 +1,7 @@
 import numpy as np
 import numpy.testing as npt
 from astropy.utils.data import get_pkg_data_filename
-from astropy.tests.helper import raises
+import pytest
 
 from skypy.utils.special import gammaincc
 
@@ -80,13 +80,13 @@ def test_gammaincc_precision():
     npt.assert_allclose(g, v, rtol=1e-10, atol=0, err_msg='\n'.join(lines))
 
 
-@raises(ValueError)
 def test_gammaincc_neg_x_scalar():
     # negative x raises an exception
-    gammaincc(0.5, -1.0)
+    with pytest.raises(ValueError):
+        gammaincc(0.5, -1.0)
 
 
-@raises(ValueError)
 def test_gammaincc_neg_x_array():
     # negative x in array raises an exception
-    gammaincc(0.5, [3.0, 2.0, 1.0, 0.0, -1.0])
+    with pytest.raises(ValueError):
+        gammaincc(0.5, [3.0, 2.0, 1.0, 0.0, -1.0])
