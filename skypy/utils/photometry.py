@@ -400,7 +400,7 @@ def logistic_completeness_function(magnitude, magnitude_95, magnitude_50):
     r'''Logistic completeness function.
 
     This function calculates the logistic completeness function (based on eq. (7) in
-    Lopez-Sanjuan C. et al. (2017))
+    López-Sanjuan, C. et al. (2017) [1]_.
 
     .. math::
 
@@ -437,7 +437,8 @@ def logistic_completeness_function(magnitude, magnitude_95, magnitude_50):
 
     References
     -----------
-    .. [1] Lopez-Sanjuan C. et al., 2017, A&A, 599, A62
+    .. [1] López-Sanjuan, C. et al., `2017A&A…599A..62L`_
+    .. _2017A&A…599A..62L: https://ui.adsabs.harvard.edu/abs/2017A%26A...599A..62L
 
     '''
 
