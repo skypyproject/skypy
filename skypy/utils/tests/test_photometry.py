@@ -212,3 +212,21 @@ def test_magnitude_error_rykoff():
     error_limit = 1
     error = magnitude_error_rykoff(magnitude, magnitude_limit, magnitude_zp, a, b, error_limit)
     assert error == error_limit
+
+
+def test_logistic_completeness_function():
+    from skypy.utils.photometry import logistic_completeness_function
+
+    # Test that arguments broadcast correctly
+    m = np.full((2, 1, 1), 21)
+    m95 = np.full((3, 1), 22)
+    m50 = np.full(5, 23)
+    p = logistic_completeness_function(m, m95, m50)
+    assert p.shape == np.broadcast(m, m95, m50).shape
+
+    # Test result of completeness function for different given magnitudes
+    m95 = 24
+    m50 = 25
+    m = [np.finfo(np.float64).min, m95, m50, 2*m50-m95, np.finfo(np.float64).max]
+    p = logistic_completeness_function(m, m95, m50)
+    assert np.allclose(p, [1, 0.95, 0.5, 0.05, 0])
