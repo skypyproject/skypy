@@ -217,7 +217,7 @@ def test_magnitude_error_rykoff():
 def test_logistic_completeness_function():
     from skypy.utils.photometry import logistic_completeness_function
 
-    # Test that correct shapeis returned
+    # Test that arguments broadcast correctly
     m = np.full((2, 1, 1), 21)
     m95 = np.full((3, 1), 22)
     m50 = np.full(5, 23)
