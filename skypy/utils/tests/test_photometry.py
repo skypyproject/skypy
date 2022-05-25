@@ -200,7 +200,7 @@ def test_magnitude_error_rykoff():
     b = 2
     a = np.log(10) - 1.5 * b
     error = magnitude_error_rykoff(magnitude, magnitude_limit, magnitude_zp, a, b)
-    assert error == 2.5 / np.log(10) * np.sqrt(1 / 1000)
+    assert np.isclose(error, 0.25 / np.log(10) / np.sqrt(10))
 
     # test that error limit is returned if error is larger than error_limit
     # The following set-up would give a value larger than 10
