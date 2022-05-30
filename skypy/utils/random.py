@@ -135,11 +135,16 @@ def triaxial_axis_ratio(zeta, xi, size=None):
     return q
 
 def triaxial_axis_ratio_extincted(zeta, xi, M_star, alpha, E0, M_lim,
-                                  size=None):
-    r'''axis ratio of a randomly projected triaxial ellipsoid
+                                  resolution=1000, size=None):
+    r'''axis ratio of a randomly projected triaxial ellipsoid obscured by a dust
+    ring of maximum extinction E0.
 
     Given the two axis ratios `1 >= zeta >= xi` of a randomly oriented triaxial
     ellipsoid, computes the axis ratio `q` of the projection.
+
+    The polar viewing angle is drawn from a non-flat cosine distribution
+    following equation (3) in [2], assuming a Schechter luminosity function
+    characterised by M_star and alpha and limited by M_lim.
 
     Parameters
     ----------
@@ -147,22 +152,36 @@ def triaxial_axis_ratio_extincted(zeta, xi, M_star, alpha, E0, M_lim,
         Axis ratio of intermediate and major axis.
     xi : array_like
         Axis ratio of minor and major axis.
+    M_star : float
+        Characteristic absolute magnitude of the Schechter function in [2]_.
+    alpha : float or int
+        The alpha parameter in the Schechter function in [2]_.
+    E0 : float
+        Edge-on extinction in magnitudes
+    M_lim : float
+        Absolute magnitude limit of the Schechter function in [2]_.
+    resolution : int
+        Resolution of the inverse transform sampling spline. Default is 1000.
     size : tuple of int or None
         Size of the random draw. If `None` is given, size is inferred from
         other inputs.
 
     Returns
     -------
-    q : array_like
+    q : (size,) array_like
         Axis ratio of the randomly projected ellipsoid.
 
     Notes
     -----
-    See equations (11) and (12) in [1]_ for details.
+    See equations (11) and (12) in [1]_ and (1), (2) and (3) in [3]_
+    for details.
 
     References
     ----------
     .. [1] Binney J., 1985, MNRAS, 212, 767. doi:10.1093/mnras/212.4.767
+    .. [2] https://en.wikipedia.org/wiki/Luminosity_function_(astronomy)
+    .. [3] Padilla N. D., Strauss M. A., 2008, MNRAS, 388, 1321
+
     '''
 
     # get size from inputs if not explicitly provided
@@ -172,8 +191,7 @@ def triaxial_axis_ratio_extincted(zeta, xi, M_star, alpha, E0, M_lim,
     # draw random viewing angle (theta, phi)
     # Ellipsoid with A > B > C axes. zeta = B/A; xi = C/A; y = C/B = xi/zeta
     y = xi/zeta
-    theta = schecter_extincted_angle(y, E0, alpha, M_star, M_lim, resolution,
-                                     size=size)
+    theta = schechter_extincted_angle(y, E0, alpha, M_star, M_lim, resolution)
     cos2_theta = np.cos(theta)**2
 
     sin2_theta = 1 - cos2_theta
@@ -196,21 +214,64 @@ def triaxial_axis_ratio_extincted(zeta, xi, M_star, alpha, E0, M_lim,
 
     return q
 
-def schecter_extincted_angle(y, E0, alpha, M_star, M_lim, resolution,
+def schechter_extincted_angle(y, E0, alpha, M_star, M_lim, resolution=1000,
                              size = None):
-    """
-    This function should return an array of theta angles use to project a
-    triaxial ellipsoid. The distribution depends on the parameters of the
-    schecter luminosity function
-    """
+    r'''Sample from dust extincted polar viewing angle distribution, assuming
+    a Schechter luminosity function.
 
-    # Extinction increases with theta. Eq (1)
-    theta = np.linspace(0, np.pi, resolution)
-    theta_blocked = np.where(np.cos(theta) > y)
+    Parameters
+    ----------
+    y : float
+        Galaxy height to diameter ratio
+    E0 : float
+        Edge-on extinction in magnitudes
+    alpha : float
+        The alpha parameter in the Schechter function in [1]_.
+    M_star : float
+        Characteristic absolute magnitude of the Schechter function in [1]_.
+    M_lim : float
+        Absolute magnitude limit of the Schechter function in [1]_.
+    resolution : int
+        Resolution of the inverse transform sampling spline. Default is 1000.
+    size : tuple of int or None
+        Size of the random draw. If `None` is given, size is inferred from
+        other inputs.
+
+    Returns
+    -------
+    theta_sample : (size,) array_like
+        Polar viewing angle samples drawn from a non-flat extincted
+        distribution.
+
+    Warnings
+    --------
+    The inverse cumulative distribution function is approximated from the
+    observed galaxy ratio psi evaluated on a spaced grid. The user
+    must choose the `resolution` of this grid to satisfy their desired
+    numerical accuracy.
+
+    Notes
+    -----
+    See equations (1), (2) and (3) in [2]_ for details.
+
+    References
+    ----------
+    .. [1] https://en.wikipedia.org/wiki/Luminosity_function_(astronomy)
+    .. [2] Padilla N. D., Strauss M. A., 2008, MNRAS, 388, 1321
+
+    '''
+    # get size from inputs if not explicitly provided
+    if size is None:
+        size = len(y)
+
+    # generate array of y and theta values
+    y = np.repeat(y, resolution)
+    theta = np.tile(np.linspace(0 , np.pi, resolution), size)
+
+    # Extinction increases with theta. Eq (1) in [2]
     E_theta = np.ones_like(theta)*E0
-    E_theta[theta_blocked] = E0*(1 + y - np.cos(theta)[theta_blocked])
-
-    # Extincted magnitude limit as a function of theta
+    mask = np.abs(np.cos(theta)) > y
+    E_theta[mask] = E0*(1 + y[mask] - np.abs(np.cos(theta[mask])))
     M_lim_ext = M_lim + E_theta
 
     # Convert to luminosities for easier integration
@@ -218,5 +279,28 @@ def schecter_extincted_angle(y, E0, alpha, M_star, M_lim, resolution,
     L_star = 10**(-0.4*M_star)
     L_lim_ext = 10**(-0.4*M_lim_ext)
 
-    # Integration of the schecter function is an incomplete gamma function
-    phi = gammainc(alpha+1, L_lim_ext/L_star) / gammainc(alpha+1, L_lim/L_star)
+    # Integration of the schechter function is an incomplete gamma function
+    # Eq (3) in [2]
+    psi = gammainc(alpha+1, L_lim_ext/L_star) / gammainc(alpha+1, L_lim/L_star)
+
+    # Reshape arrays
+    print(size, resolution)
+    E_theta = E_theta.reshape(size, resolution)
+    theta = theta.reshape(size, resolution)
+    psi = psi.reshape(size, resolution)
+
+    # Theta distribution is sine function, times the likelihood Psi
+    pdf = np.sin(theta) * psi
+    cdf = pdf  # in place
+    np.cumsum((pdf[:,1:]+pdf[:,:-1])/2*np.diff(theta), axis=1, out=cdf[:, 1:])
+    cdf[:,0] = 0
+    norm = cdf[:,-1]
+    cdf /= norm[:, None]
+
+    # Sampling from inverse cumulative distribution
+    invu = np.random.uniform(0, 1, size=size)
+    theta_samples = np.empty(size)
+    for iu, u in enumerate(invu):
+        theta_samples[iu] = np.interp(u, cdf[iu], theta[iu])
+
+    return theta_samples

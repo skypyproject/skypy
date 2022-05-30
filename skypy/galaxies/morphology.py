@@ -289,16 +289,20 @@ def ryden04_ellipticity(mu_gamma, sigma_gamma, mu, sigma, size=None):
     return (1-q)/(1+q)
 
 
-def dust_extincted_ellipticity(mu_gamma, sigma_gamma, mu, sigma,
-                               M_star, alpha, M_lim, E0, size=None):
+def dust_extincted_ellipticity(mu_gamma, sigma_gamma, mu, sigma, M_star, alpha,
+                               M_lim, E0, resolution=1000, size=None):
     r'''Ellipticity distribution of Padilla & Strauss (2008).
 
     The ellipticity is sampled by randomly projecting a 3D ellipsoid with
-    principal axes :math:`A > B > C` [1]_. The distribution of the axis ratio
-    :math:`\gamma = C/A` is a truncated normal with mean :math:`\mu_\gamma` and
-    standard deviation :math:`\sigma_\gamma`. The distribution of
-    :math:`\epsilon = \log(1 - B/A)` is truncated normal with mean :math:`\mu`
-    and standard deviation :math:`\sigma`.
+    principal axes :math:`A > B > C` [2]_.
+    The projection angle is randomly drawn, accounting for the likelihood of a
+    galaxy to enter the sample at a viewing angle due to extinction by dust,
+    following the model in [3].
+    The distribution of the axis ratio :math:`\gamma = C/A` is a truncated
+    normal with mean :math:`\mu_\gamma` and standard deviation
+    :math:`\sigma_\gamma`. The distribution of :math:`\epsilon = \log(1 - B/A)`
+    is truncated normal with mean :math:`\mu` and standard deviation
+    :math:`\sigma`.
 
 
     Parameters
@@ -312,13 +316,15 @@ def dust_extincted_ellipticity(mu_gamma, sigma_gamma, mu, sigma,
     sigma : array_like
         Standard deviation for :math:`\epsilon`.
     M_star : float
-        Characteristic absolute magnitude.
+        Characteristic absolute magnitude of the Schechter function in [1]_.
     alpha : float
-        Schechter function index.
+        The alpha parameter in the Schechter function in [1]_.
     E0 : float
         Edge on magnitude extinction.
     M_lim : float
-        Absolute magnitude limit
+        Absolute magnitude limit of the Schechter function in [1]_.
+    resolution : int
+        Resolution of the inverse transform sampling spline. Default is 1000.
     size : int or tuple of ints or None
         Size of the sample. If `None` the size is inferred from the parameters.
 
@@ -329,8 +335,9 @@ def dust_extincted_ellipticity(mu_gamma, sigma_gamma, mu, sigma,
 
     References
     ----------
-    .. [1] Ryden B. S., 2004, ApJ, 601, 214
-    .. [2] Padilla N. D., Strauss M. A., MNRAS, 288, 1321
+    .. [1] https://en.wikipedia.org/wiki/Luminosity_function_(astronomy)
+    .. [2] Ryden B. S., 2004, ApJ, 601, 214
+    .. [3] Padilla N. D., Strauss M. A., MNRAS, 288, 1321
 
     '''
 
@@ -355,7 +362,7 @@ def dust_extincted_ellipticity(mu_gamma, sigma_gamma, mu, sigma,
 
     # random projection of random triaxial ellipsoid
     q = random.triaxial_axis_ratio_extincted(1-eps, gam, M_star, alpha, E0,
-                                             M_lim)
+                                             M_lim, resolution)
 
     # return the ellipticity
     return (1-q)/(1+q)

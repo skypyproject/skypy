@@ -224,3 +224,45 @@ def test_ryden04_ellipticity():
     # sample a spherical distribution
     e = ryden04_ellipticity(1-1e-99, 1e-99, -1e99, 1e-99, size=1000)
     assert np.allclose(e, 0.)
+
+def test_dust_extincted_ellipticity():
+    from skypy.galaxies.morphology import dust_extincted_ellipticity
+    from skypy.galaxies.morphology import ryden04_ellipticity
+
+    # sample a single ellipticity
+    e = dust_extincted_ellipticity(0.222, 0.056, -1.85, 0.89)
+    assert np.isscalar(e)
+
+    # sample many ellipticities
+    e = dust_extincted_ellipticity(0.222, 0.056, -1.85, 0.89, size=1000)
+    assert np.shape(e) == (1000,)
+
+    # sample with explicit shape
+    e = dust_extincted_ellipticity(0.222, 0.056, -1.85, 0.89, size=(10, 10))
+    assert np.shape(e) == (10, 10)
+
+    # sample with implicit size
+    e1 = dust_extincted_ellipticity([0.222, 0.333], 0.056, -1.85, 0.89)
+    e2 = dust_extincted_ellipticity(0.222, [0.056, 0.067], -1.85, 0.89)
+    e3 = dust_extincted_ellipticity(0.222, 0.056, [-1.85, -2.85], 0.89)
+    e4 = dust_extincted_ellipticity(0.222, 0.056, -1.85, [0.89, 1.001])
+    assert np.shape(e1) == np.shape(e2) == np.shape(e3) == np.shape(e4) == (2,)
+
+    # sample with broadcasting rule
+    e = dust_extincted_ellipticity([[0.2, 0.3], [0.4, 0.5]], 0.1, [-1.9, -2.9], 0.9)
+    assert np.shape(e) == (2, 2)
+
+    # sample with random parameters and check that result is in unit range
+    args = np.random.rand(4)*[1., .1, -2., 1.]
+    e = dust_extincted_ellipticity(*args, size=1000)
+    assert np.all((e >= 0.) & (e <= 1.))
+
+    # sample a spherical distribution
+    e = dust_extincted_ellipticity(1-1e-99, 1e-99, -1e99, 1e-99, size=1000)
+    assert np.allclose(e, 0.)
+
+    # sample with 0 Extinction and check the result is identical to ryden04
+
+    # sample with large magnitude limit and check the result is close to ryden04
+
+    
