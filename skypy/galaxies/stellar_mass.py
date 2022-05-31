@@ -23,7 +23,8 @@ def schechter_smf_mass(redshift, alpha, m_star, m_min, m_max, size=None,
     redshift : array_like
         Galaxy redshifts for which to sample magnitudes.
     alpha : float or function
-        The alpha parameter in the Schechter stellar mass function.
+        The alpha parameter in the Schechter stellar mass function. If function,
+        it must return a scalar value.
     m_star : (nm,) array-like or function
         Characteristic stellar mass m_*.
     size: int, optional

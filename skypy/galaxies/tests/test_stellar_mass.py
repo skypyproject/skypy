@@ -32,44 +32,23 @@ def test_stellar_masses():
     sample = stellar_mass.schechter_smf_mass(0., -1.4, m_star, 1.e7, 1.e13, size=None)
     assert m_star.shape == sample.shape
 
-    # Test m_star can be callable
+    # Test m_star can be a function that returns an array of values for each redshift
     redshift = np.linspace(0, 2, 100)
     alpha = 0.357
     m_min = 10 ** 7
     m_max = 10 ** 14
-    m_star = Exponential1D(10**10.626, np.log(10)*1/0.095)
-    try:
-        sample = stellar_mass.schechter_smf_mass(redshift, alpha, m_star,
-                                                 m_min, m_max)
-    except Exception as exc:
-        pytest.fail(f"Unexpected exception {exc} for test that m_star is a callable.")
+    m_star_function = Exponential1D(10**10.626, np.log(10)/0.095)
+    sample = stellar_mass.schechter_smf_mass(redshift, alpha, m_star_function, m_min, m_max)
+    assert sample.shape == redshift.shape
 
-    # Test alpha can be scalar returning callable.
-    redshift = np.linspace(0, 2, 100)
+    # Test alpha can be a function returning a scalar value.
+    sample = stellar_mass.schechter_smf_mass(redshift, lambda z: alpha, 10**10.626, m_min, m_max)
+    assert sample.shape == redshift.shape
 
-    def alpha(z):
-        return 0.357 + 0
-
-    m_min = 10 ** 7
-    m_max = 10 ** 14
-    m_star = 10**10.626
-    try:
-        sample = stellar_mass.schechter_smf_mass(redshift, alpha, m_star,
-                                                 m_min, m_max)
-    except Exception as exc:
-        pytest.fail(f"Unexpected exception {exc} for test that alpha is a "
-                    "scalar returning callable.")
-
-    # sample with array for alpha
-    # not implemented at the moment
-    redshift = np.linspace(0, 2, 100)
-    alpha = np.linspace(0, 0.357, 20)
-    m_min = 10 ** 7
-    m_max = 10 ** 14
-    m_star = 10**10.626
-    with pytest.raises(NotImplementedError):
-        sample = stellar_mass.schechter_smf_mass(redshift, alpha, m_star,
-                                                 m_min, m_max)
+    # Sampling with an array for alpha is not implemented
+    alpha_array = np.full_like(redshift, alpha)
+    with pytest.raises(NotImplementedError, match='only scalar alpha is supported'):
+        sample = stellar_mass.schechter_smf_mass(redshift, alpha_array, m_star, m_min, m_max)
 
     # Test that sampling corresponds to sampling from the right pdf.
     # For this, we sample an array of luminosities for redshift z = 1.0 and we
