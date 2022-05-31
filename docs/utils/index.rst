@@ -143,6 +143,8 @@ create their own named `speclite.filters.FilterResponse`.
    luminosity_in_band
    mag_ab
    SpectrumTemplates
+   magnitude_error_rykoff
+   logistic_completeness_function
 
 
 Random sampling (`skypy.utils.random`)
