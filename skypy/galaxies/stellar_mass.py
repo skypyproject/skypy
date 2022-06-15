@@ -144,9 +144,6 @@ def schechter_smf_amplitude_satellites(phi_centrals, fsatellite):
 
     '''
 
-    if np.ndim(phi_centrals) == 2 and np.ndim(fsatellite) == 1:
-        phi_centrals = phi_centrals[:, np.newaxis]
-
     return phi_centrals * np.log(1 / (1 - fsatellite))
 
 

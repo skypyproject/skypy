@@ -91,30 +91,33 @@ def test_schechter_smf_amplitude_satellites():
     phic_scalar = 10**-2.423
     fsat_scalar = 0.4
 
-    # Array inputs
-    phic_array = np.array([10**-2.423, 10**-2.422])
-    fsat_array = np.array([0.40, 0.41, 0.42])
+    # 1D Array inputs
+    phic_1d = np.array([10**-2.423, 10**-2.422])
+    fsat_1d = np.array([0.40, 0.41, 0.42])
+
+    # 2D Array inputs
+    phic_2d = np.array([[10**-2.50, 10**-2.51, 10**-2.51], [10**-2.50, 10**-2.51, 10**-2.51]])
 
     # Test for scalar output
     phis_scalar = stellar_mass.schechter_smf_amplitude_satellites(phic_scalar, fsat_scalar)
     assert np.isscalar(phis_scalar)
 
     # Test for 1 dim output
-    phis_1d_phib = stellar_mass.schechter_smf_amplitude_satellites(phic_array, fsat_scalar)
-    phis_1d_fsat = stellar_mass.schechter_smf_amplitude_satellites(phic_scalar, fsat_array)
-    assert phis_1d_phib.shape == phic_array.shape
-    assert phis_1d_fsat.shape == fsat_array.shape
+    phis_1d_phib = stellar_mass.schechter_smf_amplitude_satellites(phic_1d, fsat_scalar)
+    phis_1d_fsat = stellar_mass.schechter_smf_amplitude_satellites(phic_scalar, fsat_1d)
+    assert phis_1d_phib.shape == phic_1d.shape
+    assert phis_1d_fsat.shape == fsat_1d.shape
 
     # Test for 2 dim output
-    phis_2d = stellar_mass.schechter_smf_amplitude_satellites(phic_array, fsat_array)
-    assert phis_2d.shape == (len(phic_array), len(fsat_array))
+    phis_2d = stellar_mass.schechter_smf_amplitude_satellites(phic_2d, fsat_1d)
+    assert phis_2d.shape == (len(phic_2d), len(fsat_1d))
 
     # Corner case: no satellite galaxies
     fsat_null = 0
     phis_null_scalar = stellar_mass.schechter_smf_amplitude_satellites(phic_scalar, fsat_null)
-    phis_null_array = stellar_mass.schechter_smf_amplitude_satellites(phic_array, fsat_null)
+    phis_null_1d = stellar_mass.schechter_smf_amplitude_satellites(phic_1d, fsat_null)
     assert phis_null_scalar == 0
-    assert np.all(phis_null_array == np.zeros(len(phic_array)))
+    assert np.all(phis_null_1d == np.zeros(len(phic_1d)))
 
 
 def test_schechter_smf_amplitude_mass_quenched():
