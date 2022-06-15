@@ -8,7 +8,10 @@ from ..utils.random import schechter
 
 __all__ = [
     'schechter_smf_mass',
-    'schechter_smf_parameters',
+    'schechter_smf_amplitude_centrals',
+    'schechter_smf_amplitude_satellites',
+    'schechter_smf_amplitude_mass_quenched',
+    'schechter_smf_amplitude_satellite_quenched',
 ]
 
 
@@ -77,39 +80,62 @@ def schechter_smf_mass(redshift, alpha, m_star, m_min, m_max, size=None,
     return m
 
 
-def schechter_smf_parameters(active_parameters, fsatellite, fenvironment):
-    r'''Schechter parameters.
-    This function returns the Schechter mass function parameters
-    for active galaxies (centrals and satellites)
-    and passive galaxies (mass- and satellite-quenched)
-    based on equation (15) in de la Bella et al. 2021 [1]_.
+def schechter_smf_amplitude_centrals(phi_blue_total, fsatellite):
+    r'''Schechter amplitude of centrals.
+    This function returns the Schechter mass function amplitude
+    for active central population based on equation (15)
+    in de la Bella et al. 2021 [1]_.
 
     Parameters
     ----------
-    active_parameters: tuple
-        Schechter mass function parameters for the entire active
-        sample of galaxies: :math:`(\phi_b, \alpha_b, m_{*})`.
-        Note: in [1], :math:`\alpha_b` and :math:`m_{*}` are
-        constants. The elements of the tuple should be scalars.
-        Exception: :math:`\phi_b` can be array only when
-        fsatellite is scalar.
+    phi_blue_total: float, (nt, ) array_like
+        Schechter mass function amplitude for the entire active
+        sample of galaxies, :math:`(\phi_b, \alpha_b, m_{*})`.
 
-    fsatellite: float, (n, ) array_like
+    fsatellite: float, (nm, ) array_like
         Fraction of active satellite galaxies between 0 and 1.
         It could be a float or an array, depending on the model you choose.
 
-    fenvironment: float
-        Fraction of satellite-quenched galaxies between 0 and 1.
+    Returns
+    -------
+    amplitude: float, (nt, nm) array_like
+        Amplitude of the Schechter mass function.
 
+     References
+    ----------
+    .. [1] de la Bella et al. 2021, Quenching and Galaxy Demographics,
+           arXiv 2112.11110.
+
+    '''
+
+    if np.ndim(phi_blue_total) == 1 and np.ndim(fsatellite) == 1:
+        phi_blue_total = phi_blue_total[:, np.newaxis]
+
+    sum_phics = (1 - fsatellite) * (1 - np.log(1 - fsatellite))
+
+    return (1 - fsatellite) * phi_blue_total / sum_phics
+
+
+def schechter_smf_amplitude_satellites(phi_centrals, fsatellite):
+    r'''Schechter amplitude of satellites.
+    This function returns the Schechter mass function amplitude
+    for active satellite population based on equation (15)
+    in de la Bella et al. 2021 [1]_.
+
+    Parameters
+    ----------
+    phi_centrals: float, (nt, nm) array_like
+        Schechter mass function amplitude of the central
+        active galaxies.
+
+    fsatellite: float, (nm, ) array_like
+        Fraction of active satellite galaxies between 0 and 1.
+        It could be a float or an array, depending on the model you choose.
 
     Returns
     -------
-    parameters: dic
-        It returns a  dictionary with the parameters of the
-        Schechter mass function. The dictionary keywords:
-        `centrals`, `satellites`, `mass_quenched` and
-        `satellite_quenched`. The values correspond to a
-        tuple :math:`(\phi, \alpha, m_{*})`.
+    amplitude: float, (nt, nm) array_like
+        Amplitude of the Schechter mass function.
 
     References
     ----------
@@ -117,16 +143,69 @@ def schechter_smf_parameters(active_parameters, fsatellite, fenvironment):
            arXiv 2112.11110.
 
     '''
-    phi, alpha, mstar = active_parameters
 
-    sum_phics = (1 - fsatellite) * (1 - np.log(1 - fsatellite))
-    phic = (1 - fsatellite) * phi / sum_phics
-    phis = phic * np.log(1 / (1 - fsatellite))
+    if np.ndim(phi_centrals) == 2 and np.ndim(fsatellite) == 1:
+        phi_centrals = phi_centrals[:, np.newaxis]
 
-    centrals = (phic, alpha, mstar)
-    satellites = (phis, alpha, mstar)
-    mass_quenched = (phic + phis, alpha + 1, mstar)
-    satellite_quenched = (- np.log(1 - fenvironment) * phis, alpha, mstar)
+    return phi_centrals * np.log(1 / (1 - fsatellite))
 
-    return {'centrals': centrals, 'satellites': satellites,
-            'mass_quenched': mass_quenched, 'satellite_quenched': satellite_quenched}
+
+def schechter_smf_amplitude_mass_quenched(phi_centrals, phi_satellites):
+    r'''Schechter amplitude of satellites.
+    This function returns the Schechter mass function amplitude
+    for passive mass-quenched population based on equation (15)
+    in de la Bella et al. 2021 [1]_.
+
+    Parameters
+    ----------
+    phi_centrals: float, (nt, nm) array_like
+        Schechter mass function amplitude of the central
+        active galaxies.
+
+    phi_satellites: float, (nt, nm) array_like
+        Schechter mass function amplitude of the satellite
+        active galaxies.
+
+    Returns
+    -------
+    amplitude: float, (nt, nm) array_like
+        Amplitude of the Schechter mass function.
+
+    References
+    ----------
+    .. [1] de la Bella et al. 2021, Quenching and Galaxy Demographics,
+           arXiv 2112.11110.
+
+    '''
+
+    return phi_centrals + phi_satellites
+
+
+def schechter_smf_amplitude_satellite_quenched(phi_satellites, fenvironment):
+    r'''Schechter amplitude of satellites.
+    This function returns the Schechter mass function amplitude
+    for active central population based on equation (15)
+    in de la Bella et al. 2021 [1]_.
+
+    Parameters
+    ----------
+    phi_satellites: float, (nt, nm) array_like
+        Schechter mass function amplitude of the satellite
+        active galaxies.
+
+    fenvironment: float
+        Fraction of satellite-quenched galaxies between 0 and 1.
+
+    Returns
+    -------
+    amplitude: float, (nt, nm) array_like
+        Amplitude of the Schechter mass function.
+
+    References
+    ----------
+    .. [1] de la Bella et al. 2021, Quenching and Galaxy Demographics,
+           arXiv 2112.11110.
+
+    '''
+
+    return - np.log(1 - fenvironment) * phi_satellites
