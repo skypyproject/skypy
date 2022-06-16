@@ -25,22 +25,29 @@ from a general Schechter mass function.
 # Schechter Parameters
 # --------------------
 #
-# We use the blue parameters in Wiegel et al. 2016 [2]_.
-# Also the fraction of satellite galaxies from [2].
-# We use a fixed value for the fraction of satellite-quenched galaxies
+# We generate their Figure 4 and use the best-fit values of the blue parameters
+# in Wiegel et al. 2016 [2]_. We follow de la Bella et al.'s procedure
+# to compute the fraction of satellite galaxies from [2]
+# and use their fixed value for the fraction of satellite-quenched galaxies
 # :math:`f_{\rho} = 0.5`.
+# 
+# Finally we generate the different galaxy samples by feeding the Schechter parameters
+# as inputs for the Schechter mass function.
 
 import numpy as np
 import matplotlib.pyplot as plt
+from astropy.table import Table
 # from skypy.galaxies.stellar_mass import (schechter_smf_amplitude_centrals,
                                   #    schechter_smf_amplitude_satellites,
                                 #    schechter_smf_amplitude_mass_quenched,
                              #    schechter_smf_amplitude_satellite_quenched
 #                                          )
-from astropy.table import Table
+
+# %%
+# First we use the model implemented in `skypy.galaxies.stellar_mass`.
 
 
-# Replace by the SkyPy function once it's merged
+# To be replaced by the SkyPy function once it's merged
 def schechter_smf_amplitude_centrals(phi_blue_total, fsatellite):
     if np.ndim(phi_blue_total) == 1 and np.ndim(fsatellite) == 1:
         phi_blue_total = phi_blue_total[:, np.newaxis]
@@ -67,7 +74,7 @@ mstarb = 10**10.60
 alphab = -1.21
 blue = (phiblue, alphab, mstarb)
 
-# Choose a fraction of satellite-quenched galaxies
+# Fraction of satellite-quenched galaxies
 frho = 0.5
 
 # Compute the fraction of satellite galaxies
@@ -88,7 +95,10 @@ mass_quenched = (phimq, alphab + 1, mstarb)
 sat_quenched = (phisq, alphab, mstarb)
 
 
-# Compute the Schechter mass functions for all populations
+# %%
+# Finally we compute the Schechter mass functions for all populations.
+
+
 # SMF ideally from SkyPy
 def schechter_dndm(mass, params):
     phi, alpha, mstar = params
