@@ -5,6 +5,7 @@ populations.
 
 __all__ = [
     'schechter_lf',
+    'schechter_smf',
 ]
 
 from . import luminosity  # noqa F401,F403
