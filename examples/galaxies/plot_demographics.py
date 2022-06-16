@@ -77,11 +77,11 @@ def schechter_dndm(mass, params):
     return phi * x**alpha * np.exp(-x)
 
 m = 10**logm
-gb = schechter_dndm(m, blue_params)
-gc = schechter_dndm(m, sp['centrals'])
-gs = schechter_dndm(m, sp['satellites'])
-gmq = schechter_dndm(m, sp['mass_quenched'])
-gsq = schechter_dndm(m, sp['satellite_quenched'])
+gb = schechter_dndm(m, blue)
+gc = schechter_dndm(m, central)
+gs = schechter_dndm(m, satellite)
+gmq = schechter_dndm(m, mass_quenched)
+gsq = schechter_dndm(m, sat_quenched)
 
 active = gc + gs
 passive = gmq + gsq
@@ -152,6 +152,6 @@ plt.show()
 #
 # .. [1] de la Bella et al. 2021, Quenching and Galaxy Demographics, arXiv 2112.11110.
 # 
-# .. [2] Weigel 2016
+# .. [2] Weigel A. K., Schawinski K., Bruderer C., 2016, Monthly Notices of the Royal Astronomical Society, 459, 2150
 # 
 # .. [3] Trayford J., 2021, james-trayford/strauss: v0.1.0 Pre-release, doi:10.5281/zenodo.5776280, https://doi.org/10.5281/ zenodo.5776280
