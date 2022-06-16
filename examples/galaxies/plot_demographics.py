@@ -121,20 +121,32 @@ total = active + passive
 # Validation against SSD DR7 data
 # -------------------------------
 #
-# Weigel et al 2016 Model.
-# Here we compare our sampled galaxies.
+# Here we compare our sampled galaxies and
+# we validate the model using the results from the best fit to
+# SDSS DR7 data in Weigel et al. (2016) [2].
+# The authors presented a comprehensive method to determine
+# stellar mass functions and apply it to samples in the local universe,
+# in particular to SDSS DR7 data in the redshift range from 0.02 to 0.06.
+#
+# Their data is presented as logarithmic distribution, therefore,
+# to perform the comparison we need to apply a conversion factor.
+# This factor allows us to go from :math:`\phi` to a :math:`\log \phi` plot
+# and compare with Weigel et al 2016 best-fit model. 
+
 
 # Load the rest of data
 wred = Table.read('weigel16_quiescent.csv', format='csv')
 wblue = Table.read('weigel16_active.csv', format='csv')
 wcentral = Table.read('weigel16_central.csv', format='csv')
 
-# This factor allows us to go from :math:`\phi` to a :math: `\log \phi` plot
-# and compare with Weigel et al 2016 best-fit model
+# Conversion factor to log distribution
 factor = np.log(10) * 10**logm / mstarb
 lblue, lcentrals, lsats = np.log10(gb * factor), np.log10(gc * factor), np.log10(gs * factor)
 lred, lmq, lsq = np.log10(passive * factor), np.log10(gmq * factor), np.log10(gsq * factor)
 ltotal = np.log10(total * factor)
+
+# %%
+
 
 # Plot
 fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(16, 6), sharex=True, sharey=True)
