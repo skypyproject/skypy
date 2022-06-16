@@ -183,18 +183,36 @@ plt.show()
 # %%
 # Sonification
 # ------------
-# STRAUSS clip! [3]_.
+# The sonification, or transformation of physical data via sound,
+# is becoming increasingly important to make astronomy accessible
+# for those who are visually impaired, and to enhance visualisations
+# and convey information that visualisation alone cannot.
+# In this work [1] the authors also made their main plot available
+# in sound format using the STRAUSS software (Trayford 2021) [3]_.
+
+import IPython
+# Active population
+IPython.display.Audio("skypy_active.wav")
+
+# %%
+
+# Mass-quenched galaxies
+IPython.display.Audio("skypy_mass_quenched.wav")
+
+# %%
+
+# Satellite-quenched galaxies
+IPython.display.Audio("skypy_satellite_quenched.wav")
 
 
 # %%
 # References
 # ----------
 #
-#
 # .. [1] de la Bella et al. 2021, Quenching and Galaxy Demographics, arXiv 2112.11110.
 #
 # .. [2] Weigel A. K., Schawinski K., Bruderer C., 2016, Monthly Notices of the
-# Royal Astronomical Society, 459, 2150
+#   Royal Astronomical Society, 459, 2150
 #
 # .. [3] Trayford J., 2021, james-trayford/strauss: v0.1.0 Pre-release, doi:10.5281/zenodo.5776280,
-# https://doi.org/10.5281/ zenodo.5776280
+#   https://doi.org/10.5281/ zenodo.5776280
