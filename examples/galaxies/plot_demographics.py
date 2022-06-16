@@ -1,34 +1,51 @@
 """
 Galaxy Demographics
 ===================
-This example demonstrates how to sample any type of galaxy population
-from a general Schechter mass function as implemented in SkyPy.
+
+In this example we reproduce the results from de la Bella et al. 2021 [1]_.
+In that paper the authors distinguished between active galaxies
+(centrals and satellites) and quiescent galaxies (mass-quenched and satellite-quenched),
+describing the galaxy demographics with a set of continuity equations that are solved analytically.
+Such equations invoke two quenching mechanisms that transform star-forming galaxies into quiescent
+objects: mass quenching and satellite quenching.
+
+They showed that the combination of the two quenching mechanisms produces
+a double Schechter function for the quiescent population.
+They demonstrated that the satellite-quenched galaxies are indeed a subset
+of the active galaxies and that the mass-quenched galaxies have a different
+faint-end slope parameter by one unit. The connection between quenching and
+galaxy populations reduced significantly the parameter space of the simulations.
+
+This example uses de la Bella et al. model implemented in `skypy.galaxies.stellar_mass`
+and shows how to sample any type of galaxy population
+from a general Schechter mass function.
 """
 
 # %%
 # Schechter Parameters
 # --------------------
-# 
-# We use the blue parameters in Wiegel et al. 2016 [1]_.
-# Also the fraction of satellite galaxies from [1].
+#
+# We use the blue parameters in Wiegel et al. 2016 [2]_.
+# Also the fraction of satellite galaxies from [2].
 # We use a fixed value for the fraction of satellite-quenched galaxies
 # :math:`f_{\rho} = 0.5`.
 
 import numpy as np
 import matplotlib.pyplot as plt
 # from skypy.galaxies.stellar_mass import (schechter_smf_amplitude_centrals,
-                                        #    schechter_smf_amplitude_satellites,
-                                        #    schechter_smf_amplitude_mass_quenched,
-                                        #    schechter_smf_amplitude_satellite_quenched
+                                  #    schechter_smf_amplitude_satellites,
+                                #    schechter_smf_amplitude_mass_quenched,
+                             #    schechter_smf_amplitude_satellite_quenched
 #                                          )
 from astropy.table import Table
 
+
 # Replace by the SkyPy function once it's merged
 def schechter_smf_amplitude_centrals(phi_blue_total, fsatellite):
-    if np.ndim(phi_blue_total)==1 and np.ndim(fsatellite)==1:
-        phi_blue_total = phi_blue_total[:,np.newaxis]
-    
-    sum_phics = (1 - fsatellite) * (1 -  np.log(1 - fsatellite)) 
+    if np.ndim(phi_blue_total) == 1 and np.ndim(fsatellite) == 1:
+        phi_blue_total = phi_blue_total[:, np.newaxis]
+
+    sum_phics = (1 - fsatellite) * (1 - np.log(1 - fsatellite))
     return (1 - fsatellite) * phi_blue_total / sum_phics
 
 
@@ -38,6 +55,7 @@ def schechter_smf_amplitude_satellites(phi_centrals, fsatellite):
 
 def schechter_smf_amplitude_mass_quenched(phi_centrals, phi_satellites):
     return phi_centrals + phi_satellites
+
 
 def schechter_smf_amplitude_satellite_quenched(phi_satellites, fenvironment):
     return - np.log(1 - fenvironment) * phi_satellites
@@ -69,12 +87,14 @@ satellite = (phis, alphab, mstarb)
 mass_quenched = (phimq, alphab + 1, mstarb)
 sat_quenched = (phisq, alphab, mstarb)
 
+
 # Compute the Schechter mass functions for all populations
 # SMF ideally from SkyPy
 def schechter_dndm(mass, params):
     phi, alpha, mstar = params
     x = mass / mstar
     return phi * x**alpha * np.exp(-x)
+
 
 m = 10**logm
 gb = schechter_dndm(m, blue)
@@ -85,12 +105,12 @@ gsq = schechter_dndm(m, sat_quenched)
 
 active = gc + gs
 passive = gmq + gsq
-total = active + passive 
+total = active + passive
 
 # %%
 # Validation against SSD DR7 data
 # -------------------------------
-# 
+#
 # Weigel et al 2016 Model.
 # Here we compare our sampled galaxies.
 
@@ -107,7 +127,7 @@ lred, lmq, lsq = np.log10(passive * factor), np.log10(gmq * factor), np.log10(gs
 ltotal = np.log10(total * factor)
 
 # Plot
-fig, (ax1, ax2, ax3) = plt.subplots(1,3, figsize=(16,6), sharex=True, sharey=True)
+fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(16, 6), sharex=True, sharey=True)
 fig.suptitle('Galaxy Demographics', fontsize=26)
 
 ax1.plot(wblue['logm'], wblue['logphi'], color='k', label='Weigel+16', lw=1)
@@ -128,7 +148,7 @@ ax3.fill_between(wtotal['logm'], wtotal['upper_error'], wtotal['lower_error'], c
 ax3.plot(logm, ltotal, color='purple', label='SkyPy Total', lw=1)
 
 
-for ax in [ax1, ax2,ax3]:
+for ax in [ax1, ax2, ax3]:
     ax.legend(loc='lower left', frameon=False, fontsize=14)
     ax.set_xlabel(r'Stellar mass, $log (M/M_{\odot})$', fontsize=18)
     ax.set_ylim(-5.5)
@@ -144,14 +164,15 @@ plt.show()
 # STRAUSS clip! [3]_.
 
 
-
 # %%
 # References
 # ----------
 #
 #
 # .. [1] de la Bella et al. 2021, Quenching and Galaxy Demographics, arXiv 2112.11110.
-# 
-# .. [2] Weigel A. K., Schawinski K., Bruderer C., 2016, Monthly Notices of the Royal Astronomical Society, 459, 2150
-# 
-# .. [3] Trayford J., 2021, james-trayford/strauss: v0.1.0 Pre-release, doi:10.5281/zenodo.5776280, https://doi.org/10.5281/ zenodo.5776280
+#
+# .. [2] Weigel A. K., Schawinski K., Bruderer C., 2016, Monthly Notices of the
+# Royal Astronomical Society, 459, 2150
+#
+# .. [3] Trayford J., 2021, james-trayford/strauss: v0.1.0 Pre-release, doi:10.5281/zenodo.5776280,
+# https://doi.org/10.5281/ zenodo.5776280
