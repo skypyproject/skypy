@@ -16,33 +16,38 @@ from a general Schechter mass function as implemented in SkyPy.
 
 import numpy as np
 import matplotlib.pyplot as plt
-# from skypy.galaxies.stellar_mass import schechter_smf_parameters
+# from skypy.galaxies.stellar_mass import (schechter_smf_amplitude_centrals,
+                                        #    schechter_smf_amplitude_satellites,
+                                        #    schechter_smf_amplitude_mass_quenched,
+                                        #    schechter_smf_amplitude_satellite_quenched
+#                                          )
 from astropy.table import Table
 
 # Replace by the SkyPy function once it's merged
+def schechter_smf_amplitude_centrals(phi_blue_total, fsatellite):
+    if np.ndim(phi_blue_total)==1 and np.ndim(fsatellite)==1:
+        phi_blue_total = phi_blue_total[:,np.newaxis]
+    
+    sum_phics = (1 - fsatellite) * (1 -  np.log(1 - fsatellite)) 
+    return (1 - fsatellite) * phi_blue_total / sum_phics
 
-def schechter_smf_parameters(active_parameters, fsatellite, fenvironment):
-    phi, alpha, mstar = active_parameters
-    
-    sum_phics = (1 - fsatellite) * (1 -  np.log(1 - fsatellite))
-    
-    phic = (1 - fsatellite) * phi / sum_phics
-    phis = phic * np.log(1 / (1 - fsatellite))
-    
-    centrals = (phic, alpha, mstar)
-    satellites = (phis, alpha, mstar)
-    mass_quenched = (phic + phis, alpha + 1, mstar)
-    satellite_quenched = (- np.log(1 - fenvironment) * phis, alpha, mstar)
-    
-    return {'centrals': centrals, 'satellites': satellites,
-            'mass_quenched': mass_quenched, 'satellite_quenched': satellite_quenched}
+
+def schechter_smf_amplitude_satellites(phi_centrals, fsatellite):
+    return phi_centrals * np.log(1 / (1 - fsatellite))
+
+
+def schechter_smf_amplitude_mass_quenched(phi_centrals, phi_satellites):
+    return phi_centrals + phi_satellites
+
+def schechter_smf_amplitude_satellite_quenched(phi_satellites, fenvironment):
+    return - np.log(1 - fenvironment) * phi_satellites
 
 
 # Weigel et al. 2016 parameters for the active population
 phiblue = 10**-2.423
 mstarb = 10**10.60
 alphab = -1.21
-blue_params = (phiblue, alphab, mstarb)
+blue = (phiblue, alphab, mstarb)
 
 # Choose a fraction of satellite-quenched galaxies
 frho = 0.5
@@ -54,7 +59,15 @@ logm = wtotal['logm']
 fsat = 10**wsatellite['logphi']/10**wtotal['logphi']
 
 # Generate the Schechter parameters for all populations
-sp = schechter_smf_parameters(blue_params, fsat, frho)
+phic = schechter_smf_amplitude_centrals(phiblue, fsat)
+phis = schechter_smf_amplitude_satellites(phic, fsat)
+phimq = schechter_smf_amplitude_mass_quenched(phic, phis)
+phisq = schechter_smf_amplitude_satellite_quenched(phis, frho)
+
+central = (phic, alphab, mstarb)
+satellite = (phis, alphab, mstarb)
+mass_quenched = (phimq, alphab + 1, mstarb)
+sat_quenched = (phisq, alphab, mstarb)
 
 # Compute the Schechter mass functions for all populations
 # SMF ideally from SkyPy
@@ -128,7 +141,7 @@ plt.show()
 # %%
 # Sonification
 # ------------
-# STRAUSS clip!
+# STRAUSS clip! [3]_.
 
 
 
@@ -141,4 +154,4 @@ plt.show()
 # 
 # .. [2] Weigel 2016
 # 
-#  .. [3] Trayford J., 2021, james-trayford/strauss: v0.1.0 Pre-release, doi:10.5281/zenodo.5776280, https://doi.org/10.5281/ zenodo.5776280
+# .. [3] Trayford J., 2021, james-trayford/strauss: v0.1.0 Pre-release, doi:10.5281/zenodo.5776280, https://doi.org/10.5281/ zenodo.5776280
