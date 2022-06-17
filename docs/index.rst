@@ -42,6 +42,7 @@ Packages
    :maxdepth: 1
 
    galaxies
+   position/index
    utils/index
 
 Pipeline
