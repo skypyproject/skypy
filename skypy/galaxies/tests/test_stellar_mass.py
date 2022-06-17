@@ -85,6 +85,12 @@ def test_schechter_smf_amplitude_centrals():
     phic_2d = stellar_mass.schechter_smf_amplitude_centrals(phiblue_array, fsat_array)
     assert phic_2d.shape == (len(phiblue_array), len(fsat_array))
 
+    # Special case
+    fsat_special = 1 - np.exp(-1)
+    phic_special = stellar_mass.schechter_smf_amplitude_centrals(phiblue_scalar, fsat_special)
+    expectation = 0.5 * phiblue_scalar
+    assert phic_special == expectation
+
 
 def test_schechter_smf_amplitude_satellites():
     # Scalar inputs
