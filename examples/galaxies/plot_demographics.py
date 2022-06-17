@@ -188,7 +188,7 @@ plt.show()
 # for those who are visually impaired, and to enhance visualisations
 # and convey information that visualisation alone cannot.
 # In this work [1] the authors also made their main plot available
-# in sound format using the STRAUSS software (Trayford 2021) [3]_.
+# in sound format using the `STRAUSS`_ software (Trayford 2021) [3]_.
 
 import IPython
 # Active population
@@ -214,5 +214,8 @@ IPython.display.Audio("skypy_satellite_quenched.wav")
 # .. [2] Weigel A. K., Schawinski K., Bruderer C., 2016, Monthly Notices of the
 #   Royal Astronomical Society, 459, 2150
 #
-# .. [3] Trayford J., 2021, james-trayford/strauss: v0.1.0 Pre-release, doi:10.5281/zenodo.5776280,
-#   https://doi.org/10.5281/ zenodo.5776280
+# .. [3] Trayford J., 2021, james-trayford/strauss: v0.1.0 Pre-release, `doi:10.5281/zenodo.5776280`_.
+#   
+# .. _doi:10.5281/zenodo.5776280: https://doi.org/10.5281/zenodo.5776280
+# 
+# .. _STRAUSS: https://strauss.readthedocs.io/en/latest/
