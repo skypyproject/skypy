@@ -153,6 +153,12 @@ def test_schechter_smf_amplitude_mass_quenched():
     assert phimq_2d.shape == phic_2d.shape == phis_2d.shape
     assert np.all(phimq_2d == phic_2d + phis_2d)
 
+    # Special case
+    phic_null = 0
+    phis_null = 0
+    phimq_null = stellar_mass.schechter_smf_amplitude_mass_quenched(phic_null, phis_null)
+    assert phimq_null == 0
+
 
 def test_schechter_smf_amplitude_satellite_quenched():
     # Scalar inputs
