@@ -225,10 +225,10 @@ def test_ryden04_ellipticity():
     e = ryden04_ellipticity(1-1e-99, 1e-99, -1e99, 1e-99, size=1000)
     assert np.allclose(e, 0.)
 
+
 @pytest.mark.flaky
 def test_dust_extincted_ellipticity():
     from skypy.galaxies.morphology import dust_extincted_ellipticity
-    from skypy.galaxies.morphology import ryden04_ellipticity
 
     # define luminosity function arguments
     # M_star, alpha, M_lim, E0
