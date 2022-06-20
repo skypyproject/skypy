@@ -135,6 +135,7 @@ def triaxial_axis_ratio(zeta, xi, size=None):
 
     return q
 
+
 def triaxial_axis_ratio_extincted(zeta, xi, M_star, alpha, E0, M_lim,
                                   resolution=100):
     r'''axis ratio of a randomly projected triaxial ellipsoid obscured by a dust
@@ -142,7 +143,6 @@ def triaxial_axis_ratio_extincted(zeta, xi, M_star, alpha, E0, M_lim,
 
     Given the two axis ratios `1 >= zeta >= xi` of a randomly oriented triaxial
     ellipsoid, computes the axis ratio `q` of the projection.
-
     The polar viewing angle is drawn from a non-flat cosine distribution
     following equation (3) in [2], assuming a Schechter luminosity function
     characterised by M_star and alpha and limited by M_lim.
@@ -210,6 +210,7 @@ def triaxial_axis_ratio_extincted(zeta, xi, M_star, alpha, E0, M_lim,
 
     return q
 
+
 def extincted_angle_schechter(y, E0, alpha, M_star, M_lim, resolution=100):
     r'''Sample from dust extincted polar viewing angle distribution, assuming
     a Schechter luminosity function.
@@ -264,7 +265,7 @@ def extincted_angle_schechter(y, E0, alpha, M_star, M_lim, resolution=100):
     # generate array of y and theta values
     y = y.flatten()
     y = np.repeat(y, resolution, axis=-1)
-    theta = np.tile(np.linspace(0 , np.pi, resolution), length)
+    theta = np.tile(np.linspace(0, np.pi, resolution), length)
 
     # Extinction increases with theta. Eq (1) in [2]
     E_theta = np.ones_like(theta)*E0
@@ -289,10 +290,10 @@ def extincted_angle_schechter(y, E0, alpha, M_star, M_lim, resolution=100):
     # Theta distribution is sine function, times the likelihood Psi
     pdf = np.sin(theta) * psi
     cdf = pdf  # in place
-    np.cumsum((pdf[...,1:]+pdf[...,:-1])/2*np.diff(theta), axis=1,
+    np.cumsum((pdf[..., 1:]+pdf[..., :-1])/2*np.diff(theta), axis=1,
               out=cdf[..., 1:])
-    cdf[:,0] = 0
-    norm = cdf[:,-1]
+    cdf[:, 0] = 0
+    norm = cdf[:, -1]
     cdf /= norm[:, None]
 
     # Sampling from inverse cumulative distribution

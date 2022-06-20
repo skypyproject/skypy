@@ -225,6 +225,7 @@ def test_ryden04_ellipticity():
     e = ryden04_ellipticity(1-1e-99, 1e-99, -1e99, 1e-99, size=1000)
     assert np.allclose(e, 0.)
 
+@pytest.mark.flaky
 def test_dust_extincted_ellipticity():
     from skypy.galaxies.morphology import dust_extincted_ellipticity
     from skypy.galaxies.morphology import ryden04_ellipticity
@@ -276,15 +277,15 @@ def test_dust_extincted_ellipticity():
     # sample with large extinction and check the average elipticity decreases
     # for a large enough sample size
     e_args = [0.222, 0.056, -1.85, 0.89]
-    lf_args_highE = [-20, -0.9, -21, 20]
+    lf_highE = [-20, -0.9, -21, 20]
 
-    e = dust_extincted_ellipticity(*e_args, *lf_args, size=100000)
-    e_highE = dust_extincted_ellipticity(*e_args, *lf_args_highE, size=100000)
+    e_lowE = dust_extincted_ellipticity(*e_args, *lf_args, size=100000)
+    e_highE = dust_extincted_ellipticity(*e_args, *lf_highE, size=100000)
     assert np.mean(e_lowE) > np.mean(e_highE)
 
     # sample with brighter M_lim and check the average elipticity increases
     # for a lage enough sample size
-    lf_args_bright = [-20, -0.9, -25, 2.0]
+    lf_bright = [-20, -0.9, -25, 2.0]
 
     e_bright = dust_extincted_ellipticity(*e_args, *lf_bright, size=100000)
     assert np.mean(e_bright) > np.mean(e)

@@ -91,9 +91,12 @@ def test_triaxial_axis_ratio():
     q = triaxial_axis_ratio(zeta, xi)
     assert np.all((qmax >= q) & (q >= qmin))
 
+
+@pytest.mark.flaky
 def test_triaxial_axis_ratio_extincted():
 
     from skypy.utils.random import triaxial_axis_ratio_extincted
+    from skypy.utils.random import triaxial_axis_ratio
 
     # define luminosity function arguments
     # M_star, alpha, M_lim, E0
@@ -125,8 +128,9 @@ def test_triaxial_axis_ratio_extincted():
     # samples without extinction for a large enough sample size
     zeta, xi = np.ones(10000)*0.8, np.ones(10000)*0.4
     q_ext = triaxial_axis_ratio_extincted(zeta, xi, *lf_args)
-    q = triaxial_axis_ratio(0.8, 0.4, size = 10000)
+    q = triaxial_axis_ratio(0.8, 0.4, size=10000)
     assert np.mean(q_ext) < np.mean(q)
+
 
 def test_extincted_angle_schechter():
 
@@ -141,6 +145,6 @@ def test_extincted_angle_schechter():
     assert np.isscalar(theta)
 
     # sample with implicit sizes
-    y = np.random.uniform(0,1, size=1000)
+    y = np.random.uniform(0, 1, size=1000)
     theta = extincted_angle_schechter(y, *lf_args)
-    assert np.shape(theta) = (1000,)
+    assert np.shape(theta) == (1000,)
