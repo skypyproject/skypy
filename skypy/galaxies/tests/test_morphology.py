@@ -229,40 +229,62 @@ def test_dust_extincted_ellipticity():
     from skypy.galaxies.morphology import dust_extincted_ellipticity
     from skypy.galaxies.morphology import ryden04_ellipticity
 
+    # define luminosity function arguments
+    # M_star, alpha, M_lim, E0
+    lf_args = [-20, -0.9, -21, 2.0]
+
     # sample a single ellipticity
-    e = dust_extincted_ellipticity(0.222, 0.056, -1.85, 0.89)
+    e = dust_extincted_ellipticity(0.222, 0.056, -1.85, 0.89, *lf_args)
     assert np.isscalar(e)
 
     # sample many ellipticities
-    e = dust_extincted_ellipticity(0.222, 0.056, -1.85, 0.89, size=1000)
+    e = dust_extincted_ellipticity(0.222, 0.056, -1.85, 0.89, *lf_args,
+                                   size=1000)
     assert np.shape(e) == (1000,)
 
     # sample with explicit shape
-    e = dust_extincted_ellipticity(0.222, 0.056, -1.85, 0.89, size=(10, 10))
+    e = dust_extincted_ellipticity(0.222, 0.056, -1.85, 0.89, *lf_args,
+                                   size=(10, 10))
     assert np.shape(e) == (10, 10)
 
     # sample with implicit size
-    e1 = dust_extincted_ellipticity([0.222, 0.333], 0.056, -1.85, 0.89)
-    e2 = dust_extincted_ellipticity(0.222, [0.056, 0.067], -1.85, 0.89)
-    e3 = dust_extincted_ellipticity(0.222, 0.056, [-1.85, -2.85], 0.89)
-    e4 = dust_extincted_ellipticity(0.222, 0.056, -1.85, [0.89, 1.001])
+    e1 = dust_extincted_ellipticity([0.222, 0.333], 0.056, -1.85, 0.89,
+                                    *lf_args)
+    e2 = dust_extincted_ellipticity(0.222, [0.056, 0.067], -1.85, 0.89,
+                                    *lf_args)
+    e3 = dust_extincted_ellipticity(0.222, 0.056, [-1.85, -2.85], 0.89,
+                                    *lf_args)
+    e4 = dust_extincted_ellipticity(0.222, 0.056, -1.85, [0.89, 1.001],
+                                    *lf_args)
     assert np.shape(e1) == np.shape(e2) == np.shape(e3) == np.shape(e4) == (2,)
 
     # sample with broadcasting rule
-    e = dust_extincted_ellipticity([[0.2, 0.3], [0.4, 0.5]], 0.1, [-1.9, -2.9], 0.9)
+    e = dust_extincted_ellipticity([[0.2, 0.3], [0.4, 0.5]], 0.1, [-1.9, -2.9],
+                                   0.9, *lf_args)
     assert np.shape(e) == (2, 2)
 
     # sample with random parameters and check that result is in unit range
     args = np.random.rand(4)*[1., .1, -2., 1.]
-    e = dust_extincted_ellipticity(*args, size=1000)
+    e = dust_extincted_ellipticity(*args, *lf_args, size=1000)
     assert np.all((e >= 0.) & (e <= 1.))
 
     # sample a spherical distribution
-    e = dust_extincted_ellipticity(1-1e-99, 1e-99, -1e99, 1e-99, size=1000)
+    e = dust_extincted_ellipticity(1-1e-99, 1e-99, -1e99, 1e-99, *lf_args,
+                                   size=1000)
     assert np.allclose(e, 0.)
 
-    # sample with 0 Extinction and check the result is identical to ryden04
+    # sample with large extinction and check the average elipticity decreases
+    # for a large enough sample size
+    e_args = [0.222, 0.056, -1.85, 0.89]
+    lf_args_highE = [-20, -0.9, -21, 20]
 
-    # sample with large magnitude limit and check the result is close to ryden04
+    e = dust_extincted_ellipticity(*e_args, *lf_args, size=100000)
+    e_highE = dust_extincted_ellipticity(*e_args, *lf_args_highE, size=100000)
+    assert np.mean(e_lowE) > np.mean(e_highE)
 
-    
+    # sample with brighter M_lim and check the average elipticity increases
+    # for a lage enough sample size
+    lf_args_bright = [-20, -0.9, -25, 2.0]
+
+    e_bright = dust_extincted_ellipticity(*e_args, *lf_bright, size=100000)
+    assert np.mean(e_bright) > np.mean(e)

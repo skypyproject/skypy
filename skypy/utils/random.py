@@ -13,6 +13,7 @@ Utility Functions
    schechter
    triaxial_axis_ratio
    triaxial_axis_ratio_extincted
+   schechter_extincted_angle
 
 """
 
@@ -135,7 +136,7 @@ def triaxial_axis_ratio(zeta, xi, size=None):
     return q
 
 def triaxial_axis_ratio_extincted(zeta, xi, M_star, alpha, E0, M_lim,
-                                  resolution=1000, size=None):
+                                  resolution=100):
     r'''axis ratio of a randomly projected triaxial ellipsoid obscured by a dust
     ring of maximum extinction E0.
 
@@ -162,9 +163,6 @@ def triaxial_axis_ratio_extincted(zeta, xi, M_star, alpha, E0, M_lim,
         Absolute magnitude limit of the Schechter function in [2]_.
     resolution : int
         Resolution of the inverse transform sampling spline. Default is 1000.
-    size : tuple of int or None
-        Size of the random draw. If `None` is given, size is inferred from
-        other inputs.
 
     Returns
     -------
@@ -184,14 +182,12 @@ def triaxial_axis_ratio_extincted(zeta, xi, M_star, alpha, E0, M_lim,
 
     '''
 
-    # get size from inputs if not explicitly provided
-    if size is None:
-        size = np.broadcast(zeta, xi).shape
+    size = np.broadcast(zeta, xi).shape
 
     # draw random viewing angle (theta, phi)
     # Ellipsoid with A > B > C axes. zeta = B/A; xi = C/A; y = C/B = xi/zeta
-    y = xi/zeta
-    theta = schechter_extincted_angle(y, E0, alpha, M_star, M_lim, resolution)
+    y = np.divide(xi, zeta)
+    theta = extincted_angle_schechter(y, E0, alpha, M_star, M_lim, resolution)
     cos2_theta = np.cos(theta)**2
 
     sin2_theta = 1 - cos2_theta
@@ -214,14 +210,13 @@ def triaxial_axis_ratio_extincted(zeta, xi, M_star, alpha, E0, M_lim,
 
     return q
 
-def schechter_extincted_angle(y, E0, alpha, M_star, M_lim, resolution=1000,
-                             size = None):
+def extincted_angle_schechter(y, E0, alpha, M_star, M_lim, resolution=100):
     r'''Sample from dust extincted polar viewing angle distribution, assuming
     a Schechter luminosity function.
 
     Parameters
     ----------
-    y : float
+    y : array_like
         Galaxy height to diameter ratio
     E0 : float
         Edge-on extinction in magnitudes
@@ -233,9 +228,6 @@ def schechter_extincted_angle(y, E0, alpha, M_star, M_lim, resolution=1000,
         Absolute magnitude limit of the Schechter function in [1]_.
     resolution : int
         Resolution of the inverse transform sampling spline. Default is 1000.
-    size : tuple of int or None
-        Size of the random draw. If `None` is given, size is inferred from
-        other inputs.
 
     Returns
     -------
@@ -260,13 +252,19 @@ def schechter_extincted_angle(y, E0, alpha, M_star, M_lim, resolution=1000,
     .. [2] Padilla N. D., Strauss M. A., 2008, MNRAS, 388, 1321
 
     '''
-    # get size from inputs if not explicitly provided
-    if size is None:
-        size = len(y)
+
+    # convert to array to get shape
+    if np.isscalar(y):
+        y = np.array([y])
+
+    # get size from input ratios
+    size = np.shape(y)
+    length = y.size
 
     # generate array of y and theta values
-    y = np.repeat(y, resolution)
-    theta = np.tile(np.linspace(0 , np.pi, resolution), size)
+    y = y.flatten()
+    y = np.repeat(y, resolution, axis=-1)
+    theta = np.tile(np.linspace(0 , np.pi, resolution), length)
 
     # Extinction increases with theta. Eq (1) in [2]
     E_theta = np.ones_like(theta)*E0
@@ -275,32 +273,36 @@ def schechter_extincted_angle(y, E0, alpha, M_star, M_lim, resolution=1000,
     M_lim_ext = M_lim + E_theta
 
     # Convert to luminosities for easier integration
-    L_lim = 10**(-0.4*M_lim)
-    L_star = 10**(-0.4*M_star)
-    L_lim_ext = 10**(-0.4*M_lim_ext)
+    L_lim = np.power(10, -0.4*M_lim)
+    L_star = np.power(10, -0.4*M_star)
+    L_lim_ext = np.power(10, -0.4*M_lim_ext)
 
     # Integration of the schechter function is an incomplete gamma function
     # Eq (3) in [2]
     psi = gammainc(alpha+1, L_lim_ext/L_star) / gammainc(alpha+1, L_lim/L_star)
 
     # Reshape arrays
-    print(size, resolution)
-    E_theta = E_theta.reshape(size, resolution)
-    theta = theta.reshape(size, resolution)
-    psi = psi.reshape(size, resolution)
+    E_theta = E_theta.reshape(length, resolution)
+    theta = theta.reshape(length, resolution)
+    psi = psi.reshape(length, resolution)
 
     # Theta distribution is sine function, times the likelihood Psi
     pdf = np.sin(theta) * psi
     cdf = pdf  # in place
-    np.cumsum((pdf[:,1:]+pdf[:,:-1])/2*np.diff(theta), axis=1, out=cdf[:, 1:])
+    np.cumsum((pdf[...,1:]+pdf[...,:-1])/2*np.diff(theta), axis=1,
+              out=cdf[..., 1:])
     cdf[:,0] = 0
     norm = cdf[:,-1]
     cdf /= norm[:, None]
 
     # Sampling from inverse cumulative distribution
-    invu = np.random.uniform(0, 1, size=size)
-    theta_samples = np.empty(size)
+    invu = np.random.uniform(0, 1, size=length)
+    theta_samples = np.empty(length)
     for iu, u in enumerate(invu):
         theta_samples[iu] = np.interp(u, cdf[iu], theta[iu])
 
+    theta_samples = theta_samples.reshape(size)
+    # convert to scalar when size of the array is 1
+    if length == 1:
+        theta_samples = np.float(theta_samples)
     return theta_samples

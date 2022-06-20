@@ -95,25 +95,22 @@ def test_triaxial_axis_ratio_extincted():
 
     from skypy.utils.random import triaxial_axis_ratio_extincted
 
+    # define luminosity function arguments
+    # M_star, alpha, M_lim, E0
+    lf_args = [-20, -0.9, -21, 2.0]
+
     # sample a single axis ratio
-    q = triaxial_axis_ratio_extincted(0.8, 0.4)
+    q = triaxial_axis_ratio_extincted(0.8, 0.4, *lf_args)
     assert np.isscalar(q)
 
-    # sample many axis ratios
-    q = triaxial_axis_ratio_extincted(0.8, 0.4, size=1000)
-    assert np.shape(q) == (1000,)
-
-    # sample with explicit shape
-    q = triaxial_axis_ratio_extincted(0.8, 0.4, size=(10, 10))
-    assert np.shape(q) == (10, 10)
-
     # sample with implicit size
-    q1 = triaxial_axis_ratio_extincted([0.8, 0.9], 0.4)
-    q2 = triaxial_axis_ratio_extincted(0.8, [0.4, 0.5])
+    q1 = triaxial_axis_ratio_extincted([0.8, 0.9], 0.4, *lf_args)
+    q2 = triaxial_axis_ratio_extincted(0.8, [0.4, 0.5], *lf_args)
     assert np.shape(q1) == np.shape(q2) == (2,)
 
     # sample with broadcasting rule
-    q = triaxial_axis_ratio_extincted([[0.6, 0.7], [0.8, 0.9]], [0.4, 0.5])
+    q = triaxial_axis_ratio_extincted([[0.6, 0.7], [0.8, 0.9]], [0.4, 0.5],
+                                      *lf_args)
     assert np.shape(q) == (2, 2)
 
     # sample with random parameters and check that projection is
@@ -121,11 +118,29 @@ def test_triaxial_axis_ratio_extincted():
     zeta, xi = np.sort(np.random.uniform(0, 1, size=(2, 1000)), axis=0)
     qmin = np.min([zeta, xi, xi/zeta], axis=0)
     qmax = np.max([zeta, xi, xi/zeta], axis=0)
-    q = triaxial_axis_ratio_extincted(zeta, xi)
+    q = triaxial_axis_ratio_extincted(zeta, xi, *lf_args)
     assert np.all((qmax >= q) & (q >= qmin))
 
-def test_schechter_extincted_angle():
+    # sample with extinction and check axis ratios are smaller than the ones
+    # samples without extinction for a large enough sample size
+    zeta, xi = np.ones(10000)*0.8, np.ones(10000)*0.4
+    q_ext = triaxial_axis_ratio_extincted(zeta, xi, *lf_args)
+    q = triaxial_axis_ratio(0.8, 0.4, size = 10000)
+    assert np.mean(q_ext) < np.mean(q)
 
-     from skypy.utils.random import schechter_extincted_angle
+def test_extincted_angle_schechter():
 
-     
+    from skypy.utils.random import extincted_angle_schechter
+
+    # define luminosity function arguments
+    # M_star, alpha, M_lim, E0
+    lf_args = [-20, -0.9, -21, 2.0]
+
+    # sample a single inclination angle
+    theta = extincted_angle_schechter(0.7, *lf_args)
+    assert np.isscalar(theta)
+
+    # sample with implicit sizes
+    y = np.random.uniform(0,1, size=1000)
+    theta = extincted_angle_schechter(y, *lf_args)
+    assert np.shape(theta) = (1000,)

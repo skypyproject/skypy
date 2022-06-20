@@ -11,6 +11,7 @@ __all__ = [
     'late_type_lognormal_size',
     'linear_lognormal_size',
     'ryden04_ellipticity',
+    'dust_extincted_ellipticity',
 ]
 
 
@@ -290,7 +291,7 @@ def ryden04_ellipticity(mu_gamma, sigma_gamma, mu, sigma, size=None):
 
 
 def dust_extincted_ellipticity(mu_gamma, sigma_gamma, mu, sigma, M_star, alpha,
-                               M_lim, E0, resolution=1000, size=None):
+                               M_lim, E0, resolution=100, size=None):
     r'''Ellipticity distribution of Padilla & Strauss (2008).
 
     The ellipticity is sampled by randomly projecting a 3D ellipsoid with
