@@ -13,7 +13,7 @@ Utility Functions
    schechter
    triaxial_axis_ratio
    triaxial_axis_ratio_extincted
-   schechter_extincted_angle
+   extincted_angle_schechter
 
 """
 
