@@ -9,7 +9,7 @@ __all__ = [
 
 
 class CAMB(TabulatedPowerSpectrum):
-    r'''CAMB linear matter power spectrum.
+    '''CAMB linear matter power spectrum.
     Compute the linear matter power spectrum on a two dimensional grid of
     redshift and wavenumber using CAMB.
     '''
