@@ -48,3 +48,4 @@ from ._camb import *  # noqa F401,F403
 from ._eisenstein_hu import *  # noqa F401,F403
 from ._halofit import *  # noqa F401,F403
 from ._growth import *  # noqa F401,F403
+from ._base import * # noqa F401,F403
