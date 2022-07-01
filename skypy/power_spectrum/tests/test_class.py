@@ -32,14 +32,14 @@ def test_classy():
     ps = CLASSY(k_max, redshift, Pl15massless)
     pzk = ps(wavenumber, redshift)
     assert pzk.shape == (len(redshift), len(wavenumber))
-    assert allclose(pzk, test_pzk, rtol=1.e-3)
+    assert allclose(pzk, test_pzk, rtol=1.e-4)
 
     # also check redshifts are ordered correctly
     redshift = [1.0, 0.0]
     ps = CLASSY(k_max, redshift, Pl15massless)
     pzk = ps(wavenumber, redshift)
     assert pzk.shape == (len(redshift), len(wavenumber))
-    assert allclose(pzk, test_pzk[np.argsort(redshift)], rtol=1.e-3)
+    assert allclose(pzk, test_pzk[np.argsort(redshift)], rtol=1.e-4)
 
     # also check scalar arguments are treated correctly
     redshift = 1.0
