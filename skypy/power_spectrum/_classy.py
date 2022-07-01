@@ -7,6 +7,9 @@ __all__ = [
 
 
 class CLASSY(TabulatedPowerSpectrum):
+    """Return the CLASS computation of the linear matter power spectrum, on a
+    two dimensional grid of wavenumber and redshift.
+    """
 
     def __init__(self, kmax, redshift, cosmology, **kwargs):
         try:
