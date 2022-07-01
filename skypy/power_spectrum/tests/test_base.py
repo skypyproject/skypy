@@ -6,9 +6,7 @@ def test_TabulatedPowerSpectrum():
 
     def power_spectrum_dummy(wavenumber, redshift):
         # returns log10 power spectrum on redshift wavelength grid -> 2D
-        redshift = redshift.reshape(50, 1)
-        wavenumber = wavenumber.reshape(1, 100)
-        return 0.4*redshift + 0.2*np.log10(wavenumber) + 2
+        return 0.4*redshift[:, np.newaxis] + 0.2*np.log10(wavenumber) + 2
 
     wavenumber = np.linspace(800, 9000, 100)
     redshift = np.linspace(0, 3, 50)
