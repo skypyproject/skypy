@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 from astropy.cosmology import Planck15, FlatLambdaCDM
-from skypy.power_spectrum import eisenstein_hu
+from skypy.power_spectrum import eisenstein_hu, EisensteinHu, growth_function_carroll
 
 
 def test_eisenstein_hu():
@@ -44,6 +44,16 @@ def test_eisenstein_hu():
 
     assert np.allclose(pk_eisensteinhu_w, pk_pre_w)
     assert np.allclose(pk_eisensteinhu_nw, pk_pre_nw)
+
+    # Also test using the EisensteinHu PowerSpectrum class
+    ps_w = EisensteinHu(A_s, n_s, cosmology, kwmap=kwmap, wiggle=True)
+    ps_nw = EisensteinHu(A_s, n_s, cosmology, kwmap=kwmap, wiggle=False)
+    redshift = 0
+    pk_eisensteinhu_w = ps_w(wavenumber, redshift)
+    pk_eisensteinhu_nw = ps_nw(wavenumber, redshift)
+    growth_function = growth_function_carroll(redshift, cosmology)
+    assert np.allclose(pk_eisensteinhu_w, pk_pre_w * np.square(growth_function))
+    assert np.allclose(pk_eisensteinhu_nw, pk_pre_nw * np.square(growth_function))
 
     # Test for failure when wavenumber <= 0
     negative_wavenumber_scalar = 0
