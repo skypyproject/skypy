@@ -259,8 +259,52 @@ def eisenstein_hu(wavenumber, A_s, n_s, cosmology, kwmap=0.02, wiggle=True):
 
 
 class EisensteinHu(PowerSpectrum):
+    """
+    Power spectrum class using Eisenstein & Hu linear power spectrum described
+    in [1]_ and [2]_, using formulation from Komatsu et al (2009) in [3]_.
 
+    ...
+
+    Attributes
+    ----------
+    A_s, n_s: float
+        Amplitude and spectral index of primordial scalar fluctuations.
+    cosmology : astropy.cosmology.Cosmology
+        Cosmology object providing omega_matter, omega_baryon, Hubble parameter
+        and CMB temperature in the present day.
+    kwmap : float
+        WMAP normalization for the amplitude of primordial scalar fluctuations,
+        as described in [3], in units of Mpc-1. Default is 0.02.
+    wiggle : bool
+        Boolean flag to set the use of baryion acoustic oscillations wiggles.
+        Default is True, for which the power spectrum is computed with the
+        wiggles.
+
+    References
+    ----------
+    .. [1] Eisenstein D. J., Hu W., ApJ, 496, 605 (1998)
+    .. [2] Eisenstein D. J., Hu W., ApJ, 511, 5 (1999)
+    .. [3] Komatsu et al., ApJS, 180, 330 (2009)
+    """
     def __init__(self, A_s, n_s, cosmology, kwmap=0.02, wiggle=True):
+        """
+        Constructs all the necessary attributes for the EisensteinHu class.
+
+        Parameters
+        ----------
+        A_s, n_s: float
+            Amplitude and spectral index of primordial scalar fluctuations.
+        cosmology : astropy.cosmology.Cosmology
+            Cosmology object providing omega_matter, omega_baryon, Hubble
+            parameter and CMB temperature in the present day.
+        kwmap : float
+            WMAP normalization for the amplitude of primordial scalar
+            fluctuations, described in [3], in units of Mpc-1. Default is 0.02.
+        wiggle : bool
+            Boolean flag to set the use of baryion acoustic oscillation wiggles.
+            Default is True, for which the power spectrum is computed with the
+            wiggles.
+        """
         self.A_s = A_s
         self.n_s = n_s
         self.cosmology = cosmology
@@ -268,9 +312,34 @@ class EisensteinHu(PowerSpectrum):
         self.wiggle = wiggle
 
     def __call__(self, wavenumber, redshift):
-        growth_function = growth_function_carroll(np.atleast_1d(redshift), self.cosmology)
-        power_spectrum = eisenstein_hu(wavenumber, self.A_s, self.n_s, self.cosmology,
-                                       kwmap=self.kwmap, wiggle=self.wiggle)
+        """
+        Calls the Eisenstein and Hu linear matter power spectrum.
+
+        Parameters
+        ----------
+        wavenumber : (nk, ) array_like
+            Array of wavenumbers in units of Mpc-1 at which to evaluate
+            the linear matter power spectrum.
+        redshift : (nz, ) array_like
+            Array of redshifts at which to evaluate the linear matter power
+            spectrum
+
+        Returns
+        -------
+        pzk : array_like
+            Linear matter power spectrum in units of Mpc3,
+            evaluated at the given wavenumbers from the defined EisensteinHu
+            object.
+        """
+        growth_function = growth_function_carroll(np.atleast_1d(redshift),
+                                                  self.cosmology)
+        power_spectrum = eisenstein_hu(wavenumber, self.A_s, self.n_s,
+                                       self.cosmology, kwmap=self.kwmap,
+                                       wiggle=self.wiggle)
         shape = np.shape(redshift) + np.shape(wavenumber)
-        pzk = (np.square(growth_function)[:, np.newaxis] * power_spectrum).reshape(shape)
-        return pzk.item() if np.isscalar(wavenumber) and np.isscalar(redshift) else pzk
+        pzk = (np.square(growth_function)[:, np.newaxis] *
+               power_spectrum).reshape(shape)
+
+        if np.isscalar(wavenumber) and np.isscalar(redshift):
+            pzk = pzk.item()
+        return pzk
