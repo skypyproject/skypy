@@ -12,13 +12,12 @@ test_pzk = np.loadtxt(class_result_filename)
 # try to import the requirement, if it doesn't exist, skip test
 try:
     __import__('classy')
+    CLASS_294_NOT_FOUND = __import__('classy').__version__ != 'v2.9.4'
 except ImportError:
-    CLASS_NOT_FOUND = True
-else:
-    CLASS_NOT_FOUND = False
+    CLASS_294_NOT_FOUND = True
 
 
-@pytest.mark.skipif(CLASS_NOT_FOUND, reason='classy not found')
+@pytest.mark.skipif(CLASS_294_NOT_FOUND, reason='classy v2.9.4 not found')
 def test_classy():
     '''
     Test a default astropy cosmology
