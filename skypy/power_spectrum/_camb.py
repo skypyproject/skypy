@@ -9,6 +9,10 @@ __all__ = [
 
 
 class CAMB(TabulatedPowerSpectrum):
+    '''CAMB linear matter power spectrum.
+    Compute the linear matter power spectrum on a two dimensional grid of
+    redshift and wavenumber using CAMB.
+    '''
 
     def __init__(self, kmax, redshift, cosmology, A_s, n_s, **kwargs):
 
