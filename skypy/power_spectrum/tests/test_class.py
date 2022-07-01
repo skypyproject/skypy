@@ -16,9 +16,12 @@ except ImportError:
     CLASS_NOT_FOUND = True
 else:
     CLASS_NOT_FOUND = False
+    CLASS_VERSION = __import__('classy').__version__
 
 
 @pytest.mark.skipif(CLASS_NOT_FOUND, reason='classy not found')
+@pytest.mark.skipif(CLASS_VERSION != 'v2.9.4',
+                    reason='classy version v2.9.4 required for test')
 def test_classy():
     '''
     Test a default astropy cosmology
