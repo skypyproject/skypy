@@ -9,7 +9,7 @@ Linear Power Spectrum
    :toctree: ../api/
 
    camb
-   classy
+   CLASSY
    eisenstein_hu
    transfer_no_wiggles
    transfer_with_wiggles
