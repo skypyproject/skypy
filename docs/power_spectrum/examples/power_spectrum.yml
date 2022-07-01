@@ -1,4 +1,4 @@
-cosmology: !astropy.cosmology.default_cosmology.get
+cosmology: !astropy.cosmology.default_cosmology.get []
 wavenumber: !numpy.logspace [-3, 1, 100]
 eisenstein_hu_wiggle: !skypy.power_spectrum.eisenstein_hu
   wavenumber: $wavenumber

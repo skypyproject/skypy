@@ -9,6 +9,7 @@ from copy import copy, deepcopy
 from collections.abc import Sequence, Mapping
 from ._config import load_skypy_yaml
 from ._items import Item, Call, Ref
+from . import log
 import networkx
 import pathlib
 
@@ -101,8 +102,6 @@ class Pipeline:
             self.dag.add_node(job, skip=False)
             if isinstance(settings, Item):
                 items[job] = settings
-                # infer additional item properties from context
-                settings.infer(context)
         for table, columns in self.table_config.items():
             table_complete = '.'.join((table, 'complete'))
             self.dag.add_node(table_complete)
@@ -114,8 +113,6 @@ class Pipeline:
                 self.dag.add_edge(job, table_complete)
                 if isinstance(settings, Item):
                     items[job] = settings
-                    # infer additional item properties from context
-                    settings.infer(context)
                 # DAG nodes for individual columns in multi-column assignment
                 names = [n.strip() for n in column.split(',')]
                 if len(names) > 1:
@@ -137,6 +134,8 @@ class Pipeline:
                 while c:
                     self.dag.add_edge(c, d)
                     c, d = c.rpartition('.')[0], c
+            # infer additional item properties from context
+            settings.infer(context)
 
     def execute(self, parameters={}):
         r'''Run a pipeline.
@@ -164,6 +163,7 @@ class Pipeline:
 
         # Initialise cosmology from config parameters
         if self.cosmology is not None:
+            log.info("Setting cosmology")
             self.state['cosmology'] = self.evaluate(self.cosmology)
 
         # go through the jobs in dependency order
@@ -172,7 +172,8 @@ class Pipeline:
             skip = node.get('skip', True)
             if skip:
                 continue
-            elif job in self.config:
+            log.info(f"Generating {job}")
+            if job in self.config:
                 settings = self.config.get(job)
                 self.state[job] = self.evaluate(settings)
             else:

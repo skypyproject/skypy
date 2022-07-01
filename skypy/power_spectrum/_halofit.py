@@ -95,17 +95,6 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
     .. [3] S. Bird, M. Viel and M. G. Haehnelt,
            Mon. Not. Roy. Astron. Soc. 420, 2551 (2012).
 
-    Examples
-    --------
-    >>> import numpy as np
-    >>> from astropy.cosmology import default_cosmology
-    >>> from skypy.power_spectrum import growth_function, eisenstein_hu, halofit_smith
-    >>> k = np.logspace(-4, 2, 100, base=10)
-    >>> z, A_s, n_s = 0, 2.2e-09, 0.97
-    >>> cosmology = default_cosmology.get()
-    >>> dz = growth_function(z, cosmology)
-    >>> linear_power = eisenstein_hu(k, A_s, n_s, cosmology) * np.square(dz)
-    >>> nonlinear_power = halofit_smith(k, z, linear_power, cosmology)
     '''
 
     # Manage shapes of input arrays
@@ -212,6 +201,14 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
     return pknl.reshape(return_shape)
 
 
+# Smith et. al. 2003  model
 halofit_smith = partial(halofit, parameters=_smith_parameters)
+halofit_smith.__name__ = "halofit_smith"
+
+# Takahashi et al. 2012 model
 halofit_takahashi = partial(halofit, parameters=_takahashi_parameters)
+halofit_takahashi.__name__ = "halofit_takahashi"
+
+# Bird et al. 2012 model
 halofit_bird = partial(halofit, parameters=_bird_parameters)
+halofit_bird.__name__ = "halofit_bird"

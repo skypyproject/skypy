@@ -47,20 +47,6 @@ def transfer_with_wiggles(wavenumber, A_s, n_s, cosmology, kwmap=0.02):
         input primordial power spectrum parameters A_s and n_s, cosmology and
         kwmap normalization.
 
-    Examples
-    --------
-
-    This returns the transfer function with wiggles for the Planck 2015
-    cosmology at a given array of wavenumbers:
-
-    >>> import numpy as np
-    >>> from astropy.cosmology import Planck15
-    >>> wavenumber = np.logspace(-3, 1, num=5, base=10.0)
-    >>> A_s, n_s = 2.1982e-09, 0.969453
-    >>> transfer_with_wiggles(wavenumber, A_s, n_s, Planck15, kwmap=0.02)
-    array([9.84445487e-01, 6.77428507e-01, 8.21122028e-02, 2.44250638e-03,
-       4.41412308e-05])
-
     References
     ----------
     .. [1] Eisenstein D. J., Hu W., ApJ, 496, 605 (1998)
@@ -182,20 +168,6 @@ def transfer_no_wiggles(wavenumber, A_s, n_s, cosmology):
         primordial power spectrum parameters A_s and n_s, cosmology and kwmap
         normalization.
 
-    Examples
-    --------
-
-    This returns the transfer function without wiggles for the Planck 2015
-    cosmology at a given array of wavenumbers:
-
-    >>> import numpy as np
-    >>> from astropy.cosmology import Planck15
-    >>> wavenumber = np.logspace(-3, 1, num=5, base=10.0)
-    >>> A_s, n_s = 2.1982e-09, 0.969453
-    >>> transfer_no_wiggles(wavenumber, A_s, n_s, Planck15)
-    array([9.84321214e-01, 6.83446969e-01, 8.15258290e-02, 2.42055117e-03,
-       4.36725897e-05])
-
     References
     ----------
     .. [1] Eisenstein D. J., Hu W., ApJ, 496, 605 (1998)
@@ -262,26 +234,12 @@ def eisenstein_hu(wavenumber, A_s, n_s, cosmology, kwmap=0.02, wiggle=True):
         power spectrum parameters
         A_s and n_s, cosmology, and kwmap normalization.
 
-    Examples
-    --------
-
-    This example returns the Eisenstein and Hu matter power spectrum with
-    baryon acoustic oscillations for the Planck 2015
-    cosmology at a given array of wavenumbers:
-
-    >>> import numpy as np
-    >>> from astropy.cosmology import Planck15
-    >>> wavenumber = np.logspace(-3, 1, num=5, base=10.0)
-    >>> A_s, n_s = 2.1982e-09, 0.969453
-    >>> eisenstein_hu(wavenumber, A_s, n_s, Planck15, kwmap=0.02, wiggle=True)
-    array([2.99126326e+04, 1.32023496e+05, 1.80797616e+04, 1.49108261e+02,
-           4.53912529e-01])
-
     References
     ----------
     .. [1] Eisenstein D. J., Hu W., ApJ, 496, 605 (1998)
     .. [2] Eisenstein D. J., Hu W., ApJ, 511, 5 (1999)
     .. [3] Komatsu et al., ApJS, 180, 330 (2009)
+
     """
     om0 = cosmology.Om0
     H0_c = (cosmology.H0 / constants.c).to_value('Mpc-1')
