@@ -8,7 +8,7 @@ Linear Power Spectrum
    :nosignatures:
    :toctree: ../api/
 
-   camb
+   CAMB
    classy
    eisenstein_hu
    transfer_no_wiggles
