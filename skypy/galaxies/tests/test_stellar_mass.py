@@ -3,6 +3,8 @@ import scipy.stats
 import scipy.integrate
 from scipy.special import gammaln
 import pytest
+from hypothesis import given
+from hypothesis.strategies import integers
 
 from skypy.galaxies import stellar_mass
 from skypy.utils import special
@@ -91,39 +93,22 @@ def test_schechter_smf_phi_centrals():
     assert phic_special == 0.5 * phiblue_scalar
 
 
-def test_schechter_smf_phi_mass_quenched():
-    # Scalar inputs
-    phic_scalar = 10**-2.5
-    phis_scalar = 10**-2.4
+@given(integers(), integers())
+def test_schechter_smf_phi_mass_quenched(phic, phis):
 
-    # 1D Array inputs
-    phic_1d = np.array([10**-2.50, 10**-2.51])
-    phis_1d = np.array([10**-2.40, 10**-2.41])
-
-    # 2D Array inputs
-    phic_2d = np.array([[10**-2.50, 10**-2.51], [10**-2.50, 10**-2.51]])
-    phis_2d = np.array([[10**-2.40, 10**-2.41], [10**-2.40, 10**-2.41]])
+    # Array inputs
+    phic_1d = np.array([phic, phic])
+    phis_1d = np.array([phis, phis])
 
     # Test for scalar output
-    phimq_scalar = stellar_mass.schechter_smf_phi_mass_quenched(phic_scalar, phis_scalar)
-    assert np.isscalar(phis_scalar)
-    assert phimq_scalar == phic_scalar + phis_scalar
+    phimq_scalar = stellar_mass.schechter_smf_phi_mass_quenched(phic, phis)
+    assert np.isscalar(phimq_scalar)
+    assert phimq_scalar == phic + phis
 
-    # Test for 1 dim output
+    # Test for array output
     phimq_1d = stellar_mass.schechter_smf_phi_mass_quenched(phic_1d, phis_1d)
     assert phimq_1d.shape == phic_1d.shape == phis_1d.shape
     assert np.all(phimq_1d == phic_1d + phis_1d)
-
-    # Test for 2 dim output
-    phimq_2d = stellar_mass.schechter_smf_phi_mass_quenched(phic_2d, phis_2d)
-    assert phimq_2d.shape == phic_2d.shape == phis_2d.shape
-    assert np.all(phimq_2d == phic_2d + phis_2d)
-
-    # Special case
-    phic_null = 0
-    phis_null = 0
-    phimq_null = stellar_mass.schechter_smf_phi_mass_quenched(phic_null, phis_null)
-    assert phimq_null == 0
 
 
 SATELLITE_FUNCTIONS = [
