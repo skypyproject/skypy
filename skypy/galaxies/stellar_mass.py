@@ -81,7 +81,7 @@ def schechter_smf_mass(redshift, alpha, m_star, m_min, m_max, size=None,
 
 
 def schechter_smf_phi_centrals(phi_blue_total, fsatellite):
-    r'''Schechter amplitude of centrals.
+    r'''Schechter amplitude of central galaxies.
     This function returns the Schechter mass function amplitude
     for active central population based on equation (15)
     in de la Bella et al. 2021 [1]_.
@@ -114,7 +114,7 @@ def schechter_smf_phi_centrals(phi_blue_total, fsatellite):
 
 
 def schechter_smf_phi_satellites(phi_centrals, fsatellite):
-    r'''Schechter amplitude of satellites.
+    r'''Schechter amplitude of satellite galaxies.
     This function returns the Schechter mass function amplitude
     for active satellite population based on equation (15)
     in de la Bella et al. 2021 [1]_.
