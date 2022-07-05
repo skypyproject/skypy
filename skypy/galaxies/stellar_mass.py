@@ -88,17 +88,17 @@ def schechter_smf_phi_centrals(phi_blue_total, fsatellite):
 
     Parameters
     ----------
-    phi_blue_total: float, (nt, ) array_like
+    phi_blue_total: array_like
         Schechter mass function amplitude for the entire active
         sample of galaxies, :math:`(\phi_b, \alpha_b, m_{*})`.
 
-    fsatellite: float, (nm, ) array_like
+    fsatellite: array_like
         Fraction of active satellite galaxies between 0 and 1.
         It could be a float or an array, depending on the model you choose.
 
     Returns
     -------
-    amplitude: float, (nt, nm) array_like
+    amplitude: array_like
         Amplitude of the Schechter mass function.
 
      References
@@ -124,7 +124,7 @@ def schechter_smf_phi_satellites(phi_centrals, fsatellite):
 
     Parameters
     ----------
-    phi_centrals: float, (nt, nm) array_like
+    phi_centrals: array_like
         Schechter mass function amplitude of the central
         active galaxies.
 
@@ -134,7 +134,7 @@ def schechter_smf_phi_satellites(phi_centrals, fsatellite):
 
     Returns
     -------
-    amplitude: float, (nt, nm) array_like
+    amplitude: array_like
         Amplitude of the Schechter mass function.
 
     References
@@ -155,17 +155,17 @@ def schechter_smf_phi_mass_quenched(phi_centrals, phi_satellites):
 
     Parameters
     ----------
-    phi_centrals: float, (nt, nm) array_like
+    phi_centrals: array_like
         Schechter mass function amplitude of the central
         active galaxies.
 
-    phi_satellites: float, (nt, nm) array_like
+    phi_satellites: array_like
         Schechter mass function amplitude of the satellite
         active galaxies.
 
     Returns
     -------
-    amplitude: float, (nt, nm) array_like
+    amplitude: array_like
         Amplitude of the Schechter mass function.
 
     References
@@ -186,7 +186,7 @@ def schechter_smf_phi_satellite_quenched(phi_satellites, fenvironment):
 
     Parameters
     ----------
-    phi_satellites: float, (nt, nm) array_like
+    phi_satellites: array_like
         Schechter mass function amplitude of the satellite
         active galaxies.
 
@@ -195,7 +195,7 @@ def schechter_smf_phi_satellite_quenched(phi_satellites, fenvironment):
 
     Returns
     -------
-    amplitude: float, (nt, nm) array_like
+    amplitude: array_like
         Amplitude of the Schechter mass function.
 
     References
