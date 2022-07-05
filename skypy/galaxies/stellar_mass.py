@@ -141,7 +141,7 @@ def schechter_smf_phi_satellites(phi_centrals, fsatellite):
 
     '''
 
-    return phi_centrals * np.log(1 / (1 - fsatellite))
+    return _satellite_computation(phi_centrals, fsatellite)
 
 
 def schechter_smf_phi_mass_quenched(phi_centrals, phi_satellites):
@@ -202,4 +202,8 @@ def schechter_smf_phi_satellite_quenched(phi_satellites, fenvironment):
 
     '''
 
-    return - np.log(1 - fenvironment) * phi_satellites
+    return _satellite_computation(phi_satellites, fenvironment)
+
+
+def _satellite_computation(amplitude, fraction):
+    return - np.log(1 - fraction) * amplitude
