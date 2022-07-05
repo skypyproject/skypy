@@ -91,40 +91,6 @@ def test_schechter_smf_phi_centrals():
     assert phic_special == 0.5 * phiblue_scalar
 
 
-def test_schechter_smf_phi_satellites():
-    # Scalar inputs
-    phic_scalar = 10**-2.423
-    fsat_scalar = 0.4
-
-    # 1D Array inputs
-    phic_1d = np.array([10**-2.423, 10**-2.422])
-    fsat_1d = np.array([0.40, 0.41, 0.42])
-
-    # 2D Array inputs
-    phic_2d = np.array([[10**-2.50, 10**-2.51, 10**-2.51], [10**-2.50, 10**-2.51, 10**-2.51]])
-
-    # Test for scalar output
-    phis_scalar = stellar_mass.schechter_smf_phi_satellites(phic_scalar, fsat_scalar)
-    assert np.isscalar(phis_scalar)
-
-    # Test for 1 dim output
-    phis_1d_phib = stellar_mass.schechter_smf_phi_satellites(phic_1d, fsat_scalar)
-    phis_1d_fsat = stellar_mass.schechter_smf_phi_satellites(phic_scalar, fsat_1d)
-    assert phis_1d_phib.shape == phic_1d.shape
-    assert phis_1d_fsat.shape == fsat_1d.shape
-
-    # Test for 2 dim output
-    phis_2d = stellar_mass.schechter_smf_phi_satellites(phic_2d, fsat_1d)
-    assert phis_2d.shape == (len(phic_2d), len(fsat_1d))
-
-    # Corner case: no satellite galaxies
-    fsat_null = 0
-    phis_null_scalar = stellar_mass.schechter_smf_phi_satellites(phic_scalar, fsat_null)
-    phis_null_1d = stellar_mass.schechter_smf_phi_satellites(phic_1d, fsat_null)
-    assert phis_null_scalar == 0
-    assert np.all(phis_null_1d == np.zeros(len(phic_1d)))
-
-
 def test_schechter_smf_phi_mass_quenched():
     # Scalar inputs
     phic_scalar = 10**-2.5
@@ -160,25 +126,32 @@ def test_schechter_smf_phi_mass_quenched():
     assert phimq_null == 0
 
 
-def test_schechter_smf_phi_satellite_quenched():
+SATELLITE_FUNCTIONS = [
+    stellar_mass.schechter_smf_phi_satellites,
+    stellar_mass.schechter_smf_phi_satellite_quenched,
+]
+
+
+@pytest.mark.parametrize('satellite_function', SATELLITE_FUNCTIONS)
+def test_schechter_smf_phi_satellites_common(satellite_function):
     # Scalar inputs
     phis_scalar = 10**-2.423
-    frho_scalar = 0.2
+    fraction_scalar = 0.2
 
     # Array inputs
     phis_array = np.array([10**-2.423, 10**-2.422])
 
     # Test for scalar output
-    phisq_scalar = stellar_mass.schechter_smf_phi_satellite_quenched(phis_scalar, frho_scalar)
-    assert np.isscalar(phisq_scalar)
+    phis_sat_scalar = satellite_function(phis_scalar, fraction_scalar)
+    assert np.isscalar(phis_sat_scalar)
 
     # Test for 1 dim output
-    phisq_1d_phib = stellar_mass.schechter_smf_phi_satellite_quenched(phis_array, frho_scalar)
-    assert phisq_1d_phib.shape == phis_array.shape
+    phis_sat_1d_phib = satellite_function(phis_array, fraction_scalar)
+    assert phis_sat_1d_phib.shape == phis_array.shape
 
-    # Corner case no satellite-quenched galaxies
-    frho_null = 0
-    phisq_null_scalar = stellar_mass.schechter_smf_phi_satellites(phis_scalar, frho_null)
-    phisq_null_array = stellar_mass.schechter_smf_phi_satellites(phis_array, frho_null)
-    assert phisq_null_scalar == 0
-    assert np.all(phisq_null_array == np.zeros(len(phis_array)))
+    # Corner case no satellite galaxies
+    fraction_null = 0
+    phis_sat_null_scalar = satellite_function(phis_scalar, fraction_null)
+    phis_sat_null_array = satellite_function(phis_array, fraction_null)
+    assert phis_sat_null_scalar == 0
+    assert np.all(phis_sat_null_array == np.zeros(len(phis_array)))
