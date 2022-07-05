@@ -82,7 +82,7 @@ def test_schechter_smf_phi_centrals():
     assert phic_1d_fsat.shape == fsat_array.shape
 
     # Test for 2 dim output
-    phic_2d = stellar_mass.schechter_smf_phi_centrals(phiblue_array, fsat_array)
+    phic_2d = stellar_mass.schechter_smf_phi_centrals(phiblue_array[:, np.newaxis], fsat_array)
     assert phic_2d.shape == (len(phiblue_array), len(fsat_array))
 
     # Special case
