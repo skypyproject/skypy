@@ -8,10 +8,10 @@ from ..utils.random import schechter
 
 __all__ = [
     'schechter_smf_mass',
-    'schechter_smf_amplitude_centrals',
-    'schechter_smf_amplitude_satellites',
-    'schechter_smf_amplitude_mass_quenched',
-    'schechter_smf_amplitude_satellite_quenched',
+    'schechter_smf_phi_centrals',
+    'schechter_smf_phi_satellites',
+    'schechter_smf_phi_mass_quenched',
+    'schechter_smf_phi_satellite_quenched',
 ]
 
 
@@ -80,7 +80,7 @@ def schechter_smf_mass(redshift, alpha, m_star, m_min, m_max, size=None,
     return m
 
 
-def schechter_smf_amplitude_centrals(phi_blue_total, fsatellite):
+def schechter_smf_phi_centrals(phi_blue_total, fsatellite):
     r'''Schechter amplitude of centrals.
     This function returns the Schechter mass function amplitude
     for active central population based on equation (15)
@@ -116,7 +116,7 @@ def schechter_smf_amplitude_centrals(phi_blue_total, fsatellite):
     return (1 - fsatellite) * phi_blue_total / sum_phics
 
 
-def schechter_smf_amplitude_satellites(phi_centrals, fsatellite):
+def schechter_smf_phi_satellites(phi_centrals, fsatellite):
     r'''Schechter amplitude of satellites.
     This function returns the Schechter mass function amplitude
     for active satellite population based on equation (15)
@@ -147,7 +147,7 @@ def schechter_smf_amplitude_satellites(phi_centrals, fsatellite):
     return phi_centrals * np.log(1 / (1 - fsatellite))
 
 
-def schechter_smf_amplitude_mass_quenched(phi_centrals, phi_satellites):
+def schechter_smf_phi_mass_quenched(phi_centrals, phi_satellites):
     r'''Schechter amplitude of satellites.
     This function returns the Schechter mass function amplitude
     for passive mass-quenched population based on equation (15)
@@ -178,7 +178,7 @@ def schechter_smf_amplitude_mass_quenched(phi_centrals, phi_satellites):
     return phi_centrals + phi_satellites
 
 
-def schechter_smf_amplitude_satellite_quenched(phi_satellites, fenvironment):
+def schechter_smf_phi_satellite_quenched(phi_satellites, fenvironment):
     r'''Schechter amplitude of satellites.
     This function returns the Schechter mass function amplitude
     for active central population based on equation (15)
