@@ -108,9 +108,6 @@ def schechter_smf_phi_centrals(phi_blue_total, fsatellite):
 
     '''
 
-    if np.ndim(phi_blue_total) == 1 and np.ndim(fsatellite) == 1:
-        phi_blue_total = phi_blue_total[:, np.newaxis]
-
     sum_phics = (1 - fsatellite) * (1 - np.log(1 - fsatellite))
 
     return (1 - fsatellite) * phi_blue_total / sum_phics
