@@ -145,7 +145,7 @@ def schechter_smf_phi_satellites(phi_centrals, fsatellite):
 
 
 def schechter_smf_phi_mass_quenched(phi_centrals, phi_satellites):
-    r'''Schechter amplitude of satellites.
+    r'''Schechter amplitude of mass-quenched galaxies.
     This function returns the Schechter mass function amplitude
     for passive mass-quenched population based on equation (15)
     in de la Bella et al. 2021 [1]_.
@@ -176,7 +176,7 @@ def schechter_smf_phi_mass_quenched(phi_centrals, phi_satellites):
 
 
 def schechter_smf_phi_satellite_quenched(phi_satellites, fenvironment):
-    r'''Schechter amplitude of satellites.
+    r'''Schechter amplitude of satellite-quenched galaxies.
     This function returns the Schechter mass function amplitude
     for active central population based on equation (15)
     in de la Bella et al. 2021 [1]_.
