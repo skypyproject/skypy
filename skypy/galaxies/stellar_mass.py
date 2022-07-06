@@ -88,7 +88,7 @@ def schechter_smf_phi_active_redshift(redshift,
                                       cosmology,
                                       redshift_initial=10,
                                       resolution=100):
-    r'''Time-dependent Schechter amplitude of active galaxies.
+    r'''Redshift-dependent Schechter amplitude of active galaxies.
     This function returns the time-dependent Schechter mass function amplitude
     for the total active population based on equation (17)
     in de la Bella et al. 2021 [1]_.
