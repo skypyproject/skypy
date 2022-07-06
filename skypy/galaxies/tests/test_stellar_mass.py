@@ -4,6 +4,8 @@ import scipy.integrate
 from scipy.special import gammaln
 import pytest
 from astropy.modeling.models import Exponential1D
+from hypothesis import given
+from hypothesis.strategies import integers
 
 from skypy.galaxies import stellar_mass
 from skypy.utils import special
@@ -79,3 +81,30 @@ def test_stellar_masses():
                                              size=1000, resolution=100)
     p_value = scipy.stats.kstest(sample, calc_cdf)[1]
     assert p_value >= 0.01
+
+
+@given(integers(1, 100))
+def test_schechter_smf_phi_active_redshift(redshift):
+    # Amplitude today and cosmology
+    from astropy.cosmology import Planck15
+    phi_today = 10**-2.423
+
+    # Simple probability of satellites
+    def prob_sat(z, a=0.4):
+        return a * np.exp(- z)
+
+    # Test that today the output of the active amplitude equals the input
+    output_today = stellar_mass.schechter_smf_phi_active_redshift(0, phi_today, prob_sat, Planck15)
+    assert output_today == phi_today
+
+    # Test that at any redshift for a null probability of creating satellite galaxies
+    # the output of the active amplitude equals the input
+    def prob_null(z):
+        return prob_sat(z, 0)
+
+    output_null = stellar_mass.schechter_smf_phi_active_redshift(redshift,
+                                                                 phi_today,
+                                                                 prob_null,
+                                                                 Planck15
+                                                                 )
+    assert output_null == phi_today
