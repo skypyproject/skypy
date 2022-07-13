@@ -48,6 +48,27 @@ from skypy.galaxies import schechter_smf
 #                                          )
 
 # %%
+
+
+# Weigel et al. 2016 parameters for the active population
+phiblue = 10**-2.423
+mstarb = 10**10.60
+alphab = -1.21
+blue = (phiblue, alphab, mstarb)
+
+# Fraction of satellite-quenched galaxies and satellites
+frho = 0.5
+fsat = 0.4
+
+# Weigel+16 redshift and cosmology
+z_min, z_max = 0.02, 0.06
+z_range = np.linspace(z_min, z_max, 100)
+cosmology = FlatLambdaCDM(H0=70, Om0=0.3)
+
+# Sky area (SDSS DR7 8423 deg2)
+sky_area = Quantity(2000, "deg2")
+
+# %%
 # First we use the model implemented in `skypy.galaxies.stellar_mass`.
 
 
@@ -71,24 +92,6 @@ def schechter_smf_phi_mass_quenched(phi_centrals, phi_satellites):
 def schechter_smf_phi_satellite_quenched(phi_satellites, fenvironment):
     return - np.log(1 - fenvironment) * phi_satellites
 
-
-# Weigel et al. 2016 parameters for the active population
-phiblue = 10**-2.423
-mstarb = 10**10.60
-alphab = -1.21
-blue = (phiblue, alphab, mstarb)
-
-# Fraction of satellite-quenched galaxies and satellites
-frho = 0.5
-fsat = 0.4
-
-# Weigel+16 redshift and cosmology
-z_min, z_max = 0.02, 0.06
-z_range = np.linspace(z_min, z_max, 100)
-cosmology = FlatLambdaCDM(H0=70, Om0=0.3)
-
-# Sky area (SDSS DR7 8423 deg2)
-sky_area = Quantity(2000, "deg2")
 
 # SkyPy amplitudes
 phic = schechter_smf_phi_centrals(phiblue, fsat)
@@ -180,8 +183,6 @@ ax3.plot(wcentral['logm'], 10**wcentral['logphi'], '--', color='grey', label='We
 ax3.plot(wsatellite['logm'], 10**wsatellite['logphi'], '--', color='grey', label='Weigel+16 satellites', lw=1)
 ax3.fill_between(wtotal['logm'], 10**wtotal['upper_error'], 10**wtotal['lower_error'], color='plum', alpha=0.1)
 ax3.step(bins[:-1], logphi_total, where='post', label='SkyPy total', color='purple', zorder=3, lw=1)
-
-
 
 for ax in [ax1, ax2, ax3]:
     ax.legend(loc='lower left', fontsize='small', frameon=False)
