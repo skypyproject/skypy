@@ -192,17 +192,17 @@ plt.show()
 
 import IPython
 # Active population
-IPython.display.Audio("skypy_active.wav")
+IPython.display.Audio("skypy_sim_active.wav")
 
 # %%
 
 # Mass-quenched galaxies
-IPython.display.Audio("skypy_mass_quenched.wav")
+IPython.display.Audio("skypy_sim_massq.wav")
 
 # %%
 
 # Satellite-quenched galaxies
-IPython.display.Audio("skypy_satellite_quenched.wav")
+IPython.display.Audio("skypy_sim_satq.wav")
 
 
 # %%
