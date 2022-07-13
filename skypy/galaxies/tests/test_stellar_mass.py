@@ -95,7 +95,7 @@ def test_schechter_smf_phi_active_redshift(redshift):
 
     # Test that today the output of the active amplitude equals the input
     output_today = stellar_mass.schechter_smf_phi_active_redshift(0, phi_today, prob_sat, Planck15)
-    assert output_today == approx(phi_today)
+    assert output_today == pytest.approx(phi_today)
 
     # Test that at any redshift for a null probability of creating satellite galaxies
     # the output of the active amplitude equals the input
@@ -107,4 +107,4 @@ def test_schechter_smf_phi_active_redshift(redshift):
                                                                  prob_null,
                                                                  Planck15
                                                                  )
-    assert output_null == approx(phi_today)
+    assert output_null == pytest.approx(phi_today)
