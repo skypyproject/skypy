@@ -36,7 +36,11 @@ from a general Schechter mass function.
 
 import numpy as np
 import matplotlib.pyplot as plt
+
+from astropy.cosmology import FlatLambdaCDM
 from astropy.table import Table
+from astropy.units import Quantity
+from skypy.galaxies import schechter_smf
 # from skypy.galaxies.stellar_mass import (schechter_smf_amplitude_centrals,
                                   #    schechter_smf_amplitude_satellites,
                                 #    schechter_smf_amplitude_mass_quenched,
@@ -48,7 +52,7 @@ from astropy.table import Table
 
 
 # To be replaced by the SkyPy function once it's merged
-def schechter_smf_amplitude_centrals(phi_blue_total, fsatellite):
+def schechter_smf_phi_centrals(phi_blue_total, fsatellite):
     if np.ndim(phi_blue_total) == 1 and np.ndim(fsatellite) == 1:
         phi_blue_total = phi_blue_total[:, np.newaxis]
 
@@ -56,15 +60,15 @@ def schechter_smf_amplitude_centrals(phi_blue_total, fsatellite):
     return (1 - fsatellite) * phi_blue_total / sum_phics
 
 
-def schechter_smf_amplitude_satellites(phi_centrals, fsatellite):
+def schechter_smf_phi_satellites(phi_centrals, fsatellite):
     return phi_centrals * np.log(1 / (1 - fsatellite))
 
 
-def schechter_smf_amplitude_mass_quenched(phi_centrals, phi_satellites):
+def schechter_smf_phi_mass_quenched(phi_centrals, phi_satellites):
     return phi_centrals + phi_satellites
 
 
-def schechter_smf_amplitude_satellite_quenched(phi_satellites, fenvironment):
+def schechter_smf_phi_satellite_quenched(phi_satellites, fenvironment):
     return - np.log(1 - fenvironment) * phi_satellites
 
 
@@ -74,48 +78,59 @@ mstarb = 10**10.60
 alphab = -1.21
 blue = (phiblue, alphab, mstarb)
 
-# Fraction of satellite-quenched galaxies
+# Fraction of satellite-quenched galaxies and satellites
 frho = 0.5
+fsat = 0.4
 
-# Compute the fraction of satellite galaxies
-wtotal = Table.read('weigel16_total.csv', format='csv')
-wsatellite = Table.read('weigel16_satellite.csv', format='csv')
-logm = wtotal['logm']
-fsat = 10**wsatellite['logphi']/10**wtotal['logphi']
+# Weigel+16 redshift and cosmology
+z_min, z_max = 0.02, 0.06
+z_range = np.linspace(z_min, z_max, 100)
+cosmology = FlatLambdaCDM(H0=70, Om0=0.3)
 
-# Generate the Schechter parameters for all populations
-phic = schechter_smf_amplitude_centrals(phiblue, fsat)
-phis = schechter_smf_amplitude_satellites(phic, fsat)
-phimq = schechter_smf_amplitude_mass_quenched(phic, phis)
-phisq = schechter_smf_amplitude_satellite_quenched(phis, frho)
+# Sky area (SDSS DR7 8423 deg2)
+sky_area = Quantity(2000, "deg2")
 
-central = (phic, alphab, mstarb)
-satellite = (phis, alphab, mstarb)
-mass_quenched = (phimq, alphab + 1, mstarb)
-sat_quenched = (phisq, alphab, mstarb)
+# SkyPy amplitudes
+phic = schechter_smf_phi_centrals(phiblue, fsat)
+phis = schechter_smf_phi_satellites(phic, fsat)
+phimq = schechter_smf_phi_mass_quenched(phic, phis)
+phisq = schechter_smf_phi_satellite_quenched(phis, frho)
 
 
 # %%
-# Finally we compute the Schechter mass functions for all populations.
+# Finally we simulate the galaxy populations.
 
 
-# SMF ideally from SkyPy
-def schechter_dndm(mass, params):
-    phi, alpha, mstar = params
-    x = mass / mstar
-    return phi * x**alpha * np.exp(-x)
+# Schechter mass functions
+z_centrals, m_centrals = schechter_smf(z_range, mstarb, phic, alphab, 1e9, 1e12, sky_area, cosmology)
+z_satellites, m_satellites = schechter_smf(z_range, mstarb, phis, alphab, 1e9, 1e12, sky_area, cosmology)
+z_massq, m_mass_quenched = schechter_smf(z_range, mstarb, phimq, alphab + 1, 1e9, 1e12, sky_area, cosmology)
+z_satq, m_satellite_quenched = schechter_smf(z_range, mstarb, phisq, alphab, 1e9, 1e12, sky_area, cosmology)
 
 
-m = 10**logm
-gb = schechter_dndm(m, blue)
-gc = schechter_dndm(m, central)
-gs = schechter_dndm(m, satellite)
-gmq = schechter_dndm(m, mass_quenched)
-gsq = schechter_dndm(m, sat_quenched)
+logm_centrals = np.log10(m_centrals)
+logm_satellites = np.log10(m_satellites)
+logm_massq = np.log10(m_mass_quenched)
+logm_satq = np.log10(m_satellite_quenched)
 
-active = gc + gs
-passive = gmq + gsq
-total = active + passive
+# log Mass bins
+bins = np.linspace(9, 12, 35)
+
+# Sky volume
+dV_dz = (cosmology.differential_comoving_volume(z_range) * sky_area).to_value('Mpc3')
+dV = np.trapz(dV_dz, z_range)
+dlm = (np.max(bins)-np.min(bins)) / (np.size(bins)-1)
+
+# log distribution of masses
+logphi_centrals = np.histogram(logm_centrals, bins=bins)[0] / dV / dlm
+logphi_satellites = np.histogram(logm_satellites, bins=bins)[0] / dV / dlm
+logphi_massq = np.histogram(logm_massq, bins=bins)[0] / dV / dlm
+logphi_satq = np.histogram(logm_satq, bins=bins)[0] / dV / dlm
+
+logphi_active = logphi_centrals + logphi_satellites
+logphi_passive = logphi_massq + logphi_satq
+logphi_total = logphi_active + logphi_passive
+
 
 # %%
 # Validation against SSD DR7 data
@@ -134,51 +149,53 @@ total = active + passive
 # and compare with Weigel et al 2016 best-fit model. 
 
 
-# Load the rest of data
+# Load the data
+wtotal = Table.read('weigel16_total.csv', format='csv')
 wred = Table.read('weigel16_quiescent.csv', format='csv')
 wblue = Table.read('weigel16_active.csv', format='csv')
 wcentral = Table.read('weigel16_central.csv', format='csv')
-
-# Conversion factor to log distribution
-factor = np.log(10) * 10**logm / mstarb
-lblue, lcentrals, lsats = np.log10(gb * factor), np.log10(gc * factor), np.log10(gs * factor)
-lred, lmq, lsq = np.log10(passive * factor), np.log10(gmq * factor), np.log10(gsq * factor)
-ltotal = np.log10(total * factor)
+wsatellite = Table.read('weigel16_satellite.csv', format='csv')
 
 # %%
 
 
 # Plot
-fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(16, 6), sharex=True, sharey=True)
-fig.suptitle('Galaxy Demographics', fontsize=26)
+fig, (ax1, ax2, ax3) = plt.subplots(nrows=1, ncols=3, figsize=(16, 6), sharex=True, sharey=True)
+fig.suptitle('Galaxy Demographics Simulation', fontsize=26)
 
-ax1.plot(wblue['logm'], wblue['logphi'], color='k', label='Weigel+16', lw=1)
-ax1.plot(logm, lblue, color='blue', label='SkyPy Active', lw=1)
-ax1.plot(logm, lcentrals, '--', color='royalblue', label='SkyPy Centrals', lw=1)
-ax1.plot(logm, lsats, '--', color='cyan', label='SkyPy Satellites', lw=1)
+ax1.plot(wblue['logm'], 10**wblue['logphi'], color='k', label='Weigel+16 active', lw=1)
+ax1.step(bins[:-1], logphi_active, where='post', label='SkyPy active', color='blue', zorder=3, lw=1)
+ax1.step(bins[:-1], logphi_centrals, where='post', label='SkyPy centrals', color='royalblue', zorder=3, lw=1)
+ax1.step(bins[:-1], logphi_satellites, where='post', label='SkyPy satellites', color='cyan', zorder=3, lw=1)
 
-ax2.plot(wred['logm'], wred['logphi'], color='k', label='Weigel+16', lw=1)
-ax2.fill_between(wred['logm'], wred['upper_error'], wred['lower_error'], color='salmon', alpha=0.1)
-ax2.plot(logm, lred, color='red', label='SkyPy Passive', lw=1)
-ax2.plot(logm, lmq, '--', color='coral', label='SkyPy Mass Quenched', lw=1)
-ax2.plot(logm, lsq, '--', color='maroon', label='SkyPy Sat Quenched', lw=1)
 
-ax3.plot(wtotal['logm'], wtotal['logphi'], color='k', label='Weigel+16', lw=1)
-ax3.plot(wcentral['logm'], wcentral['logphi'], '--', color='grey', label='Centrals', lw=1)
-ax3.plot(wsatellite['logm'], wsatellite['logphi'], '--', color='grey', label='Satellites', lw=1)
-ax3.fill_between(wtotal['logm'], wtotal['upper_error'], wtotal['lower_error'], color='plum', alpha=0.1)
-ax3.plot(logm, ltotal, color='purple', label='SkyPy Total', lw=1)
+ax2.plot(wred['logm'], 10**wred['logphi'], color='k', label='Weigel+16 passive', lw=1)
+ax2.fill_between(wred['logm'], 10**wred['upper_error'], 10**wred['lower_error'], color='salmon', alpha=0.1)
+ax2.step(bins[:-1], logphi_passive, where='post', label='SkyPy passive', color='red', zorder=3, lw=1)
+ax2.step(bins[:-1], logphi_massq, where='post', label='SkyPy mass-quenched', color='coral', zorder=3, lw=1)
+ax2.step(bins[:-1], logphi_satq, where='post', label='SkyPy sat-quenched', color='maroon', zorder=3, lw=1)
+
+ax3.plot(wtotal['logm'], 10**wtotal['logphi'], color='k', label='Weigel+16 total', lw=1)
+ax3.plot(wcentral['logm'], 10**wcentral['logphi'], '--', color='grey', label='Weigel+16 centrals', lw=1)
+ax3.plot(wsatellite['logm'], 10**wsatellite['logphi'], '--', color='grey', label='Weigel+16 satellites', lw=1)
+ax3.fill_between(wtotal['logm'], 10**wtotal['upper_error'], 10**wtotal['lower_error'], color='plum', alpha=0.1)
+ax3.step(bins[:-1], logphi_total, where='post', label='SkyPy total', color='purple', zorder=3, lw=1)
+
 
 
 for ax in [ax1, ax2, ax3]:
-    ax.legend(loc='lower left', frameon=False, fontsize=14)
+    ax.legend(loc='lower left', fontsize='small', frameon=False)
     ax.set_xlabel(r'Stellar mass, $log (M/M_{\odot})$', fontsize=18)
-    ax.set_ylim(-5.5)
+    ax.set_xlim((9, 11.9))
+    ax.set_ylim((2e-6,5e-2))
+    ax.set_yscale('log')
 
 
-ax1.set_ylabel(r'$log(\phi /h^3 Mpc^{-3}dex^{-1} )$', fontsize=18)
+ax1.set_ylabel(r'$\phi /h^3 Mpc^{-3}$', fontsize=18)
+# plt.savefig('galaxy_simulation.pdf')
 plt.tight_layout()
 plt.show()
+
 
 # %%
 # Sonification
