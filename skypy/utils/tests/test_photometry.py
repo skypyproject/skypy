@@ -175,3 +175,58 @@ def test_speclite_not_installed():
     filter = 'bessell-B'
     with pytest.raises(ImportError):
         mag_ab(wavelength, spectrum, filter)
+
+
+def test_magnitude_error_rykoff():
+    from skypy.utils.photometry import magnitude_error_rykoff
+
+    # Test broadcasting to same shape given array for each parameter and
+    # test for correct result.
+    magnitude = np.full((2, 1, 1, 1, 1), 21)
+    magnitude_limit = np.full((3, 1, 1, 1), 21)
+    magnitude_zp = np.full((5, 1, 1), 21)
+    a = np.full((7, 1), np.log(200))
+    b = np.zeros(11)
+    error = magnitude_error_rykoff(magnitude, magnitude_limit, magnitude_zp, a, b)
+    # test result
+    assert np.allclose(error, 0.25 / np.log(10))
+    # test shape
+    assert error.shape == (2, 3, 5, 7, 11)
+
+    # second test for result
+    magnitude = 20
+    magnitude_limit = 22.5
+    magnitude_zp = 25
+    b = 2
+    a = np.log(10) - 1.5 * b
+    error = magnitude_error_rykoff(magnitude, magnitude_limit, magnitude_zp, a, b)
+    assert np.isclose(error, 0.25 / np.log(10) / np.sqrt(10))
+
+    # test that error limit is returned if error is larger than error_limit
+    # The following set-up would give a value larger than 10
+    magnitude = 30
+    magnitude_limit = 25
+    magnitude_zp = 30
+    a = 0.5
+    b = 1.0
+    error_limit = 1
+    error = magnitude_error_rykoff(magnitude, magnitude_limit, magnitude_zp, a, b, error_limit)
+    assert error == error_limit
+
+
+def test_logistic_completeness_function():
+    from skypy.utils.photometry import logistic_completeness_function
+
+    # Test that arguments broadcast correctly
+    m = np.full((2, 1, 1), 21)
+    m95 = np.full((3, 1), 22)
+    m50 = np.full(5, 23)
+    p = logistic_completeness_function(m, m95, m50)
+    assert p.shape == np.broadcast(m, m95, m50).shape
+
+    # Test result of completeness function for different given magnitudes
+    m95 = 24
+    m50 = 25
+    m = [np.finfo(np.float64).min, m95, m50, 2*m50-m95, np.finfo(np.float64).max]
+    p = logistic_completeness_function(m, m95, m50)
+    assert np.allclose(p, [1, 0.95, 0.5, 0.05, 0])
