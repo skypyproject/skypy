@@ -131,7 +131,7 @@ def mag_ab(wavelength, spectrum, filters, *, redshift=None, coefficients=None,
         u = u.reshape(u.shape + (1,)*(nd_s+nd_f))
         m = np.ascontiguousarray(m[n])
         m += u*dm[n]
-        del (dm, n, u)
+        del dm, n, u
 
     # combine spectra if asked to
     if coefficients is not None:
