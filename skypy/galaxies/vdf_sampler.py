@@ -1,5 +1,4 @@
 """Sample from velocity distribution function
-
 """
 
 import numpy as np
@@ -8,6 +7,7 @@ from scipy.interpolate import interp1d
 
 def sample_vdf(x_min, x_max, resolution=100, size=1):
     """Sample from velocity dispersion function of elliptical galaxies in the local universe [1]_.
+
     Parameters
     ----------
     xmin, xmax: int
@@ -16,15 +16,18 @@ def sample_vdf(x_min, x_max, resolution=100, size=1):
         Resolution of the inverse transform sampling spline. Default is 100.
     size: int
         Number of samples returned. Default is 1.
+
     Returns
     -------
     x_sample: array_like
         Samples drawn from vdf function.
+        
     Warnings
     --------
     Inverse cumulative dispersion function is approximated from the function 
-    using quadratic interpolation. The usre should specify the resolution to 
+    using quadratic interpolation. The user should specify the resolution to 
     satisfy their numerical accuracy.
+    
     References
     ----------
     .. [1] Choi, Park and Vogeley, (2007), astro-ph/0611607, doi:10.1086/511060
