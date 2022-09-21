@@ -5,6 +5,7 @@ import numpy as np
 import scipy.special as special
 from scipy.interpolate import interp1d
 
+
 def sample_vdf(x_min, x_max, resolution=100, size=1):
     """Sample from velocity dispersion function of elliptical galaxies in the local universe [1]_.
 
@@ -21,19 +22,22 @@ def sample_vdf(x_min, x_max, resolution=100, size=1):
     -------
     x_sample: array_like
         Samples drawn from vdf function.
-        
+
     Warnings
     --------
-    Inverse cumulative dispersion function is approximated from the function 
-    using quadratic interpolation. The user should specify the resolution to 
+    Inverse cumulative dispersion function is approximated from the function
+    using quadratic interpolation. The user should specify the resolution to
     satisfy their numerical accuracy.
-    
+
     References
     ----------
     .. [1] Choi, Park and Vogeley, (2007), astro-ph/0611607, doi:10.1086/511060
     """
     x = np.linspace(0, 1000, resolution)
-    vdf_func = lambda x: 8e-3*(x/161)**2.32*np.exp(-(x/161)**2.67)*(2.67/special.gamma(2.32/2.67))*(1/x)
+
+    def vdf_func(x):
+        return 8e-3*(x/161)**2.32*np.exp(-(x/161)**2.67)*(2.67/special.gamma(2.32/2.67))*(1/x)
+
     y = vdf_func(x)
     pdf_sampler = PDFSampling(x, y[1:], x_min, x_max)
     return pdf_sampler.draw(size)
