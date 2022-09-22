@@ -40,6 +40,8 @@ def sample_vdf(x_min, x_max, resolution=100, size=1):
 
     y = vdf_func(x)
     pdf_sampler = PDFSampling(x, y[1:], x_min, x_max)
+    test_draw = pdf_sampler.draw_one()
+    assert len(test_draw) == 1
     return pdf_sampler.draw(size)
 
 
