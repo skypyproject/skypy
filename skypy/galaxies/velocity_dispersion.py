@@ -1,13 +1,16 @@
-r"""Sample from velocity distribution function
+r"""Models of galaxy velocity dispersion.
 
 """
 
 import numpy as np
 import scipy.special as special
 
+__all__ = [
+    'schechter_vdf',
+]
 
 def schecter_vdf(vd_min, vd_max, resolution=100, size=None, scale=1.):
-    r"""Sample from velocity dispersion function of elliptical galaxies in the local universe [1]_.
+    r"""Sample velocity dispersion of elliptical galaxies in the local universe following a Schecter function.
 
     Parameters
     ----------
@@ -23,20 +26,15 @@ def schecter_vdf(vd_min, vd_max, resolution=100, size=None, scale=1.):
     velocity_dispersion: array_like
         Velocity dispersion drawn from Schechter function.
 
-    Warnings
-    --------
-    Inverse cumulative dispersion function is approximated from the function
-    using quadratic interpolation. The user should specify the resolution to
-    satisfy their numerical accuracy.
-
-        Notes
+    Notes
     -----
-    The probability distribution function :math:`p(\sigma)` for redshift :math:`\sigma`
-    is given by Choi et al. [1]_ as
+    The probability distribution function :math:`p(\sigma)` for velocity dispersion :math:`\sigma`
+    can be described by a Schechter function (see eq. (4) in [1]_)
 
     .. math::
+    
         \begin{eqnarray}&&{dn}={\phi }_{*}{(\displaystyle \frac{\sigma }{{\sigma }_{*}})}^{\alpha }
-        \mathrm{exp}[-{(\displaystyle \frac{\sigma }{{\sigma }_{*}})}^{\beta }]\displaystyle
+        \mathrm{exp}[-{(\displaystyle \frac{\sigma  }{{\sigma }_{*}})}^{\beta }]\displaystyle
         \frac{\beta }{{\rm{\Gamma }}(\alpha /\beta )}\displaystyle \frac{1}{\sigma },
         \end{eqnarray}\tag{3} \;.
 
