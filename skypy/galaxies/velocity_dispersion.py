@@ -9,7 +9,7 @@ __all__ = [
     'schechter_vdf',
 ]
 
-def schecter_vdf(vd_min, vd_max, resolution=100, size=None, scale=1.):
+def schechter_vdf(vd_min, vd_max, size=None, resolution=1000):
     r"""Sample velocity dispersion of elliptical galaxies in the local universe following a Schecter function.
 
     Parameters
@@ -32,11 +32,10 @@ def schecter_vdf(vd_min, vd_max, resolution=100, size=None, scale=1.):
     can be described by a Schechter function (see eq. (4) in [1]_)
 
     .. math::
-    
-        \begin{eqnarray}&&{dn}={\phi }_{*}{(\displaystyle \frac{\sigma }{{\sigma }_{*}})}^{\alpha }
-        \mathrm{exp}[-{(\displaystyle \frac{\sigma  }{{\sigma }_{*}})}^{\beta }]\displaystyle
-        \frac{\beta }{{\rm{\Gamma }}(\alpha /\beta )}\displaystyle \frac{1}{\sigma },
-        \end{eqnarray}\tag{3} \;.
+
+        {dn}={\phi }_{*}{(\frac{\sigma}{{\sigma}_{*}})}^{\alpha}
+        {exp}[-{(\frac{\sigma}{{\sigma}_{*}})}^{\beta}]
+        \frac{\beta}{{\Gamma}(\alpha/\beta)}\frac{1}{\sigma},
 
     References
     ----------
@@ -44,8 +43,8 @@ def schecter_vdf(vd_min, vd_max, resolution=100, size=None, scale=1.):
 
     """
 
-    if size is None:
-        size = np.broadcast(vd_min, vd_max, scale).shape or None
+    # if np.ndim(alpha) > 0:
+    #     raise NotImplementedError('only scalar alpha is supported')
 
     lnx = np.linspace(vd_min, vd_max, resolution)
 
@@ -64,4 +63,4 @@ def schecter_vdf(vd_min, vd_max, resolution=100, size=None, scale=1.):
     u = np.random.uniform(t_lower, t_upper, size=size)
     lnx_sample = np.interp(u, cdf, lnx)
 
-    return lnx_sample * scale
+    return lnx_sample
