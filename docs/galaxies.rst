@@ -92,7 +92,7 @@ The following models are found in the `skypy.galaxies.stellar_mass` package.
 
 
 Velocity dispersion
-------------
+-------------------
 
 The following models are found in the `skypy.galaxies.velocity_dispersion` package.
 
