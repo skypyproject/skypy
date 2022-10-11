@@ -3,13 +3,12 @@ r"""Models of galaxy velocity dispersion.
 """
 
 import numpy as np
-import scipy.special as special
 
 __all__ = [
     'schechter_vdf',
 ]
 
-def schechter_vdf(vd_min, vd_max, size=None, resolution=1000):
+def schechter_vdf(alpha, beta, vd_star, vd_min, vd_max, size=None, resolution=1000):
     r"""Sample velocity dispersion of elliptical galaxies in the local universe following a Schecter function.
 
     Parameters
@@ -37,6 +36,9 @@ def schechter_vdf(vd_min, vd_max, size=None, resolution=1000):
         {exp}[-{(\frac{\sigma}{{\sigma}_{*}})}^{\beta}]
         \frac{\beta}{{\Gamma}(\alpha/\beta)}\frac{1}{\sigma},
 
+        where :math:`\sigma` is velocity dispersion, :math:`\sigma_*` is the charactersitic velocity dispersion, :math:`\phi_*` 
+        is number density of all spiral galaxies and :math:`\alpha` and :math:`\beta` are free parameters.
+
     References
     ----------
     .. [1] Choi, Park and Vogeley, (2007), astro-ph/0611607, doi:10.1086/511060
@@ -46,21 +48,10 @@ def schechter_vdf(vd_min, vd_max, size=None, resolution=1000):
     # if np.ndim(alpha) > 0:
     #     raise NotImplementedError('only scalar alpha is supported')
 
-    lnx = np.linspace(vd_min, vd_max, resolution)
+    # alpha_prime = alpha - 1
 
-    def vdf_func(x):
-        return 8e-3*(x/161)**2.32*np.exp(-(x/161)**2.67)*(2.67/special.gamma(2.32/2.67))*(1/x)
+    # samples = schechter(alpha, vd_min, vd_max, resolution = resolution, size = size)
 
-    pdf = vdf_func(lnx)
-    cdf = pdf  # in place
-    np.cumsum((pdf[1:]+pdf[:-1])/2*np.diff(lnx), out=cdf[1:])
-    cdf[0] = 0
-    cdf /= cdf[-1]
+    # samples = samples*sigma_star/beta
 
-    t_lower = np.interp(vd_min, lnx, cdf)
-    t_upper = np.interp(vd_max, lnx, cdf)
-
-    u = np.random.uniform(t_lower, t_upper, size=size)
-    lnx_sample = np.interp(u, cdf, lnx)
-
-    return lnx_sample
+    # return samples
