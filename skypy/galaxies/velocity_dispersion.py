@@ -4,7 +4,6 @@ r"""Models of galaxy velocity dispersion.
 
 import numpy as np
 from skypy.utils.random import schechter
-from scipy.special import gamma
 
 __all__ = [
     'schechter_vdf',
@@ -36,9 +35,9 @@ def schechter_vdf(alpha, beta, vd_star, vd_min, vd_max, size=None, resolution=10
 
         \phi = \phi_* \left(\frac{\sigma}{\sigma_*}\right)^\alpha
         \exp\left[-\left( \frac{\sigma}{\sigma_*} \right)^\beta\right] 
-        \frac{\beta}{\Sigma(\alpha/\beta)} \frac{1}{\sigma} \mathrm{d}\sigma
+        \frac{\beta}{\Gamma(\alpha/\beta)} \frac{1}{\sigma} \mathrm{d}\sigma
 
-        where :math:`\Sigma` is velocity dispersion, :math:`\sigma_*` is the charactersitic velocity dispersion, :math:`\phi_*` 
+        where :math:`\Gamma` is the gamma function, :math:`\sigma_*` is the charactersitic velocity dispersion, :math:`\phi_*` 
         is number density of all spiral galaxies and :math:`\alpha` and :math:`\beta` are free parameters.
 
     References
@@ -51,7 +50,8 @@ def schechter_vdf(alpha, beta, vd_star, vd_min, vd_max, size=None, resolution=10
         raise NotImplementedError('only scalar alpha is supported')
 
     alpha_prime = alpha/beta - 1
-    samples = schechter(alpha_prime, vd_min, vd_max, resolution = resolution, size = size)
+    x_min, x_max = (vd_min/vd_star)**beta, (vd_max/vd_star)**beta
+    samples = schechter(alpha_prime, x_min, x_max, resolution = resolution, size = size)
     samples_converted = samples**(1/beta) * vd_star
 
     return samples_converted
