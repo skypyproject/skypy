@@ -9,11 +9,19 @@ __all__ = [
     'schechter_vdf',
 ]
 
+
 def schechter_vdf(alpha, beta, vd_star, vd_min, vd_max, size=None, resolution=1000):
-    r"""Sample velocity dispersion of elliptical galaxies in the local universe following a Schecter function.
+    r"""Sample velocity dispersion of elliptical galaxies in the local universe
+    following a Schecter function.
 
     Parameters
     ----------
+    alpha: int
+        The alpha parameter in the modified Schechter equation.
+    beta: int
+        The beta parameter in the modified Schechter equation.
+    vd_star: int
+        The characteristic velocity dispersion.
     vd_min, vd_max: int
         Lower and upper bounds of random variable x. Samples are drawn uniformly from bounds.
     resolution: int
@@ -34,11 +42,13 @@ def schechter_vdf(alpha, beta, vd_star, vd_min, vd_max, size=None, resolution=10
     .. math::
 
         \phi = \phi_* \left(\frac{\sigma}{\sigma_*}\right)^\alpha
-        \exp\left[-\left( \frac{\sigma}{\sigma_*} \right)^\beta\right] 
-        \frac{\beta}{\Gamma(\alpha/\beta)} \frac{1}{\sigma} \mathrm{d}\sigma
+        \exp\left[-\left( \frac{\sigma}{\sigma_*} \right)^\beta\right]
+        \frac{\beta}{\Gamma(\alpha/\beta)} \frac{1}{\sigma} \mathrm{d}\sigma \;,
 
-        where :math:`\Gamma` is the gamma function, :math:`\sigma_*` is the charactersitic velocity dispersion, :math:`\phi_*` 
-        is number density of all spiral galaxies and :math:`\alpha` and :math:`\beta` are free parameters.
+    where :math:`\Gamma` is the gamma function, :math:`\sigma_*` is the
+    characteristic velocity dispersion, :math:`\phi_*` is
+    number density of all spiral galaxies and
+    :math:`\alpha` and :math:`\beta` are free parameters.
 
     References
     ----------
@@ -51,7 +61,8 @@ def schechter_vdf(alpha, beta, vd_star, vd_min, vd_max, size=None, resolution=10
 
     alpha_prime = alpha/beta - 1
     x_min, x_max = (vd_min/vd_star)**beta, (vd_max/vd_star)**beta
-    samples = schechter(alpha_prime, x_min, x_max, resolution = resolution, size = size)
-    samples_converted = samples**(1/beta) * vd_star
 
-    return samples_converted
+    samples = schechter(alpha_prime, x_min, x_max, resolution=resolution, size=size)
+    samples = samples**(1/beta) * vd_star
+
+    return samples
