@@ -25,7 +25,7 @@ def test_schechter_vdf():
 
     # test that sampling corresponds to sampling from the right pdf
     def calc_pdf(vd):
-        return phi_star*(vd/vd_star)**alpha*np.exp(-(vd/vd_star)**beta)* \
+        return phi_star*(vd/vd_star)**alpha*np.exp(-(vd/vd_star)**beta) * \
             (beta/gamma(alpha/beta))*(1/vd)
 
     def calc_cdf(m):

@@ -42,8 +42,8 @@ def schechter_vdf(alpha, beta, vd_star, vd_min, vd_max, size=None, resolution=10
     .. math::
 
         \phi = \phi_* \left(\frac{\sigma}{\sigma_*}\right)^\alpha
-        \exp\left[-\left( \frac{\sigma}{\sigma_*} \right)^\beta\right]
-        \frac{\beta}{\Gamma(\alpha/\beta)} \frac{1}{\sigma} \mathrm{d}\sigma \;,
+            \exp\left[-\left( \frac{\sigma}{\sigma_*} \right)^\beta\right]
+            \frac{\beta}{\Gamma(\alpha/\beta)} \frac{1}{\sigma} \mathrm{d}\sigma \;.
 
     where :math:`\Gamma` is the gamma function, :math:`\sigma_*` is the
     characteristic velocity dispersion, :math:`\phi_*` is
