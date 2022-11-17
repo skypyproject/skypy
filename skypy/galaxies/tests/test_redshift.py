@@ -32,7 +32,7 @@ def test_schechter_lf_redshift():
     x_min = 10.**(-0.4*(M_lim - M_star))
 
     # density with factor from upper incomplete gamma function
-    density = phi_star*gamma(alpha+1)*gammaincc(alpha+1, x_min)
+    density = phi_star*gamma(alpha+1)*gammaincc(alpha+1, x_min)*np.power(cosmo.h, 3)
 
     # turn into galaxies/surface area
     density *= (sky_area * cosmo.differential_comoving_volume(z)).to_value('Mpc3')
