@@ -29,18 +29,18 @@ channel. To install the latest version for your active conda environment:
 From GitHub
 -----------
 
-The latest development version of SkyPy can be found on the master branch of
+The latest development version of SkyPy can be found on the main branch of
 the `skypyproject/skypy`_ GitHub repository. This and any other branch or tag
 can be installed directly from GitHub using a recent version of pip:
 
 .. code:: console
 
-    $ pip install skypy@git+https://github.com/skypyproject/skypy.git@master
+    $ pip install skypy@git+https://github.com/skypyproject/skypy.git@main
 
 Dependencies
 ------------
 
-SkyPy is compatble with Python versions 3.6 or later on Ubuntu, macOS and
+SkyPy is compatble with Python versions 3.7 or later on Ubuntu, macOS and
 Windows operating systems. It has the following core dependencies:
 
 - `astropy <https://www.astropy.org/>`__
@@ -53,6 +53,7 @@ Installing using pip or conda will automatically install or update these core
 dependencies if necessary. SkyPy also has a number of optional dependencies
 that enable additional features:
 
+- `h5py <https://www.h5py.org/>`_
 - `speclite <https://speclite.readthedocs.io/>`_
 
 To install SkyPy with all optional dependencies using pip:

@@ -1,0 +1,15 @@
+cosmology: !astropy.cosmology.default_cosmology.get []
+z_range: !numpy.linspace [0, 2, 21]
+M_star: !astropy.modeling.models.Linear1D [-0.9, -20.4]
+phi_star: !astropy.modeling.models.Exponential1D [3e-3, -9.7]
+magnitude_limit: 23
+sky_area: 0.1 deg2
+tables:
+  blue_galaxies:
+    redshift, magnitude: !skypy.galaxies.schechter_lf
+      redshift: $z_range
+      M_star: $M_star
+      phi_star: $phi_star
+      alpha: -1.3
+      m_lim: $magnitude_limit
+      sky_area: $sky_area
