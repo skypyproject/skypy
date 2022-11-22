@@ -61,6 +61,56 @@ Examples_ that demonstrate how to use it.
 .. _Examples: https://skypy.readthedocs.io/en/stable/examples/index.html
 
 
+Contributing
+------------
+
+We love contributions! 
+SkyPy is open source,
+built on open source, and we'd love to have you hang out in our community.
+
+How to contribute
+^^^^^^^^^^^^^^^^^
+
+Whether you would like to contribute to SkyPy with your own piece of code or
+helping develop a concrete feature in SkyPy:
+
+1. Read through our `Discussions Page`_ to start a new conversation and share your
+ideas or follow up an existing conversation on a particular feature.
+
+2. Following the discussions, when you have a good idea of the specifics 
+of the feature you wish to contribute, open an `Issue`_ describing the feature. 
+
+3. Then follow the `Contributor Guidelines`_ to open a `Pull Request`_ to contribute
+the code implementing the new feature.
+
+For further information on how to contribute see our `Contributor Guidelines`_.
+All communication relating to The SkyPy Project must meet the standards set out
+in the `Code of Conduct`_.
+
+.. _Issue: https://github.com/skypyproject/skypy/issues
+.. _Pull Request: https://github.com/skypyproject/skypy/pulls
+.. _Contributor Guidelines: https://skypy.readthedocs.io/en/latest/developer/contributing.html
+.. _Code of Conduct: https://skypy.readthedocs.io/en/stable/project/code_of_conduct.html
+
+Members vs External contributions
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+SkyPy allows contributions from two types of contributor: *Members* and *External Contributors*.
+These two categories are intended to allow contributions both from those who are willing and
+able to commit to being part of the SkyPy community and actively involved in the steering of the project,
+and those who wish to simply contribute code where a need has been identified.
+
+1. SkyPy *Members* go through a simple onboarding process where their expertise and expected contributions
+are discussed and defined. Members have access to internal communication channels, they are involved in
+SkyPy decision making processes and attend quarterly meetings.
+Members are listed as a separate tier in author lists for SkyPy publications,
+with the classification of "Project Members" in the Zenodo DoI.
+
+2. *External Contributors* are able to develop, discuss and commit code in the same way as *Members*,
+but do not have the same responsibilities and opportunities for contributing to the guidance and management
+of SkyPy as a project. *External Contributors* are listed as a separate tier in author lists for SkyPy publications,
+with the classification of "Others" in the Zenodo version DoI.
+
 Get in Touch
 ------------
 
@@ -70,18 +120,6 @@ please get in touch with the `SkyPy Co-ordinators`_.
 
  .. _Discussions Page: https://github.com/skypyproject/skypy/discussions
  .. _SkyPy Co-ordinators: mailto:skypy-coordinators@googlegroups.com
-
-Contributing
-------------
-
-We love contributions! SkyPy is open source,
-built on open source, and we'd love to have you hang out in our community.
-For information on how to contribute see our `Contributor Guidelines`_.
-All communication relating to The SkyPy Project must meet the standards set out
-in the `Code of Conduct`_.
-
-.. _Contributor Guidelines: https://skypy.readthedocs.io/en/latest/developer/contributing.html
-.. _Code of Conduct: https://skypy.readthedocs.io/en/stable/project/code_of_conduct.html
 
 .. |PyPI| image:: https://img.shields.io/pypi/v/skypy?label=PyPI&logo=pypi
     :target: https://pypi.python.org/pypi/skypy
