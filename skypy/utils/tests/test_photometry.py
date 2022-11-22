@@ -200,7 +200,7 @@ def test_magnitude_error_rykoff():
     b = 2
     a = np.log(10) - 1.5 * b
     error = magnitude_error_rykoff(magnitude, magnitude_limit, magnitude_zp, a, b)
-    assert error == 2.5 / np.log(10) * np.sqrt(1 / 1000)
+    assert np.isclose(error, 0.25 / np.log(10) / np.sqrt(10))
 
     # test that error limit is returned if error is larger than error_limit
     # The following set-up would give a value larger than 10
@@ -212,3 +212,21 @@ def test_magnitude_error_rykoff():
     error_limit = 1
     error = magnitude_error_rykoff(magnitude, magnitude_limit, magnitude_zp, a, b, error_limit)
     assert error == error_limit
+
+
+def test_logistic_completeness_function():
+    from skypy.utils.photometry import logistic_completeness_function
+
+    # Test that arguments broadcast correctly
+    m = np.full((2, 1, 1), 21)
+    m95 = np.full((3, 1), 22)
+    m50 = np.full(5, 23)
+    p = logistic_completeness_function(m, m95, m50)
+    assert p.shape == np.broadcast(m, m95, m50).shape
+
+    # Test result of completeness function for different given magnitudes
+    m95 = 24
+    m50 = 25
+    m = [np.finfo(np.float64).min, m95, m50, 2*m50-m95, np.finfo(np.float64).max]
+    p = logistic_completeness_function(m, m95, m50)
+    assert np.allclose(p, [1, 0.95, 0.5, 0.05, 0])

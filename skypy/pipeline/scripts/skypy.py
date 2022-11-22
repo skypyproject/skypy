@@ -48,4 +48,4 @@ def main(args=None):
         logger.exception(e)
         raise SystemExit(2) from e
 
-    return(0)
+    return 0
