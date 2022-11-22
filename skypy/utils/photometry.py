@@ -131,7 +131,7 @@ def mag_ab(wavelength, spectrum, filters, *, redshift=None, coefficients=None,
         u = u.reshape(u.shape + (1,)*(nd_s+nd_f))
         m = np.ascontiguousarray(m[n])
         m += u*dm[n]
-        del(dm, n, u)
+        del dm, n, u
 
     # combine spectra if asked to
     if coefficients is not None:
@@ -310,7 +310,7 @@ def absolute_magnitude_from_luminosity(luminosity, zeropoint=None):
 
 
 def magnitude_error_rykoff(magnitude, magnitude_limit, magnitude_zp, a, b, error_limit=np.inf):
-    r"""Magnitude error acoording to the model from Rykoff et al. (2015).
+    r"""Magnitude error according to the model from Rykoff et al. (2015).
 
     Given an apparent magnitude calculate the magnitude error that is introduced
     by the survey specifications and follows the model described in Rykoff et al. (2015).

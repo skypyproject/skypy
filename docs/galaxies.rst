@@ -91,6 +91,18 @@ The following models are found in the `skypy.galaxies.stellar_mass` package.
   schechter_smf_mass
 
 
+Velocity dispersion
+-------------------
+
+The following models are found in the `skypy.galaxies.velocity_dispersion` package.
+
+.. currentmodule:: skypy.galaxies.velocity_dispersion
+.. autosummary::
+  :nosignatures:
+
+  schechter_vdf
+
+
 Reference/API
 =============
 
@@ -103,3 +115,4 @@ Reference/API
 .. automodapi:: skypy.galaxies.spectrum
    :include-all-objects:
 .. automodapi:: skypy.galaxies.stellar_mass
+.. automodapi:: skypy.galaxies.velocity_dispersion
