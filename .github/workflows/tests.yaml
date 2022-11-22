@@ -2,32 +2,57 @@ name: Tests
 on:
   push:
     branches:
-    - master
+    - main
+    - module/*
   pull_request:
     branches:
-    - master
+    - main
+    - module/*
 jobs:
   test:
-    runs-on: ubuntu-latest
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+
+          - name: latest supported versions
+            os: ubuntu-latest
+            python: '3.10'
+            toxenv: py310-test-all-latest-cov
+            toxposargs: --cov-report=xml:${GITHUB_WORKSPACE}/coverage.xml
+
+          - name: oldest supported versions
+            os: ubuntu-latest
+            python: 3.7
+            toxenv: py37-test-oldest
+
+          - name: macOS latest supported
+            os: macos-latest
+            python: '3.10'
+            toxenv: py310-test-latest
+
+          - name: Windows latest supported
+            os: windows-latest
+            python: '3.10'
+            toxenv: py310-test-latest
+
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v2
-    - name: Install Python 3.5
-      uses: actions/setup-python@v1
       with:
-        python-version: 3.5
+        fetch-depth: 0
+    - name: Install Python ${{ matrix.python }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python }}
     - name: Install Dependencies
       run: |
-        python -m pip install --upgrade pip
-        pip install astropy networkx pytest pytest-astropy 'coverage<5' scipy "setuptools>=30.3" wheel
-    - name: Add pytest Matcher
-      run: |
-        echo ::add-matcher::.github/problem_matchers/pytest.json
+        pip install tox
     - name: Run Tests
       run: |
-        python setup.py test --coverage
-    - name: Generate Coverage
-      run: |
-        coverage xml -i
-    - name: Report Coverage
+        tox -e ${{ matrix.toxenv }} ${{ matrix.toxargs }} -- ${{ matrix.toxposargs }}
+    - if: contains(matrix.toxenv, '-cov')
+      name: Report Coverage
       uses: codecov/codecov-action@v1

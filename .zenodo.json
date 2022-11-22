@@ -1,0 +1,146 @@
+{
+    "title": "SkyPy",
+    "description": "A package for modelling the Universe",
+    "license": "BSD-3-Clause",
+    "notes": "AA and PS supported by the Royal Society Wolfson Fellowship, JPC acknowledges support granted by Agencia Nacional de Investigaci\u00f3n y Desarrollo (ANID) DOCTORADO BECAS CHILE/2016 - 72170279.",
+    "grants": [
+        {
+            "id": "10.13039/501100000780::681431"
+        }
+    ],
+    "upload_type": "software",
+    "keywords": [
+        "Cosmology",
+        "Astrophysics",
+        "Forward modelling"
+    ],
+    "creators": [
+        {
+            "name": "SkyPy Collaboration"
+        },
+        {
+            "orcid": "0000-0003-3481-3491",
+            "affiliation": "University of Portsmouth",
+            "name": "Adam Amara"
+        },
+        {
+            "orcid": "0000-0002-1064-3400",
+            "affiliation": "University of Portsmouth",
+            "name": "Lucia F. de la Bella"
+        },
+        {
+            "orcid": "0000-0003-3195-5507",
+            "affiliation": "Stanford University",
+            "name": "Simon Birrer"
+        },
+        {
+            "orcid": "0000-0002-0128-1006",
+            "affiliation": "University of Manchester",
+            "name": "Sarah Bridle"
+        },
+        {
+            "orcid": "0000-0002-6625-7656",
+            "affiliation": "University of Manchester",
+            "name": "Juan Pablo Cordero"
+        },
+        {
+            "orcid": "0000-0003-1560-7959",
+            "affiliation": "University of Portsmouth",
+            "name": "Fox Davidson"
+        },
+        {
+            "orcid": "0000-0002-8218-563X",
+            "affiliation": "University of Portsmouth",
+            "name": "Ginevra Favole"
+        },
+        {
+            "orcid": "0000-0002-4437-0770",
+            "affiliation": "University of Oxford, University of Manchester",
+            "name": "Ian Harrison"
+        },
+        {
+            "orcid": "0000-0002-5304-9372",
+            "affiliation": "University of Portsmouth",
+            "name": "Ian Harry"
+        },
+        {
+            "orcid": "0000-0001-9994-1115",
+            "affiliation": "University of Geneva",
+            "name": "William G. Hartley"
+        },
+        {
+            "orcid": "0000-0001-9233-2341",
+            "affiliation": "University of Portsmouth",
+            "name": "Coleman Krawczyk"
+        },
+        {
+            "orcid": "0000-0002-0363-4469",
+            "affiliation": "University of Portsmouth",
+            "name": "Andy Lundgren"
+        },
+        {
+            "orcid": "0000-0001-6706-8972",
+            "affiliation": "Fermilab",
+            "name": "Brian Nord"
+        },
+        {
+            "orcid": "0000-0002-8599-8791",
+            "affiliation": "University of Portsmouth",
+            "name": "Laura Nuttall"
+        },
+        {
+            "orcid": "0000-0003-1291-1023",
+            "affiliation": "University of Edinburgh",
+            "name": "Richard P. Rollins"
+        },
+        {
+            "orcid": "0000-0001-8685-2308",
+            "affiliation": "University of Portsmouth",
+            "name": "Philipp Sudek"
+        },
+        {
+            "orcid": "0000-0002-6724-833X",
+            "affiliation": "Institute of Astronomy and Astrophysics Academia Sinica",
+            "name": "Sut-Ieng Tam"
+        },
+        {
+            "orcid": "0000-0002-9696-7931",
+            "affiliation": "UCL",
+            "name": "Nicolas Tessore"
+        },
+        {
+            "orcid": "0000-0002-7196-4822",
+            "affiliation": "Institute of Astronomy and Astrophysics Academia Sinica",
+            "name": "Keiichi Umetsu"
+        },
+        {
+            "orcid": "0000-0001-9841-943X",
+            "affiliation": "University of Portsmouth",
+            "name": "Arthur E. Tolley"
+        },
+        {
+            "orcid": "0000-0002-7627-8688",
+            "affiliation": "University of Portsmouth",
+            "name": "Andrew R. Williamson"
+        },
+        {
+            "orcid": "0000-0003-3334-3037",
+            "affiliation": "University of Manchester",
+            "name": "Laura Wolz"
+        }
+    ],
+    "contributors": [
+        {
+            "orcid": "0000-0002-3988-8591",
+            "name": "Jonathan D Harris",
+            "type": "Other"
+        },
+        {
+            "orcid": "0000-0003-3954-3291",
+            "affiliation": "University of Toronto",
+            "name": "Nathaniel Starkman",
+            "type": "Other"
+        }
+    ],
+    "access_right": "open"
+}

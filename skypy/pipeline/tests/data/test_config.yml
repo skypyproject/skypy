@@ -1,0 +1,22 @@
+test_int: 1
+test_float: 1.0
+test_str: hello world
+test_func: !numpy.random.uniform []
+test_func_with_arg: !len ['hello world']
+test_object: !astropy.cosmology.Planck15
+cosmology: !astropy.cosmology.FlatLambdaCDM
+  H0: 67.74
+  Om0: 0.3075
+tables:
+  test_table_1:
+    test_column_1: !numpy.random.uniform
+      size: 10
+    test_column_2: !numpy.random.uniform
+      low: $test_table_1.test_column_1
+    test_column_3: !numpy.random.uniform
+      - $test_table_1.test_column_1  # <- low
+      - $test_table_1.test_column_2  # <- high
+  test_table_2:
+    .init: !astropy.table.QTable
+      .depends: test_table_1.complete
+      names: ['column_1', 'column_2']

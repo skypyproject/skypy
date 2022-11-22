@@ -1,0 +1,7 @@
+parameters:
+  median-redshift: 1.0
+galaxy-redshifts: !skypy.galaxies.redshift.smail
+  z_median: $median-redshift
+  alpha: 1.5
+  beta: 2.0
+  size: 1000
