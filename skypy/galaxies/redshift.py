@@ -151,7 +151,7 @@ def schechter_lf_redshift(redshift, M_star, phi_star, alpha, m_lim, sky_area,
         gam[i], _ = scipy.integrate.quad(f, lnxmin[i], np.inf, args=(alpha[i],))
 
     # comoving number density is normalisation times upper incomplete gamma
-    density = phi_star*gam*np.power(cosmology.h, 3)
+    density = phi_star*gam
 
     # sample redshifts from the comoving density
     return redshifts_from_comoving_density(redshift=redshift, density=density,
