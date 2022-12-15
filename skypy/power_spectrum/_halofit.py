@@ -104,8 +104,8 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
     >>> z, A_s, n_s = 0, 2.2e-09, 0.97
     >>> cosmology = default_cosmology.get()
     >>> dz = growth_function(z, cosmology)
-    >>> linear_power = eisenstein_hu(k, A_s, n_s, cosmology) * np.square(dz)
-    >>> nonlinear_power = halofit_smith(k, z, linear_power, cosmology)
+    >>> linear_power = eisenstein_hu(k, A_s, n_s, cosmology) * np.square(dz)  # doctest: +SKIP
+    >>> nonlinear_power = halofit_smith(k, z, linear_power, cosmology)  # doctest: +SKIP
     '''
 
     # Manage shapes of input arrays
