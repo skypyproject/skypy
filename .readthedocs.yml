@@ -4,6 +4,8 @@ build:
   os: ubuntu-20.04
   apt_packages:
     - graphviz
+  tools:
+    python: "3.7"
 
 sphinx:
   builder: html
@@ -11,11 +13,12 @@ sphinx:
   fail_on_warning: true
 
 python:
-  version: 3.7
+  system_packages: false
   install:
     - method: pip
       path: .
       extra_requirements:
         - docs
+        - all
 
 formats: []
