@@ -130,6 +130,12 @@ def test_schechter_smf_phi_mass_quenched(phic, phis):
     assert phimq_1d.shape == phic_1d.shape == phis_1d.shape
     assert np.all(phimq_1d == phic_1d + phis_1d)
 
+    # Corner cases
+    phi0 = 1
+    assert phi0 == 0.5 * stellar_mass.schechter_smf_phi_mass_quenched(phi0, phi0)
+    assert 0.0 == stellar_mass.schechter_smf_phi_mass_quenched(phi0, -phi0)
+    assert phi0 == stellar_mass.schechter_smf_phi_mass_quenched(phi0, 0.0)
+
 
 SATELLITE_FUNCTIONS = [
     stellar_mass.schechter_smf_phi_satellites,
