@@ -40,7 +40,7 @@ kcorrect spectral energy distribution templates as implemented in SkyPy.
 #
 # .. code-block:: bash
 #
-#    $ skypy examples/galaxies/sdss_photometry.yml sdss_photometry.fits
+#    $ skypy examples/galaxies/sdss_photometry.yml --format fits
 #
 # or in a python script using the :class:`Pipeline <skypy.pipeline.Pipeline>`
 # class as demonstrated in the `SDSS Photometry`_ section below. For more

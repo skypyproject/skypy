@@ -19,10 +19,7 @@ fits files:
 
 .. code-block:: bash
 
-    $ skypy examples/galaxies/sdss_photometry.yml sdss_photometry.fits
-
-To view the progress of the pipeline as it runs you can enable logging using the
-`--verbose` flag.
+    $ skypy examples/galaxies/sdss_photometry.yml --format fits
 
 Config files are written in YAML format and read using the
 `~skypy.pipeline.load_skypy_yaml` funciton. Each entry in the config specifices

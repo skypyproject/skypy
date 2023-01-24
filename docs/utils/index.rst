@@ -126,14 +126,6 @@ Photometry (`skypy.utils.photometry`)
 This module contains methods that model spectral energy distributions and
 calculate photometric properties.
 
-SkyPy uses the `speclite <https://speclite.readthedocs.io/>`_ package for
-photometric calculations. Some of the following functions take the names of
-photometric filters as an input parameter. Users can choose from the available
-`Speclite Filters <https://speclite.readthedocs.io/en/latest/filters.html>`_
-following the naming syntax described in `speclite.filters.load_filters`, or
-create their own named `speclite.filters.FilterResponse`.
-
-
 .. currentmodule:: skypy.utils.photometry
 .. autosummary::
    :nosignatures:
@@ -143,8 +135,6 @@ create their own named `speclite.filters.FilterResponse`.
    luminosity_in_band
    mag_ab
    SpectrumTemplates
-   magnitude_error_rykoff
-   logistic_completeness_function
 
 
 Random sampling (`skypy.utils.random`)
