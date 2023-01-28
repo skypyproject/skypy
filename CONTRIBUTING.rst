@@ -1,6 +1,45 @@
 Contributor Guidelines
 ======================
 
+How to contribute
+-----------------
+We love contributions! SkyPy is open source,
+built on open source, and we'd love to have you hang out in our community.
+Whether you would like to contribute to SkyPy with your own piece of code or
+helping develop a concrete feature in SkyPy:
+
+1. Read through our `Discussions Page`_ to start a new conversation and share your
+ideas or follow up an existing conversation on a particular feature.
+
+2. Following the discussions, when you have a good idea of the specifics 
+of the feature you wish to contribute, open an `Issue`_ describing the feature. 
+
+3. Then follow the `Contributor Guidelines`_ on the rest of this page to open
+a `Pull Request`_ to contribute the code implementing the new feature.
+
+Members vs External contributions
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+SkyPy allows contributions from two types of contributor: *Members* and *External Contributors*.
+These two categories are intended to allow contributions both from those who are willing and
+able to commit to being part of the SkyPy community and actively involved in the steering of the project,
+and those who wish to simply contribute code where a need has been identified.
+
+1. SkyPy *Members* go through a simple onboarding process where their expertise and expected contributions
+are discussed and defined. Members have access to internal communication channels, they are involved in
+SkyPy decision making processes and attend quarterly meetings.
+Members are listed as a separate tier in author lists for SkyPy publications,
+with the classification of "Creators" in the Zenodo DoI.
+
+2. *External Contributors* are able to develop, discuss and commit code in the same way as *Members*,
+but do not have the same responsibilities and opportunities for contributing to the guidance and management
+of SkyPy as a project. *External Contributors* are listed as a separate tier in author lists for SkyPy publications,
+with the classification of "Others" in the Zenodo DoI.
+
+ .. _Discussions Page: https://github.com/skypyproject/skypy/discussions
+ .. _Issue: https://github.com/skypyproject/skypy/issues
+ .. _Pull Request: https://github.com/skypyproject/skypy/pulls
+
 GitHub Workflow
 ---------------
 
