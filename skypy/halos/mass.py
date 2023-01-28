@@ -287,22 +287,28 @@ def ellipsoidal_collapse_function(sigma, params):
 
 press_schechter_collapse_function = partial(ellipsoidal_collapse_function,
                                             params=(0.5, 1, 0, 1.69))
+press_schechter_collapse_function.__name__ = "press_schechter_collapse_function"
 sheth_tormen_collapse_function = partial(ellipsoidal_collapse_function,
                                          params=(0.3222, 0.707, 0.3, 1.686))
+sheth_tormen_collapse_function.__name__ = "sheth_tormen_collapse_function"
 sheth_tormen_mass_function = partial(
                              halo_mass_function,
                              collapse_function=ellipsoidal_collapse_function,
                              params=(0.3222, 0.707, 0.3, 1.686))
+sheth_tormen_mass_function.__name__ = "sheth_tormen_mass_function"
 press_schechter_mass_function = partial(
                                 halo_mass_function,
                                 collapse_function=ellipsoidal_collapse_function,
                                 params=(0.5, 1, 0, 1.69))
+press_schechter_mass_function.__name__ = "press_schechter_mass_function"
 sheth_tormen = partial(halo_mass_sampler,
                        collapse_function=ellipsoidal_collapse_function,
                        params=(0.3222, 0.707, 0.3, 1.686))
+sheth_tormen.__name__ = "sheth_tormen"
 press_schechter = partial(halo_mass_sampler,
                           collapse_function=ellipsoidal_collapse_function,
                           params=(0.5, 1, 0, 1.69))
+press_schechter.__name__ = "press_schechter"
 
 
 def _sigma_squared(M, k, Pk, growth_function, cosmology):
