@@ -99,7 +99,7 @@ def growth_factor(redshift, cosmology, gamma=6.0/11.0):
     >>> from astropy.cosmology import FlatLambdaCDM
     >>> cosmology = FlatLambdaCDM(H0=67.04, Om0=0.3183, Ob0=0.047745)
     >>> growth_factor(0, cosmology)
-    0.5355746155304598
+    0.535574...
 
     References
     ----------
@@ -148,7 +148,7 @@ def growth_function(redshift, cosmology, gamma=6.0/11.0, z_upper=1100):
     >>> from astropy.cosmology import FlatLambdaCDM
     >>> cosmology = FlatLambdaCDM(H0=67.04, Om0=0.3183, Ob0=0.047745)
     >>> growth_function(0, cosmology)
-    0.7909271056297236
+    0.790927...
 
     References
     ----------
@@ -218,7 +218,7 @@ def growth_function_derivative(redshift, cosmology, gamma=6.0/11.0):
     >>> from astropy.cosmology import FlatLambdaCDM
     >>> cosmology = FlatLambdaCDM(H0=67.04, Om0=0.3183, Ob0=0.047745)
     >>> growth_function_derivative(0, cosmology)
-    -0.42360048051025856
+    -0.423600...
 
     References
     ----------
