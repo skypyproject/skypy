@@ -1,6 +1,45 @@
 Contributor Guidelines
 ======================
 
+How to contribute
+-----------------
+We love contributions! SkyPy is open source,
+built on open source, and we'd love to have you hang out in our community.
+Whether you would like to contribute to SkyPy with your own piece of code or
+helping develop a concrete feature in SkyPy:
+
+1. Read through our `Discussions Page`_ to start a new conversation and share your
+ideas or follow up an existing conversation on a particular feature.
+
+2. Following the discussions, when you have a good idea of the specifics 
+of the feature you wish to contribute, open an `Issue`_ describing the feature. 
+
+3. Then follow the `Contributor Guidelines`_ on the rest of this page to open
+a `Pull Request`_ to contribute the code implementing the new feature.
+
+Members vs External contributions
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+SkyPy allows contributions from two types of contributor: *Members* and *External Contributors*.
+These two categories are intended to allow contributions both from those who are willing and
+able to commit to being part of the SkyPy community and actively involved in the steering of the project,
+and those who wish to simply contribute code where a need has been identified.
+
+1. SkyPy *Members* go through a simple onboarding process where their expertise and expected contributions
+are discussed and defined. Members have access to internal communication channels, they are involved in
+SkyPy decision making processes and attend quarterly meetings.
+Members are listed as a separate tier in author lists for SkyPy publications,
+with the classification of "Creators" in the Zenodo DoI.
+
+2. *External Contributors* are able to develop, discuss and commit code in the same way as *Members*,
+but do not have the same responsibilities and opportunities for contributing to the guidance and management
+of SkyPy as a project. *External Contributors* are listed as a separate tier in author lists for SkyPy publications,
+with the classification of "Others" in the Zenodo DoI.
+
+ .. _Discussions Page: https://github.com/skypyproject/skypy/discussions
+ .. _Issue: https://github.com/skypyproject/skypy/issues
+ .. _Pull Request: https://github.com/skypyproject/skypy/pulls
+
 GitHub Workflow
 ---------------
 
@@ -32,12 +71,12 @@ Finally add the ``skypyproject`` repository as a *remote*. This will allow you t
 Create a branch for your new feature
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Create a *branch* off the ``skypyproject`` master branch. Working on unique branches for each new feature simplifies the development, review and merge processes by maintining logical separation. To create a feature branch:
+Create a *branch* off the ``skypyproject`` main branch. Working on unique branches for each new feature simplifies the development, review and merge processes by maintining logical separation. To create a feature branch:
 
 ::
 
   git fetch skypyproject
-  git checkout -b <your-branch-name> skypyproject/master
+  git checkout -b <your-branch-name> skypyproject/main
 
 
 Hack away!
@@ -73,7 +112,7 @@ When you feel that work on your new feature is complete, you should create a *Pu
   1. Go to `SkyPy Pull Requests <https://github.com/skypyproject/skypy/pulls>`_
   2. Click the green **New pull request** button
   3. Click **compare across forks**
-  4. Confirm that the base fork is ``skypyproject/skypy`` and the base branch is ``master``
+  4. Confirm that the base fork is ``skypyproject/skypy`` and the base branch is ``main``
   5. Confirm the head fork is ``<your-account>/skypy`` and the compare branch is ``<your-branch-name>``
   6. Give your pull request a title and fill out the the template for the description
   7. Click the green **Create pull request** button
@@ -91,22 +130,22 @@ A series of automated checks will be run on your pull request, some of which wil
 Updating your branch
 ^^^^^^^^^^^^^^^^^^^^
 
-As you work on your feature, new commits might be made to the ``skypyproject`` master branch. You will need to update your branch with these new commits before your pull request can be accepted. You can achieve this in a few different ways:
+As you work on your feature, new commits might be made to the ``skypyproject`` main branch. You will need to update your branch with these new commits before your pull request can be accepted. You can achieve this in a few different ways:
 
   - If your pull request has no conflicts, click **Update branch**
   - If your pull request has conflicts, click **Resolve conflicts**, manually resolve the conflicts and click **Mark as resolved**
-  - *merge* the ``skypyproject`` master branch from the command line:
+  - *merge* the ``skypyproject`` main branch from the command line:
 
     ::
 
         git fetch skypyproject
-        git merge skypyproject/master
+        git merge skypyproject/main
 
-  - *rebase* your feature branch onto the ``skypyproject`` master branch from the command line:
+  - *rebase* your feature branch onto the ``skypyproject`` main branch from the command line:
     ::
 
         git fetch skypyproject
-        git rebase skypyproject/master
+        git rebase skypyproject/main
 
 
 **Warning**: It is bad practice to *rebase* commits that have already been pushed to a remote such as your fork. Rebasing creates new copies of your commits that can cause the local and remote branches to diverge. ``git push --force`` will **overwrite** the remote branch with your newly rebased local branch. This is strongly discouraged, particularly when working on a shared branch where you could erase a collaborators commits.
@@ -129,7 +168,7 @@ Before your pull request can be merged into the codebase, it will be reviewed by
 General Guidelines
 ^^^^^^^^^^^^^^^^^^
 
-- SkyPy is compatible with Python>=3.6 (see `setup.cfg <https://github.com/skypyproject/skypy/blob/master/setup.cfg>`_). SkyPy *does not* support backwards compatibility with Python 2.x; `six`, `__future__` and `2to3` should not be used.
+- SkyPy is compatible with Python>=3.7 (see `setup.cfg <https://github.com/skypyproject/skypy/blob/main/setup.cfg>`_). SkyPy *does not* support backwards compatibility with Python 2.x; `six`, `__future__` and `2to3` should not be used.
 - All contributions should follow the `PEP8 Style Guide for Python Code <https://www.python.org/dev/peps/pep-0008/>`_. We recommend using `flake8 <https://flake8.pycqa.org/>`__ to check your code for PEP8 compliance.
 - Importing SkyPy should only depend on having `NumPy <https://www.numpy.org>`_, `SciPy <https://www.scipy.org/>`_ and `Astropy <https://www.astropy.org/>`__ installed.
 - Code is grouped into submodules based on broad science areas e.g. `galaxies <https://skypy.readthedocs.io/en/stable/galaxies.html>`_. There is also a `utils <https://skypy.readthedocs.io/en/stable/utils/index.html>`_ submodule for general utility functions.
@@ -150,7 +189,6 @@ All public classes, methods and functions require docstrings. You can build docu
   - Description
   - Parameters
   - Notes
-  - Examples
   - References
 
 For more information see the Astropy guide to `Writing Documentation <https://docs.astropy.org/en/stable/development/docguide.html>`_.

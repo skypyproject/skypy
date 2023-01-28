@@ -63,6 +63,13 @@ Spectrum
 
 The following models are found in the `skypy.galaxies.spectrum` package.
 
+SkyPy uses the `speclite <https://speclite.readthedocs.io/>`_ package for
+photometric calculations. Some of the following functions take the names of
+photometric filters as an input parameter. Users can choose from the available
+`Speclite Filters <https://speclite.readthedocs.io/en/latest/filters.html>`_
+following the naming syntax described in `speclite.filters.load_filters`, or
+create their own named `speclite.filters.FilterResponse`.
+
 .. currentmodule:: skypy.galaxies.spectrum
 .. autosummary::
    :nosignatures:
@@ -84,6 +91,18 @@ The following models are found in the `skypy.galaxies.stellar_mass` package.
   schechter_smf_mass
 
 
+Velocity dispersion
+-------------------
+
+The following models are found in the `skypy.galaxies.velocity_dispersion` package.
+
+.. currentmodule:: skypy.galaxies.velocity_dispersion
+.. autosummary::
+  :nosignatures:
+
+  schechter_vdf
+
+
 Reference/API
 =============
 
@@ -96,3 +115,4 @@ Reference/API
 .. automodapi:: skypy.galaxies.spectrum
    :include-all-objects:
 .. automodapi:: skypy.galaxies.stellar_mass
+.. automodapi:: skypy.galaxies.velocity_dispersion

@@ -165,7 +165,7 @@ if setup_cfg.get('edit_on_github').lower() == 'true':
     extensions += ['sphinx_astropy.ext.edit_on_github']
 
     edit_on_github_project = setup_cfg['github_project']
-    edit_on_github_branch = "master"
+    edit_on_github_branch = "main"
 
     edit_on_github_source_root = ""
     edit_on_github_doc_root = "docs"
@@ -250,6 +250,13 @@ plot_rcparams = {
     'figure.subplot.wspace': 0.4,
     'text.usetex': False,
 }
+
+# Mock camb if it is not available e.g. on readthedocs
+autodoc_mock_imports = []
+try:
+    import_module('camb')
+except ImportError:
+    autodoc_mock_imports.append('camb')
 
 # Sphinx Gallery
 extensions += ['sphinx_gallery.gen_gallery', ]

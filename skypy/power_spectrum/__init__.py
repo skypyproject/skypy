@@ -8,8 +8,8 @@ Linear Power Spectrum
    :nosignatures:
    :toctree: ../api/
 
-   camb
-   classy
+   CAMB
+   CLASSY
    eisenstein_hu
    transfer_no_wiggles
    transfer_with_wiggles
@@ -48,3 +48,4 @@ from ._camb import *  # noqa F401,F403
 from ._eisenstein_hu import *  # noqa F401,F403
 from ._halofit import *  # noqa F401,F403
 from ._growth import *  # noqa F401,F403
+from ._base import * # noqa F401,F403

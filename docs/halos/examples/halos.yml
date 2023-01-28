@@ -1,4 +1,4 @@
-cosmology: !astropy.cosmology.default_cosmology.get 
+cosmology: !astropy.cosmology.default_cosmology.get []
 power_spectrum: !skypy.power_spectrum.eisenstein_hu
   wavenumber: !numpy.logspace [-3, 1, 100]
   A_s: 2.1982e-09

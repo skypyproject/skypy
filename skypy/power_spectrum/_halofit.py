@@ -3,6 +3,8 @@ from collections import namedtuple
 from functools import partial
 import numpy as np
 from scipy import optimize
+from ._base import PowerSpectrum
+from ._eisenstein_hu import eisenstein_hu, growth_function_carroll
 
 
 __all__ = [
@@ -95,17 +97,6 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
     .. [3] S. Bird, M. Viel and M. G. Haehnelt,
            Mon. Not. Roy. Astron. Soc. 420, 2551 (2012).
 
-    Examples
-    --------
-    >>> import numpy as np
-    >>> from astropy.cosmology import default_cosmology
-    >>> from skypy.power_spectrum import growth_function, eisenstein_hu, halofit_smith
-    >>> k = np.logspace(-4, 2, 100, base=10)
-    >>> z, A_s, n_s = 0, 2.2e-09, 0.97
-    >>> cosmology = default_cosmology.get()
-    >>> dz = growth_function(z, cosmology)
-    >>> linear_power = eisenstein_hu(k, A_s, n_s, cosmology) * np.square(dz)
-    >>> nonlinear_power = halofit_smith(k, z, linear_power, cosmology)
     '''
 
     # Manage shapes of input arrays
@@ -212,6 +203,133 @@ def halofit(wavenumber, redshift, linear_power_spectrum,
     return pknl.reshape(return_shape)
 
 
+# Smith et. al. 2003  model
 halofit_smith = partial(halofit, parameters=_smith_parameters)
+halofit_smith.__name__ = "halofit_smith"
+
+# Takahashi et al. 2012 model
 halofit_takahashi = partial(halofit, parameters=_takahashi_parameters)
+halofit_takahashi.__name__ = "halofit_takahashi"
+
+# Bird et al. 2012 model
 halofit_bird = partial(halofit, parameters=_bird_parameters)
+halofit_bird.__name__ = "halofit_bird"
+
+halofit_model = {"smith": halofit_smith,
+                 "takahashi": halofit_takahashi,
+                 "bird": halofit_bird}
+
+
+class EisensteinHuHalofit(PowerSpectrum):
+    """
+    Power spectrum class with Halofit nonlinear matter spectrum using Eisenstein
+    & Hu linear power spectrum described in [1]_ and [2]_, using
+    formulation from Komatsu et al (2009) in [3]_.
+
+    ...
+
+    Attributes
+    ----------
+    A_s, n_s: float
+        Amplitude and spectral index of primordial scalar fluctuations.
+    cosmology : astropy.cosmology.Cosmology
+        Cosmology object providing omega_matter, omega_baryon, Hubble parameter
+        and CMB temperature in the present day.
+    model : str
+        String to set the parameter models for Halofit. "smith", "takahashi" and
+        "bird" call the corresponding free parameters in [4], [5] and [6]
+        respectively.
+    kwmap : float
+        WMAP normalization for the amplitude of primordial scalar fluctuations,
+        as described in [3], in units of Mpc-1. Default is 0.02.
+    wiggle : bool
+        Boolean flag to set the use of baryion acoustic oscillations wiggles.
+        Default is True, for which the power spectrum is computed with the
+        wiggles.
+
+    References
+    ----------
+    .. [1] Eisenstein D. J., Hu W., ApJ, 496, 605 (1998)
+    .. [2] Eisenstein D. J., Hu W., ApJ, 511, 5 (1999)
+    .. [3] Komatsu et al., ApJS, 180, 330 (2009)
+    .. [4] R. E. Smith it et al., VIRGO Consortium,
+           Mon. Not. Roy. Astron. Soc. 341, 1311 (2003).
+    .. [5] R. Takahashi, M. Sato, T. Nishimichi, A. Taruya and M. Oguri,
+           Astrophys. J. 761, 152 (2012).
+    .. [6] S. Bird, M. Viel and M. G. Haehnelt,
+           Mon. Not. Roy. Astron. Soc. 420, 2551 (2012).
+    """
+    def __init__(self, A_s, n_s, cosmology, model="smith", kwmap=0.02,
+                 wiggle=True):
+        """
+        Constructs all the necessary attributes for the EisensteinHuHalofit
+        class.
+
+        Parameters
+        ----------
+        A_s, n_s: float
+            Amplitude and spectral index of primordial scalar fluctuations.
+        cosmology : astropy.cosmology.Cosmology
+            Cosmology object providing omega_matter, omega_baryon, Hubble
+            parameter and CMB temperature in the present day.
+        model : str
+            String to set the parameter models for Halofit. "smith", "takahashi"
+            and "bird" call the corresponding free parameters in [4], [5] and
+            [6] respectively.
+        kwmap : float
+            WMAP normalization for the amplitude of primordial scalar
+            fluctuations, as described in [3], in units of Mpc-1. Default is
+            0.02.
+        wiggle : bool
+            Boolean flag to set the use of baryion acoustic oscillations
+            wiggles. Default is True, for which the power spectrum is computed
+            with the wiggles.
+        """
+
+        self.A_s = A_s
+        self.n_s = n_s
+        self.cosmology = cosmology
+        self.kwmap = kwmap
+        self.wiggle = wiggle
+        self.model = model
+
+    def __call__(self, wavenumber, redshift):
+
+        """
+        Calls the Eisenstein and Hu linear matter power spectrum and Halofit to
+        obtain the nonlinear matter power spectrum.
+
+        Parameters
+        ----------
+        wavenumber : (nk, ) array_like
+            Array of wavenumbers in units of Mpc-1 at which to evaluate
+            the linear matter power spectrum.
+        redshift : (nz, ) array_like
+            Array of redshifts at which to evaluate the linear matter power
+            spectrum
+
+        Returns
+        -------
+        nlpzk : array_like
+            Nonlinear matter power spectrum in units of Mpc3,
+            evaluated at the given wavenumbers from the defined
+            EisensteinHuHalofit object.
+
+        """
+
+        growth_function = growth_function_carroll(np.atleast_1d(redshift),
+                                                  self.cosmology)
+        power_spectrum = eisenstein_hu(wavenumber, self.A_s, self.n_s,
+                                       self.cosmology, kwmap=self.kwmap,
+                                       wiggle=self.wiggle)
+        shape = np.shape(redshift) + np.shape(wavenumber)
+
+        pzk = (np.square(growth_function)[:, np.newaxis] *
+               power_spectrum).reshape(shape)
+
+        nlpzk = halofit_model[self.model](wavenumber, redshift, pzk,
+                                          self.cosmology)
+
+        if np.isscalar(wavenumber) and np.isscalar(redshift):
+            nlpzk = nlpzk.item()
+        return nlpzk
