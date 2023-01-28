@@ -2,11 +2,11 @@ name: Code Style
 on:
   push:
     branches:
-    - main
+    - master
     - module/*
   pull_request:
     branches:
-    - main
+    - master
     - module/*
 jobs:
   flake8:

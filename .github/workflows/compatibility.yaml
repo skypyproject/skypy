@@ -9,15 +9,15 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
-        python: ['3.10']
-        toxenv: [py310-test, py310-test-dev]
-        release: [main, latest]
+        python: [3.9]
+        toxenv: [py39-test, py39-test-dev]
+        release: [master, latest]
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v2
       with:
         fetch-depth: 0
-    - if: matrix.release != 'main'
+    - if: matrix.release != 'master'
       name: Checkout Release
       run: |
         git checkout tags/$(curl -s https://api.github.com/repos/skypyproject/skypy/releases/${{ matrix.release }} | python -c "import sys, json; print(json.load(sys.stdin)['tag_name'])")

@@ -1,26 +1,19 @@
 from astropy.cosmology import FlatLambdaCDM, default_cosmology
 from astropy.cosmology.core import Cosmology
 from astropy.io import fits
-from astropy.io.misc.hdf5 import read_table_hdf5
-from astropy.table import Table, vstack
+from astropy.table import Table
 from astropy.table.column import Column
 from astropy.units import Quantity
 from astropy.utils.data import get_pkg_data_filename
 import networkx
 import numpy as np
+import os
 import pytest
 from skypy.pipeline import Pipeline
 from skypy.pipeline._items import Call, Ref
 
-try:
-    import h5py # noqa
-except ImportError:
-    HAS_H5PY = False
-else:
-    HAS_H5PY = True
 
-
-def test_pipeline(tmp_path):
+def test_pipeline():
 
     # Evaluate and store the default astropy cosmology.
     config = {'test_cosmology': Call(default_cosmology.get)}
@@ -43,22 +36,17 @@ def test_pipeline(tmp_path):
 
     pipeline = Pipeline(config)
     pipeline.execute()
-    output_filename = str(tmp_path / 'output.fits')
-    pipeline.write(output_filename)
+    pipeline.write(file_format='fits')
     assert len(pipeline['test_table']) == size
     assert np.all(pipeline['test_table.column1'] < pipeline['test_table.column2'])
-    with fits.open(output_filename) as hdu:
-        assert np.all(Table(hdu['test_table'].data) == pipeline['test_table'])
-
-    # Test invalid file extension
-    with pytest.raises(ValueError):
-        pipeline.write('output.invalid')
+    with fits.open('test_table.fits') as hdu:
+        assert np.all(Table(hdu[1].data) == pipeline['test_table'])
 
     # Check for failure if output files already exist and overwrite is False
     pipeline = Pipeline(config)
     pipeline.execute()
     with pytest.raises(OSError):
-        pipeline.write(output_filename, overwrite=False)
+        pipeline.write(file_format='fits', overwrite=False)
 
     # Check that the existing output files are modified if overwrite is True
     new_size = 2 * size
@@ -67,8 +55,8 @@ def test_pipeline(tmp_path):
     config['tables']['test_table']['column3'].args = [new_string]
     pipeline = Pipeline(config)
     pipeline.execute()
-    pipeline.write(output_filename, overwrite=True)
-    with fits.open(output_filename) as hdu:
+    pipeline.write(file_format='fits', overwrite=True)
+    with fits.open('test_table.fits') as hdu:
         assert len(hdu[1].data) == new_size
 
     # Check for failure if 'column1' requires itself creating a cyclic
@@ -214,7 +202,7 @@ def test_pipeline_read():
     assert isinstance(pipeline['test_int'], int)
     assert isinstance(pipeline['test_float'], float)
     assert isinstance(pipeline['test_str'], str)
-    assert isinstance(pipeline['cosmology'], Cosmology)
+    assert isinstance(pipeline['test_cosmology'], Cosmology)
     assert isinstance(pipeline['test_table_1'], Table)
     assert isinstance(pipeline['test_table_1']['test_column_3'], Column)
 
@@ -249,43 +237,7 @@ def test_column_quantity():
     np.testing.assert_array_less(pipeline['test_table.lengths_in_cm'], 100)
 
 
-@pytest.mark.skipif(not HAS_H5PY, reason='Requires h5py')
-def test_hdf5(tmp_path):
-    size = 100
-    string = size*'a'
-    config = {'tables': {
-              'test_table': {
-                'column1': Call(np.random.uniform, [], {
-                  'size': size}),
-                'column2': Call(np.random.uniform, [], {
-                  'low': Ref('test_table.column1')}),
-                'column3': Call(list, [string], {})}}}
+def teardown_module(module):
 
-    pipeline = Pipeline(config)
-    pipeline.execute()
-    output_filename = str(tmp_path / 'output.hdf5')
-    pipeline.write(output_filename)
-    hdf_table = read_table_hdf5(output_filename, 'tables/test_table', character_as_bytes=False)
-    assert np.all(hdf_table == pipeline['test_table'])
-
-
-def test_depends():
-
-    # Regression test for GitHub Issue #464
-    # Previously the .depends keyword was also being passed to functions as a
-    # keyword argument. This was because Pipeline was executing Item.infer to
-    # handle additional function arguments from context before handling
-    # additional dependencies specified using the .depends keyword. The
-    # .depends keyword is now handled first.
-
-    config = {'tables': {
-                'table_1': {
-                  'column1': Call(np.random.uniform, [0, 1, 10])},
-                'table_2': {
-                    '.init': Call(vstack, [], {
-                      'tables': [Ref('table_1')],
-                      '.depends': ['table_1.complete']})}}}
-
-    pipeline = Pipeline(config)
-    pipeline.execute()
-    assert np.all(pipeline['table_1'] == pipeline['table_2'])
+    # Remove fits file generated in test_pipeline
+    os.remove('test_table.fits')

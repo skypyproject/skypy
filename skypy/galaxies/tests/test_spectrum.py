@@ -158,39 +158,6 @@ def test_kcorrect_stellar_mass():
     np.testing.assert_allclose(stellar_mass, truth)
 
 
-@pytest.mark.skipif(not HAS_SPECLITE, reason='test requires speclite')
-def test_kcorrect_stellar_mass_remain():
-
-    from astropy import units
-    from skypy.galaxies.spectrum import kcorrect
-    from speclite.filters import FilterResponse
-
-    # Gaussian bandpass
-    filt_lam = np.logspace(3, 4, 1000) * units.AA
-    filt_mean = 5000 * units.AA
-    filt_width = 100 * units.AA
-    filt_tx = np.exp(-((filt_lam-filt_mean)/filt_width)**2)
-    filt_tx[[0, -1]] = 0
-    FilterResponse(wavelength=filt_lam, response=filt_tx,
-                   meta=dict(group_name='test', band_name='filt'))
-
-    # Using the identity matrix for the coefficients yields trivial test cases
-    coeff = np.eye(5)
-    Mt = kcorrect.absolute_magnitudes(coeff, 'test-filt')
-
-    # Using the absolute magnitudes of the templates as reference magnitudes
-    # should return one solar mass for each template.
-    stellar_mass = kcorrect.stellar_mass_remain(coeff, Mt, 'test-filt')
-    truth = kcorrect.mremain
-    np.testing.assert_allclose(stellar_mass, truth)
-
-    # Solution for given magnitudes without template mixing
-    Mb = np.array([10, 20, 30, 40, 50])
-    stellar_mass = kcorrect.stellar_mass_remain(coeff, Mb, 'test-filt')
-    truth = np.power(10, -0.4*(Mb-Mt)) * kcorrect.mremain
-    np.testing.assert_allclose(stellar_mass, truth)
-
-
 def test_kcorrect_metallicity():
 
     from skypy.galaxies.spectrum import kcorrect
