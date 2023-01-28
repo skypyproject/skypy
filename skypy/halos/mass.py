@@ -101,19 +101,19 @@ def halo_mass_function(M, wavenumber, power_spectrum, growth_function,
 
     >>> m = 10**np.arange(9.0, 12.0, 2)
     >>> mass.sheth_tormen_mass_function(m, k, Pk, D0, cosmo)
-    array([3.07523240e-11, 6.11387743e-13])
+    array([2.730976...e-11, 5.202592...e-13])
 
     And the Press-Schechter mass function at redshift 0:
 
     >>> mass.press_schechter_mass_function(m, k, Pk, D0, cosmo)
-    array([3.46908809e-11, 8.09874945e-13])
+    array([2.945662...e-11, 6.573908...e-13])
 
     For any other collapse models:
 
     >>> params_model = (0.3, 0.7, 0.3, 1.686)
     >>> mass.halo_mass_function(m, k, Pk, D0, cosmo,
     ...     mass.ellipsoidal_collapse_function, params=params_model)
-    array([2.85598921e-11, 5.67987501e-13])
+    array([2.536209...e-11, 4.832517...e-13])
 
     References
     ----------
@@ -258,18 +258,18 @@ def ellipsoidal_collapse_function(sigma, params):
     >>> m = 10**np.arange(9.0, 12.0, 2)
     >>> sigma = np.sqrt(_sigma_squared(m, k, Pk, D0, cosmo))
     >>> mass.sheth_tormen_collapse_function(sigma)
-    array([0.17947815, 0.19952375])
+    array([0.204174..., 0.272237...])
 
     And the Press-Schechter collapse function at redshift 0:
 
     >>> mass.press_schechter_collapse_function(sigma)
-    array([0.17896132, 0.21613726])
+    array([0.225083..., 0.368156...])
 
     For any other collapse models:
 
     >>> params_model = (0.3, 0.7, 0.3, 1.686)
     >>> mass.ellipsoidal_collapse_function(sigma, params=params_model)
-    array([0.16667541, 0.18529452])
+    array([0.189615..., 0.252937...])
 
     References
     ----------
