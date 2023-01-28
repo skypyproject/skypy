@@ -40,6 +40,13 @@ def angular_size(physical_size, redshift, cosmology):
     angular_size : astropy.Quantity
         Angular distances in units of [rad] for a given radius.
 
+    Examples
+    --------
+    >>> from astropy import units
+    >>> from skypy.galaxies.morphology import angular_size
+    >>> from astropy.cosmology import Planck15
+    >>> r = angular_size(10*units.kpc, 1, Planck15)
+
     References
     ----------
     .. [1] D. W. Hogg, (1999), astro-ph/9905116.
@@ -82,6 +89,14 @@ def beta_ellipticity(e_ratio, e_sum, size=None):
     ----------
     .. [1] Kacprzak T., Herbel J., Nicola A. et al., arXiv:1906.01018
 
+    Examples
+    --------
+    Sample 10000 random variates from the Kacprzak model with
+    :math:`e_{\rm ratio} = 0.5` and :math:`e_{\rm sum} = 1.0`:
+
+    >>> from skypy.galaxies.morphology import beta_ellipticity
+    >>> ellipticity = beta_ellipticity(0.5, 1.0, size=10000)
+
     '''
 
     # convert to beta distribution parameters
@@ -123,6 +138,17 @@ def late_type_lognormal_size(magnitude, alpha, beta, gamma, M0, sigma1, sigma2,
         If size is ns, different from None, and magnitude is scalar,
         shape is (ns,). If magnitude has shape (nm,) and size=None,
         shape is (nm,).
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from skypy.galaxies import morphology
+    >>> magnitude = -16.0
+    >>> alpha, beta, gamma, M0 = 0.21, 0.53, -1.31, -20.52
+    >>> sigma1, sigma2 = 0.48, 0.25
+    >>> s = morphology.late_type_lognormal_size(magnitude, alpha, beta, gamma,
+    ...                                         M0, sigma1, sigma2)
+
 
     References
     ----------
@@ -174,6 +200,17 @@ def early_type_lognormal_size(magnitude, a, b, M0, sigma1, sigma2, size=None):
         shape is (ns,). If magnitude has shape (nm,) and size=None,
         shape is (nm,).
 
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from skypy.galaxies import morphology
+    >>> magnitude = -20.0
+    >>> a, b, M0 = 0.6, -4.63, -20.52
+    >>> sigma1, sigma2 = 0.48, 0.25
+    >>> s = morphology.early_type_lognormal_size(magnitude, a, b, M0, sigma1,
+    ...                                          sigma2)
+
+
     References
     ----------
     .. [1] S. Shen, H.J. Mo, S.D.M. White, M.R. Blanton, G. Kauffmann, W. Voges,
@@ -216,6 +253,14 @@ def linear_lognormal_size(magnitude, a_mu, b_mu, sigma, size=None):
         shape is (ns,). If magnitude has shape (nm,) and size=None,
         shape is (nm,).
 
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from skypy.galaxies import morphology
+    >>> magnitude = -20.0
+    >>> a_mu, b_mu, sigma =-0.24, -4.63, 0.4
+    >>> s = morphology.linear_lognormal_size(magnitude, a_mu, b_mu, sigma)
+
     References
     ----------
     .. [1] J. Herbel, T. Kacprzak, A. Amara, A. Refregier, C.Bruderer and
@@ -251,14 +296,18 @@ def ryden04_ellipticity(mu_gamma, sigma_gamma, mu, sigma, size=None):
     size : int or tuple of ints or None
         Size of the sample. If `None` the size is inferred from the parameters.
 
-    Returns
-    -------
-    ellipticity: (size,) array_like
-        Ellipticities sampled from the Ryden 2004 model.
-
     References
     ----------
     .. [1] Ryden B. S., 2004, ApJ, 601, 214
+
+    Examples
+    --------
+    Sample 10000 random variates from the Ryden (2004) model with parameters
+    :math:`\mu_\gamma = 0.222`, :math:`\sigma_\gamma = 0.056`,
+    :math:`\mu = -1.85`, and :math:`\sigma = 0.89`.
+
+    >>> from skypy.galaxies.morphology import ryden04_ellipticity
+    >>> ellipticity = ryden04_ellipticity(0.222, 0.056, -1.85, 0.89, size=10000)
 
     '''
 

@@ -2,11 +2,11 @@ name: Tests
 on:
   push:
     branches:
-    - main
+    - master
     - module/*
   pull_request:
     branches:
-    - main
+    - master
     - module/*
 jobs:
   test:
@@ -19,24 +19,24 @@ jobs:
 
           - name: latest supported versions
             os: ubuntu-latest
-            python: '3.10'
-            toxenv: py310-test-all-latest-cov
+            python: 3.9
+            toxenv: py39-test-all-latest-cov
             toxposargs: --cov-report=xml:${GITHUB_WORKSPACE}/coverage.xml
 
           - name: oldest supported versions
             os: ubuntu-latest
-            python: 3.7
-            toxenv: py37-test-oldest
+            python: 3.6
+            toxenv: py36-test-oldest
 
           - name: macOS latest supported
             os: macos-latest
-            python: '3.10'
-            toxenv: py310-test-latest
+            python: 3.9
+            toxenv: py39-test-latest
 
           - name: Windows latest supported
             os: windows-latest
-            python: '3.10'
-            toxenv: py310-test-latest
+            python: 3.9
+            toxenv: py39-test-latest
 
     steps:
     - name: Checkout Repository

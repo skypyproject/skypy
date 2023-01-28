@@ -3,7 +3,6 @@ import pytest
 from skypy.pipeline import load_skypy_yaml
 from skypy.pipeline._items import Call
 from astropy import units
-from astropy.cosmology.core import Cosmology
 
 
 def test_load_skypy_yaml():
@@ -19,9 +18,7 @@ def test_load_skypy_yaml():
     assert isinstance(config['test_float'], float)
     assert isinstance(config['test_str'], str)
     assert isinstance(config['test_func'], Call)
-    assert isinstance(config['test_func_with_arg'], Call)
-    assert isinstance(config['test_object'], Cosmology)
-    assert isinstance(config['cosmology'], Call)
+    assert isinstance(config['test_cosmology'], Call)
     assert isinstance(config['tables']['test_table_1']['test_column_3'], Call)
 
     # Bad function
@@ -32,11 +29,6 @@ def test_load_skypy_yaml():
     # Bad module
     filename = get_pkg_data_filename('data/bad_module.yml')
     with pytest.raises(ImportError):
-        load_skypy_yaml(filename)
-
-    # Bad object
-    filename = get_pkg_data_filename('data/bad_object.yml')
-    with pytest.raises(ValueError):
         load_skypy_yaml(filename)
 
 

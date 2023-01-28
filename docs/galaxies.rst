@@ -63,13 +63,6 @@ Spectrum
 
 The following models are found in the `skypy.galaxies.spectrum` package.
 
-SkyPy uses the `speclite <https://speclite.readthedocs.io/>`_ package for
-photometric calculations. Some of the following functions take the names of
-photometric filters as an input parameter. Users can choose from the available
-`Speclite Filters <https://speclite.readthedocs.io/en/latest/filters.html>`_
-following the naming syntax described in `speclite.filters.load_filters`, or
-create their own named `speclite.filters.FilterResponse`.
-
 .. currentmodule:: skypy.galaxies.spectrum
 .. autosummary::
    :nosignatures:

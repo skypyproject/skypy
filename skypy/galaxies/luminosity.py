@@ -46,6 +46,18 @@ def schechter_lf_magnitude(redshift, M_star, alpha, m_lim, cosmology, size=None,
         Absolute magnitude sampled from a Schechter luminosity function for
         each input galaxy redshift.
 
+    Examples
+    --------
+
+    Sample a number of blue (alpha = -1.3, M_star = -20.5) galaxy magnitudes
+    brighter than m = 22.0 around redshift 0.5.
+
+    >>> import numpy as np
+    >>> from skypy.galaxies.luminosity import schechter_lf_magnitude
+    >>> from astropy.cosmology import Planck15
+    >>> z = np.random.uniform(4.9, 5.1, size=20)
+    >>> M = schechter_lf_magnitude(z, -20.5, -1.3, 22.0, Planck15)
+
     '''
 
     # only alpha scalars supported at the moment

@@ -1,7 +1,6 @@
 '''item types in the pipeline'''
 
 from collections.abc import Sequence, Mapping
-from . import log
 import inspect
 
 
@@ -89,5 +88,4 @@ class Call(Item):
         '''execute the call in the given pipeline'''
         args = pipeline.evaluate(self.args)
         kwargs = pipeline.evaluate(self.kwargs)
-        log.info(f"Calling {self.function.__name__}")
         return self.function(*args, **kwargs)
