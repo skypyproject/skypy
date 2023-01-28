@@ -5,6 +5,7 @@
 
 from abc import ABCMeta, abstractmethod
 import numpy as np
+import scipy.special
 
 
 __all__ = [
@@ -13,10 +14,12 @@ __all__ = [
     'luminosity_in_band',
     'mag_ab',
     'SpectrumTemplates',
+    'magnitude_error_rykoff',
+    'logistic_completeness_function',
 ]
 
 try:
-    import speclite.filters
+    import speclite.filters  # noqa F401
 except ImportError:
     HAS_SPECLITE = False
 else:
@@ -84,11 +87,12 @@ def mag_ab(wavelength, spectrum, filters, *, redshift=None, coefficients=None,
     .. [1] M. R. Blanton et al., 2003, AJ, 125, 2348
 
     '''
+    from speclite.filters import load_filters
 
     # load the filters
     if np.ndim(filters) == 0:
         filters = (filters,)
-    filters = speclite.filters.load_filters(*filters)
+    filters = load_filters(*filters)
     if np.shape(filters) == (1,):
         filters = filters[0]
 
@@ -127,7 +131,7 @@ def mag_ab(wavelength, spectrum, filters, *, redshift=None, coefficients=None,
         u = u.reshape(u.shape + (1,)*(nd_s+nd_f))
         m = np.ascontiguousarray(m[n])
         m += u*dm[n]
-        del(dm, n, u)
+        del dm, n, u
 
     # combine spectra if asked to
     if coefficients is not None:
@@ -303,3 +307,141 @@ def absolute_magnitude_from_luminosity(luminosity, zeropoint=None):
         zeropoint = -luminosity_in_band[zeropoint]
 
     return -2.5*np.log10(luminosity) - zeropoint
+
+
+def magnitude_error_rykoff(magnitude, magnitude_limit, magnitude_zp, a, b, error_limit=np.inf):
+    r"""Magnitude error according to the model from Rykoff et al. (2015).
+
+    Given an apparent magnitude calculate the magnitude error that is introduced
+    by the survey specifications and follows the model described in Rykoff et al. (2015).
+
+    Parameters
+    ----------
+    magnitude: array_like
+        Apparent magnitude. This and the other array_like parameters must
+        be broadcastable to the same shape.
+    magnitude_limit: array_like
+        :math:`10\sigma` limiting magnitude of the survey. This and the other
+        array_like parameters must be broadcastable to the same shape.
+    magnitude_zp: array_like
+        Zero-point magnitude of the survey. This and the other array_like parameters must
+        be broadcastable to the same shape.
+    a,b: array_like
+        Model parameters: a is the intercept and
+        b is the slope of the logarithmic effective time.
+        These and the other array_like parameters must be broadcastable to the same shape.
+    error_limit: float, optional
+        Upper limit of the returned error. If given, all values larger than this value
+        will be set to error_limit. Default is None.
+
+    Returns
+    -------
+    error: ndarray
+        The apparent magnitude error in the Rykoff et al. (2015) model. This is a scalar
+        if magnitude, magnitude_limit, magnitude_zp, a and b are scalars.
+
+    Notes
+    -----
+    Rykoff et al. (2015) (see [1]_) describe the error of the apparent magnitude :math:`m` as
+
+    .. math::
+
+        \sigma_m(m;m_{\mathrm{lim}}, t_{\mathrm{eff}}) &=
+            \sigma_m(F(m);F_{\mathrm{noise}}(m_{\mathrm{lim}}), t_{\mathrm{eff}}) \\
+        &= \frac{2.5}{\ln(10)} \left[ \frac{1}{Ft_{\mathrm{eff}}}
+            \left( 1 + \frac{F_{\mathrm{noise}}}{F} \right) \right]^{1/2} \;,
+
+    where
+
+    .. math::
+
+        F=10^{-0.4(m - m_{\mathrm{ZP}})}
+
+    is the source's flux,
+
+    .. math::
+
+        F_\mathrm{noise} = \frac{F_{\mathrm{lim}}^2 t_{\mathrm{eff}}}{10^2} - F_{\mathrm{lim}}
+
+    is the effective noise flux and :math:`t_\mathrm{eff}` is the effective exposure time
+    (we absorbed the normalisation constant :math:`k` in the definition of
+    :math:`t_\mathrm{eff}`).
+    Furthermore, :math:`m_\mathrm{ZP}` is the zero-point magnitude of the survey and
+    :math:`F_\mathrm{lim}` is the :math:`10\sigma` limiting flux.
+    Accordingly, :math:`m_\mathrm{lim}` is the :math:`10\sigma` limiting magnitud
+    associated with :math:`F_\mathrm{lim}`.
+
+    The effective exposure time is described by
+
+    .. math::
+
+        \ln{t_\mathrm{eff}} = a + b(m_\mathrm{lim} - 21)\;,
+
+    where :math:`a` and :math:`b` are free parameters.
+
+    Further note that the model was originally used for SDSS galaxy photometry.
+
+    References
+    ----------
+    .. [1] Rykoff E. S., Rozo E., Keisler R., 2015, eprint arXiv:1509.00870
+
+    """
+
+    flux = luminosity_from_absolute_magnitude(magnitude, -magnitude_zp)
+    flux_limit = luminosity_from_absolute_magnitude(magnitude_limit, -magnitude_zp)
+    t_eff = np.exp(a + b * np.subtract(magnitude_limit, 21.0))
+    flux_noise = np.square(flux_limit / 10) * t_eff - flux_limit
+    error = 2.5 / np.log(10) * np.sqrt((1 + flux_noise / flux) / (flux * t_eff))
+
+    return np.minimum(error, error_limit)
+
+
+def logistic_completeness_function(magnitude, magnitude_95, magnitude_50):
+    r'''Logistic completeness function.
+
+    This function calculates the logistic completeness function (based on eq. (7) in
+    López-Sanjuan, C. et al. (2017) [1]_.
+
+    .. math::
+
+        p(m) = \frac{1}{1 + \exp[\kappa (m - m_{50})]}\;,
+
+    which describes the probability :math:`p(m)` that an object of magnitude :math:`m` is detected
+    in a specific band and with
+
+    .. math::
+
+        \kappa = \frac{\ln(\frac{1}{19})}{m_{95} - m_{50}}\;.
+
+    Here, :math:`m_{95}` and :math:`m_{50}` are the 95% and 50% completeness
+    magnitudes, respectively.
+
+    Parameters
+    ----------
+    magnitude : array_like
+        Magnitudes. Can be multidimensional for computing with multiple filter bands.
+    magnitude_95 : scalar or 1-D array_like
+        95% completeness magnitude.
+        If `magnitude_50` is 1-D array it has to be scalar or 1-D array of the same shape.
+    magnitude_50 : scalar or 1-D array_like
+        50% completeness magnitude.
+        If `magnitude_95` is 1-D array it has to be scalar or 1-D array of the same shape.
+
+    Returns
+    -------
+    probability : scalar or array_like
+        Probability of detecting an object with magnitude :math:`m`.
+        Returns array_like of the same shape as magnitude.
+        Exemption: If magnitude is scalar and `magnitude_95` or `magnitude_50`
+        is array_like of shape (nb, ) it returns array_like of shape (nb, ).
+
+    References
+    -----------
+    .. [1] López-Sanjuan, C. et al., `2017A&A…599A..62L`_
+    .. _2017A&A…599A..62L: https://ui.adsabs.harvard.edu/abs/2017A%26A...599A..62L
+
+    '''
+
+    kappa = np.log(1. / 19) / np.subtract(magnitude_95, magnitude_50)
+    arg = kappa * np.subtract(magnitude, magnitude_50)
+    return scipy.special.expit(-arg)
