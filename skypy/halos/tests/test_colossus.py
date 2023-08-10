@@ -11,7 +11,7 @@ def test_colossus_mass_sampler():
     from astropy.cosmology import WMAP9
     from colossus.cosmology.cosmology import fromAstropy
     from colossus.lss import mass_function
-    from skypy.halos.mass import colossus_mass_sampler
+    from skypy.halos._colossus import colossus_mass_sampler
     m_min, m_max, size = 1e+12, 1e+16, 100
     sample = colossus_mass_sampler(redshift=0.1, model='despali16',
                                    mdef='500c', m_min=m_min, m_max=m_max,
@@ -105,3 +105,53 @@ def test_colossus_mf():
     assert np.all(z_halo <= np.max(z))
     assert np.all(m_halo >= m_min)
     assert np.all(m_halo <= m_max)
+
+
+@pytest.mark.skipif(not HAS_COLOSSUS, reason='test requires colossus')
+@pytest.mark.flaky
+def test_colossus_concentration():
+    from skypy.halos._colossus import concentration
+    from astropy.cosmology import Planck15
+
+    mass = np.logspace(np.log10(1e+14), np.log10(1e+15), 10)
+    model, mdef = 'diemer19', '200c'
+    redshift = 0.5
+    cosmo = Planck15
+    sigma8, ns = 0.82, 0.96
+    c = concentration(mass, mdef, redshift, model, cosmo, sigma8, ns)
+
+    assert len(c) == len(mass)
+
+
+@pytest.mark.skipif(not HAS_COLOSSUS, reason='test requires colossus')
+@pytest.mark.flaky
+def test_colossus_radius():
+    from skypy.halos._colossus import radius
+    from astropy.cosmology import Planck15
+
+    mass, c, redshift = 1e+15, 3, 0.5
+    Delta, mdef = '500c', '200c'
+    cosmo = Planck15
+    sigma8, ns = 0.82, 0.96
+
+    rs, RDelta = radius(mass, c, redshift, mdef, Delta, cosmo, sigma8, ns)
+
+    assert rs > 0
+    assert RDelta > 0
+
+
+@pytest.mark.skipif(not HAS_COLOSSUS, reason='test requires colossus')
+@pytest.mark.flaky
+def test_colossus_Delta_Sigma():
+    from skypy.halos._colossus import Delta_Sigma
+    from astropy.cosmology import Planck15
+
+    mass, c, redshift = 1e+15, 3, 0.5
+    mdef = '200c'
+    cosmo = Planck15
+    sigma8, ns = 0.82, 0.96
+    radius = np.logspace(np.log10(300), np.log10(3000), 10)
+
+    DeltaSigma = Delta_Sigma(mass, c, redshift, mdef, radius, cosmo, sigma8, ns)
+
+    assert len(DeltaSigma) == len(radius)
