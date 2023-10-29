@@ -436,7 +436,7 @@ def logistic_completeness_function(magnitude, magnitude_95, magnitude_50):
         is array_like of shape (nb, ) it returns array_like of shape (nb, ).
 
     References
-    -----------
+    ----------
     .. [1] López-Sanjuan, C. et al., `2017A&A…599A..62L`_
     .. _2017A&A…599A..62L: https://ui.adsabs.harvard.edu/abs/2017A%26A...599A..62L
 
