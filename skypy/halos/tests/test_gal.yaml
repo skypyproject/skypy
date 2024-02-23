@@ -1,0 +1,20 @@
+m_star: !numpy.power [10, 10.58]
+phi_star: !numpy.power [10, -2.77]
+alpha_val: -0.33
+m_min: !numpy.power [10, 7.456579727808869]
+m_max: !numpy.power [10, 14.0]
+sky_area: 600.0 deg2
+z_range: !numpy.linspace [0.01, 0.1, 100]
+cosmology: !astropy.cosmology.FlatLambdaCDM
+  H0: 70.0
+  Om0: 0.3
+tables:
+  galaxy:
+    z, sm: !skypy.galaxies.schechter_smf
+      redshift: $z_range
+      m_star: $m_star
+      phi_star: $phi_star
+      alpha: $alpha_val
+      m_min: $m_min
+      m_max: $m_max
+      sky_area: $sky_area

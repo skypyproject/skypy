@@ -383,7 +383,8 @@ def number_subhalos(halo_mass, alpha, beta, gamma_M, x, m_min, noise=True):
 
     # Random number of subhalos following a Poisson distribution
     # with mean n_subhalos
-    return np.random.poisson(n_subhalos) if noise else n_subhalos #ERROR CLEAN UP - Poisson rounds the value, otherwise doesn't. mass_sampler needs rounded numbers
+    # TODO Poisson rounds the value, otherwise doesn't. mass_sampler needs rounded numbers
+    return np.random.poisson(n_subhalos) if noise else n_subhalos
 
 
 def subhalo_mass_sampler(halo_mass, nsubhalos, alpha, beta,
@@ -440,8 +441,8 @@ def subhalo_mass_sampler(halo_mass, nsubhalos, alpha, beta,
     halo_mass = np.atleast_1d(halo_mass)
     nsubhalos = np.atleast_1d(nsubhalos)
     subhalo_list = []
-    #Potential fix for not using Poisson in above function
-    #nsubhalos = [int(x) for x in nsubhalos]
+    # TODO fix for not using Poisson in above function
+    # nsubhalos = [int(x) for x in nsubhalos]
 
     for M, n in zip(halo_mass, nsubhalos):
         x_min = m_min / (x * beta * M)
