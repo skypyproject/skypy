@@ -22,7 +22,6 @@ __all__ = [
     'assignment',
     'sham_arrays',
     'run_sham',
-    'test_run_file'
 ]
 
 from . import abundance_matching  # noqa F401,F403
