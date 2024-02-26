@@ -301,7 +301,7 @@ def run_file(file_name, table1, info1, info2=None):
     '''
     import os
     # Errors
-    if type(file_name) != str:
+    if type(file_name) is not str:
         raise Exception('File name must be a string')
     if not os.path.exists(file_name):
         raise Exception('File does not exist')
@@ -529,7 +529,7 @@ def galaxy_cat(m_star, phi_star, alpha, cosmology, z_range, skyarea, min_mass, m
     line5 = 'm_max: !numpy.power [10, ' + str(np.log10(max_mass)) + ']\n'
 
     # Observational parameters
-    if type(skyarea) != float:
+    if type(skyarea) is not float:
         skyarea = float(skyarea)
     line6 = 'sky_area: ' + str(skyarea) + ' deg2\n'
     line7 = 'z_range: !numpy.linspace [' + str(z_range[0]) + ', ' + str(z_range[1]) + ', 100]\n'
@@ -998,7 +998,7 @@ def run_sham(h_file, gal_param, cosmology, z_range, skyarea, qu_h_param, qu_s_pa
     qu_s_param = np.atleast_1d(qu_s_param)
 
     # Check that all inputs are of the correct type and size
-    if type(h_file) != str:
+    if type(h_file) is not str:
         raise Exception('Halo YAML file must be provided as a string')
     if gal_param.shape != (4, 3):
         if gal_param.shape[0] != 4:

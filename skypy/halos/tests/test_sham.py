@@ -126,7 +126,7 @@ def test_find_min():
     min_mass = find_min(m_star, phi_star, alpha, cosmology, z_range, skyarea, max_mass, no_halo_y)
 
     # Check type and expected number
-    assert type(min_mass) == np.float64
+    assert type(min_mass) is np.float64
     assert np.log10(min_mass) == approx(7.9976, rel=10**(-4))
 
     # Check that the expected integral gives the number of halos
@@ -295,8 +295,8 @@ def test_run_file():
     dndV = trap(dndmdV, mass_range)
     dn = dndV*dVdz
 
-    assert type(test_cat) == astropy.table.column.Column
-    assert type(test_z) == astropy.table.column.Column
+    assert type(test_cat) is astropy.table.column.Column
+    assert type(test_z) is astropy.table.column.Column
     assert test_cat.ndim == 1
     assert test_z.ndim == 1
     # Length same within Poisson sampling error
@@ -354,7 +354,7 @@ def test_gen_sub_cat():
     i_type = []
     id_list = np.append(ID_halo, ID_sub)
     for ii in id_list:
-        if type(ii) == np.int64:
+        if type(ii) is np.int64:
             i_type.append(True)
         else:
             i_type.append(False)
@@ -1039,7 +1039,7 @@ def test_sham_plots():
                                                                         gal_type_fin)
 
     # Arrays correct type and size
-    assert type(sham_rc) == type(sham_rs) == type(sham_bc) == type(sham_bs) == np.ndarray
+    assert type(sham_rc) is type(sham_rs) is type(sham_bc) is type(sham_bs) is np.ndarray
     assert sham_rc.ndim == sham_rs.ndim == sham_bc.ndim == sham_bs.ndim == 2
     assert sham_cen.ndim == sham_sub.ndim == 2
     assert sham_rc.size  # Check lists are not empty
@@ -1117,11 +1117,11 @@ def test_run_sham():
                     print_out=False, run_anyway=True)
 
     # Check arrays
-    assert type(sham['Halo mass']) == np.ndarray
-    assert type(sham['Galaxy mass']) == np.ndarray
-    assert type(sham['Galaxy type']) == np.ndarray
-    assert type(sham['ID value']) == np.ndarray
-    assert type(sham['Redshift']) == np.ndarray
+    assert type(sham['Halo mass']) is np.ndarray
+    assert type(sham['Galaxy mass']) is np.ndarray
+    assert type(sham['Galaxy type']) is np.ndarray
+    assert type(sham['ID value']) is np.ndarray
+    assert type(sham['Redshift']) is np.ndarray
 
     assert len(sham['Halo mass']) == len(sham['Galaxy mass'])
     assert len(sham['Galaxy mass']) == len(sham['Galaxy type'])
