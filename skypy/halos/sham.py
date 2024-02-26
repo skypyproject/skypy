@@ -20,15 +20,22 @@ Models
    run_sham
 '''
 
-#Imports
+# Imports
 import numpy as np
 from skypy.pipeline import Pipeline
-from skypy.halos import mass #Vale and Ostriker 2004 num of subhalos
+from skypy.halos import mass  # Vale and Ostriker 2004 num of subhalos
 from time import time
-from scipy.special import erf #Error function for quenching
-from scipy.integrate import trapezoid as trap #Integration of galaxies
+from scipy.special import erf  # Error function for quenching
+from scipy.integrate import trapezoid as trap  # Integration of galaxies
 from astropy import units as u
 import os
+
+try:
+    import colossus  # noqa F401
+except ImportError:
+    HAS_COLOSSUS = False
+else:
+    HAS_COLOSSUS = True
 
 __all__ = [
     'quenching_funct',
@@ -41,10 +48,10 @@ __all__ = [
     'run_sham',
  ]
 
-#General functions
+# General functions
 
 
-#Quenching function
+# Quenching function
 def quenching_funct(mass, M_mu, sigma, baseline=0):
     r'''Quenching function applied to halos
     This function computes the fraction of quenched halos (halos assigned
@@ -89,11 +96,10 @@ def quenching_funct(mass, M_mu, sigma, baseline=0):
     References
     ----------
     .. [1] Peng Y.-j., et al., 2010, ApJ, 721, 193
-       
     '''
     mass = np.atleast_1d(mass)
-    
-    #Errors
+
+    # Errors
     if M_mu <= 0:
         raise Exception('M_mu cannot be negative or 0 solar masses')
     if sigma <= 0:
@@ -106,37 +112,35 @@ def quenching_funct(mass, M_mu, sigma, baseline=0):
     if len(mass) == 1:
         raise TypeError('Mass must be array-like')
 
-    #Only works with an increasing array due to normalisation?
-    qu_id = np.arange(0, len(mass)) #Random order elements (ie halo original order)
+    # Only works with an increasing array due to normalisation?
+    qu_id = np.arange(0, len(mass))  # Random order elements (ie halo original order)
 
-    #Elements of sorted halos
+    # Elements of sorted halos
     stack1 = np.stack((mass, qu_id), axis=1)
-    order1 = stack1[np.argsort(stack1[:,0])] #Order on the halos
+    order1 = stack1[np.argsort(stack1[:, 0])]  # Order on the halos
     mass = order1[:, 0]
     order_qu_id = order1[:, 1]
 
     calc = np.log10(mass/M_mu)/sigma
-    old_prob = 0.5 * (1.0 + erf(calc/np.sqrt(2))) #Base error funct, 0 -> 1
+    old_prob = 0.5 * (1.0 + erf(calc/np.sqrt(2)))  # Base error funct, 0 -> 1
     add_val = baseline/(1-baseline)
-    prob_sub = old_prob + add_val #Add value to plot to get baseline
-    prob_array = prob_sub/prob_sub[-1] #Normalise, base -> 1
+    prob_sub = old_prob + add_val  # Add value to plot to get baseline
+    prob_array = prob_sub/prob_sub[-1]  # Normalise, base -> 1
     rand_array = np.random.uniform(size=len(mass))
     qu_arr = rand_array < prob_array
 
-    #Reorder truth to match original order
+    # Reorder truth to match original order
     stack2 = np.stack((order_qu_id, qu_arr), axis=1)
-    order2 = stack2[np.argsort(stack2[:,0])] 
+    order2 = stack2[np.argsort(stack2[:, 0])]
     return order2[:, 1]
 
 
-#Find minimum galaxy mass for given halo population through the integral
-#@units.quantity_input(sky_area=units.sr) #To make area work?
-        
-def find_min(m_star, phi_star, alpha, cosmology, z_range, skyarea, max_mass, no_halo, print_out = False, run_anyway = False):
-    #Find minimum mass for halo type
+# Find minimum galaxy mass for given halo population through the integral
+def find_min(m_star, phi_star, alpha, cosmology, z_range, skyarea, max_mass, no_halo,
+             print_out=False, run_anyway=False):
     r'''Function to find a minimum mass for a galaxy type for a given number
     of halos
-        
+
     This function computes a look up table of the integral of the galaxy
     Schechter function and interpolates on the number of halos to find the
     minimum mass.
@@ -192,11 +196,10 @@ def find_min(m_star, phi_star, alpha, cosmology, z_range, skyarea, max_mass, no_
     ----------
     .. [1] Birrer S., Lilly S., Amara A., Paranjape A., Refregier A., 2014,
         The Astrophysical Journal, 793, 12
-       
     '''
     z_range = np.atleast_1d(z_range)
 
-    #Errors
+    # Errors
     if z_range.shape != (2, ):
         raise Exception('The wrong number of redshifts were given')
     if z_range[0] < 0 or z_range[1] < 0:
@@ -205,7 +208,7 @@ def find_min(m_star, phi_star, alpha, cosmology, z_range, skyarea, max_mass, no_
         raise Exception('The second redshift should be more than the first')
     if alpha >= 0:
         alpha = -1*alpha
-        raise Warning('The Schechter function for galaxies is defined such that alpha should be negative, set_alpha = -alpha')
+        raise Warning('Schechter function defined so alpha < 0, set_alpha = -alpha')
     if m_star <= 0 or phi_star <= 0:
         raise Exception('M* and phi* must be positive and non-zero numbers')
     if skyarea <= 0:
@@ -215,46 +218,48 @@ def find_min(m_star, phi_star, alpha, cosmology, z_range, skyarea, max_mass, no_
 
     skyarea = skyarea*u.deg**2
     z = np.linspace(z_range[0], z_range[1], 1000)
-    dVdz = (cosmology.differential_comoving_volume(z)*skyarea).to_value('Mpc3')  
-    
-    #Other
-    mass_mins = 10**np.arange(6, 10, 0.1) #Minimums to integrate, linear in logspace
+    dVdz = (cosmology.differential_comoving_volume(z)*skyarea).to_value('Mpc3')
+
+    # Other
+    mass_mins = 10**np.arange(6, 10, 0.1)  # Minimums to integrate, linear in logspace
     phi_m = phi_star/m_star
-    res = 10**(-2.3) #Want all integral bins to have same resolution in log space, this should give accurate integral value
-    
-    #Integrate
+    # Want all integral bins to have same resolution in log space, should give accurate integral
+    res = 10**(-2.3)
+
+    # Integrate
     int_vals = []
     for ii in mass_mins:
-        mass_bin = 10**np.arange(np.log10(ii), np.log10(max_mass), res) #Masses to integrate over
-        m_m  = mass_bin/m_star
-        dndmdV = phi_m*np.e**(-m_m)*(m_m)**alpha #Mass function
+        mass_bin = 10**np.arange(np.log10(ii), np.log10(max_mass), res)  # Masses to integrate over
+        m_m = mass_bin/m_star
+        dndmdV = phi_m*np.e**(-m_m)*(m_m)**alpha  # Mass function
         dndV = trap(dndmdV, mass_bin)
-        dn = dndV*dVdz #n(z)*V(z)
-        int_vals.append(trap(dn, z)) #Integral per mass bin
-    
+        dn = dndV*dVdz
+        int_vals.append(trap(dn, z))  # Integral per mass bin
+
     int_vals = np.array(int_vals)
-        
-    min_mass = np.interp(no_halo, np.flip(int_vals), np.flip(mass_mins)) #x must be increasing so flip arrays
-    
-    #Region within Poisson error
+    # Integral must be increasing so flip arrays
+    min_mass = np.interp(no_halo, np.flip(int_vals), np.flip(mass_mins))
+
+    # Region within Poisson error
     poisson_min = min(int_vals) - np.sqrt(min(int_vals))
     poisson_max = max(int_vals) + np.sqrt(max(int_vals))
-    
-    if (no_halo < poisson_min or no_halo > poisson_max) and run_anyway == False:
-        #Interpolation falls outside of created range
+
+    if (no_halo < poisson_min or no_halo > poisson_max) and not run_anyway:
+        # Interpolation falls outside of created range
         raise Exception('Number of halos not within reachable bounds')
-        
-    elif (no_halo < poisson_min or no_halo > poisson_max) and run_anyway == True:
-        if print_out == True:
+
+    elif (no_halo < poisson_min or no_halo > poisson_max) and run_anyway:
+        if print_out:
             print('Outside of interpolation, but running anyway')
         return 10**(7)
-        
+
     return min_mass
 
-#Generate catalogues
-def run_file(file_name, table1, info1, info2 = None):
+
+# Generate catalogues
+def run_file(file_name, table1, info1, info2=None):
     r'''Function that runs a yaml file to generate a catalogue
-        
+
     This function runs a yaml file using the SkyPy pipeline and
     produces a catalogue from the file.
 
@@ -290,36 +295,32 @@ def run_file(file_name, table1, info1, info2 = None):
 
     >>> halo_cat, h_z = sham.run_file('halo.yaml', 'halo', 'mass', 'z')
 
-
     References
     ----------
-    .. 
-       
+    ..
     '''
     import os
-    #Errors
+    # Errors
     if type(file_name) != str:
         raise Exception('File name must be a string')
-    try:
-        os.path.exists(file_name)
-    except:
+    if not os.path.exists(file_name):
         raise Exception('File does not exist')
 
-    #Use pipeline
+    # Use pipeline
     pipe = Pipeline.read(file_name)
     pipe.execute()
-    
-    #Get information
+
+    # Get information
     info = pipe[table1]
     cat = info[info1]
-    if info2 != None:
+    if info2 is not None:
         z = info[info2]
         return cat, z
-    
-    return cat
-    
 
-#Generate subhalo catalogues
+    return cat
+
+
+# Generate subhalo catalogues
 def gen_sub_cat(parent_halo, z_halo, sub_alpha, sub_beta, sub_gamma, sub_x):
     r'''Function that generates a catalogue of subhalos from a population
     of parent halos
@@ -338,7 +339,7 @@ def gen_sub_cat(parent_halo, z_halo, sub_alpha, sub_beta, sub_gamma, sub_x):
     sub_alpha : float
         Low mass power law slope of conditional mass function
     sub_beta : float
-        Exponential cutoff of subhalo masses and a fraction of the 
+        Exponential cutoff of subhalo masses and a fraction of the
         parent halo
     sub_gamma : float
         Present day mass fraction of parent halo in sum of generated
@@ -377,12 +378,11 @@ def gen_sub_cat(parent_halo, z_halo, sub_alpha, sub_beta, sub_gamma, sub_x):
     ----------
     .. [1] Vale A., Ostriker J. P., 2004, Monthly Notices of the Royal
        Astronomical Society, 353, 189
-       
     '''
     parent_halo = np.atleast_1d(parent_halo)
     z_halo = np.atleast_1d(z_halo)
 
-    #Errors
+    # Errors
     if len(parent_halo) != len(z_halo):
         raise Exception('Catalogue of halos and redshifts must be the same length')
     if len(np.where(parent_halo <= 0)[0]) > 0:
@@ -391,7 +391,7 @@ def gen_sub_cat(parent_halo, z_halo, sub_alpha, sub_beta, sub_gamma, sub_x):
         raise Exception('Redshifts in catalogue should be positive')
     if sub_alpha < 0:
         sub_alpha = -1*sub_alpha
-        raise Warning('The subhalo mass function is defined such that alpha should be positive, set_alpha = -alpha')
+        raise Warning('Subhalo mass function defined alpha > 0, set_alpha = -alpha')
     if sub_alpha >= 2:
         raise Exception('Subhalo alpha must be less than 2')
     if sub_x < 1:
@@ -400,43 +400,43 @@ def gen_sub_cat(parent_halo, z_halo, sub_alpha, sub_beta, sub_gamma, sub_x):
         raise Exception('Subhalo beta must be between 0 and 1')
     if sub_gamma < 0 or sub_gamma > 1:
         raise Exception('Subhalo gamma must be between 0 and 1')
-    
-    if parent_halo.size == 1: #ie only one halo is provided
+
+    if parent_halo.size == 1:  # ie only one halo is provided
         m_min = 10**(10)
     else:
-        m_min = min(parent_halo) #Min mass of subhalo to generate (SET AT RESOLUTION OF PARENT HALOS)
-    ID_halo = -1*np.arange(1, len(parent_halo)+1, dtype=int) #Halo IDs
-    
-    #Get list of halos that will have subhalos
-    halo_to_sub = parent_halo[np.where(parent_halo >= 10**(10))] #ADD - change this hardcoded value to a larger number?
+        m_min = min(parent_halo)  # Min mass of subhalo to generate (RESOLUTION OF PARENT HALOS)
+    ID_halo = -1*np.arange(1, len(parent_halo)+1, dtype=int)  # Halo IDs
+
+    # Get list of halos that will have subhalos
+    halo_to_sub = parent_halo[np.where(parent_halo >= 10**(10))]  # TODO change to a larger number?
     ID_to_sub = -1*ID_halo[np.where(parent_halo >= 10**(10))]
     z_to_sub = z_halo[np.where(parent_halo >= 10**(10))]
 
-    #Get subhalos
-    no_sub = mass.number_subhalos(halo_to_sub, sub_alpha, sub_beta, sub_gamma, sub_x, m_min, noise=True)
+    # Get subhalos
+    no_sub = mass.number_subhalos(halo_to_sub, sub_alpha, sub_beta,
+                                  sub_gamma, sub_x, m_min, noise=True)
     sub_masses = mass.subhalo_mass_sampler(halo_to_sub, no_sub, sub_alpha, sub_beta, sub_x, m_min)
-    
-    #Assign subhalos to parents by ID value
+
+    # Assign subhalos to parents by ID value
     ID_sub = []
     z_sub = []
     ID_count = 0
     for ii in no_sub:
         ID_set = ID_to_sub[ID_count]
-        ID_sub.extend(ID_set*np.ones(ii, dtype=int)) #Positive ID for subhalo
-        z_sub.extend(z_to_sub[ID_count]*np.ones(ii)) #Same redshift as the parent
-        ID_count +=1
-        
-    #Delete any generated subhalos smaller than the resolution
+        ID_sub.extend(ID_set*np.ones(ii, dtype=int))  # Positive ID for subhalo
+        z_sub.extend(z_to_sub[ID_count]*np.ones(ii))  # Same redshift as the parent
+        ID_count += 1
+
+    # Delete any generated subhalos smaller than the resolution
     del_sub = np.where(sub_masses < m_min)[0]
     sub_masses = np.delete(sub_masses, del_sub)
     ID_sub = np.delete(ID_sub, del_sub)
     z_sub = np.delete(z_sub, del_sub)
-        
+
     return ID_halo, sub_masses, ID_sub, z_sub
 
-#Generate galaxies
 
-#Generate YAML file and get catalogue
+# Generate YAML file and get catalogue
 def galaxy_cat(m_star, phi_star, alpha, cosmology, z_range, skyarea, min_mass, max_mass, file_name):
     r'''Function that generates a galaxy catalogue by generating a YAML file
     and running it
@@ -493,16 +493,14 @@ def galaxy_cat(m_star, phi_star, alpha, cosmology, z_range, skyarea, min_mass, m
     ...                              z_range, skyarea, min_mass, max_mass,
     ...                              'red_central.yaml')
 
-
     References
     ----------
     .. [1] Birrer S., Lilly S., Amara A., Paranjape A., Refregier A., 2014,
         The Astrophysical Journal, 793, 12
-       
     '''
     z_range = np.atleast_1d(z_range)
-    
-    #Errors
+
+    # Errors
     if z_range.shape != (2, ):
         raise Exception('The wrong number of redshifts were given')
     if z_range[0] < 0 or z_range[1] < 0:
@@ -511,52 +509,56 @@ def galaxy_cat(m_star, phi_star, alpha, cosmology, z_range, skyarea, min_mass, m
         raise Exception('The second redshift should be more than the first')
     if alpha > 0:
         alpha = -1*alpha
-        raise Warning('The Schechter function for galaxies is defined such that alpha should be negative, set_alpha = -alpha')
+        raise Warning('Schechter function defined so alpha < 0, set_alpha = -alpha')
     if m_star <= 0 or phi_star <= 0:
         raise Exception('M* and phi* must be positive and non-zero numbers')
     if skyarea <= 0:
         raise Exception('The skyarea must be a positive non-zero number')
     if min_mass > max_mass:
         raise Exception('The minimum mass should be less than the maximum mass')
-    if cosmology.name == None:
+    if cosmology.name is None:
         raise Exception('Cosmology object must have an astropy cosmology name')
 
-    #Galaxy parameters
+    # Galaxy parameters
     line1 = 'm_star: !numpy.power [10, ' + str(np.log10(m_star)) + ']\n'
     line2 = 'phi_star: !numpy.power [10, ' + str(np.log10(phi_star)) + ']\n'
     line3 = 'alpha_val: ' + str(alpha) + '\n'
-    
-    #Mass range
+
+    # Mass range
     line4 = 'm_min: !numpy.power [10, ' + str(np.log10(min_mass)) + ']\n'
     line5 = 'm_max: !numpy.power [10, ' + str(np.log10(max_mass)) + ']\n'
-    
-    #Observational parameters
+
+    # Observational parameters
     if type(skyarea) != float:
         skyarea = float(skyarea)
     line6 = 'sky_area: ' + str(skyarea) + ' deg2\n'
     line7 = 'z_range: !numpy.linspace [' + str(z_range[0]) + ', ' + str(z_range[1]) + ', 100]\n'
-    
-    #Cosmology
+
+    # Cosmology
     line8 = 'cosmology: !astropy.cosmology.' + cosmology.name + '\n'
-    line9 = '  H0: ' +  str(cosmology.h*100) + '\n'
-    line10 = '  Om0: ' +  str(cosmology.Om0) + '\n'
-    
-    #Call function
-    function = 'tables:\n  galaxy:\n    z, sm: !skypy.galaxies.schechter_smf\n      redshift: $z_range\n'
-    function += '      m_star: $m_star\n      phi_star: $phi_star\n      alpha: $alpha_val\n      m_min: $m_min\n'
+    line9 = '  H0: ' + str(cosmology.h*100) + '\n'
+    line10 = '  Om0: ' + str(cosmology.Om0) + '\n'
+
+    # Call function
+    function = 'tables:\n  galaxy:\n'
+    function += '    z, sm: !skypy.galaxies.schechter_smf\n      redshift: $z_range\n'
+    function += '      m_star: $m_star\n      phi_star: $phi_star\n'
+    function += '      alpha: $alpha_val\n      m_min: $m_min\n'
     function += '      m_max: $m_max\n      sky_area: $sky_area\n'
 
-    #Make one large string
-    yaml_lines = line1 + line2 + line3 + line4 + line5 + line6 + line7 + line8 + line9 + line10 + function
-    
+    # Make one large string
+    yaml_lines = line1 + line2 + line3 + line4 + line5 + line6 + line7 + line8 + line9 + line10
+    yaml_lines += function
+
     file_gal = open(file_name, 'w')
     file_gal.write(yaml_lines)
     file_gal.close()
-    
-    #Execute file
+
+    # Execute file
     return run_file(file_name, 'galaxy', 'sm')
 
-#Assignment
+
+# Assignment
 def assignment(hs_order, rc_order, rs_order, bc_order, bs_order, qu_order, id_order, z_order):
     r'''Function that assigns galaxies to halos based on type and the
     quenching function
@@ -670,8 +672,7 @@ def assignment(hs_order, rc_order, rs_order, bc_order, bs_order, qu_order, id_or
 
     References
     ----------
-    .. 
-       
+    ..
     '''
     hs_order = np.atleast_1d(hs_order)
     rc_order = np.atleast_1d(rc_order)
@@ -682,55 +683,63 @@ def assignment(hs_order, rc_order, rs_order, bc_order, bs_order, qu_order, id_or
     id_order = np.atleast_1d(id_order)
     z_order = np.atleast_1d(z_order)
 
-    #Order check
+    # Order check
     hs_order_check = np.diff(hs_order)
     rc_order_check = np.diff(rc_order)
     rs_order_check = np.diff(rs_order)
     bc_order_check = np.diff(bc_order)
     bs_order_check = np.diff(bs_order)
 
-    #Errors
+    # Shape check
+    hs_shape = hs_order.shape
+    qu_shape = qu_order.shape
+    id_shape = id_order.shape
+    z_shape = z_order.shape
+
+    # Errors
     if ((hs_order <= 0)).any():
         raise Exception('Halo masses must be positive and non-zero')
-    if ((rc_order <= 0)).any() or ((rs_order <= 0)).any() or ((bc_order <= 0)).any() or ((bs_order <= 0)).any():
+    if ((rc_order <= 0)).any() or ((rs_order <= 0)).any():
+        raise Exception('Galaxy masses must be positive and non-zero')
+    if ((bc_order <= 0)).any() or ((bs_order <= 0)).any():
         raise Exception('Galaxy masses must be positive and non-zero')
     if ((hs_order_check > 0)).all():
         hs_order = np.flip(hs_order)
-        raise Warning('Halo masses were in the wrong order and have been corrected')
+        raise Warning('Halo masses were in the wrong order and have been correct')
     elif ((hs_order_check > 0)).any():
         raise Exception('Halos are not in a sorted order')
     if ((rc_order_check > 0)).any():
         rc_order = np.flip(rc_order)
-        raise Warning('Red central galaxy masses were in the wrong order and have been corrected')
+        raise Warning('Red central galaxies were in wrong order now correct')
     elif ((rc_order_check > 0)).any():
         raise Exception('Red central galaxies are not in a sorted order')
     if ((rs_order_check > 0)).all():
         rs_order = np.flip(rs_order)
-        raise Warning('Red satellite galaxy masses were in the wrong order and have been corrected')
+        raise Warning('Red satellite galaxies were in wrong order now correct')
     elif ((rs_order_check > 0)).any():
         raise Exception('Red satellite galaxies are not in a sorted order')
     if ((bc_order_check > 0)).all():
         bc_order = np.flip(bc_order)
-        raise Warning('Blue central galaxy masses were in the wrong order and have been corrected')
+        raise Warning('Blue central galaxies were in wrong order and now correct')
     elif ((bc_order_check > 0)).any():
         raise Exception('Blue central galaxies are not in a sorted order')
     if ((bs_order_check > 0)).all():
         bs_order = np.flip(bs_order)
-        raise Warning('Blue satellite galaxy masses were in the wrong order and have been corrected')
+        raise Warning('Blue satellite galaxies were in wrong order and now correct')
     elif ((bs_order_check > 0)).any():
         raise Exception('Blue satellite galaxies are not in a sorted order')
-    if hs_order.shape != qu_order.shape or qu_order.shape != id_order.shape or id_order.shape != z_order.shape:
+    if hs_shape != qu_shape or qu_shape != id_shape or id_shape != z_shape:
         raise Exception('All arrays pertaining to halos must be the same shape')
-    
 
-    #Assign galaxies to halos
-    del_ele = [] #Elements to delete later
-    gal_assigned = [] #Assigned galaxies
-    gal_type_A = [] #Population assigned
+    # Assign galaxies to halos
+    del_ele = []  # Elements to delete later
+    gal_assigned = []  # Assigned galaxies
+    gal_type_A = []  # Population assigned
 
-    gal_num = len(rc_order) + len(rs_order) + len(bc_order) + len(bs_order) #Total number of galaxies
+    # Total number of galaxies
+    gal_num = len(rc_order) + len(rs_order) + len(bc_order) + len(bs_order)
 
-    rc_counter = 0 #Counters for each population
+    rc_counter = 0  # Counters for each population
     rs_counter = 0
     bc_counter = 0
     bs_counter = 0
@@ -740,49 +749,50 @@ def assignment(hs_order, rc_order, rs_order, bc_order, bs_order, qu_order, id_or
         total_counter = rc_counter + rs_counter + bc_counter + bs_counter
         ID_A = id_order[ii]
 
-        if total_counter == gal_num: #All galaxies assigned
+        if total_counter == gal_num:  # All galaxies assigned
             del_array = np.arange(ii, len(hs_order))
             del_ele.extend(del_array)
             break
 
-        if qu == 1: #Halo is quenched
-            if ID_A < 0 and rc_counter != len(rc_order): #Halo assigned a mass quenched
+        if qu == 1:  # Halo is quenched
+            if ID_A < 0 and rc_counter != len(rc_order):  # Halo assigned mass quenched
                 gal_assigned.append(rc_order[rc_counter])
                 gal_type_A.append(1)
                 rc_counter += 1
 
-            elif ID_A > 0 and rs_counter != len(rs_order): #Subhalo assigned an environment quenched
+            elif ID_A > 0 and rs_counter != len(rs_order):  # Subhalo assigned environment quenched
                 gal_assigned.append(rs_order[rs_counter])
                 gal_type_A.append(2)
                 rs_counter += 1
 
-            else: #No red to assign
-                del_ele.append(ii) #Delete unassigned halos
+            else:  # No red to assign
+                del_ele.append(ii)  # Delete unassigned halos
 
-        else: #Halo not quenched
-            if ID_A < 0 and bc_counter != len(bc_order): #Halo assigned a blue central
+        else:  # Halo not quenched
+            if ID_A < 0 and bc_counter != len(bc_order):  # Halo assigned blue central
                 gal_assigned.append(bc_order[bc_counter])
                 gal_type_A.append(3)
                 bc_counter += 1
 
-            elif ID_A > 0 and bs_counter != len(bs_order): #Subhalo assigned a blue satellite
+            elif ID_A > 0 and bs_counter != len(bs_order):  # Subhalo assigned blue satellite
                 gal_assigned.append(bs_order[bs_counter])
                 gal_type_A.append(4)
                 bs_counter += 1
 
-            else: #No blue to assign
+            else:  # No blue to assign
                 del_ele.append(ii)
-    
-    #Delete and array final lists
+
+    # Delete and array final lists
     hs_fin = np.delete(hs_order, del_ele)
     id_fin = np.delete(id_order, del_ele)
     z_fin = np.delete(z_order, del_ele)
     gal_fin = np.array(gal_assigned)
     gal_type_fin = np.array(gal_type_A)
-    
+
     return hs_fin, gal_fin, id_fin, z_fin, gal_type_fin
 
-#Separate populations
+
+# Separate populations
 def sham_plots(hs_fin, gal_fin, gal_type_fin, print_out=False):
     r'''Function that pulls assigned galaxies together into groups for
     plotting
@@ -842,9 +852,9 @@ def sham_plots(hs_fin, gal_fin, gal_type_fin, print_out=False):
 
     References
     ----------
-    .. 
-       
+    ..
     '''
+    # Errors
     if hs_fin.shape != gal_fin.shape or gal_fin.shape != gal_type_fin.shape:
         raise Exception('All arrays must be the same shape')
     if ((hs_fin <= 0)).any():
@@ -856,37 +866,39 @@ def sham_plots(hs_fin, gal_fin, gal_type_fin, print_out=False):
     rs_dots = np.where(gal_type_fin == 2)[0]
     bc_dots = np.where(gal_type_fin == 3)[0]
     bs_dots = np.where(gal_type_fin == 4)[0]
-    
-    #SHAMs by galaxy population
-    sham_rc = np.stack((hs_fin[rc_dots], gal_fin[rc_dots]),axis=1) 
-    sham_rs = np.stack((hs_fin[rs_dots], gal_fin[rs_dots]),axis=1)
-    sham_bc = np.stack((hs_fin[bc_dots], gal_fin[bc_dots]),axis=1)
-    sham_bs = np.stack((hs_fin[bs_dots], gal_fin[bs_dots]),axis=1)
-    
-    #Combine both sets of centrals
-    halo_all = np.concatenate((sham_rc[:,0], sham_bc[:,0]), axis=0) #All halos and galaxies
-    gals_all = np.concatenate((sham_rc[:,1], sham_bc[:,1]), axis=0)
 
-    sham_concat = np.stack((halo_all, gals_all),axis=1)
-    sham_order = sham_concat[np.argsort(sham_concat[:,0])] #Order by halo mass
+    # SHAMs by galaxy population
+    sham_rc = np.stack((hs_fin[rc_dots], gal_fin[rc_dots]), axis=1)
+    sham_rs = np.stack((hs_fin[rs_dots], gal_fin[rs_dots]), axis=1)
+    sham_bc = np.stack((hs_fin[bc_dots], gal_fin[bc_dots]), axis=1)
+    sham_bs = np.stack((hs_fin[bs_dots], gal_fin[bs_dots]), axis=1)
+
+    # Combine both sets of centrals
+    halo_all = np.concatenate((sham_rc[:, 0], sham_bc[:, 0]), axis=0)  # All halos and galaxies
+    gals_all = np.concatenate((sham_rc[:, 1], sham_bc[:, 1]), axis=0)
+
+    sham_concat = np.stack((halo_all, gals_all), axis=1)
+    sham_order = sham_concat[np.argsort(sham_concat[:, 0])]  # Order by halo mass
     sham_cen = np.flip(sham_order, 0)
-    
-    #Combine both sets of satellites
-    halo_sub = np.concatenate((sham_rs[:,0], sham_bs[:,0]), axis=0) #All halos and galaxies
-    gals_sub = np.concatenate((sham_rs[:,1], sham_bs[:,1]), axis=0)
 
-    sham_concats = np.stack((halo_sub, gals_sub),axis=1)
-    sham_orders = sham_concats[np.argsort(sham_concats[:,0])] #Order by halo mass
+    # Combine both sets of satellites
+    halo_sub = np.concatenate((sham_rs[:, 0], sham_bs[:, 0]), axis=0)  # All halos and galaxies
+    gals_sub = np.concatenate((sham_rs[:, 1], sham_bs[:, 1]), axis=0)
+
+    sham_concats = np.stack((halo_sub, gals_sub), axis=1)
+    sham_orders = sham_concats[np.argsort(sham_concats[:, 0])]  # Order by halo mass
     sham_sub = np.flip(sham_orders, 0)
 
-    if print_out == True:
+    if print_out:
         print('Created SHAMs')
-    
+
     return sham_rc, sham_rs, sham_bc, sham_bs, sham_cen, sham_sub
 
-#Called SHAM function
-def run_sham(h_file, gal_param, cosmology, z_range, skyarea, qu_h_param, qu_s_param, sub_param = [1.91, 0.39, 0.1, 3],
-             gal_max_h = 10**(14), gal_max_s = 10**(13), print_out=False, run_anyway=False):
+
+# Called SHAM function
+def run_sham(h_file, gal_param, cosmology, z_range, skyarea, qu_h_param, qu_s_param,
+             sub_param=[1.91, 0.39, 0.1, 3], gal_max_h=10**(14), gal_max_s=10**(13),
+             print_out=False, run_anyway=False):
     r'''Function that takes all inputs for the halos and galaxies and creates
     runs a SHAM over them
 
@@ -970,7 +982,7 @@ def run_sham(h_file, gal_param, cosmology, z_range, skyarea, qu_h_param, qu_s_pa
     ...                      qu_h, qu_s, sub_param = [1.91, 0.39, 0.1, 3],
     ...                      gal_max_h = 10**(14), gal_max_s = 10**(13),
     ...                      print_out=False, run_anyway=True)
-    
+
     References
     ----------
     .. [1] Vale A., Ostriker J. P., 2004, Monthly Notices of the Royal
@@ -984,13 +996,13 @@ def run_sham(h_file, gal_param, cosmology, z_range, skyarea, qu_h_param, qu_s_pa
     gal_param = np.atleast_1d(gal_param)
     qu_h_param = np.atleast_1d(qu_h_param)
     qu_s_param = np.atleast_1d(qu_s_param)
-    
-    #Check that all inputs are of the correct type and size
+
+    # Check that all inputs are of the correct type and size
     if type(h_file) != str:
         raise Exception('Halo YAML file must be provided as a string')
-    if gal_param.shape != (4,3):
+    if gal_param.shape != (4, 3):
         if gal_param.shape[0] != 4:
-            raise Exception('The wrong number of galaxies have been provided in their parameters')
+            raise Exception('The wrong number of galaxies are in galaxy parameters')
         elif gal_param.shape[1] != 3:
             raise Exception('The wrong number of galaxy parameters have been provided')
         else:
@@ -999,127 +1011,137 @@ def run_sham(h_file, gal_param, cosmology, z_range, skyarea, qu_h_param, qu_s_pa
         raise Exception('Provided incorrect number of halo quenching parameters')
     if qu_s_param.shape != (3,):
         raise Exception('Provided incorrect number of subhalo quenching parameters')
-    
-    
-    #Generate parent halos from YAML file (TODO: remove hard coded table/variable names)
+
+    # Generate parent halos from YAML file
+    # TODO remove hard coded table/variable names
     h_st = time()
     parent_halo, z_halo = run_file(h_file, 'halo', 'mass', 'z')
-    if print_out == True:
+    if print_out:
         print('Halo catalogues generated in', round((time() - h_st), 2), 's')
-    
-    #Generate subhalos and IDs
-    sub_alpha = sub_param[0] #Vale and Ostriker 2004 mostly
+
+    # Generate subhalos and IDs
+    sub_alpha = sub_param[0]  # Vale and Ostriker 2004 mostly
     sub_beta = sub_param[1]
     sub_gamma = sub_param[2]
     sub_x = sub_param[3]
-    
+
     sub_tim = time()
-    ID_halo, subhalo_m, ID_sub, z_sub = gen_sub_cat(parent_halo, z_halo, sub_alpha, sub_beta, sub_gamma, sub_x)
-    
-    if print_out == True:
+    ID_halo, subhalo_m, ID_sub, z_sub = gen_sub_cat(parent_halo, z_halo, sub_alpha,
+                                                    sub_beta, sub_gamma, sub_x)
+
+    if print_out:
         print('Generated subhalos and IDs in', round((time() - sub_tim), 2), 's')
         print('')
-    
-    #Quench halos and subhalos
-    M_mu = qu_h_param[0] #Parameters
+
+    # Quench halos and subhalos
+    M_mu = qu_h_param[0]  # Parameters
     sigma = qu_h_param[1]
     M_mus = qu_s_param[0]
     sigmas = qu_s_param[1]
     baseline_s = qu_s_param[2]
 
-    h_quench = quenching_funct(parent_halo, M_mu, sigma, 0) #Quenched halos
-    sub_quench = quenching_funct(subhalo_m, M_mus, sigmas, baseline_s) #Quenched subhalos
-    
-    #Galaxy Schechter function parameters
+    h_quench = quenching_funct(parent_halo, M_mu, sigma, 0)  # Quenched halos
+    sub_quench = quenching_funct(subhalo_m, M_mus, sigmas, baseline_s)  # Quenched subhalos
+
+    # Galaxy Schechter function parameters
     rc_param = gal_param[0]
     rs_param = gal_param[1]
     bc_param = gal_param[2]
     bs_param = gal_param[3]
-    
-    #Number of halos for each population
+
+    # Number of halos for each population
     rc_halo = len(np.where(h_quench == 1)[0])
     rs_halo = len(np.where(sub_quench == 1)[0])
     bc_halo = len(np.where(h_quench == 0)[0])
     bs_halo = len(np.where(sub_quench == 0)[0])
-    
-    #Find galaxy mass range (m_star, phi_star, alpha, tag)
-    #TODO Add a way to import a look up table
+
+    # Find galaxy mass range (m_star, phi_star, alpha, tag)
+    # TODO Add a way to import a look up table
     range1 = time()
     rc_min = find_min(rc_param[0], rc_param[1], rc_param[2], cosmology, z_range, skyarea,
                       gal_max_h, rc_halo, print_out, run_anyway)
-    if print_out == True:
-        print('Red central log(minimum mass)', np.log10(rc_min), 'in', round((time() - range1), 4), 's')
-    
+    if print_out:
+        print('Red central log(minimum mass)', np.log10(rc_min), 'in',
+              round((time() - range1), 4), 's')
+
     range2 = time()
     rs_min = find_min(rs_param[0], rs_param[1], rs_param[2], cosmology, z_range, skyarea,
                       gal_max_s, rs_halo, print_out, run_anyway)
-    if print_out == True:
-        print('Red satellite log(minimum mass)', np.log10(rs_min), 'in', round((time() - range2), 4), 's')
-            
+    if print_out:
+        print('Red satellite log(minimum mass)', np.log10(rs_min), 'in',
+              round((time() - range2), 4), 's')
+
     range3 = time()
     bc_min = find_min(bc_param[0], bc_param[1], bc_param[2], cosmology, z_range, skyarea,
                       gal_max_h, bc_halo, print_out, run_anyway)
-    if print_out == True:
-        print('Blue central log(minimum mass)', np.log10(bc_min), 'in', round((time() - range3), 4), 's')
-    
+    if print_out:
+        print('Blue central log(minimum mass)', np.log10(bc_min), 'in',
+              round((time() - range3), 4), 's')
+
     range4 = time()
     bs_min = find_min(bs_param[0], bs_param[1], bs_param[2], cosmology, z_range, skyarea,
                       gal_max_s, bs_halo, print_out, run_anyway)
-    if print_out == True:
-        print('Blue satellite log(minimum mass)', np.log10(bs_min), 'in', round((time() - range4), 4), 's')
+    if print_out:
+        print('Blue satellite log(minimum mass)', np.log10(bs_min), 'in',
+              round((time() - range4), 4), 's')
         print('')
-    
-    #Get a catalogue for each population
+
+    # Get a catalogue for each population
     cat_time = time()
-    rc_cat = galaxy_cat(rc_param[0], rc_param[1], rc_param[2], cosmology, z_range, skyarea, rc_min, gal_max_h, 'rc_test.yaml')
-    rs_cat = galaxy_cat(rs_param[0], rs_param[1], rs_param[2], cosmology, z_range, skyarea, rs_min, gal_max_s, 'rs_test.yaml')
-    bc_cat = galaxy_cat(bc_param[0], bc_param[1], bc_param[2], cosmology, z_range, skyarea, bc_min, gal_max_h, 'bc_test.yaml')
-    bs_cat = galaxy_cat(bs_param[0], bs_param[1], bs_param[2], cosmology, z_range, skyarea, bs_min, gal_max_s, 'bs_test.yaml')
-    
-    if print_out == True:
+    rc_cat = galaxy_cat(rc_param[0], rc_param[1], rc_param[2], cosmology, z_range,
+                        skyarea, rc_min, gal_max_h, 'rc_test.yaml')
+    rs_cat = galaxy_cat(rs_param[0], rs_param[1], rs_param[2], cosmology, z_range,
+                        skyarea, rs_min, gal_max_s, 'rs_test.yaml')
+    bc_cat = galaxy_cat(bc_param[0], bc_param[1], bc_param[2], cosmology, z_range,
+                        skyarea, bc_min, gal_max_h, 'bc_test.yaml')
+    bs_cat = galaxy_cat(bs_param[0], bs_param[1], bs_param[2], cosmology, z_range,
+                        skyarea, bs_min, gal_max_s, 'bs_test.yaml')
+
+    if print_out:
         print('Galaxy catalogues generated in', round((time() - cat_time), 2), 's')
-    
-    #Clean up the files
+
+    # Clean up the files
     os.remove('rc_test.yaml')
     os.remove('rs_test.yaml')
     os.remove('bc_test.yaml')
     os.remove('bs_test.yaml')
-    
-    #Order and process DM and galaxies----------------------------------------------------------------
-    #Concatenate halos and subhalos
+
+    # Order and process DM and galaxies
+    # Concatenate halos and subhalos
     halo_subhalo = np.concatenate((parent_halo, subhalo_m), axis=0)
     ID_list = np.concatenate((ID_halo, ID_sub), axis=0)
     z_list = np.concatenate((z_halo, z_sub), axis=0)
     q_list = np.concatenate((h_quench, sub_quench), axis=0)
-    
-    #Sort lists by halo mass
-    stack = np.stack((halo_subhalo, ID_list, z_list, q_list), axis=1)
-    order1 = stack[np.argsort(stack[:,0])]
-    hs_order = np.flip(order1[:,0])
-    id_hs = np.flip(order1[:,1])
-    z_hs = np.flip(order1[:,2])
-    qu_hs = np.flip(order1[:,3])
 
-    #List galaxies
+    # Sort lists by halo mass
+    stack = np.stack((halo_subhalo, ID_list, z_list, q_list), axis=1)
+    order1 = stack[np.argsort(stack[:, 0])]
+    hs_order = np.flip(order1[:, 0])
+    id_hs = np.flip(order1[:, 1])
+    z_hs = np.flip(order1[:, 2])
+    qu_hs = np.flip(order1[:, 3])
+
+    # List galaxies
     rc_order = np.flip(np.sort(rc_cat))
     rs_order = np.flip(np.sort(rs_cat))
     bc_order = np.flip(np.sort(bc_cat))
     bs_order = np.flip(np.sort(bs_cat))
-    
-    #Assignment of galaxies
+
+    # Assignment of galaxies
     assign_st = time()
-    hs_fin, gal_fin, id_fin, z_fin, gal_type_fin = assignment(hs_order, rc_order, rs_order, bc_order, bs_order,
-                                                              qu_hs, id_hs, z_hs)
-    
-    if print_out == True:
+    hs_fin, gal_fin, id_fin, z_fin, gal_type_fin = assignment(hs_order, rc_order, rs_order,
+                                                              bc_order, bs_order, qu_hs, id_hs,
+                                                              z_hs)
+
+    if print_out:
         print('Galaxies assigned in', round((time() - assign_st), 2), 's')
         print('')
-    
-    #Strip subhalos
+
+    # Strip subhalos
     sub_loc = np.where(id_fin > 0)
     hs_fin[sub_loc] = hs_fin[sub_loc]/sub_x
 
-    #Create output dictionary
+    # Create output dictionary
     sham_dict = {
         'Halo mass': hs_fin,
         'Galaxy mass': gal_fin,
@@ -1128,7 +1150,7 @@ def run_sham(h_file, gal_param, cosmology, z_range, skyarea, qu_h_param, qu_s_pa
         'Redshift': z_fin
     }
 
-    if print_out == True:
+    if print_out:
         print('SHAM run in', round(((time() - sham_st)/60), 2), 'min')
-    
+
     return sham_dict
