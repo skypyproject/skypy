@@ -1,0 +1,26 @@
+parameters:
+  model: 'sheth99' #as in the test
+  mdef: 'fof' #as example
+  m_min: 1.e+9
+  m_max: 1.e+15
+  sky_area: 60. deg2 #same as galaxies
+  sigma_8: 0.8 #0.811, 0.8 #Planck 2018
+  ns: 1 #0.965, 1
+cosmology: !astropy.cosmology.FlatLambdaCDM
+  H0: 70 #67.4, 70 #Hubble const, normal units
+  Om0: 0.3 #0.315, 0.3 #Matter energy density
+  name: 'FlatLambdaCDM' #requires user defined name
+  Ob0: 0.045 #0.0493, 0.045 #Planck 18
+  Tcmb0: 2.7 #CMB temp in K
+z_range: !numpy.linspace [0.01, 0.1, 100] #set same as galaxies 
+tables:
+  halo:
+    z, mass: !skypy.halos.colossus_mf
+      redshift: $z_range
+      model: $model
+      mdef: $mdef
+      m_min: $m_min
+      m_max: $m_max
+      sky_area: $sky_area
+      sigma8: $sigma_8
+      ns: $ns
