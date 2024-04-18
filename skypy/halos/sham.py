@@ -1087,24 +1087,32 @@ def run_sham(h_file, gal_param, cosmology, z_range, skyarea, qu_h_param, qu_s_pa
         print('')
 
     # Get a catalogue for each population
+
+    # Names for created files, randomly generate tag
+    rand_tag = int((10**8)*np.random.rand(1))
+    rc_file = 'rc_test%s.yaml' %(rand_tag)
+    rs_file = 'rs_test%s.yaml' %(rand_tag)
+    bc_file = 'bc_test%s.yaml' %(rand_tag)
+    bs_file = 'bs_test%s.yaml' %(rand_tag)
+
     cat_time = time()
     rc_cat = galaxy_cat(rc_param[0], rc_param[1], rc_param[2], cosmology, z_range,
-                        skyarea, rc_min, gal_max_h, 'rc_test.yaml')
+                        skyarea, rc_min, gal_max_h, rc_file)
     rs_cat = galaxy_cat(rs_param[0], rs_param[1], rs_param[2], cosmology, z_range,
-                        skyarea, rs_min, gal_max_s, 'rs_test.yaml')
+                        skyarea, rs_min, gal_max_s, rs_file)
     bc_cat = galaxy_cat(bc_param[0], bc_param[1], bc_param[2], cosmology, z_range,
-                        skyarea, bc_min, gal_max_h, 'bc_test.yaml')
+                        skyarea, bc_min, gal_max_h, bc_file)
     bs_cat = galaxy_cat(bs_param[0], bs_param[1], bs_param[2], cosmology, z_range,
-                        skyarea, bs_min, gal_max_s, 'bs_test.yaml')
+                        skyarea, bs_min, gal_max_s, bs_file)
 
     if print_out:
         print('Galaxy catalogues generated in', round((time() - cat_time), 2), 's')
 
     # Clean up the files
-    os.remove('rc_test.yaml')
-    os.remove('rs_test.yaml')
-    os.remove('bc_test.yaml')
-    os.remove('bs_test.yaml')
+    os.remove(rc_file)
+    os.remove(rs_file)
+    os.remove(bc_file)
+    os.remove(bs_file)
 
     # Order and process DM and galaxies
     # Concatenate halos and subhalos
