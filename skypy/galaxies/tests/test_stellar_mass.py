@@ -68,7 +68,7 @@ def test_stellar_masses():
         mass_min = 10 ** 7
         mass_max = 10 ** 13
         pdf = calc_pdf(m, alpha, mass_star, mass_min, mass_max)
-        cdf = scipy.integrate.cumtrapz(pdf, m, initial=0)
+        cdf = scipy.integrate.cumulative_trapezoid(pdf, m, initial=0)
         cdf = cdf / cdf[-1]
         return cdf
 
