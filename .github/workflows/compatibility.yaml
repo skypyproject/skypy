@@ -9,8 +9,8 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
-        python: ['3.11']
-        toxenv: [py311-test, py311-test-dev]
+        python: ['3.12']
+        toxenv: [py312-test, py312-test-dev]
         release: [main, latest]
     steps:
     - name: Checkout Repository
