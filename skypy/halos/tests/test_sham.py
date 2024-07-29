@@ -1097,6 +1097,43 @@ def test_sham_plots():
 
 @pytest.mark.skipif(not HAS_COLOSSUS, reason='test requires colossus')
 @pytest.mark.flaky
+def test_scatter_proxy():
+    from skypy.halos.sham import run_file
+    from skypy.halos.sham import scatter_proxy
+
+    # Generate the galaxy catalogue and scatter
+    gal_cat = run_file('test_gal.yaml', 'galaxy', 'sm')
+    new_gal = scatter_proxy(gal_cat)
+
+    # Check new galaxies are not in direct mass order
+    assert np.any(np.diff(new_gal) > 0)
+
+    # Check input galaxies are just rearranged
+    assert np.all(np.isin(gal_cat, new_gal))
+
+    # Check that the general trend is reducing mass
+    # By difference in mass means
+    sets = 500
+    ii = 0
+    mean = []
+    while ii < len(new_gal):
+        gal_set = new_gal[ii:ii+sets]
+        mean.append(np.mean(gal_set))
+        ii += sets
+
+    assert np.all(np.diff(mean) < 0)
+
+    # By start and end values
+    assert new_gal[0] > new_gal[-1]
+
+    with pytest.raises(Exception) as excinfo:
+        gal_cat = np.array([-1, 2, 3, 0, -10, -20])
+        scatter_proxy(gal_cat)
+        assert str(excinfo.value) == 'Galaxy masses must be positive and non-zero'
+
+
+@pytest.mark.skipif(not HAS_COLOSSUS, reason='test requires colossus')
+@pytest.mark.flaky
 def test_run_sham():
     from astropy.cosmology import FlatLambdaCDM
     from skypy.halos.sham import run_sham
