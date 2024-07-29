@@ -44,6 +44,7 @@ __all__ = [
     'gen_sub_cat',
     'galaxy_cat',
     'assignment',
+    'scatter_proxy',
     'sham_plots',
     'run_sham',
  ]
@@ -559,7 +560,8 @@ def galaxy_cat(m_star, phi_star, alpha, cosmology, z_range, skyarea, min_mass, m
 
 
 # Assignment
-def assignment(hs_order, rc_order, rs_order, bc_order, bs_order, qu_order, id_order, z_order):
+def assignment(hs_order, rc_order, rs_order, bc_order, bs_order, qu_order, id_order, z_order,
+               scatter=False):
     r'''Function that assigns galaxies to halos based on type and the
     quenching function
 
@@ -592,6 +594,8 @@ def assignment(hs_order, rc_order, rs_order, bc_order, bs_order, qu_order, id_or
         Array of IDs to determine if the halo is central or satellite
     z_order : (nm, ) array_like
         Redshifts of generated halos
+    scatter : Boolean
+        True/false if the galaxies lists have undergone scatter
 
     Returns
     --------
@@ -708,28 +712,31 @@ def assignment(hs_order, rc_order, rs_order, bc_order, bs_order, qu_order, id_or
         raise Warning('Halo masses were in the wrong order and have been correct')
     elif ((hs_order_check > 0)).any():
         raise Exception('Halos are not in a sorted order')
-    if ((rc_order_check > 0)).any():
-        rc_order = np.flip(rc_order)
-        raise Warning('Red central galaxies were in wrong order now correct')
-    elif ((rc_order_check > 0)).any():
-        raise Exception('Red central galaxies are not in a sorted order')
-    if ((rs_order_check > 0)).all():
-        rs_order = np.flip(rs_order)
-        raise Warning('Red satellite galaxies were in wrong order now correct')
-    elif ((rs_order_check > 0)).any():
-        raise Exception('Red satellite galaxies are not in a sorted order')
-    if ((bc_order_check > 0)).all():
-        bc_order = np.flip(bc_order)
-        raise Warning('Blue central galaxies were in wrong order and now correct')
-    elif ((bc_order_check > 0)).any():
-        raise Exception('Blue central galaxies are not in a sorted order')
-    if ((bs_order_check > 0)).all():
-        bs_order = np.flip(bs_order)
-        raise Warning('Blue satellite galaxies were in wrong order and now correct')
-    elif ((bs_order_check > 0)).any():
-        raise Exception('Blue satellite galaxies are not in a sorted order')
     if hs_shape != qu_shape or qu_shape != id_shape or id_shape != z_shape:
         raise Exception('All arrays pertaining to halos must be the same shape')
+
+    # Only check ordering if not scattered
+    if not scatter:
+        if ((rc_order_check > 0)).all():
+            rc_order = np.flip(rc_order)
+            raise Warning('Red central galaxies were in wrong order now correct')
+        elif ((rc_order_check > 0)).any():
+            raise Exception('Red central galaxies are not in a sorted order')
+        if ((rs_order_check > 0)).all():
+            rs_order = np.flip(rs_order)
+            raise Warning('Red satellite galaxies were in wrong order now correct')
+        elif ((rs_order_check > 0)).any():
+            raise Exception('Red satellite galaxies are not in a sorted order')
+        if ((bc_order_check > 0)).all():
+            bc_order = np.flip(bc_order)
+            raise Warning('Blue central galaxies were in wrong order and now correct')
+        elif ((bc_order_check > 0)).any():
+            raise Exception('Blue central galaxies are not in a sorted order')
+        if ((bs_order_check > 0)).all():
+            bs_order = np.flip(bs_order)
+            raise Warning('Blue satellite galaxies were in wrong order and now correct')
+        elif ((bs_order_check > 0)).any():
+            raise Exception('Blue satellite galaxies are not in a sorted order')
 
     # Assign galaxies to halos
     del_ele = []  # Elements to delete later
@@ -790,6 +797,52 @@ def assignment(hs_order, rc_order, rs_order, bc_order, bs_order, qu_order, id_or
     gal_type_fin = np.array(gal_type_A)
 
     return hs_fin, gal_fin, id_fin, z_fin, gal_type_fin
+
+
+def scatter_proxy(gal):
+    r'''Function to add scatter to galaxies using a proxy mass
+
+    This function takes the generated galaxy masses from the catalogues
+    and generates a gaussian proxy mass for each, then reorders based on
+    this proxy mass. This adds scatter to the galaxies.
+
+    Parameters
+    -----------
+    gal : (nm, ) array_like
+        List of galaxy masses to be scattered, in units of solar mass
+
+    Returns
+    --------
+    new_gal : (nm, ) array_like
+        Reordered galaxy masses according to generated proxy mass, highest
+        to lowest mass, in units of solar mass
+
+    Examples
+    ---------
+    >>> from skypy.halos import sham
+
+    This example generates a galaxy catalogue and then reorders it
+
+    >>> gal_cat = sham.run_file('galaxies.yaml', galaxy, mass)
+    >>> new_gal = sham.scatter_proxy(gal_cat)
+
+    References
+    ----------
+    ..
+    '''
+    # Errors
+    gal = np.atleast_1d(gal)
+    if ((gal <= 0)).any():
+        raise Exception('Galaxy masses must be positive and non-zero')
+
+    # Draw one sample for each galaxy
+    # Use galaxy mass as mean and sigma of one order less
+    proxy_gal = np.random.normal(loc=gal, scale=gal/10)
+
+    # Order by proxy mass
+    proxy_stack = np.stack((proxy_gal, gal), axis=1)
+    gal_stack = proxy_stack[np.argsort(proxy_stack[:, 0])]
+    return np.flip(gal_stack[:, 1])  # Return new galaxies, highest mass first
 
 
 # Separate populations
@@ -898,9 +951,9 @@ def sham_plots(hs_fin, gal_fin, gal_type_fin, print_out=False):
 # Called SHAM function
 def run_sham(h_file, gal_param, cosmology, z_range, skyarea, qu_h_param, qu_s_param,
              sub_param=[1.91, 0.39, 0.1, 3], gal_max_h=10**(14), gal_max_s=10**(13),
-             print_out=False, run_anyway=False):
-    r'''Function that takes all inputs for the halos and galaxies and creates
-    runs a SHAM over them
+             print_out=False, run_anyway=False, scatter_prox=False):
+    r'''Function that takes all inputs for the halos and galaxies and runs
+    a SHAM over them
 
     This function runs all the functions required to make a complete SHAM.
     It generates the catalogues from the input values, quenches the halos
@@ -942,6 +995,9 @@ def run_sham(h_file, gal_param, cosmology, z_range, skyarea, qu_h_param, qu_s_pa
     run_anyway : Boolean
         True/false whether to run the SHAM code even if the galaxy abundance
         does not match the number of halos
+    scatter_prox : Boolean
+        True/false whether to scatter the galaxies by a proxy mass when the
+        catalogues are generated
 
     Returns
     --------
@@ -981,7 +1037,8 @@ def run_sham(h_file, gal_param, cosmology, z_range, skyarea, qu_h_param, qu_s_pa
     >>> sham_dict = run_sham(h_file, gal_param, cosmology, z_range, skyarea,
     ...                      qu_h, qu_s, sub_param = [1.91, 0.39, 0.1, 3],
     ...                      gal_max_h = 10**(14), gal_max_s = 10**(13),
-    ...                      print_out=False, run_anyway=True)
+    ...                      print_out=False, run_anyway=True,
+                             scatter_prox=True)
 
     References
     ----------
@@ -1090,10 +1147,10 @@ def run_sham(h_file, gal_param, cosmology, z_range, skyarea, qu_h_param, qu_s_pa
 
     # Names for created files, randomly generate tag
     rand_tag = int((10**8)*np.random.rand(1))
-    rc_file = 'rc_test%s.yaml' %(rand_tag)
-    rs_file = 'rs_test%s.yaml' %(rand_tag)
-    bc_file = 'bc_test%s.yaml' %(rand_tag)
-    bs_file = 'bs_test%s.yaml' %(rand_tag)
+    rc_file = 'rc_test%s.yaml' % (rand_tag)
+    rs_file = 'rs_test%s.yaml' % (rand_tag)
+    bc_file = 'bc_test%s.yaml' % (rand_tag)
+    bs_file = 'bs_test%s.yaml' % (rand_tag)
 
     cat_time = time()
     rc_cat = galaxy_cat(rc_param[0], rc_param[1], rc_param[2], cosmology, z_range,
@@ -1104,6 +1161,15 @@ def run_sham(h_file, gal_param, cosmology, z_range, skyarea, qu_h_param, qu_s_pa
                         skyarea, bc_min, gal_max_h, bc_file)
     bs_cat = galaxy_cat(bs_param[0], bs_param[1], bs_param[2], cosmology, z_range,
                         skyarea, bs_min, gal_max_s, bs_file)
+
+    if scatter_prox:
+        if print_out:
+            print('Using scattering')
+            print('')
+        rc_order = scatter_proxy(rc_cat)
+        rs_order = scatter_proxy(rs_cat)
+        bc_order = scatter_proxy(bc_cat)
+        bs_order = scatter_proxy(bs_cat)
 
     if print_out:
         print('Galaxy catalogues generated in', round((time() - cat_time), 2), 's')
@@ -1129,17 +1195,21 @@ def run_sham(h_file, gal_param, cosmology, z_range, skyarea, qu_h_param, qu_s_pa
     z_hs = np.flip(order1[:, 2])
     qu_hs = np.flip(order1[:, 3])
 
-    # List galaxies
-    rc_order = np.flip(np.sort(rc_cat))
-    rs_order = np.flip(np.sort(rs_cat))
-    bc_order = np.flip(np.sort(bc_cat))
-    bs_order = np.flip(np.sort(bs_cat))
+    # List galaxies if not already sorted by scattering
+    if not scatter_prox:
+        if print_out:
+            print('No scatter applied')
+            print('')
+        rc_order = np.flip(np.sort(rc_cat))
+        rs_order = np.flip(np.sort(rs_cat))
+        bc_order = np.flip(np.sort(bc_cat))
+        bs_order = np.flip(np.sort(bs_cat))
 
     # Assignment of galaxies
     assign_st = time()
     hs_fin, gal_fin, id_fin, z_fin, gal_type_fin = assignment(hs_order, rc_order, rs_order,
                                                               bc_order, bs_order, qu_hs, id_hs,
-                                                              z_hs)
+                                                              z_hs, scatter=scatter_prox)
 
     if print_out:
         print('Galaxies assigned in', round((time() - assign_st), 2), 's')
