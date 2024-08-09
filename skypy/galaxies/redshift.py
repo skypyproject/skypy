@@ -249,7 +249,7 @@ def redshifts_from_comoving_density(redshift, density, sky_area, cosmology, nois
     dN_dz *= density
 
     # integrate density to get expected number of galaxies
-    N = np.trapz(dN_dz, redshift)
+    N = scipy.integrate.trapezoid(dN_dz, redshift)
 
     # Poisson sample galaxy number if requested
     if noise:

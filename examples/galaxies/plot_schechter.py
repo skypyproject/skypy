@@ -47,6 +47,7 @@ from astropy.table import Table
 from astropy.units import Quantity
 from matplotlib import pyplot as plt
 import numpy as np
+import scipy.integrate
 from skypy.galaxies import schechter_lf
 
 z_range = np.linspace(0.2, 1.0, 100)
@@ -81,7 +82,7 @@ for ax, (z_min, z_max) in zip([a1, a2, a3, a4], z_slices):
     # SkyPy simulated galaxies
     z_mask = np.logical_and(redshift >= z_min, redshift < z_max)
     dV_dz = (cosmology.differential_comoving_volume(z) * sky_area).to_value('Mpc3')
-    dV = np.trapz(dV_dz, z)
+    dV = scipy.integrate.trapezoid(dV_dz, z)
     dM = (np.max(bins)-np.min(bins)) / (np.size(bins)-1)
     phi_skypy = np.histogram(magnitude[z_mask], bins=bins)[0] / dV / dM
 
