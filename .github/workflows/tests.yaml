@@ -4,10 +4,14 @@ on:
     branches:
     - main
     - module/*
+    - 'v*x'
+    tags:
+    - 'v*'
   pull_request:
     branches:
     - main
     - module/*
+    - 'v*x'
 jobs:
   test:
     name: ${{ matrix.name }}
