@@ -325,7 +325,7 @@ def _sigma_squared(M, k, Pk, growth_function, cosmology):
     top_hat = 3. * (np.sin(k * R) - k * R * np.cos(k * R)) / ((k * R)**3.)
     integrand = Pk * np.power(top_hat * k, 2)
 
-    return Dz2 * integrate.simps(integrand, k) / (2. * np.pi**2.)
+    return Dz2 * integrate.simpson(integrand, k) / (2. * np.pi**2.)
 
 
 def _dlns_dlnM(sigma, M):
