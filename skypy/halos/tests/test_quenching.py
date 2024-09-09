@@ -13,7 +13,7 @@ def test_environment_quenched():
     quenched = environment_quenched(n, p)
     number_quenched = Counter(quenched)[True]
 
-    p_value = stats.binom_test(number_quenched, n=n, p=p,
+    p_value = stats.binomtest(number_quenched, n=n, p=p,
                                alternative='two-sided')
     assert p_value > 0.01
 
@@ -28,6 +28,6 @@ def test_mass_quenched():
     quenched = mass_quenched(halo_mass, offset, width)
     number_quenched = Counter(quenched)[True]
 
-    p_value = stats.binom_test(number_quenched, n=n, p=0.5,
+    p_value = stats.binomtest(number_quenched, n=n, p=0.5,
                                alternative='two-sided')
     assert p_value > 0.01
