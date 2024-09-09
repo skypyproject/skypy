@@ -57,15 +57,15 @@ def test_growth():
     Dzprime = growth_function_derivative(redshift, cosmology_flat)
 
     # Test growth factor
-    assert redshift.shape == fz.shape,\
+    assert redshift.shape == fz.shape, \
         "Length of redshift array and growth rate array do not match"
-    assert isclose(fz[0], 1.0),\
+    assert isclose(fz[0], 1.0), \
         "Growth factor at redshift 0 is not close to 1.0"
 
     # Test growth function
-    assert redshift.shape == Dz.shape,\
+    assert redshift.shape == Dz.shape, \
         "Length of redshift array and growth function array do not match"
-    assert allclose(Dz, 1. / (1. + redshift)),\
+    assert allclose(Dz, 1. / (1. + redshift)), \
         "Growth function is not close to the scale factor"
 
     # make sure that growth_function with scalar returns scalar
@@ -74,9 +74,9 @@ def test_growth():
     assert Dz2 == Dz[2], 'growth function with scalar produced inconsistent result'
 
     # Test growth function derivative
-    assert redshift.shape == Dzprime.shape,\
+    assert redshift.shape == Dzprime.shape, \
         "Length of redshift array and growth function array do not match"
-    assert isclose(Dzprime[0], -1.0),\
+    assert isclose(Dzprime[0], -1.0), \
         "Derivative of growth function at redshift 0 is not close to -1.0"
 
     # Test against precomputed values using Planck15 cosmology
