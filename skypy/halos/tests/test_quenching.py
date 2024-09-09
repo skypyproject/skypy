@@ -14,7 +14,7 @@ def test_environment_quenched():
     number_quenched = Counter(quenched)[True]
 
     p_value = stats.binomtest(number_quenched, n=n, p=p,
-                               alternative='two-sided')
+                               alternative='two-sided').pvalue
     assert p_value > 0.01
 
 
@@ -29,5 +29,5 @@ def test_mass_quenched():
     number_quenched = Counter(quenched)[True]
 
     p_value = stats.binomtest(number_quenched, n=n, p=0.5,
-                               alternative='two-sided')
+                               alternative='two-sided').pvalue
     assert p_value > 0.01
