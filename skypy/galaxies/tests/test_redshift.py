@@ -1,5 +1,6 @@
 import numpy as np
 import pytest
+import scipy.integrate
 from scipy.stats import kstest
 
 
@@ -38,7 +39,7 @@ def test_schechter_lf_redshift():
     density *= (sky_area * cosmo.differential_comoving_volume(z)).to_value('Mpc3')
 
     # integrate total number
-    n_gal = np.trapz(density, z, axis=-1)
+    n_gal = scipy.integrate.trapezoid(density, z, axis=-1)
 
     # make sure noise-free sample has right size
     assert np.isclose(len(z_gal), n_gal, atol=1.0)
@@ -85,7 +86,7 @@ def test_schechter_smf_redshift():
     density *= (sky_area * cosmo.differential_comoving_volume(z)).to_value('Mpc3')
 
     # integrate total number
-    n_gal = np.trapz(density, z, axis=-1)
+    n_gal = scipy.integrate.trapezoid(density, z, axis=-1)
 
     # make sure noise-free sample has right size
     assert np.isclose(len(z_gal), n_gal, atol=1.0)

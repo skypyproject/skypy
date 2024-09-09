@@ -9,12 +9,12 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
-        python: ['3.11']
-        toxenv: [py311-test, py311-test-dev]
+        python: ['3.12']
+        toxenv: [py312-test, py312-test-dev]
         release: [main, latest]
     steps:
     - name: Checkout Repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
     - if: matrix.release != 'main'
@@ -22,7 +22,7 @@ jobs:
       run: |
         git checkout tags/$(curl -s https://api.github.com/repos/skypyproject/skypy/releases/${{ matrix.release }} | python -c "import sys, json; print(json.load(sys.stdin)['tag_name'])")
     - name: Install Python ${{ matrix.python }}
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python }}
     - name: Install Dependencies

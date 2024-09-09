@@ -4,18 +4,22 @@ on:
     branches:
     - main
     - module/*
+    - 'v*x'
+    tags:
+    - 'v*'
   pull_request:
     branches:
     - main
     - module/*
+    - 'v*x'
 jobs:
   flake8:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout Repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
     - name: Install Python 3.x
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v5
       with:
         python-version: 3.x
     - name: Install Dependencies
