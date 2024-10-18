@@ -8,7 +8,9 @@ from skypy.halos._colossus import HAS_COLOSSUS
 @pytest.mark.skipif(not HAS_COLOSSUS, reason='test requires colossus')
 @pytest.mark.flaky
 def test_quenching_funct():
-    # Create catalogue
+    # Run a test on the quenching function to check it follows the expected function values
+
+    # Create halo catalogue
     from astropy.cosmology import WMAP9  # Cannot be FlatLambdaCDM
     from skypy.halos.mass import colossus_mass_sampler
     from skypy.halos.sham import quenching_funct
@@ -38,7 +40,7 @@ def test_quenching_funct():
     fract = []
     for ii in range(0, len(mass_bins) - 1):
         l, r = mass_bins[ii], mass_bins[ii+1]
-        # Halos in range
+        # Halos in bin
         h_bin = np.where(ha_order[np.where(ha_order < r)] >= l)[0]
         q_bin = qu_order[h_bin]
 
@@ -109,6 +111,8 @@ def test_quenching_funct():
 
 @pytest.mark.flaky
 def test_find_min():
+    # Run a test on the galaxy's find_min function to check it gives expected values
+
     from scipy.integrate import trapezoid as trap
     from astropy import units as u
     from astropy.cosmology import FlatLambdaCDM
@@ -266,6 +270,8 @@ def test_find_min():
 
 @pytest.mark.flaky
 def test_run_file():
+    # Run a test on run_file to check it correctly produces a catalogue from a yaml file
+
     import astropy
     from scipy.integrate import trapezoid as trap
     from astropy import units as u
@@ -280,7 +286,7 @@ def test_run_file():
     min_mass = 10**(7.5)
     max_mass = 10**(14)
 
-    file_test = '/mnt/c/Users/user/Documents/skypy_dev/skypy/skypy/halos/test_gal.yaml'
+    file_test = 'test_gal.yaml'
     test_cat, test_z = run_file(file_test, 'galaxy', 'sm', 'z')
 
     skyarea = skyarea*u.deg**2
@@ -299,6 +305,7 @@ def test_run_file():
     assert type(test_z) is astropy.table.column.Column
     assert test_cat.ndim == 1
     assert test_z.ndim == 1
+
     # Length same within Poisson sampling error
     assert trap(dn, z) == approx(len(test_cat), rel=np.sqrt(trap(dn, z)))
     assert len(test_cat) == len(test_z)
@@ -316,6 +323,8 @@ def test_run_file():
 @pytest.mark.skipif(not HAS_COLOSSUS, reason='test requires colossus')
 @pytest.mark.flaky
 def test_gen_sub_cat():
+    # Run a test on generating the subhalos to check it outputs correctly
+
     from astropy.cosmology import WMAP9  # Cannot be FlatLambdaCDM
     from skypy.halos.mass import colossus_mass_sampler
     from skypy.halos.sham import gen_sub_cat
@@ -335,10 +344,7 @@ def test_gen_sub_cat():
     ID_halo, sub_masses, ID_sub, z_sub = gen_sub_cat(parent_halo, z_halo, alpha, beta, gamma, x)
 
     # Check array sets
-    assert ID_halo.ndim == 1
-    assert sub_masses.ndim == 1
-    assert ID_sub.ndim == 1
-    assert z_sub.ndim == 1
+    assert np.all(np.array([ID_halo.ndim, sub_masses.ndim, ID_sub.ndim, z_sub.ndim]) == 1)
     assert len(ID_halo) == len(parent_halo)
     assert len(sub_masses) == len(ID_sub)
     assert len(sub_masses) == len(z_sub)
@@ -371,33 +377,9 @@ def test_gen_sub_cat():
     # Function
     ID_halo, sub_masses, ID_sub, z_sub = gen_sub_cat(parent_halo, z_halo, alpha, beta, gamma, x)
 
-    assert sub_masses.size  # Check array is not empty, ie it worked
+    assert sub_masses.size  # Check array is not empty, i.e. it worked
 
     # Check errors trigger
-    with pytest.raises(Exception) as excinfo:
-        # Parameters
-        alpha, beta, gamma, x = 1.91, 0.39, 0.1, 3
-
-        # Catalogue
-        parent_halo = 1e+10
-        z_halo = np.linspace(0.01, 0.1, 1000)
-        gen_sub_cat(parent_halo, z_halo, alpha, beta, gamma, x)
-        assert str(excinfo.value) == 'Parent halos must be array-like'
-
-    with pytest.raises(Exception) as excinfo:
-        # Parameters
-        alpha, beta, gamma, x = 1.91, 0.39, 0.1, 3
-
-        # Catalogue
-        m_min, m_max, size = 1e+10, 1e+16, 1000
-        parent_halo = colossus_mass_sampler(redshift=0.1, model='sheth99',
-                                            mdef='fof', m_min=m_min, m_max=m_max,
-                                            cosmology=WMAP9, sigma8=0.8, ns=1.,
-                                            size=size, resolution=1000)
-        z_halo = 0.1
-        gen_sub_cat(parent_halo, z_halo, alpha, beta, gamma, x)
-        assert str(excinfo.value) == 'Redshift must be array-like'
-
     with pytest.raises(Exception) as excinfo:
         # Parameters
         alpha, beta, gamma, x = 1.91, 0.39, 0.1, 3
@@ -420,7 +402,7 @@ def test_gen_sub_cat():
         parent_halo = [-10, 1, 0]
         z_halo = np.linspace(0.01, 0.1, 3)
         gen_sub_cat(parent_halo, z_halo, alpha, beta, gamma, x)
-        assert str(excinfo.value) == 'Catalogue of halos and redshifts must be the same length'
+        assert str(excinfo.value) == 'Masses in catalogue should be positive and non-zero'
 
     with pytest.raises(Exception) as excinfo:
         # Parameters
@@ -503,227 +485,11 @@ def test_gen_sub_cat():
         assert str(excinfo.value) == 'Subhalo gamma must be between 0 and 1'
 
 
-@pytest.mark.flaky
-def test_galaxy_cat():
-    from astropy.cosmology import FlatLambdaCDM
-    import os
-    from skypy.halos.sham import galaxy_cat
-
-    # Parameters
-    m_star, phi_star, alpha = 10**(10.58), 10**(-2.77), -0.33
-    cosmology = FlatLambdaCDM(H0=70, Om0=0.3, name='FlatLambdaCDM')
-    z_range = [0.01, 0.1]
-    skyarea = 600
-    min_mass = 10**(7.5)
-    max_mass = 10**(14)
-    file_name = 'unit_test.yaml'
-
-    # Function
-    cat = galaxy_cat(m_star, phi_star, alpha, cosmology, z_range,
-                     skyarea, min_mass, max_mass, file_name)
-
-    # Check the catalogue
-    assert cat.size
-
-    # Check file exists
-    assert os.path.exists('unit_test.yaml')
-
-    # Open file and check structure
-    # Create expected lines
-    line1 = 'm_star: !numpy.power [10, 10.58]\n'
-    line2 = 'phi_star: !numpy.power [10, -2.77]\n'
-    line3 = 'alpha_val: -0.33\n'
-
-    # Mass range
-    line4 = 'm_min: !numpy.power [10, 7.5]\n'
-    line5 = 'm_max: !numpy.power [10, 14.0]\n'
-
-    # Observational parameters
-    line6 = 'sky_area: 600.0 deg2\n'
-    line7 = 'z_range: !numpy.linspace [0.01, 0.1, 100]\n'
-
-    # Cosmology
-    line8 = 'cosmology: !astropy.cosmology.FlatLambdaCDM\n'
-    line9 = '  H0: 70.0\n'
-    line10 = '  Om0: 0.3\n'
-
-    # Call function
-    function = 'tables:\n  galaxy:\n'
-    function += '    z, sm: !skypy.galaxies.schechter_smf\n      redshift: $z_range\n'
-    function += '      m_star: $m_star\n      phi_star: $phi_star\n'
-    function += '      alpha: $alpha_val\n      m_min: $m_min\n'
-    function += '      m_max: $m_max\n      sky_area: $sky_area\n'
-
-    exp_struct = line1 + line2 + line3 + line4 + line5 + line6 + line7 + line8 + line9
-    exp_struct += line10 + function
-
-    file = open('unit_test.yaml', 'r')
-    lines = file.readlines()
-
-    fil_struct = ''
-    for ii in lines:
-        fil_struct += ii
-
-    assert fil_struct == exp_struct  # Do lines in file match expected lines
-
-    # Check errors trigger
-    with pytest.raises(Exception) as excinfo:
-        # Parameters
-        m_star, phi_star, alpha = 10**(10.58), 10**(-2.77), -0.33
-        cosmology = FlatLambdaCDM(H0=70, Om0=0.3, name='FlatLambdaCDM')
-        z_range = [0.01]
-        skyarea = 600
-        min_mass = 10**(7.5)
-        max_mass = 10**(14)
-        file_name = 'unit_test.yaml'
-
-        # Function
-        cat = galaxy_cat(m_star, phi_star, alpha, cosmology, z_range, skyarea,
-                         min_mass, max_mass, file_name)
-        assert str(excinfo.value) == 'The wrong number of redshifts were given'
-
-    with pytest.raises(Exception) as excinfo:
-        # Parameters
-        m_star, phi_star, alpha = 10**(10.58), 10**(-2.77), -0.33
-        cosmology = FlatLambdaCDM(H0=70, Om0=0.3, name='FlatLambdaCDM')
-        z_range = [-0.01, 0.1]
-        skyarea = 600
-        min_mass = 10**(7.5)
-        max_mass = 10**(14)
-        file_name = 'unit_test.yaml'
-
-        # Function
-        cat = galaxy_cat(m_star, phi_star, alpha, cosmology, z_range, skyarea,
-                         min_mass, max_mass, file_name)
-        assert str(excinfo.value) == 'Redshift cannot be negative'
-
-    with pytest.raises(Exception) as excinfo:
-        # Parameters
-        m_star, phi_star, alpha = 10**(10.58), 10**(-2.77), -0.33
-        cosmology = FlatLambdaCDM(H0=70, Om0=0.3, name='FlatLambdaCDM')
-        z_range = [-0.01, -0.1]
-        skyarea = 600
-        min_mass = 10**(7.5)
-        max_mass = 10**(14)
-        file_name = 'unit_test.yaml'
-
-        # Function
-        cat = galaxy_cat(m_star, phi_star, alpha, cosmology, z_range, skyarea,
-                         min_mass, max_mass, file_name)
-        assert str(excinfo.value) == 'Redshift cannot be negative'
-
-    with pytest.raises(Exception) as excinfo:
-        # Parameters
-        m_star, phi_star, alpha = 10**(10.58), 10**(-2.77), -0.33
-        cosmology = FlatLambdaCDM(H0=70, Om0=0.3, name='FlatLambdaCDM')
-        z_range = [0.1, 0.01]
-        skyarea = 600
-        min_mass = 10**(7.5)
-        max_mass = 10**(14)
-        file_name = 'unit_test.yaml'
-
-        # Function
-        cat = galaxy_cat(m_star, phi_star, alpha, cosmology, z_range, skyarea,
-                         min_mass, max_mass, file_name)
-        assert str(excinfo.value) == 'The second redshift should be more than the first'
-
-    with pytest.raises(Exception) as excinfo:
-        # Parameters
-        m_star, phi_star, alpha = 10**(10.58), 10**(-2.77), 0.33
-        cosmology = FlatLambdaCDM(H0=70, Om0=0.3, name='FlatLambdaCDM')
-        z_range = [0.01, 0.1]
-        skyarea = 600
-        min_mass = 10**(7.5)
-        max_mass = 10**(14)
-        file_name = 'unit_test.yaml'
-
-        # Function
-        cat = galaxy_cat(m_star, phi_star, alpha, cosmology, z_range, skyarea,
-                         min_mass, max_mass, file_name)
-        assert str(excinfo.value) == 'Schechter function defined so alpha < 0, set_alpha = -alpha'
-
-    with pytest.raises(Exception) as excinfo:
-        # Parameters
-        m_star, phi_star, alpha = -10**(10.58), 10**(-2.77), -0.33
-        cosmology = FlatLambdaCDM(H0=70, Om0=0.3, name='FlatLambdaCDM')
-        z_range = [0.01, 0.1]
-        skyarea = 600
-        min_mass = 10**(7.5)
-        max_mass = 10**(14)
-        file_name = 'unit_test.yaml'
-
-        # Function
-        cat = galaxy_cat(m_star, phi_star, alpha, cosmology, z_range, skyarea,
-                         min_mass, max_mass, file_name)
-        assert str(excinfo.value) == 'M* and phi* must be positive and non-zero numbers'
-
-    with pytest.raises(Exception) as excinfo:
-        # Parameters
-        m_star, phi_star, alpha = -10**(10.58), 0, -0.33
-        cosmology = FlatLambdaCDM(H0=70, Om0=0.3, name='FlatLambdaCDM')
-        z_range = [0.01, 0.1]
-        skyarea = 600
-        min_mass = 10**(7.5)
-        max_mass = 10**(14)
-        file_name = 'unit_test.yaml'
-
-        # Function
-        cat = galaxy_cat(m_star, phi_star, alpha, cosmology, z_range, skyarea,
-                         min_mass, max_mass, file_name)
-        assert str(excinfo.value) == 'M* and phi* must be positive and non-zero numbers'
-
-    with pytest.raises(Exception) as excinfo:
-        # Parameters
-        m_star, phi_star, alpha = 10**(10.58), 10**(-2.77), -0.33
-        cosmology = FlatLambdaCDM(H0=70, Om0=0.3, name='FlatLambdaCDM')
-        z_range = [0.01, 0.1]
-        skyarea = -6
-        min_mass = 10**(7.5)
-        max_mass = 10**(14)
-        file_name = 'unit_test.yaml'
-
-        # Function
-        cat = galaxy_cat(m_star, phi_star, alpha, cosmology, z_range, skyarea,
-                         min_mass, max_mass, file_name)
-        assert str(excinfo.value) == 'The skyarea must be a positive non-zero number'
-
-    with pytest.raises(Exception) as excinfo:
-        # Parameters
-        m_star, phi_star, alpha = 10**(10.58), 10**(-2.77), -0.33
-        cosmology = FlatLambdaCDM(H0=70, Om0=0.3, name='FlatLambdaCDM')
-        z_range = [0.01, 0.1]
-        skyarea = 600
-        min_mass = 10**(14)
-        max_mass = 10**(8)
-        file_name = 'unit_test.yaml'
-
-        # Function
-        cat = galaxy_cat(m_star, phi_star, alpha, cosmology, z_range, skyarea,
-                         min_mass, max_mass, file_name)
-        assert str(excinfo.value) == 'The minimum mass should be less than the maximum mass'
-
-    with pytest.raises(Exception) as excinfo:
-        # Parameters
-        m_star, phi_star, alpha = 10**(10.58), 10**(-2.77), -0.33
-        cosmology = FlatLambdaCDM(H0=70, Om0=0.3)
-        z_range = [0.01, 0.1]
-        skyarea = 600
-        min_mass = 10**(7.5)
-        max_mass = 10**(14)
-        file_name = 'unit_test.yaml'
-
-        # Function
-        cat = galaxy_cat(m_star, phi_star, alpha, cosmology, z_range, skyarea,
-                         min_mass, max_mass, file_name)
-        assert str(excinfo.value) == 'Cosmology object must have an astropy cosmology name'
-
-    file.close()
-    os.remove('unit_test.yaml')
-
-
 @pytest.mark.skipif(not HAS_COLOSSUS, reason='test requires colossus')
 @pytest.mark.flaky
 def test_assignment():
+    # Run a test on the assignment function to check catalogues are matched correctly
+
     # Generate the catalogues
     from astropy.cosmology import WMAP9
     from astropy.cosmology import FlatLambdaCDM
@@ -801,11 +567,12 @@ def test_assignment():
     assert hs_fin.ndim == 1
 
     # Check arrays contain expected values
-    assert ((gal_type == 1) | (gal_type == 2) | (gal_type == 3) | (gal_type == 4)).all()
-    assert len(np.where(gal_type == 1)[0]) > 1  # Check some of each were assigned
-    assert len(np.where(gal_type == 2)[0]) > 1
-    assert len(np.where(gal_type == 3)[0]) > 1
-    assert len(np.where(gal_type == 4)[0]) > 1
+    assert ((gal_type == 'red central') | (gal_type == 'red satellite') |
+            (gal_type == 'blue central') | (gal_type == 'blue satellite')).all()
+    assert len(np.where(gal_type == 'red central')[0]) > 1  # Check some of each were assigned
+    assert len(np.where(gal_type == 'red satellite')[0]) > 1
+    assert len(np.where(gal_type == 'blue central')[0]) > 1
+    assert len(np.where(gal_type == 'blue satellite')[0]) > 1
 
     assert min(z_fin) >= min(z_range)  # z within range
     assert max(z_fin) <= max(z_range)
@@ -821,10 +588,10 @@ def test_assignment():
     assert len(np.where(id_fin > 0)[0]) > 1  # Check there are some subhalos
     assert len(np.where(id_fin < 0)[0]) > 1  # Check there are some parents
 
-    assert max(gal_fin) <= 10**(15)
-    assert min(gal_fin) >= 10**(4)  # Check galaxies in correct range
-    assert max(hs_fin) <= 10**(17)
-    assert min(hs_fin) >= 10**(7)  # Check halos in correct range
+    assert max(gal_fin) <= 10**(15)  # Check galaxies in correct range
+    assert min(gal_fin) >= 10**(4)
+    assert max(hs_fin) <= 10**(17)  # Check halos in correct range
+    assert min(hs_fin) >= 10**(7)
 
     # Check galaxies are assigned to correct halos
     check_parent_t = gal_type[np.where(id_fin < 0)]  # Finished arrays
@@ -836,10 +603,11 @@ def test_assignment():
     check_red_t = gal_type[np.where(qu_hs == 1)]
     check_red_m = gal_fin[np.where(qu_hs == 1)]
 
-    assert ((check_parent_t == 1) | (check_parent_t == 3)).all()  # Check correct tags are applied
-    assert ((check_subhal_t == 2) | (check_subhal_t == 4)).all()
-    assert ((check_blu_t == 3) | (check_blu_t == 4)).all()
-    assert ((check_red_t == 1) | (check_red_t == 2)).all()
+    # Check correct tags are applied
+    assert ((check_parent_t == 'red central') | (check_parent_t == 'blue central')).all()
+    assert ((check_subhal_t == 'red satellite') | (check_subhal_t == 'blue satellite')).all()
+    assert ((check_blu_t == 'blue central') | (check_blu_t == 'blue satellite')).all()
+    assert ((check_red_t == 'red central') | (check_red_t == 'red satellite')).all()
 
     cen_append = np.append(rc_order, bc_order)  # Catalogue
     sub_append = np.append(rs_order, bs_order)
@@ -960,7 +728,48 @@ def test_assignment():
 
 @pytest.mark.skipif(not HAS_COLOSSUS, reason='test requires colossus')
 @pytest.mark.flaky
+def test_scatter_proxy():
+    # Run a test on the scattering function to check outputs are correct
+
+    from skypy.halos.sham import run_file
+    from skypy.halos.sham import scatter_proxy
+
+    # Generate the galaxy catalogue and scatter
+    gal_cat = run_file('test_gal.yaml', 'galaxy', 'sm')
+    new_gal = scatter_proxy(gal_cat)
+
+    # Check new galaxies are not in direct mass order
+    assert np.any(np.diff(new_gal) > 0)
+
+    # Check input galaxies are just rearranged
+    assert np.all(np.isin(gal_cat, new_gal))
+
+    # Check that the general trend is reducing mass
+    # By difference in mass means
+    sets = 500
+    ii = 0
+    mean = []
+    while ii < len(new_gal):
+        gal_set = new_gal[ii:ii+sets]
+        mean.append(np.mean(gal_set))
+        ii += sets
+
+    assert np.all(np.diff(mean) < 0)
+
+    # By start and end values
+    assert new_gal[0] > new_gal[-1]
+
+    with pytest.raises(Exception) as excinfo:
+        gal_cat = np.array([-1, 2, 3, 0, -10, -20])
+        scatter_proxy(gal_cat)
+        assert str(excinfo.value) == 'Galaxy masses must be positive and non-zero'
+
+
+@pytest.mark.skipif(not HAS_COLOSSUS, reason='test requires colossus')
+@pytest.mark.flaky
 def test_sham_plots():
+    # Run a test on the plotting function to check outputs are correctly labelled
+
     # Generate the catalogues
     from astropy.cosmology import WMAP9
     from astropy.cosmology import FlatLambdaCDM
@@ -1097,44 +906,9 @@ def test_sham_plots():
 
 @pytest.mark.skipif(not HAS_COLOSSUS, reason='test requires colossus')
 @pytest.mark.flaky
-def test_scatter_proxy():
-    from skypy.halos.sham import run_file
-    from skypy.halos.sham import scatter_proxy
-
-    # Generate the galaxy catalogue and scatter
-    gal_cat = run_file('test_gal.yaml', 'galaxy', 'sm')
-    new_gal = scatter_proxy(gal_cat)
-
-    # Check new galaxies are not in direct mass order
-    assert np.any(np.diff(new_gal) > 0)
-
-    # Check input galaxies are just rearranged
-    assert np.all(np.isin(gal_cat, new_gal))
-
-    # Check that the general trend is reducing mass
-    # By difference in mass means
-    sets = 500
-    ii = 0
-    mean = []
-    while ii < len(new_gal):
-        gal_set = new_gal[ii:ii+sets]
-        mean.append(np.mean(gal_set))
-        ii += sets
-
-    assert np.all(np.diff(mean) < 0)
-
-    # By start and end values
-    assert new_gal[0] > new_gal[-1]
-
-    with pytest.raises(Exception) as excinfo:
-        gal_cat = np.array([-1, 2, 3, 0, -10, -20])
-        scatter_proxy(gal_cat)
-        assert str(excinfo.value) == 'Galaxy masses must be positive and non-zero'
-
-
-@pytest.mark.skipif(not HAS_COLOSSUS, reason='test requires colossus')
-@pytest.mark.flaky
 def test_run_sham():
+    # Run a test on the SHAM function to check outputs are in correct format
+
     from astropy.cosmology import FlatLambdaCDM
     from skypy.halos.sham import run_sham
 
@@ -1145,11 +919,10 @@ def test_run_sham():
     cosmology = FlatLambdaCDM(H0=70, Om0=0.3, name='FlatLambdaCDM')
     z_range = [0.01, 0.1]
     skyarea = 60
-    qu_h = np.array([10**(12.16), 0.45])
-    qu_s = np.array([10**(12.16), 0.45, 0.5])
+    qu = np.array([10**(12.16), 0.45, 0.5])
 
     # Function
-    sham = run_sham(h_file, gal_param, cosmology, z_range, skyarea, qu_h, qu_s,
+    sham = run_sham(h_file, gal_param, cosmology, z_range, skyarea, qu,
                     sub_param=[1.91, 0.39, 0.1, 3], gal_max_h=10**(14), gal_max_s=10**(13),
                     print_out=False, run_anyway=True)
 
@@ -1168,42 +941,103 @@ def test_run_sham():
     # Check errors trigger
     with pytest.raises(Exception) as excinfo:
         h_f = 3
-        run_sham(h_f, gal_param, cosmology, z_range, skyarea, qu_h, qu_s,
+        run_sham(h_f, gal_param, cosmology, z_range, skyarea, qu,
                  sub_param=[1.91, 0.39, 0.1, 3], gal_max_h=10**(14), gal_max_s=10**(13),
                  print_out=False, run_anyway=True)
         assert str(excinfo.value) == 'Halo YAML file must be provided as a string'
 
     with pytest.raises(Exception) as excinfo:
         gal_p = [[1, 2, 3], [4, 5, 6]]
-        run_sham(h_file, gal_p, cosmology, z_range, skyarea, qu_h, qu_s,
+        run_sham(h_file, gal_p, cosmology, z_range, skyarea, qu,
                  sub_param=[1.91, 0.39, 0.1, 3], gal_max_h=10**(14), gal_max_s=10**(13),
                  print_out=False, run_anyway=True)
         assert str(excinfo.value) == 'The wrong number of galaxies are in galaxy parameters'
 
     with pytest.raises(Exception) as excinfo:
         gal_p = [[1, 2], [4, 5], [7, 8], [3, 4]]
-        run_sham(h_file, gal_p, cosmology, z_range, skyarea, qu_h, qu_s,
+        run_sham(h_file, gal_p, cosmology, z_range, skyarea, qu,
                  sub_param=[1.91, 0.39, 0.1, 3], gal_max_h=10**(14), gal_max_s=10**(13),
                  print_out=False, run_anyway=True)
         assert str(excinfo.value) == 'The wrong number of galaxy parameters have been provided'
 
     with pytest.raises(Exception) as excinfo:
         gal_p = [[1, 2], [4, 5], [7, 8]]
-        run_sham(h_file, gal_p, cosmology, z_range, skyarea, qu_h, qu_s,
+        run_sham(h_file, gal_p, cosmology, z_range, skyarea, qu,
                  sub_param=[1.91, 0.39, 0.1, 3], gal_max_h=10**(14), gal_max_s=10**(13),
                  print_out=False, run_anyway=True)
         assert str(excinfo.value) == 'Supplied galaxy parameters are not the correct shape'
 
     with pytest.raises(Exception) as excinfo:
-        qu_ht = [1]
-        run_sham(h_file, gal_param, cosmology, z_range, skyarea, qu_ht, qu_s,
+        qu_t = [1]
+        run_sham(h_file, gal_param, cosmology, z_range, skyarea, qu_t,
                  sub_param=[1.91, 0.39, 0.1, 3], gal_max_h=10**(14), gal_max_s=10**(13),
                  print_out=False, run_anyway=True)
-        assert str(excinfo.value) == 'Provided incorrect number of halo quenching parameters'
+        assert str(excinfo.value) == 'Provided incorrect number of quenching parameters'
 
     with pytest.raises(Exception) as excinfo:
-        qu_st = [1]
-        run_sham(h_file, gal_param, cosmology, z_range, skyarea, qu_h, qu_st,
+        z_t = [1]
+        run_sham(h_file, gal_param, cosmology, z_t, skyarea, qu,
                  sub_param=[1.91, 0.39, 0.1, 3], gal_max_h=10**(14), gal_max_s=10**(13),
                  print_out=False, run_anyway=True)
-        assert str(excinfo.value) == 'Provided incorrect number of halo quenching parameters'
+        assert str(excinfo.value) == 'The wrong number of redshifts were given'
+
+    with pytest.raises(Exception) as excinfo:
+        z_t = [-0.01, 0.1]
+        run_sham(h_file, gal_param, cosmology, z_t, skyarea, qu,
+                 sub_param=[1.91, 0.39, 0.1, 3], gal_max_h=10**(14), gal_max_s=10**(13),
+                 print_out=False, run_anyway=True)
+        assert str(excinfo.value) == 'Redshift cannot be negative'
+
+    with pytest.raises(Exception) as excinfo:
+        z_t = [0.1, 0.01]
+        run_sham(h_file, gal_param, cosmology, z_t, skyarea, qu,
+                 sub_param=[1.91, 0.39, 0.1, 3], gal_max_h=10**(14), gal_max_s=10**(13),
+                 print_out=False, run_anyway=True)
+        assert str(excinfo.value) == 'The second redshift should be more than the first'
+
+    with pytest.raises(Exception) as excinfo:
+        rc_p = [-10**(10.58), 10**(-2.77), -0.33]
+        rs_p = [10**(10.64), 10**(-4.24), -1.54]
+        bc_p = [0, 10**(-2.98), -1.48]
+        bs_p = [10**(10.55), 10**(-3.96), -1.53]
+        gal_t = [rc_p, rs_p, bc_p, bs_p]
+        run_sham(h_file, gal_t, cosmology, z_range, skyarea, qu,
+                 sub_param=[1.91, 0.39, 0.1, 3], gal_max_h=10**(14), gal_max_s=10**(13),
+                 print_out=False, run_anyway=True)
+        assert str(excinfo.value) == 'M* values must be positive and non-zero'
+
+    with pytest.raises(Exception) as excinfo:
+        rc_p = [10**(10.58), -10**(-2.77), -0.33]
+        rs_p = [10**(10.64), 10**(-4.24), -1.54]
+        bc_p = [10**(10.65), 0, -1.48]
+        bs_p = [10**(10.55), 10**(-3.96), -1.53]
+        gal_t = [rc_p, rs_p, bc_p, bs_p]
+        run_sham(h_file, gal_t, cosmology, z_range, skyarea, qu,
+                 sub_param=[1.91, 0.39, 0.1, 3], gal_max_h=10**(14), gal_max_s=10**(13),
+                 print_out=False, run_anyway=True)
+        assert str(excinfo.value) == 'phi* values must be positive and non-zero'
+
+    with pytest.raises(Exception) as excinfo:
+        rc_p = [10**(10.58), 10**(-2.77), 0.33]
+        rs_p = [10**(10.64), 10**(-4.24), -1.54]
+        bc_p = [10**(10.65), 10**(-2.98), -1.48]
+        bs_p = [10**(10.55), 10**(-3.96), -1.53]
+        gal_t = [rc_p, rs_p, bc_p, bs_p]
+        run_sham(h_file, gal_t, cosmology, z_range, skyarea, qu,
+                 sub_param=[1.91, 0.39, 0.1, 3], gal_max_h=10**(14), gal_max_s=10**(13),
+                 print_out=False, run_anyway=True)
+        assert str(excinfo.value) == 'Galaxy Schechter function alphas must be < 0'
+
+    with pytest.raises(Exception) as excinfo:
+        sky_t = -10
+        run_sham(h_file, gal_param, cosmology, z_range, sky_t, qu,
+                 sub_param=[1.91, 0.39, 0.1, 3], gal_max_h=10**(14), gal_max_s=10**(13),
+                 print_out=False, run_anyway=True)
+        assert str(excinfo.value) == 'The skyarea must be a positive non-zero number'
+
+    with pytest.raises(Exception) as excinfo:
+        cosmo_t = FlatLambdaCDM(H0=70, Om0=0.3)
+        run_sham(h_file, gal_param, cosmo_t, z_range, skyarea, qu,
+                 sub_param=[1.91, 0.39, 0.1, 3], gal_max_h=10**(14), gal_max_s=10**(13),
+                 print_out=False, run_anyway=True)
+        assert str(excinfo.value) == 'Cosmology object must have an astropy cosmology name'

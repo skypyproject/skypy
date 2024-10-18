@@ -1,6 +1,6 @@
-m_star: !numpy.power [10, 10.58]
-phi_star: !numpy.power [10, -2.77]
-alpha_val: -0.33
+m_star: !numpy.power [10, 10.75]
+phi_star: !numpy.power [10, -2.37]
+alpha_val: -0.18
 m_min: !numpy.power [10, 7.0]
 m_max: !numpy.power [10, 14.0]
 sky_area: 600.0 deg2

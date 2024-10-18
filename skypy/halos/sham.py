@@ -14,9 +14,9 @@ Models
    find_min
    run_file
    gen_sub_cat
-   galaxy_cat
    assignment
-   sham_arrays
+   scatter_proxy
+   sham_plots
    run_sham
 '''
 
@@ -24,11 +24,11 @@ Models
 import numpy as np
 from skypy.pipeline import Pipeline
 from skypy.halos import mass  # Vale and Ostriker 2004 num of subhalos
+from skypy.galaxies import schechter_smf
 from time import time
 from scipy.special import erf  # Error function for quenching
 from scipy.integrate import trapezoid as trap  # Integration of galaxies
 from astropy import units as u
-import os
 
 try:
     import colossus  # noqa F401
@@ -42,7 +42,6 @@ __all__ = [
     'find_min',
     'run_file',
     'gen_sub_cat',
-    'galaxy_cat',
     'assignment',
     'scatter_proxy',
     'sham_plots',
@@ -96,7 +95,7 @@ def quenching_funct(mass, M_mu, sigma, baseline=0):
 
     References
     ----------
-    .. [1] Peng Y.-j., et al., 2010, ApJ, 721, 193
+    .. [1] Peng Y.-j., et al., 2010, Astrophysical Journal, 721, 193
     '''
     mass = np.atleast_1d(mass)
 
@@ -182,7 +181,7 @@ def find_min(m_star, phi_star, alpha, cosmology, z_range, skyarea, max_mass, no_
     a number of halos these might be paired with to generate a minimum mass:
 
     >>> #Define input variables
-    >>> m_star, phi_star, alpha = 10**(10.58), 10**(-2.77), -0.33
+    >>> m_star, phi_star, alpha = 10**(10.75), 10**(-2.37), -0.18
     >>> cosmology = FlatLambdaCDM(H0=70, Om0=0.3, name='FlatLambdaCDM')
     >>> z_range = [0.01, 0.1]
     >>> skyarea = 600
@@ -195,8 +194,8 @@ def find_min(m_star, phi_star, alpha, cosmology, z_range, skyarea, max_mass, no_
 
     References
     ----------
-    .. [1] Birrer S., Lilly S., Amara A., Paranjape A., Refregier A., 2014,
-        The Astrophysical Journal, 793, 12
+    .. [1] Weigel A. K., Schawinski K., Bruderer C., 2016, Monthly Notices of the
+        Royal Astronomical Society, 459, 2150
     '''
     z_range = np.atleast_1d(z_range)
 
@@ -437,128 +436,6 @@ def gen_sub_cat(parent_halo, z_halo, sub_alpha, sub_beta, sub_gamma, sub_x):
     return ID_halo, sub_masses, ID_sub, z_sub
 
 
-# Generate YAML file and get catalogue
-def galaxy_cat(m_star, phi_star, alpha, cosmology, z_range, skyarea, min_mass, max_mass, file_name):
-    r'''Function that generates a galaxy catalogue by generating a YAML file
-    and running it
-
-    This function generates a YAML file using galaxy Schechter mass function
-    parameters plus input cosmology and mass ranges, and then runs the file
-    to generate a catalogue of masses.
-
-    Parameters
-    -----------
-    m_star : float
-        Exponential tail off of Schechter function, units of solar mass
-    phi_star : float
-        Normalisation for the Schechter function, units of Mpc^{-3}
-    alpha : float
-        Power law of Schechter function
-    cosmology : Cosmology
-        Astropy cosmology object for calculating comoving volume
-    z_range : (2, ), array_like
-        Minimum and maximum redshift of galaxies
-    skyarea : float
-        Sky area galaxies are 'observed' from, units of deg^2
-    min_mass : float
-        Minimum mass of galaxies to generate
-    max_mass : float
-        Maximum mass of galaxies to generate
-    file_name : str
-        String of file name to be run
-
-    Returns
-    --------
-    catalogue: (nm, ) array_like
-        List of masses
-    redshifts: (nm, ) array_like
-        List of redshifts generated for each mass, if requested
-
-    Examples
-    ---------
-    >>> from skypy.halos import sham
-    >>> from astropy.cosmology import FlatLambdaCDM
-
-    This example generates a galaxy catalogue using the Schechter
-    parameters for red centrals from [1]_
-
-    >>> #Parameters
-    >>> m_star, phi_star, alpha = 10**(10.58), 10**(-2.77), -0.33
-    >>> cosmology = FlatLambdaCDM(H0=70, Om0=0.3, name='FlatLambdaCDM')
-    >>> z_range = [0.01, 0.1]
-    >>> skyarea = 600
-    >>> min_mass = 10**(7)
-    >>> max_mass = 10**(14)
-    >>> #Run function
-    >>> galaxy_cat = sham.galaxy_cat(m_star, phi_star, alpha, cosmology,
-    ...                              z_range, skyarea, min_mass, max_mass,
-    ...                              'red_central.yaml')
-
-    References
-    ----------
-    .. [1] Birrer S., Lilly S., Amara A., Paranjape A., Refregier A., 2014,
-        The Astrophysical Journal, 793, 12
-    '''
-    z_range = np.atleast_1d(z_range)
-
-    # Errors
-    if z_range.shape != (2, ):
-        raise Exception('The wrong number of redshifts were given')
-    if z_range[0] < 0 or z_range[1] < 0:
-        raise Exception('Redshift cannot be negative')
-    if z_range[1] <= z_range[0]:
-        raise Exception('The second redshift should be more than the first')
-    if alpha > 0:
-        alpha = -1*alpha
-        raise Warning('Schechter function defined so alpha < 0, set_alpha = -alpha')
-    if m_star <= 0 or phi_star <= 0:
-        raise Exception('M* and phi* must be positive and non-zero numbers')
-    if skyarea <= 0:
-        raise Exception('The skyarea must be a positive non-zero number')
-    if min_mass > max_mass:
-        raise Exception('The minimum mass should be less than the maximum mass')
-    if cosmology.name is None:
-        raise Exception('Cosmology object must have an astropy cosmology name')
-
-    # Galaxy parameters
-    line1 = 'm_star: !numpy.power [10, ' + str(np.log10(m_star)) + ']\n'
-    line2 = 'phi_star: !numpy.power [10, ' + str(np.log10(phi_star)) + ']\n'
-    line3 = 'alpha_val: ' + str(alpha) + '\n'
-
-    # Mass range
-    line4 = 'm_min: !numpy.power [10, ' + str(np.log10(min_mass)) + ']\n'
-    line5 = 'm_max: !numpy.power [10, ' + str(np.log10(max_mass)) + ']\n'
-
-    # Observational parameters
-    if type(skyarea) is not float:
-        skyarea = float(skyarea)
-    line6 = 'sky_area: ' + str(skyarea) + ' deg2\n'
-    line7 = 'z_range: !numpy.linspace [' + str(z_range[0]) + ', ' + str(z_range[1]) + ', 100]\n'
-
-    # Cosmology
-    line8 = 'cosmology: !astropy.cosmology.' + cosmology.name + '\n'
-    line9 = '  H0: ' + str(cosmology.h*100) + '\n'
-    line10 = '  Om0: ' + str(cosmology.Om0) + '\n'
-
-    # Call function
-    function = 'tables:\n  galaxy:\n'
-    function += '    z, sm: !skypy.galaxies.schechter_smf\n      redshift: $z_range\n'
-    function += '      m_star: $m_star\n      phi_star: $phi_star\n'
-    function += '      alpha: $alpha_val\n      m_min: $m_min\n'
-    function += '      m_max: $m_max\n      sky_area: $sky_area\n'
-
-    # Make one large string
-    yaml_lines = line1 + line2 + line3 + line4 + line5 + line6 + line7 + line8 + line9 + line10
-    yaml_lines += function
-
-    file_gal = open(file_name, 'w')
-    file_gal.write(yaml_lines)
-    file_gal.close()
-
-    # Execute file
-    return run_file(file_name, 'galaxy', 'sm')
-
-
 # Assignment
 def assignment(hs_order, rc_order, rs_order, bc_order, bs_order, qu_order, id_order, z_order,
                scatter=False):
@@ -608,12 +485,13 @@ def assignment(hs_order, rc_order, rs_order, bc_order, bs_order, qu_order, id_or
     z_fin: (nh, ) array_like
         List of redshifts for halos
     gal_type_fin: (nh, ) array_like
-        List of assigned galaxy types, 1 = red central, 2 = red satellite,
-        3 = blue central, 4 = blue satellite
+        List of assigned galaxy types: 'red central', 'red satellite',
+        'blue central' and 'blue satellite'
 
     Examples
     ---------
     >>> from skypy.halos import sham
+    >>> from skypy.galaxies import schechter_smf
     >>> from astropy.cosmology import FlatLambdaCDM
 
     This example generates the required catalogues, assigns which halos will
@@ -630,25 +508,21 @@ def assignment(hs_order, rc_order, rs_order, bc_order, bs_order, qu_order, id_or
     >>> z_range = [min(h_z), max(h_z)]
     >>> skyarea = 100
     >>> #Galaxy parameters
-    >>> m_star1, phi_star1, alpha1 = 10**(10.58), 10**(-2.77), -0.33
-    >>> m_star2, phi_star2, alpha2 = 10**(10.64), 10**(-4.24), -1.54
-    >>> m_star3, phi_star3, alpha3 = 10**(10.65), 10**(-2.98), -1.48
-    >>> m_star4, phi_star4, alpha4 = 10**(10.55), 10**(-3.96), -1.53
+    >>> m_star1, phi_star1, alpha1 = 10**(10.75), 10**(-2.37), -0.18
+    >>> m_star2, phi_star2, alpha2 = 10**(10.72), 10**(-2.66), -0.71
+    >>> m_star3, phi_star3, alpha3 = 10**(10.59), 10**(-2.52), -1.15
+    >>> m_star4, phi_star4, alpha4 = 10**(10.59), 10**(-3.09), -1.31
     >>> min_mass = 10**(7)
     >>> max_mass = 10**(14)
     >>> #Generate the galaxies
-    >>> rc_cat = sham.galaxy_cat(m_star1, phi_star1, alpha1, cosmology,
-    ...                          z_range, skyarea, min_mass, max_mass,
-    ...                          'rc_file.yaml')
-    >>> rs_cat = sham.galaxy_cat(m_star2, phi_star2, alpha2, cosmology,
-    ...                          z_range, skyarea, min_mass, max_mass,
-    ...                          'rs_file.yaml')
-    >>> bc_cat = sham.galaxy_cat(m_star3, phi_star3, alpha3, cosmology,
-    ...                          z_range, skyarea, min_mass, max_mass,
-    ...                          'bc_file.yaml')
-    >>> bs_cat = sham.galaxy_cat(m_star4, phi_star4, alpha4, cosmology,
-    ...                          z_range, skyarea, min_mass, max_mass,
-    ...                          'bs_file.yaml')
+    >>> rc_cat = schechter_smf(z_range, m_star1, phi_star1, alpha1, min_mass,
+                           max_mass, skyarea*u.deg**2, cosmology)[1]
+    >>> rs_cat = schechter_smf(z_range, m_star2, phi_star2, alpha2, min_mass,
+                           max_mass, skyarea*u.deg**2, cosmology)[1]
+    >>> bc_cat = schechter_smf(z_range, m_star3, phi_star3, alpha3, min_mass,
+                           max_mass, skyarea*u.deg**2, cosmology)[1]
+    >>> bs_cat = schechter_smf(z_range, m_star4, phi_star4, alpha4, min_mass,
+                           max_mass, skyarea*u.deg**2, cosmology)[1]
     >>> #Quench the halos
     >>> m_mu, sigma, base = 10**(12), 0.4, 0.4
     >>> h_quench = sham.quenching_funct(halo_cat, m_mu, sigma)
@@ -764,12 +638,12 @@ def assignment(hs_order, rc_order, rs_order, bc_order, bs_order, qu_order, id_or
         if qu == 1:  # Halo is quenched
             if ID_A < 0 and rc_counter != len(rc_order):  # Halo assigned mass quenched
                 gal_assigned.append(rc_order[rc_counter])
-                gal_type_A.append(1)
+                gal_type_A.append('red central')
                 rc_counter += 1
 
             elif ID_A > 0 and rs_counter != len(rs_order):  # Subhalo assigned environment quenched
                 gal_assigned.append(rs_order[rs_counter])
-                gal_type_A.append(2)
+                gal_type_A.append('red satellite')
                 rs_counter += 1
 
             else:  # No red to assign
@@ -778,12 +652,12 @@ def assignment(hs_order, rc_order, rs_order, bc_order, bs_order, qu_order, id_or
         else:  # Halo not quenched
             if ID_A < 0 and bc_counter != len(bc_order):  # Halo assigned blue central
                 gal_assigned.append(bc_order[bc_counter])
-                gal_type_A.append(3)
+                gal_type_A.append('blue central')
                 bc_counter += 1
 
             elif ID_A > 0 and bs_counter != len(bs_order):  # Subhalo assigned blue satellite
                 gal_assigned.append(bs_order[bs_counter])
-                gal_type_A.append(4)
+                gal_type_A.append('blue satellite')
                 bs_counter += 1
 
             else:  # No blue to assign
@@ -863,8 +737,8 @@ def sham_plots(hs_fin, gal_fin, gal_type_fin, print_out=False):
     gal_fin : (nm, ) array_like
         List of assigned galaxies, in units of solar mass
     gal_type_fin : (nm, ) array_like
-        List of assigned galaxies types with the tags 1,2,3,4 for
-        red centrals, red satellites, blue centrals, blue satellites
+        List of assigned galaxies types with the tags
+        'red central', 'red satellite', 'blue central', 'blue satellite'
     print_out : Boolean
         True/false whether to output print statements for progress and
         timings
@@ -915,10 +789,10 @@ def sham_plots(hs_fin, gal_fin, gal_type_fin, print_out=False):
     if ((gal_fin <= 0)).any():
         raise Exception('Galaxy masses must be positive and non-zero')
 
-    rc_dots = np.where(gal_type_fin == 1)[0]
-    rs_dots = np.where(gal_type_fin == 2)[0]
-    bc_dots = np.where(gal_type_fin == 3)[0]
-    bs_dots = np.where(gal_type_fin == 4)[0]
+    rc_dots = np.where(gal_type_fin == 'red central')[0]
+    rs_dots = np.where(gal_type_fin == 'red satellite')[0]
+    bc_dots = np.where(gal_type_fin == 'blue central')[0]
+    bs_dots = np.where(gal_type_fin == 'blue satellite')[0]
 
     # SHAMs by galaxy population
     sham_rc = np.stack((hs_fin[rc_dots], gal_fin[rc_dots]), axis=1)
@@ -949,7 +823,7 @@ def sham_plots(hs_fin, gal_fin, gal_type_fin, print_out=False):
 
 
 # Called SHAM function
-def run_sham(h_file, gal_param, cosmology, z_range, skyarea, qu_h_param, qu_s_param,
+def run_sham(h_file, gal_param, cosmology, z_range, skyarea, qu_param,
              sub_param=[1.91, 0.39, 0.1, 3], gal_max_h=10**(14), gal_max_s=10**(13),
              print_out=False, run_anyway=False, scatter_prox=False):
     r'''Function that takes all inputs for the halos and galaxies and runs
@@ -977,12 +851,9 @@ def run_sham(h_file, gal_param, cosmology, z_range, skyarea, qu_h_param, qu_s_pa
     skyarea : float
         Sky area galaxies are 'observed' from, units of deg^2. Should be the
         same as specified in the halo YAML file
-    qu_h_param : (2, ) array_like
-        The mean and standard deviation of the error function to quench
-        central halos (see 'quenching_funct' for more detail)
-    qu_s_param : (3, ) array_like
+    qu_param : (3, ) array_like
         The mean, standard deviation and baseline of the error function
-        to quench satellite halos (see 'quenching_funct' for more detail)
+        to quench the halos (see 'quenching_funct' for more detail)
     sub_param : (4, ) array_like
         alpha, beta, gamma and x parameters for subhalo generation. Defaults
         from [1]_ (see 'gen_sub_cat' for more detail)
@@ -1006,8 +877,8 @@ def run_sham(h_file, gal_param, cosmology, z_range, skyarea, qu_h_param, qu_s_pa
         - 'Halo mass' parent and subhalo masses, in units of solar mass,
           the subhalos are their present stripped mass
         - 'Galaxy mass' assigned galaxy masses, in units of solar mass
-        - 'Galaxy type' type of galaxy assigned, written as 1, 2, 3 or 4
-          for red centrals, red satellites, blue centrals and blue satellites
+        - 'Galaxy type' type of galaxy assigned, written as 'red central',
+          'red satellite', 'blue central' and 'blue satellite'
         - 'ID value' ID number of halos and subhalos, negative for halos,
           positive for subhalos
         - 'Redshift' Redshift of halos/galaxies
@@ -1024,18 +895,18 @@ def run_sham(h_file, gal_param, cosmology, z_range, skyarea, qu_h_param, qu_s_pa
 
     >>> #Parameters
     >>> h_file = 'halo.yaml'
-    >>> gal_param = np.array([[10**(10.58), 10**(-2.77), -0.33],
-    ...                      [10**(10.64), 10**(-4.24), -1.54],
-    ...                      [10**(10.65), 10**(-2.98), -1.48],
-    ...                      [10**(10.55), 10**(-3.96), -1.53]])
+    >>> rc_p = [10**(10.75), 10**(-2.37), -0.18]
+    >>> rs_p = [10**(10.72), 10**(-2.66), -0.71]
+    >>> bc_p = [10**(10.59), 10**(-2.52), -1.15]
+    >>> bs_p = [10**(10.59), 10**(-3.09), -1.31]
+    >>> gal_param = [rc_p, rs_p, bc_p, bs_p]
     >>> cosmology = FlatLambdaCDM(H0=70, Om0=0.3, name='FlatLambdaCDM')
     >>> z_range = np.array([0.01, 0.1])
     >>> skyarea = 600.
-    >>> qu_h = np.array([10**(12.1), 0.45])
-    >>> qu_s = np.array([10**(11.9), 0.4, 0.5])
+    >>> qu = np.array([10**(11.9), 0.4, 0.5])
     >>> #Run function
     >>> sham_dict = run_sham(h_file, gal_param, cosmology, z_range, skyarea,
-    ...                      qu_h, qu_s, sub_param = [1.91, 0.39, 0.1, 3],
+    ...                      qu, sub_param = [1.91, 0.39, 0.1, 3],
     ...                      gal_max_h = 10**(14), gal_max_s = 10**(13),
     ...                      print_out=False, run_anyway=True,
                              scatter_prox=True)
@@ -1044,15 +915,14 @@ def run_sham(h_file, gal_param, cosmology, z_range, skyarea, qu_h_param, qu_s_pa
     ----------
     .. [1] Vale A., Ostriker J. P., 2004, Monthly Notices of the Royal
        Astronomical Society, 353, 189
-    .. [2] Birrer S., Lilly S., Amara A., Paranjape A., Refregier A., 2014,
-       The Astrophysical Journal, 793, 12
-    .. [3] Peng Y.-j., et al., 2010, ApJ, 721, 193
+    .. [2] Weigel A. K., Schawinski K., Bruderer C., 2016, Monthly Notices of the
+       Royal Astronomical Society, 459, 2150
+    .. [3] Peng Y.-j., et al., 2010, Astrophysical Journal, 721, 193
     '''
     sham_st = time()
 
     gal_param = np.atleast_1d(gal_param)
-    qu_h_param = np.atleast_1d(qu_h_param)
-    qu_s_param = np.atleast_1d(qu_s_param)
+    qu_param = np.atleast_1d(qu_param)
 
     # Check that all inputs are of the correct type and size
     if type(h_file) is not str:
@@ -1064,10 +934,26 @@ def run_sham(h_file, gal_param, cosmology, z_range, skyarea, qu_h_param, qu_s_pa
             raise Exception('The wrong number of galaxy parameters have been provided')
         else:
             raise Exception('Supplied galaxy parameters are not the correct shape')
-    if qu_h_param.shape != (2,):
-        raise Exception('Provided incorrect number of halo quenching parameters')
-    if qu_s_param.shape != (3,):
-        raise Exception('Provided incorrect number of subhalo quenching parameters')
+    if qu_param.shape != (3,):
+        raise Exception('Provided incorrect number of quenching parameters')
+    if z_range.shape != (2, ):
+        raise Exception('The wrong number of redshifts were given')
+    if z_range[0] < 0 or z_range[1] < 0:
+        raise Exception('Redshift cannot be negative')
+    if z_range[1] <= z_range[0]:
+        raise Exception('The second redshift should be more than the first')
+
+    # Check galaxy parameters are correct sign
+    if np.any(np.array([gal_param[0][0], gal_param[1][0], gal_param[2][0], gal_param[3][0]]) <= 0):
+        raise Warning('M* values must be positive and non-zero')
+    if np.any(np.array([gal_param[0][1], gal_param[1][1], gal_param[2][1], gal_param[3][1]]) <= 0):
+        raise Exception('phi* values must be positive and non-zero')
+    if np.any(np.array([gal_param[0][2], gal_param[1][2], gal_param[2][2], gal_param[3][2]]) > 0):
+        raise Warning('Galaxy Schechter function alphas must be < 0')
+    if skyarea <= 0:
+        raise Exception('The skyarea must be a positive non-zero number')
+    if cosmology.name is None:
+        raise Exception('Cosmology object must have an astropy cosmology name')
 
     # Generate parent halos from YAML file
     # TODO remove hard coded table/variable names
@@ -1091,14 +977,12 @@ def run_sham(h_file, gal_param, cosmology, z_range, skyarea, qu_h_param, qu_s_pa
         print('')
 
     # Quench halos and subhalos
-    M_mu = qu_h_param[0]  # Parameters
-    sigma = qu_h_param[1]
-    M_mus = qu_s_param[0]
-    sigmas = qu_s_param[1]
-    baseline_s = qu_s_param[2]
+    M_mu = qu_param[0]  # Parameters
+    sigma = qu_param[1]
+    baseline = qu_param[2]
 
     h_quench = quenching_funct(parent_halo, M_mu, sigma, 0)  # Quenched halos
-    sub_quench = quenching_funct(subhalo_m, M_mus, sigmas, baseline_s)  # Quenched subhalos
+    sub_quench = quenching_funct(subhalo_m, M_mu, sigma, baseline)  # Quenched subhalos
 
     # Galaxy Schechter function parameters
     rc_param = gal_param[0]
@@ -1144,23 +1028,18 @@ def run_sham(h_file, gal_param, cosmology, z_range, skyarea, qu_h_param, qu_s_pa
         print('')
 
     # Get a catalogue for each population
-
-    # Names for created files, randomly generate tag
-    rand_tag = int((10**8)*np.random.rand(1))
-    rc_file = 'rc_test%s.yaml' % (rand_tag)
-    rs_file = 'rs_test%s.yaml' % (rand_tag)
-    bc_file = 'bc_test%s.yaml' % (rand_tag)
-    bs_file = 'bs_test%s.yaml' % (rand_tag)
-
     cat_time = time()
-    rc_cat = galaxy_cat(rc_param[0], rc_param[1], rc_param[2], cosmology, z_range,
-                        skyarea, rc_min, gal_max_h, rc_file)
-    rs_cat = galaxy_cat(rs_param[0], rs_param[1], rs_param[2], cosmology, z_range,
-                        skyarea, rs_min, gal_max_s, rs_file)
-    bc_cat = galaxy_cat(bc_param[0], bc_param[1], bc_param[2], cosmology, z_range,
-                        skyarea, bc_min, gal_max_h, bc_file)
-    bs_cat = galaxy_cat(bs_param[0], bs_param[1], bs_param[2], cosmology, z_range,
-                        skyarea, bs_min, gal_max_s, bs_file)
+
+    redshift = np.linspace(z_range[0], z_range[1], 100)  # Redshift volume
+
+    rc_cat = schechter_smf(redshift, rc_param[0], rc_param[1], rc_param[2], rc_min,
+                           gal_max_h, skyarea*u.deg**2, cosmology)[1]
+    rs_cat = schechter_smf(redshift, rs_param[0], rs_param[1], rs_param[2], rs_min,
+                           gal_max_s, skyarea*u.deg**2, cosmology)[1]
+    bc_cat = schechter_smf(redshift, bc_param[0], bc_param[1], bc_param[2], bc_min,
+                           gal_max_h, skyarea*u.deg**2, cosmology)[1]
+    bs_cat = schechter_smf(redshift, bs_param[0], bs_param[1], bs_param[2], bs_min,
+                           gal_max_s, skyarea*u.deg**2, cosmology)[1]
 
     if scatter_prox:
         if print_out:
@@ -1173,12 +1052,6 @@ def run_sham(h_file, gal_param, cosmology, z_range, skyarea, qu_h_param, qu_s_pa
 
     if print_out:
         print('Galaxy catalogues generated in', round((time() - cat_time), 2), 's')
-
-    # Clean up the files
-    os.remove(rc_file)
-    os.remove(rs_file)
-    os.remove(bc_file)
-    os.remove(bs_file)
 
     # Order and process DM and galaxies
     # Concatenate halos and subhalos
