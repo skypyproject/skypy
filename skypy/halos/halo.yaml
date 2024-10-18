@@ -1,0 +1,26 @@
+parameters:
+  model: 'sheth99'
+  mdef: 'fof'
+  m_min: 1.e+9
+  m_max: 1.e+15
+  sky_area: 600. deg2 # Same as galaxies
+  sigma_8: 0.8
+  ns: 0.96
+cosmology: !astropy.cosmology.FlatLambdaCDM
+  H0: 70
+  Om0: 0.3
+  name: 'FlatLambdaCDM' # Requires user defined name
+  Ob0: 0.045
+  Tcmb0: 2.7
+z_range: !numpy.linspace [0.01, 0.1, 100] # Same as galaxies 
+tables:
+  halo:
+    z, mass: !skypy.halos.colossus_mf
+      redshift: $z_range
+      model: $model
+      mdef: $mdef
+      m_min: $m_min
+      m_max: $m_max
+      sky_area: $sky_area
+      sigma8: $sigma_8
+      ns: $ns
