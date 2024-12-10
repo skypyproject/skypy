@@ -168,7 +168,7 @@ Before your pull request can be merged into the codebase, it will be reviewed by
 General Guidelines
 ^^^^^^^^^^^^^^^^^^
 
-- SkyPy is compatible with Python>=3.8 (see `setup.cfg <https://github.com/skypyproject/skypy/blob/main/setup.cfg>`_). SkyPy *does not* support backwards compatibility with Python 2.x; `six`, `__future__` and `2to3` should not be used.
+- SkyPy is compatible with Python>=3.9 (see `setup.cfg <https://github.com/skypyproject/skypy/blob/main/setup.cfg>`_). SkyPy *does not* support backwards compatibility with Python 2.x; `six`, `__future__` and `2to3` should not be used.
 - All contributions should follow the `PEP8 Style Guide for Python Code <https://www.python.org/dev/peps/pep-0008/>`_. We recommend using `flake8 <https://flake8.pycqa.org/>`__ to check your code for PEP8 compliance.
 - Importing SkyPy should only depend on having `NumPy <https://www.numpy.org>`_, `SciPy <https://www.scipy.org/>`_ and `Astropy <https://www.astropy.org/>`__ installed.
 - Code is grouped into submodules based on broad science areas e.g. `galaxies <https://skypy.readthedocs.io/en/stable/galaxies.html>`_. There is also a `utils <https://skypy.readthedocs.io/en/stable/utils/index.html>`_ submodule for general utility functions.
