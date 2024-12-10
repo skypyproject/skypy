@@ -4,8 +4,8 @@ r"""Galaxy spectrum module.
 
 from astropy import units
 from astropy.io import fits
+from importlib import resources
 import numpy as np
-from pkg_resources import resource_filename
 from skypy.utils.photometry import SpectrumTemplates
 
 
@@ -107,7 +107,7 @@ class KCorrectTemplates(SpectrumTemplates):
     '''
 
     def __init__(self, hdu=1):
-        filename = resource_filename('skypy', 'data/kcorrect/k_nmf_derived.default.fits')
+        filename = resources.files('skypy') / 'data/kcorrect/k_nmf_derived.default.fits'
         with fits.open(filename) as hdul:
             self.templates = hdul[hdu].data * units.Unit('erg s-1 cm-2 angstrom-1')
             self.wavelength = hdul[11].data * units.Unit('angstrom')

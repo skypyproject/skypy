@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.stats import kstest
 from scipy.special import gamma
-from scipy.integrate import cumtrapz
+from scipy.integrate import cumulative_trapezoid
 
 
 def test_schechter_vdf():
@@ -30,7 +30,7 @@ def test_schechter_vdf():
 
     def calc_cdf(m):
         pdf = calc_pdf(m)
-        cdf = cumtrapz(pdf, m, initial=0)
+        cdf = cumulative_trapezoid(pdf, m, initial=0)
         cdf /= cdf[-1]
         return cdf
 

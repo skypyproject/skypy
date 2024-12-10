@@ -4,10 +4,14 @@ on:
     branches:
     - main
     - module/*
+    - 'v*x'
+    tags:
+    - 'v*'
   pull_request:
     branches:
     - main
     - module/*
+    - 'v*x'
 jobs:
   test:
     name: ${{ matrix.name }}
@@ -19,32 +23,32 @@ jobs:
 
           - name: latest supported versions
             os: ubuntu-latest
-            python: '3.11'
-            toxenv: py311-test-all-latest-cov
+            python: '3.13'
+            toxenv: py313-test-all-latest-cov
             toxposargs: --cov-report=xml:${GITHUB_WORKSPACE}/coverage.xml
 
           - name: oldest supported versions
             os: ubuntu-latest
-            python: 3.7
-            toxenv: py37-test-oldest
+            python: '3.9'
+            toxenv: py39-test-oldest
 
           - name: macOS latest supported
             os: macos-latest
-            python: '3.11'
-            toxenv: py311-test-latest
+            python: '3.13'
+            toxenv: py313-test-latest
 
           - name: Windows latest supported
             os: windows-latest
-            python: '3.11'
-            toxenv: py311-test-latest
+            python: '3.13'
+            toxenv: py313-test-latest
 
     steps:
     - name: Checkout Repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
     - name: Install Python ${{ matrix.python }}
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python }}
     - name: Install Dependencies
@@ -55,4 +59,4 @@ jobs:
         tox -e ${{ matrix.toxenv }} ${{ matrix.toxargs }} -- ${{ matrix.toxposargs }}
     - if: contains(matrix.toxenv, '-cov')
       name: Report Coverage
-      uses: codecov/codecov-action@v1
+      uses: codecov/codecov-action@v3
