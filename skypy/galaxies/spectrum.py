@@ -4,8 +4,8 @@ r"""Galaxy spectrum module.
 
 from astropy import units
 from astropy.io import fits
+from importlib import resources
 import numpy as np
-from pkg_resources import resource_filename
 from skypy.utils.photometry import SpectrumTemplates
 
 
@@ -107,15 +107,15 @@ class KCorrectTemplates(SpectrumTemplates):
     '''
 
     def __init__(self, hdu=1):
-        filename = resource_filename('skypy', 'data/kcorrect/k_nmf_derived.default.fits')
-        with fits.open(filename) as hdul:
-            self.templates = hdul[hdu].data * units.Unit('erg s-1 cm-2 angstrom-1')
-            self.wavelength = hdul[11].data * units.Unit('angstrom')
-            self.mass = hdul[16].data
-            self.mremain = hdul[17].data
-            self.mets = hdul[18].data
-            self.mass300 = hdul[19].data
-            self.mass1000 = hdul[20].data
+        with resources.files('skypy') / 'data/kcorrect/k_nmf_derived.default.fits' as filename:
+            with fits.open(filename) as hdul:
+                self.templates = hdul[hdu].data * units.Unit('erg s-1 cm-2 angstrom-1')
+                self.wavelength = hdul[11].data * units.Unit('angstrom')
+                self.mass = hdul[16].data
+                self.mremain = hdul[17].data
+                self.mets = hdul[18].data
+                self.mass300 = hdul[19].data
+                self.mass1000 = hdul[20].data
 
     def stellar_mass(self, coefficients, magnitudes, filter):
         r'''Compute stellar mass from absolute magnitudes in a reference filter.
