@@ -23,8 +23,8 @@ jobs:
 
           - name: latest supported versions
             os: ubuntu-latest
-            python: '3.12'
-            toxenv: py312-test-all-latest-cov
+            python: '3.13'
+            toxenv: py313-test-all-latest-cov
             toxposargs: --cov-report=xml:${GITHUB_WORKSPACE}/coverage.xml
 
           - name: oldest supported versions
@@ -34,13 +34,13 @@ jobs:
 
           - name: macOS latest supported
             os: macos-latest
-            python: '3.12'
-            toxenv: py312-test-latest
+            python: '3.13'
+            toxenv: py313-test-latest
 
           - name: Windows latest supported
             os: windows-latest
-            python: '3.12'
-            toxenv: py312-test-latest
+            python: '3.13'
+            toxenv: py313-test-latest
 
     steps:
     - name: Checkout Repository
