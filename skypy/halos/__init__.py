@@ -14,9 +14,18 @@ Models
 
 __all__ = [
     'colossus_mf',
+    'quenching_funct',
+    'find_min',
+    'run_file',
+    'gen_sub_cat',
+    'galaxy_cat',
+    'assignment',
+    'sham_arrays',
+    'run_sham',
 ]
 
 from . import abundance_matching  # noqa F401,F403
 from . import mass  # noqa F401,F403
 from . import quenching  # noqa F401,F403
 from ._colossus import colossus_mf  # noqa F401,F403
+from . import sham # noqa F401,F403
