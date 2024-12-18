@@ -1,12 +1,12 @@
-Arrays for literature data featured in Davidson et al. (2024). Please see the paper for more information. 
+Arrays for literature models and the specific values used as featured in Davidson et al. (2025). Please see the paper for more information. 
  
 Variables: 
 smhm: Ratio of galaxy and halo mass, unitless 
-halo_bins: Bins in halo mass used to average the model, units of solar masses 
-halo_mids: Halo mass used to plot the data points, units of solar masses 
-error: Error for each data point, used in calculation of chi^2 
+halo_bins: Bins in halo mass used to average the Davidson et al. (2025) model, units of solar mass
+halo_mids: Halo mass used to plot the smhm values, units of solar mass
+error: Error for each smhm value, used in calculation of chi^2 
  
-### Data points (ratios and masses in log_10) 
+### Model values (ratios and masses in log_10) 
  
 # Moster et al. (2010) Central 
 smhm = [-2.57004016 -2.42705081 -2.28589751 -2.14773997 -2.01439977 -1.88862798
