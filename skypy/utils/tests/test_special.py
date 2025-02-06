@@ -3,7 +3,7 @@ import numpy.testing as npt
 from astropy.utils.data import get_pkg_data_filename
 import pytest
 
-from skypy.utils.special import gammaincc
+from skypy.utils.special import gammaincc, _is_gamma_pole
 
 
 def test_gammaincc_scalar():
@@ -90,3 +90,25 @@ def test_gammaincc_neg_x_array():
     # negative x in array raises an exception
     with pytest.raises(ValueError):
         gammaincc(0.5, [3.0, 2.0, 1.0, 0.0, -1.0])
+
+
+gamma_poles = np.array([-2.0, -1.0, 0.0])
+not_gamma_poles = np.array([-2.5, 0.5, 1.0])
+
+
+@pytest.mark.parametrize('z', gamma_poles)
+def test_is_gamma_pole_scalar(z):
+    assert _is_gamma_pole(z)
+
+
+def test_is_gamma_pole_array():
+    assert np.all(_is_gamma_pole(gamma_poles))
+
+
+@pytest.mark.parametrize('z', not_gamma_poles)
+def test_is_not_gamma_pole_scalar(z):
+    assert not _is_gamma_pole(z)
+
+
+def test_is_not_gamma_pole_array():
+    assert not np.any(_is_gamma_pole(not_gamma_poles))
