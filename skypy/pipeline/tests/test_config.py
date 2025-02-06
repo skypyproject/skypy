@@ -3,7 +3,7 @@ import pytest
 from skypy.pipeline import load_skypy_yaml
 from skypy.pipeline._items import Call
 from astropy import units
-from astropy.cosmology.core import Cosmology
+from astropy.cosmology import Cosmology
 
 
 def test_load_skypy_yaml():
