@@ -10,8 +10,20 @@ This module computes useful special functions.
 
 """
 
+from importlib.metadata import version
+from packaging.version import parse
+
 import numpy as np
 import scipy.special as sc
+
+
+def _is_gamma_pole(a):
+    '''Utility function that returns True if a is a pole of the gamma function'''
+    s = sc.gammasgn(a)
+    if parse(version('scipy')) < parse('1.15'):
+        return s == 0
+    else:
+        return np.logical_or(a == 0, np.isnan(s))
 
 
 def _gammaincc(a, x):
@@ -21,10 +33,9 @@ def _gammaincc(a, x):
     if x == 0:
         if a > 0:
             return 1
-        s = sc.gammasgn(a)
-        if s == 0:
+        if _is_gamma_pole(a):
             return 0
-        return s*np.inf
+        return sc.gammasgn(a) * np.inf
     if np.isinf(x):
         return 0
     if a < 0:
@@ -95,7 +106,7 @@ def gammaincc(a, x):
         # do x = 0 for nonpositive a; depends on Gamma(a)
         i = i & (x == 0)
         s = sc.gammasgn(a[i])
-        g[i] = np.where(s == 0, 0, np.copysign(np.inf, s))
+        g[i] = np.where(_is_gamma_pole(a[i]), 0, np.copysign(np.inf, s))
         n[i] = 0
 
         # these are still to do
