@@ -1,5 +1,4 @@
-from astropy.cosmology import FlatLambdaCDM, default_cosmology
-from astropy.cosmology.core import Cosmology
+from astropy.cosmology import Cosmology, FlatLambdaCDM, default_cosmology
 from astropy.io import fits
 from astropy.io.misc.hdf5 import read_table_hdf5
 from astropy.table import Table, vstack
