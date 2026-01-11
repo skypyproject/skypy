@@ -40,7 +40,7 @@ can be installed directly from GitHub using a recent version of pip:
 Dependencies
 ------------
 
-SkyPy is compatble with Python versions 3.9 or later on Ubuntu, macOS and
+SkyPy is compatble with Python versions 3.10 or later on Ubuntu, macOS and
 Windows operating systems. It has the following core dependencies:
 
 - `astropy <https://www.astropy.org/>`__
