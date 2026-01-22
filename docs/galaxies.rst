@@ -89,6 +89,10 @@ The following models are found in the `skypy.galaxies.stellar_mass` package.
   :nosignatures:
 
   schechter_smf_mass
+  schechter_smf_phi_centrals
+  schechter_smf_phi_satellites
+  schechter_smf_phi_mass_quenched
+  schechter_smf_phi_satellite_quenched
 
 
 Velocity dispersion
